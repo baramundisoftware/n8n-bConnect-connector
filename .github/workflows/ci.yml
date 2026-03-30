@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build-and-test:
+    name: Build, Lint, Test, Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint (zero errors required)
+        run: npm run lint
+
+      - name: TypeScript build
+        run: npx @n8n/node-cli build
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: Security audit (runtime dependencies only)
+        run: npm audit --omit=dev --audit-level=high

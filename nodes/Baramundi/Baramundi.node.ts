@@ -51,7 +51,7 @@ export class Baramundi implements INodeType {
     },
     properties: [
       {
-        displayName: 'baramundi Management Suite Version',
+        displayName: 'Baramundi Management Suite Version',
         name: 'bmsVersion',
         type: 'options',
         required: true,
@@ -125,7 +125,7 @@ export class Baramundi implements INodeType {
             description: 'Query compliance rules, vulnerabilities, and violations (requires bMS 26R1+)',
           },
           {
-            name: 'Universal Dynamic Groups',
+            name: 'Universal Dynamic Group',
             value: 'universalDynamicGroups',
             description: 'Manage universal dynamic groups and folders (requires bMS 26R1+)',
           },
@@ -192,7 +192,7 @@ export class Baramundi implements INodeType {
           }
 
           return options;
-        } catch (error) {
+        } catch (_error) {
           // Return empty array if API call fails
           return [];
         }
@@ -224,7 +224,7 @@ export class Baramundi implements INodeType {
           }
 
           return options;
-        } catch (error) {
+        } catch (_error) {
           // Return empty array if API call fails
           return [];
         }
@@ -256,7 +256,7 @@ export class Baramundi implements INodeType {
           }
 
           return options;
-        } catch (error) {
+        } catch (_error) {
           // Return empty array if API call fails
           return [];
         }
@@ -288,7 +288,7 @@ export class Baramundi implements INodeType {
           }
 
           return options;
-        } catch (error) {
+        } catch (_error) {
           // Return empty array if API call fails
           return [];
         }
@@ -320,7 +320,7 @@ export class Baramundi implements INodeType {
           }
 
           return options;
-        } catch (error) {
+        } catch (_error) {
           // Return empty array if API call fails
           return [];
         }
@@ -352,7 +352,7 @@ export class Baramundi implements INodeType {
           }
 
           return options;
-        } catch (error) {
+        } catch (_error) {
           // Return empty array if API call fails
           return [];
         }

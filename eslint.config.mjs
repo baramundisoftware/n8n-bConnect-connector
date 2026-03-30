@@ -13,13 +13,13 @@ export default tseslint.config(
     },
     languageOptions: {
       parserOptions: {
-        project: './tsconfig.json',
+        project: './tsconfig.eslint.json',
       },
     },
     rules: {
       // TypeScript rules
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }],
 
       // n8n node rules
       'n8n-nodes-base/node-class-description-credentials-name-unsuffixed': 'error',
@@ -70,6 +70,15 @@ export default tseslint.config(
       'n8n-nodes-base/node-param-resource-with-plural-option': 'error',
       'n8n-nodes-base/node-param-resource-without-no-data-expression': 'error',
       'n8n-nodes-base/node-param-type-options-missing-from-limit': 'error',
+    },
+  },
+  {
+    // Relax rules for test files — unused imports from test helpers are acceptable
+    files: ['test/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
   {

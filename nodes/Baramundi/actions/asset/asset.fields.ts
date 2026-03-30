@@ -37,7 +37,7 @@ export const assetOperations26R1: INodeProperties[] = [
       { name: 'Get Assets by AD Object', value: 'getAssetsByADObject', description: 'Get assets linked to an AD object (bMS 26R1+)', action: 'Get assets by AD object' },
       { name: 'Get Assets by Org Unit', value: 'getAssetsByOrgUnit', description: 'Get assets linked to an org unit (bMS 26R1+)', action: 'Get assets by org unit' },
     ],
-    default: 'getMany',
+    default: 'getAssetsByADObject',
   },
 ];
 
