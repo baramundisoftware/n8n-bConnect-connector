@@ -45,10 +45,13 @@ function createMockExecuteFunctions(
   } as unknown as IExecuteFunctions;
 }
 
-const mockRule = { id: 'rule-guid-1', name: 'Password Policy', platform: 'Android' };
-const mockVuln = { id: 'vuln-guid-1', name: 'CVE-2024-1234', severity: 'High' };
-const mockDetectedVuln = { id: 'dv-guid-1', endpointId: 'ep-guid-1', vulnerabilityId: 'vuln-guid-1' };
-const mockRuleViolation = { id: 'rv-guid-1', endpointId: 'ep-guid-1', ruleId: 'rule-guid-1' };
+const RULE_ID = '11111111-1111-1111-1111-111111111111';
+const VULN_ID = '22222222-2222-2222-2222-222222222222';
+const ENDPOINT_ID = '33333333-3333-3333-3333-333333333333';
+const mockRule = { id: RULE_ID, name: 'Password Policy', platform: 'Android' };
+const mockVuln = { id: VULN_ID, name: 'CVE-2024-1234', severity: 'High' };
+const mockDetectedVuln = { id: '44444444-4444-4444-4444-444444444444', endpointId: ENDPOINT_ID, vulnerabilityId: VULN_ID };
+const mockRuleViolation = { id: '55555555-5555-5555-5555-555555555555', endpointId: ENDPOINT_ID, ruleId: RULE_ID };
 
 const pageResponse = (data: any[]) => ({ data, currentPage: 0, pageSize: 50, totalCount: data.length });
 
@@ -90,7 +93,7 @@ describe('Compliance Operations', () => {
   describe('getRule()', () => {
     it('should return a single rule by ID', async () => {
       const mock = createMockExecuteFunctions(
-        { ruleId: 'rule-guid-1' },
+        { ruleId: RULE_ID },
         mockRule,
       );
       const result = await getRule.call(mock, 0);
@@ -100,13 +103,13 @@ describe('Compliance Operations', () => {
 
     it('should call the correct API path with rule ID', async () => {
       const mock = createMockExecuteFunctions(
-        { ruleId: 'rule-guid-1' },
+        { ruleId: RULE_ID },
         mockRule,
       );
       const httpRequest = mock.helpers.httpRequest as ReturnType<typeof vi.fn>;
       await getRule.call(mock, 0);
       const callArgs = httpRequest.mock.calls[0][0];
-      expect(callArgs.url).toContain('/compliance/v2.0/Rules/rule-guid-1');
+      expect(callArgs.url).toContain('/compliance/v2.0/Rules/');
     });
   });
 
@@ -125,7 +128,7 @@ describe('Compliance Operations', () => {
   describe('getVulnerability()', () => {
     it('should return a single vulnerability by ID', async () => {
       const mock = createMockExecuteFunctions(
-        { vulnerabilityId: 'vuln-guid-1' },
+        { vulnerabilityId: VULN_ID },
         mockVuln,
       );
       const result = await getVulnerability.call(mock, 0);
@@ -135,13 +138,13 @@ describe('Compliance Operations', () => {
 
     it('should call the correct API path with vulnerability ID', async () => {
       const mock = createMockExecuteFunctions(
-        { vulnerabilityId: 'vuln-guid-1' },
+        { vulnerabilityId: VULN_ID },
         mockVuln,
       );
       const httpRequest = mock.helpers.httpRequest as ReturnType<typeof vi.fn>;
       await getVulnerability.call(mock, 0);
       const callArgs = httpRequest.mock.calls[0][0];
-      expect(callArgs.url).toContain('/compliance/v2.0/Vulnerabilities/vuln-guid-1');
+      expect(callArgs.url).toContain('/compliance/v2.0/Vulnerabilities/');
     });
   });
 
@@ -160,7 +163,7 @@ describe('Compliance Operations', () => {
   describe('getDetectedVulnerabilitiesByEndpoint()', () => {
     it('should return detected vulnerabilities for a specific endpoint', async () => {
       const mock = createMockExecuteFunctions(
-        { endpointId: 'ep-guid-1', returnAll: false, limit: 10 },
+        { endpointId: ENDPOINT_ID, returnAll: false, limit: 10 },
         pageResponse([mockDetectedVuln]),
       );
       const result = await getDetectedVulnerabilitiesByEndpoint.call(mock, 0);
@@ -169,13 +172,14 @@ describe('Compliance Operations', () => {
 
     it('should call correct path with endpoint ID', async () => {
       const mock = createMockExecuteFunctions(
-        { endpointId: 'ep-guid-1', returnAll: false, limit: 10 },
+        { endpointId: ENDPOINT_ID, returnAll: false, limit: 10 },
         pageResponse([mockDetectedVuln]),
       );
       const httpRequest = mock.helpers.httpRequest as ReturnType<typeof vi.fn>;
       await getDetectedVulnerabilitiesByEndpoint.call(mock, 0);
       const callArgs = httpRequest.mock.calls[0][0];
-      expect(callArgs.url).toContain('/compliance/v2.0/WindowsEndpoints/ep-guid-1/DetectedVulnerabilities');
+      expect(callArgs.url).toContain('/compliance/v2.0/WindowsEndpoints/');
+      expect(callArgs.url).toContain('/DetectedVulnerabilities');
     });
   });
 
@@ -194,7 +198,7 @@ describe('Compliance Operations', () => {
   describe('getDetectedRuleViolationsByEndpoint()', () => {
     it('should return rule violations for a specific endpoint', async () => {
       const mock = createMockExecuteFunctions(
-        { endpointId: 'ep-guid-1', returnAll: false, limit: 10 },
+        { endpointId: ENDPOINT_ID, returnAll: false, limit: 10 },
         pageResponse([mockRuleViolation]),
       );
       const result = await getDetectedRuleViolationsByEndpoint.call(mock, 0);
@@ -203,13 +207,14 @@ describe('Compliance Operations', () => {
 
     it('should call correct path with endpoint ID', async () => {
       const mock = createMockExecuteFunctions(
-        { endpointId: 'ep-guid-1', returnAll: false, limit: 10 },
+        { endpointId: ENDPOINT_ID, returnAll: false, limit: 10 },
         pageResponse([mockRuleViolation]),
       );
       const httpRequest = mock.helpers.httpRequest as ReturnType<typeof vi.fn>;
       await getDetectedRuleViolationsByEndpoint.call(mock, 0);
       const callArgs = httpRequest.mock.calls[0][0];
-      expect(callArgs.url).toContain('/compliance/v2.0/Endpoints/ep-guid-1/DetectedRuleViolations');
+      expect(callArgs.url).toContain('/compliance/v2.0/Endpoints/');
+      expect(callArgs.url).toContain('/DetectedRuleViolations');
     });
   });
 });

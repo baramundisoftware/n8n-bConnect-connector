@@ -1,129 +1,48 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-export const assetOperations: INodeProperties[] = [
+const COMMON_ASSET_OPTIONS = [
+  { name: 'Get', value: 'get', description: 'Get an asset by ID', action: 'Get an asset' },
+  { name: 'Get Many', value: 'getMany', description: 'Get many assets', action: 'Get many assets' },
+  { name: 'Create', value: 'create', description: 'Create a new asset', action: 'Create an asset' },
+  { name: 'Update', value: 'update', description: 'Update an asset', action: 'Update an asset' },
+  { name: 'Delete', value: 'delete', description: 'Delete an asset', action: 'Delete an asset' },
+  { name: 'Get Asset Types', value: 'getAssetTypes', description: 'Get many asset types', action: 'Get asset types' },
+  { name: 'Get Asset Type', value: 'getAssetType', description: 'Get an asset type by ID', action: 'Get an asset type' },
+  { name: 'Create Asset Type', value: 'createAssetType', description: 'Create a new asset type', action: 'Create an asset type' },
+  { name: 'Delete Asset Type', value: 'deleteAssetType', description: 'Delete an asset type', action: 'Delete an asset type' },
+  { name: 'Get Assets by Endpoint', value: 'getAssetsByEndpoint', description: 'Get assets linked to an endpoint', action: 'Get assets by endpoint' },
+  { name: 'Get Assets by Logical Group', value: 'getAssetsByLogicalGroup', description: 'Get assets in a logical group', action: 'Get assets by logical group' },
+  { name: 'Get Asset Stock Assets', value: 'getAssetStockAssets', description: 'Get assets in stock', action: 'Get asset stock assets' },
+  { name: 'Get Asset Stock Folders', value: 'getAssetStockFolders', description: 'Get asset stock folders', action: 'Get asset stock folders' },
+  { name: 'Create Asset Stock Folder', value: 'createAssetStockFolder', description: 'Create a new asset stock folder', action: 'Create asset stock folder' },
+  { name: 'Update Asset Stock Folder', value: 'updateAssetStockFolder', description: 'Update an asset stock folder', action: 'Update asset stock folder' },
+  { name: 'Delete Asset Stock Folder', value: 'deleteAssetStockFolder', description: 'Delete an asset stock folder', action: 'Delete asset stock folder' },
+];
+
+export const assetOperations25R2: INodeProperties[] = [
   {
-    displayName: 'Operation',
-    name: 'operation',
-    type: 'options',
-    noDataExpression: true,
-    displayOptions: {
-      show: {
-        resource: ['asset'],
-      },
-    },
+    displayName: 'Operation', name: 'operation', type: 'options', noDataExpression: true,
+    displayOptions: { show: { resource: ['asset'], bmsVersion: ['25R2'] } },
+    options: [...COMMON_ASSET_OPTIONS],
+    default: 'getMany',
+  },
+];
+
+export const assetOperations26R1: INodeProperties[] = [
+  {
+    displayName: 'Operation', name: 'operation', type: 'options', noDataExpression: true,
+    displayOptions: { show: { resource: ['asset'], bmsVersion: ['26R1'] } },
     options: [
-      {
-        name: 'Get',
-        value: 'get',
-        description: 'Get an asset by ID',
-        action: 'Get an asset',
-      },
-      {
-        name: 'Get Many',
-        value: 'getMany',
-        description: 'Get many assets',
-        action: 'Get many assets',
-      },
-      {
-        name: 'Create',
-        value: 'create',
-        description: 'Create a new asset',
-        action: 'Create an asset',
-      },
-      {
-        name: 'Update',
-        value: 'update',
-        description: 'Update an asset',
-        action: 'Update an asset',
-      },
-      {
-        name: 'Delete',
-        value: 'delete',
-        description: 'Delete an asset',
-        action: 'Delete an asset',
-      },
-      {
-        name: 'Get Asset Types',
-        value: 'getAssetTypes',
-        description: 'Get many asset types',
-        action: 'Get asset types',
-      },
-      {
-        name: 'Get Asset Type',
-        value: 'getAssetType',
-        description: 'Get an asset type by ID',
-        action: 'Get an asset type',
-      },
-      {
-        name: 'Create Asset Type',
-        value: 'createAssetType',
-        description: 'Create a new asset type',
-        action: 'Create an asset type',
-      },
-      {
-        name: 'Delete Asset Type',
-        value: 'deleteAssetType',
-        description: 'Delete an asset type',
-        action: 'Delete an asset type',
-      },
-      {
-        name: 'Get Assets by Endpoint',
-        value: 'getAssetsByEndpoint',
-        description: 'Get assets linked to an endpoint',
-        action: 'Get assets by endpoint',
-      },
-      {
-        name: 'Get Assets by Logical Group',
-        value: 'getAssetsByLogicalGroup',
-        description: 'Get assets in a logical group',
-        action: 'Get assets by logical group',
-      },
-      {
-        name: 'Get Asset Stock Assets',
-        value: 'getAssetStockAssets',
-        description: 'Get assets in stock',
-        action: 'Get asset stock assets',
-      },
-      {
-        name: 'Get Asset Stock Folders',
-        value: 'getAssetStockFolders',
-        description: 'Get asset stock folders',
-        action: 'Get asset stock folders',
-      },
-      {
-        name: 'Create Asset Stock Folder',
-        value: 'createAssetStockFolder',
-        description: 'Create a new asset stock folder',
-        action: 'Create asset stock folder',
-      },
-      {
-        name: 'Update Asset Stock Folder',
-        value: 'updateAssetStockFolder',
-        description: 'Update an asset stock folder',
-        action: 'Update asset stock folder',
-      },
-      {
-        name: 'Delete Asset Stock Folder',
-        value: 'deleteAssetStockFolder',
-        description: 'Delete an asset stock folder',
-        action: 'Delete asset stock folder',
-      },
-      {
-        name: 'Get Assets by AD Object',
-        value: 'getAssetsByADObject',
-        description: 'Get assets linked to an AD object (requires bMS 26R1+)',
-        action: 'Get assets by AD object',
-      },
-      {
-        name: 'Get Assets by Org Unit',
-        value: 'getAssetsByOrgUnit',
-        description: 'Get assets linked to an org unit (requires bMS 26R1+)',
-        action: 'Get assets by org unit',
-      },
+      ...COMMON_ASSET_OPTIONS,
+      { name: 'Get Assets by AD Object', value: 'getAssetsByADObject', description: 'Get assets linked to an AD object (bMS 26R1+)', action: 'Get assets by AD object' },
+      { name: 'Get Assets by Org Unit', value: 'getAssetsByOrgUnit', description: 'Get assets linked to an org unit (bMS 26R1+)', action: 'Get assets by org unit' },
     ],
     default: 'getMany',
   },
 ];
+
+/** @deprecated Use assetOperations25R2 and assetOperations26R1 instead */
+export const assetOperations: INodeProperties[] = [...assetOperations25R2, ...assetOperations26R1];
 
 export const assetFields: INodeProperties[] = [
   // ----------------------------------

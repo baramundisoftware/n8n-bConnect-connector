@@ -198,9 +198,6 @@
 | ID | Task | Role | Priority | Severity | Depends on |
 |----|------|------|----------|----------|------------|
 | P6.1 | `npm audit fix` + pin `axios >=1.14.0`; re-run audit and document remaining findings | DevOps Engineer | CRITICAL | C-1 | — |
-| P6.2 | Add `validateGuid()` to `compliance.execute.ts` for `getRule` (ruleId) and `getVulnerability` (vulnerabilityId) — match pattern in `endpoint.execute.ts:109` | Backend Developer | CRITICAL | C-2 | — |
-| P6.3 | Gate EntraId (4 ops) + UnmanagedEndpoints (3 ops) operation options to `bmsVersion: ['26R1']`; gate `putEndpointMaintenanceWindow` + `putGroupMaintenanceWindow` to `bmsVersion: ['25R2']` | Backend Developer | HIGH | H-1, H-2 | — |
-| P6.4 | Gate Software Bundle (10 ops) and Asset by ADObject/OrgUnit (2 ops) operation options to `bmsVersion: ['26R1']` | Backend Developer | HIGH | H-3 | — |
 | P6.5 | Replace hardcoded password in test fixtures with `test-password-do-not-use`; set `ignoreSslIssues: false` in all unit test mocks | Test Engineer | HIGH | H-4 | — |
 | P6.6 | Write unit tests for ungated 26R1 operations: EntraId (4), UnmanagedEndpoints (3), Software Bundles (10), Asset by ADObject/OrgUnit (2), ServerManagement MSW/ApiKeys/DownloadJobs (5), MaintenanceWindow PATCH (2) | Test Engineer | MEDIUM | M-4 | P6.3, P6.4 |
 | P6.7 | Sanitise API URLs in user-facing error messages in `requestApi.ts` — truncate to `{host}/.../{resource}` | Backend Developer | MEDIUM | M-2 | — |
@@ -212,6 +209,9 @@
 | ID | Task | Completed |
 |----|------|-----------|
 | P6.1 | `npm audit fix` run; 21→11 vulns. Remaining 11 all in devDependencies only (`@n8n/node-cli` transitive: handlebars CRITICAL, minimatch HIGH — no upstream fix; esbuild MODERATE — dev server only, not exploitable in CI). Runtime package has 0 vulnerabilities. | 2026-03-30 |
+| P6.2 | Added `validateGuid()` to compliance.execute.ts for getRule (ruleId), getVulnerability (vulnerabilityId), getDetectedVulnerabilitiesByEndpoint and getDetectedRuleViolationsByEndpoint (endpointId). Updated test fixtures with valid GUIDs. | 2026-03-30 |
+| P6.3 | Split endpointOperations into endpointOperations25R2 + endpointOperations26R1. PUT MaintenanceWindow gated to 25R2; PATCH MW + EntraId + UnmanagedEndpoints gated to 26R1. | 2026-03-30 |
+| P6.4 | Split softwareOperations into 25R2/26R1 (Bundles + UDG software ops gated to 26R1). Split assetOperations into 25R2/26R1 (getAssetsByADObject + getAssetsByOrgUnit gated to 26R1). | 2026-03-30 |
 
 ---
 

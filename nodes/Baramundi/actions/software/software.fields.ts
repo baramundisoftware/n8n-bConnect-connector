@@ -1,26 +1,40 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-export const softwareOperations: INodeProperties[] = [{
+const COMMON_SOFTWARE_OPTIONS = [
+	{ name: 'Get Installed Software', value: 'getInstalledWindowsSoftware', description: 'Get all installed Windows software', action: 'Get installed software' },
+	{ name: 'Get Software by Endpoint', value: 'getInstalledSoftwareByEndpoint', description: 'Get installed software for an endpoint', action: 'Get software by endpoint' },
+	{ name: 'Get Software by Logical Group', value: 'getInstalledSoftwareByLogicalGroup', description: 'Get installed software for a logical group', action: 'Get software by logical group' },
+];
+
+export const softwareOperations25R2: INodeProperties[] = [{
 	displayName: 'Operation', name: 'operation', type: 'options', noDataExpression: true,
-	displayOptions: { show: { resource: ['software'] } },
+	displayOptions: { show: { resource: ['software'], bmsVersion: ['25R2'] } },
+	options: [...COMMON_SOFTWARE_OPTIONS],
+	default: 'getInstalledWindowsSoftware',
+}];
+
+export const softwareOperations26R1: INodeProperties[] = [{
+	displayName: 'Operation', name: 'operation', type: 'options', noDataExpression: true,
+	displayOptions: { show: { resource: ['software'], bmsVersion: ['26R1'] } },
 	options: [
-		{ name: 'Get Installed Software', value: 'getInstalledWindowsSoftware', description: 'Get all installed Windows software', action: 'Get installed software' },
-		{ name: 'Get Software by Endpoint', value: 'getInstalledSoftwareByEndpoint', description: 'Get installed software for an endpoint', action: 'Get software by endpoint' },
-		{ name: 'Get Software by Logical Group', value: 'getInstalledSoftwareByLogicalGroup', description: 'Get installed software for a logical group', action: 'Get software by logical group' },
-		{ name: 'Get Software by Universal Dynamic Group', value: 'getInstalledSoftwareByUniversalDynamicGroup', description: 'Get installed software for a universal dynamic group (requires bMS 26R1+)', action: 'Get software by universal dynamic group' },
-		{ name: 'Get Bundles', value: 'getBundles', description: 'Get all software bundles (requires bMS 26R1+)', action: 'Get bundles' },
-		{ name: 'Get Bundle', value: 'getBundle', description: 'Get a software bundle by ID (requires bMS 26R1+)', action: 'Get bundle' },
-		{ name: 'Create Bundle', value: 'createBundle', description: 'Create a software bundle (requires bMS 26R1+)', action: 'Create bundle' },
-		{ name: 'Delete Bundle', value: 'deleteBundle', description: 'Delete a software bundle (requires bMS 26R1+)', action: 'Delete bundle' },
-		{ name: 'Get Bundle Folders', value: 'getBundleFolders', description: 'Get all bundle folders (requires bMS 26R1+)', action: 'Get bundle folders' },
-		{ name: 'Get Bundle Folder', value: 'getBundleFolder', description: 'Get a bundle folder by ID (requires bMS 26R1+)', action: 'Get bundle folder' },
-		{ name: 'Get Bundle Sub Folders', value: 'getBundleSubFolders', description: 'Get sub-folders of a bundle folder (requires bMS 26R1+)', action: 'Get bundle sub folders' },
-		{ name: 'Create Bundle Folder', value: 'createBundleFolder', description: 'Create a bundle folder (requires bMS 26R1+)', action: 'Create bundle folder' },
-		{ name: 'Delete Bundle Folder', value: 'deleteBundleFolder', description: 'Delete a bundle folder (requires bMS 26R1+)', action: 'Delete bundle folder' },
-		{ name: 'Get Bundle Applications by Bundle', value: 'getBundleApplicationsByBundle', description: 'Get applications in a bundle (requires bMS 26R1+)', action: 'Get bundle applications by bundle' },
+		...COMMON_SOFTWARE_OPTIONS,
+		{ name: 'Get Software by Universal Dynamic Group', value: 'getInstalledSoftwareByUniversalDynamicGroup', description: 'Get installed software for a universal dynamic group (bMS 26R1+)', action: 'Get software by universal dynamic group' },
+		{ name: 'Get Bundles', value: 'getBundles', description: 'Get all software bundles (bMS 26R1+)', action: 'Get bundles' },
+		{ name: 'Get Bundle', value: 'getBundle', description: 'Get a software bundle by ID (bMS 26R1+)', action: 'Get bundle' },
+		{ name: 'Create Bundle', value: 'createBundle', description: 'Create a software bundle (bMS 26R1+)', action: 'Create bundle' },
+		{ name: 'Delete Bundle', value: 'deleteBundle', description: 'Delete a software bundle (bMS 26R1+)', action: 'Delete bundle' },
+		{ name: 'Get Bundle Folders', value: 'getBundleFolders', description: 'Get all bundle folders (bMS 26R1+)', action: 'Get bundle folders' },
+		{ name: 'Get Bundle Folder', value: 'getBundleFolder', description: 'Get a bundle folder by ID (bMS 26R1+)', action: 'Get bundle folder' },
+		{ name: 'Get Bundle Sub Folders', value: 'getBundleSubFolders', description: 'Get sub-folders of a bundle folder (bMS 26R1+)', action: 'Get bundle sub folders' },
+		{ name: 'Create Bundle Folder', value: 'createBundleFolder', description: 'Create a bundle folder (bMS 26R1+)', action: 'Create bundle folder' },
+		{ name: 'Delete Bundle Folder', value: 'deleteBundleFolder', description: 'Delete a bundle folder (bMS 26R1+)', action: 'Delete bundle folder' },
+		{ name: 'Get Bundle Applications by Bundle', value: 'getBundleApplicationsByBundle', description: 'Get applications in a bundle (bMS 26R1+)', action: 'Get bundle applications by bundle' },
 	],
 	default: 'getInstalledWindowsSoftware',
 }];
+
+/** @deprecated Use softwareOperations25R2 and softwareOperations26R1 instead */
+export const softwareOperations: INodeProperties[] = [...softwareOperations25R2, ...softwareOperations26R1];
 
 export const softwareFields: INodeProperties[] = [
 	{ displayName: 'Return All', name: 'returnAll', type: 'boolean', default: false, displayOptions: { show: { resource: ['software'], operation: ['getInstalledWindowsSoftware', 'getInstalledSoftwareByEndpoint', 'getInstalledSoftwareByLogicalGroup', 'getInstalledSoftwareByUniversalDynamicGroup', 'getBundles', 'getBundleFolders', 'getBundleSubFolders', 'getBundleApplicationsByBundle'] } }, description: 'Whether to return all results or only up to a given limit' },

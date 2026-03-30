@@ -1,5 +1,7 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../transport/requestApi';
+import { validateGuid } from '../../utils/validation';
 
 export async function getRules(this: IExecuteFunctions, index: number): Promise<INodeExecutionData[]> {
 	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
@@ -19,6 +21,8 @@ export async function getRules(this: IExecuteFunctions, index: number): Promise<
 
 export async function getRule(this: IExecuteFunctions, index: number): Promise<INodeExecutionData[]> {
 	const id = this.getNodeParameter('ruleId', index) as string;
+	const validation = validateGuid(id);
+	if (!validation.valid) throw new NodeOperationError(this.getNode(), `Rule ID: ${validation.errors.join(', ')}`, { itemIndex: index });
 	const response = await apiRequest.call(this, 'GET', `/compliance/v2.0/Rules/${id}`);
 	return this.helpers.returnJsonArray([response as IDataObject]);
 }
@@ -41,6 +45,8 @@ export async function getVulnerabilities(this: IExecuteFunctions, index: number)
 
 export async function getVulnerability(this: IExecuteFunctions, index: number): Promise<INodeExecutionData[]> {
 	const id = this.getNodeParameter('vulnerabilityId', index) as string;
+	const validation = validateGuid(id);
+	if (!validation.valid) throw new NodeOperationError(this.getNode(), `Vulnerability ID: ${validation.errors.join(', ')}`, { itemIndex: index });
 	const response = await apiRequest.call(this, 'GET', `/compliance/v2.0/Vulnerabilities/${id}`);
 	return this.helpers.returnJsonArray([response as IDataObject]);
 }
@@ -63,6 +69,8 @@ export async function getDetectedVulnerabilities(this: IExecuteFunctions, index:
 
 export async function getDetectedVulnerabilitiesByEndpoint(this: IExecuteFunctions, index: number): Promise<INodeExecutionData[]> {
 	const endpointId = this.getNodeParameter('endpointId', index) as string;
+	const endpointValidation = validateGuid(endpointId);
+	if (!endpointValidation.valid) throw new NodeOperationError(this.getNode(), `Endpoint ID: ${endpointValidation.errors.join(', ')}`, { itemIndex: index });
 	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
 	const qs: Record<string, string | number> = {};
 
@@ -94,6 +102,8 @@ export async function getDetectedRuleViolations(this: IExecuteFunctions, index: 
 
 export async function getDetectedRuleViolationsByEndpoint(this: IExecuteFunctions, index: number): Promise<INodeExecutionData[]> {
 	const endpointId = this.getNodeParameter('endpointId', index) as string;
+	const endpointValidation = validateGuid(endpointId);
+	if (!endpointValidation.valid) throw new NodeOperationError(this.getNode(), `Endpoint ID: ${endpointValidation.errors.join(', ')}`, { itemIndex: index });
 	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
 	const qs: Record<string, string | number> = {};
 

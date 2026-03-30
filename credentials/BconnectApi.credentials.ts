@@ -62,7 +62,7 @@ export class BconnectApi implements ICredentialType {
   test: ICredentialTestRequest = {
     request: {
       baseURL: '={{$credentials.baseUrl}}',
-      url: '/endpoints/v2.0/Endpoints',
+      url: '/v2.0/WindowsEndpoints',
       skipSslCertificateValidation: '={{$credentials.ignoreSslIssues}}',
       ignoreHttpStatusErrors: true,
     },

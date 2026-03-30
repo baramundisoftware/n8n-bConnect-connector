@@ -1,231 +1,83 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-export const endpointOperations: INodeProperties[] = [
+// Common operation options available in both 25R2 and 26R1
+const COMMON_ENDPOINT_OPTIONS = [
+  { name: 'Create', value: 'create', description: 'Create a new Windows endpoint', action: 'Create a Windows endpoint' },
+  { name: 'Delete', value: 'delete', description: 'Delete an endpoint', action: 'Delete an endpoint' },
+  { name: 'Get', value: 'get', description: 'Get an endpoint by ID', action: 'Get an endpoint' },
+  { name: 'Get Many', value: 'getMany', description: 'Get many endpoints', action: 'Get many endpoints' },
+  { name: 'Search', value: 'search', description: 'Search endpoints by name or other criteria', action: 'Search endpoints' },
+  { name: 'Start Enrollment', value: 'startEnrollment', description: 'Start enrollment process for an endpoint', action: 'Start enrollment for endpoint' },
+  { name: 'Trigger Intune Installation', value: 'triggerIntuneInstallation', description: 'Trigger installation of baramundi Management Agent via Intune', action: 'Trigger Intune installation' },
+  { name: 'Update', value: 'update', description: 'Update an endpoint', action: 'Update an endpoint' },
+  // Logical Group Operations
+  { name: 'Get Logical Group', value: 'getLogicalGroup', description: 'Get a logical group by ID', action: 'Get a logical group' },
+  { name: 'Get Logical Groups', value: 'getLogicalGroups', description: 'Get many logical groups', action: 'Get many logical groups' },
+  { name: 'Create Logical Group', value: 'createLogicalGroup', description: 'Create a new logical group', action: 'Create a logical group' },
+  { name: 'Update Logical Group', value: 'updateLogicalGroup', description: 'Update a logical group', action: 'Update a logical group' },
+  { name: 'Delete Logical Group', value: 'deleteLogicalGroup', description: 'Delete a logical group', action: 'Delete a logical group' },
+  // Static Group Operations
+  { name: 'Get Static Group', value: 'getStaticGroup', description: 'Get a static group by ID', action: 'Get a static group' },
+  { name: 'Get Static Groups', value: 'getStaticGroups', description: 'Get many static groups', action: 'Get many static groups' },
+  { name: 'Create Static Group', value: 'createStaticGroup', description: 'Create a new static group', action: 'Create a static group' },
+  { name: 'Update Static Group', value: 'updateStaticGroup', description: 'Update a static group', action: 'Update a static group' },
+  { name: 'Delete Static Group', value: 'deleteStaticGroup', description: 'Delete a static group', action: 'Delete a static group' },
+  // Dynamic Group Operations (Read-only)
+  { name: 'Get Dynamic Group', value: 'getDynamicGroup', description: 'Get a dynamic group by ID', action: 'Get a dynamic group' },
+  { name: 'Get Dynamic Groups', value: 'getDynamicGroups', description: 'Get many dynamic groups', action: 'Get many dynamic groups' },
+  // Maintenance Window — common create/delete
+  { name: 'Create Endpoint Maintenance Window', value: 'createEndpointMaintenanceWindow', description: 'Create a maintenance window for an endpoint', action: 'Create endpoint maintenance window' },
+  { name: 'Delete Endpoint Maintenance Window', value: 'deleteEndpointMaintenanceWindow', description: 'Delete a maintenance window for an endpoint', action: 'Delete endpoint maintenance window' },
+  { name: 'Create Group Maintenance Window', value: 'createGroupMaintenanceWindow', description: 'Create a maintenance window for a group', action: 'Create group maintenance window' },
+  { name: 'Delete Group Maintenance Window', value: 'deleteGroupMaintenanceWindow', description: 'Delete a maintenance window for a group', action: 'Delete group maintenance window' },
+];
+
+/** Operations shown when bmsVersion = 25R2 */
+export const endpointOperations25R2: INodeProperties[] = [
   {
     displayName: 'Operation',
     name: 'operation',
     type: 'options',
     noDataExpression: true,
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-      },
-    },
+    displayOptions: { show: { resource: ['endpoint'], bmsVersion: ['25R2'] } },
     options: [
-      {
-        name: 'Create',
-        value: 'create',
-        description: 'Create a new Windows endpoint',
-        action: 'Create a Windows endpoint',
-      },
-      {
-        name: 'Delete',
-        value: 'delete',
-        description: 'Delete an endpoint',
-        action: 'Delete an endpoint',
-      },
-      {
-        name: 'Get',
-        value: 'get',
-        description: 'Get an endpoint by ID',
-        action: 'Get an endpoint',
-      },
-      {
-        name: 'Get Many',
-        value: 'getMany',
-        description: 'Get many endpoints',
-        action: 'Get many endpoints',
-      },
-      {
-        name: 'Search',
-        value: 'search',
-        description: 'Search endpoints by name or other criteria',
-        action: 'Search endpoints',
-      },
-      {
-        name: 'Start Enrollment',
-        value: 'startEnrollment',
-        description: 'Start enrollment process for an endpoint',
-        action: 'Start enrollment for endpoint',
-      },
-      {
-        name: 'Trigger Intune Installation',
-        value: 'triggerIntuneInstallation',
-        description: 'Trigger installation of baramundi Management Agent via Intune',
-        action: 'Trigger Intune installation',
-      },
-      {
-        name: 'Update',
-        value: 'update',
-        description: 'Update an endpoint',
-        action: 'Update an endpoint',
-      },
-      // Logical Group Operations
-      {
-        name: 'Get Logical Group',
-        value: 'getLogicalGroup',
-        description: 'Get a logical group by ID',
-        action: 'Get a logical group',
-      },
-      {
-        name: 'Get Logical Groups',
-        value: 'getLogicalGroups',
-        description: 'Get many logical groups',
-        action: 'Get many logical groups',
-      },
-      {
-        name: 'Create Logical Group',
-        value: 'createLogicalGroup',
-        description: 'Create a new logical group',
-        action: 'Create a logical group',
-      },
-      {
-        name: 'Update Logical Group',
-        value: 'updateLogicalGroup',
-        description: 'Update a logical group',
-        action: 'Update a logical group',
-      },
-      {
-        name: 'Delete Logical Group',
-        value: 'deleteLogicalGroup',
-        description: 'Delete a logical group',
-        action: 'Delete a logical group',
-      },
-      // Static Group Operations
-      {
-        name: 'Get Static Group',
-        value: 'getStaticGroup',
-        description: 'Get a static group by ID',
-        action: 'Get a static group',
-      },
-      {
-        name: 'Get Static Groups',
-        value: 'getStaticGroups',
-        description: 'Get many static groups',
-        action: 'Get many static groups',
-      },
-      {
-        name: 'Create Static Group',
-        value: 'createStaticGroup',
-        description: 'Create a new static group',
-        action: 'Create a static group',
-      },
-      {
-        name: 'Update Static Group',
-        value: 'updateStaticGroup',
-        description: 'Update a static group',
-        action: 'Update a static group',
-      },
-      {
-        name: 'Delete Static Group',
-        value: 'deleteStaticGroup',
-        description: 'Delete a static group',
-        action: 'Delete a static group',
-      },
-      // Dynamic Group Operations (Read-only)
-      {
-        name: 'Get Dynamic Group',
-        value: 'getDynamicGroup',
-        description: 'Get a dynamic group by ID',
-        action: 'Get a dynamic group',
-      },
-      {
-        name: 'Get Dynamic Groups',
-        value: 'getDynamicGroups',
-        description: 'Get many dynamic groups',
-        action: 'Get many dynamic groups',
-      },
-      // Maintenance Window Operations
-      {
-        name: 'Create Endpoint Maintenance Window',
-        value: 'createEndpointMaintenanceWindow',
-        description: 'Create a maintenance window for an endpoint',
-        action: 'Create endpoint maintenance window',
-      },
-      {
-        name: 'Update Endpoint Maintenance Window (PATCH)',
-        value: 'updateEndpointMaintenanceWindow',
-        description: 'Update a maintenance window for an endpoint using JSON Patch (requires bMS 26R1+)',
-        action: 'Update endpoint maintenance window',
-      },
-      {
-        name: 'Replace Endpoint Maintenance Window (PUT)',
-        value: 'putEndpointMaintenanceWindow',
-        description: 'Replace a maintenance window for an endpoint with a full body (requires bMS 25R2)',
-        action: 'Replace endpoint maintenance window',
-      },
-      {
-        name: 'Delete Endpoint Maintenance Window',
-        value: 'deleteEndpointMaintenanceWindow',
-        description: 'Delete a maintenance window for an endpoint',
-        action: 'Delete endpoint maintenance window',
-      },
-      {
-        name: 'Create Group Maintenance Window',
-        value: 'createGroupMaintenanceWindow',
-        description: 'Create a maintenance window for a group',
-        action: 'Create group maintenance window',
-      },
-      {
-        name: 'Update Group Maintenance Window (PATCH)',
-        value: 'updateGroupMaintenanceWindow',
-        description: 'Update a maintenance window for a group using JSON Patch (requires bMS 26R1+)',
-        action: 'Update group maintenance window',
-      },
-      {
-        name: 'Replace Group Maintenance Window (PUT)',
-        value: 'putGroupMaintenanceWindow',
-        description: 'Replace a maintenance window for a group with a full body (requires bMS 25R2)',
-        action: 'Replace group maintenance window',
-      },
-      {
-        name: 'Delete Group Maintenance Window',
-        value: 'deleteGroupMaintenanceWindow',
-        description: 'Delete a maintenance window for a group',
-        action: 'Delete group maintenance window',
-      },
-      // EntraId Operations (26R1+)
-      {
-        name: 'Set Entra ID Data',
-        value: 'setEntraIdData',
-        description: 'Create or update Entra ID data for an endpoint (requires bMS 26R1+)',
-        action: 'Set Entra ID data for endpoint',
-      },
-      {
-        name: 'Delete Entra ID Data',
-        value: 'deleteEntraIdData',
-        description: 'Delete Entra ID data for an endpoint (requires bMS 26R1+)',
-        action: 'Delete Entra ID data for endpoint',
-      },
-      {
-        name: 'Get Entra ID Data By Device ID',
-        value: 'getEntraIdDataByDeviceId',
-        description: 'Get Entra ID endpoint data by Entra ID device ID (requires bMS 26R1+)',
-        action: 'Get Entra ID data by device ID',
-      },
-      // UnmanagedEndpoints Operations (26R1+)
-      {
-        name: 'Get Unmanaged Endpoints',
-        value: 'getUnmanagedEndpoints',
-        description: 'Get all unmanaged endpoints (requires bMS 26R1+)',
-        action: 'Get unmanaged endpoints',
-      },
-      {
-        name: 'Get Unmanaged Endpoint',
-        value: 'getUnmanagedEndpoint',
-        description: 'Get an unmanaged endpoint by ID (requires bMS 26R1+)',
-        action: 'Get unmanaged endpoint',
-      },
-      {
-        name: 'Delete Unmanaged Endpoint',
-        value: 'deleteUnmanagedEndpoint',
-        description: 'Delete an unmanaged endpoint by ID (requires bMS 26R1+)',
-        action: 'Delete unmanaged endpoint',
-      },
+      ...COMMON_ENDPOINT_OPTIONS,
+      // Maintenance Window — PUT (25R2 only, replaced by PATCH in 26R1)
+      { name: 'Replace Endpoint Maintenance Window (PUT)', value: 'putEndpointMaintenanceWindow', description: 'Replace a maintenance window for an endpoint with a full body (bMS 25R2)', action: 'Replace endpoint maintenance window' },
+      { name: 'Replace Group Maintenance Window (PUT)', value: 'putGroupMaintenanceWindow', description: 'Replace a maintenance window for a group with a full body (bMS 25R2)', action: 'Replace group maintenance window' },
     ],
     default: 'getMany',
   },
 ];
+
+/** Operations shown when bmsVersion = 26R1 */
+export const endpointOperations26R1: INodeProperties[] = [
+  {
+    displayName: 'Operation',
+    name: 'operation',
+    type: 'options',
+    noDataExpression: true,
+    displayOptions: { show: { resource: ['endpoint'], bmsVersion: ['26R1'] } },
+    options: [
+      ...COMMON_ENDPOINT_OPTIONS,
+      // Maintenance Window — PATCH (26R1+)
+      { name: 'Update Endpoint Maintenance Window (PATCH)', value: 'updateEndpointMaintenanceWindow', description: 'Update a maintenance window for an endpoint using JSON Patch (bMS 26R1+)', action: 'Update endpoint maintenance window' },
+      { name: 'Update Group Maintenance Window (PATCH)', value: 'updateGroupMaintenanceWindow', description: 'Update a maintenance window for a group using JSON Patch (bMS 26R1+)', action: 'Update group maintenance window' },
+      // EntraId Operations (26R1+)
+      { name: 'Set Entra ID Data', value: 'setEntraIdData', description: 'Create or update Entra ID data for an endpoint (bMS 26R1+)', action: 'Set Entra ID data for endpoint' },
+      { name: 'Delete Entra ID Data', value: 'deleteEntraIdData', description: 'Delete Entra ID data for an endpoint (bMS 26R1+)', action: 'Delete Entra ID data for endpoint' },
+      { name: 'Get Entra ID Data By Device ID', value: 'getEntraIdDataByDeviceId', description: 'Get Entra ID endpoint data by Entra ID device ID (bMS 26R1+)', action: 'Get Entra ID data by device ID' },
+      // UnmanagedEndpoints Operations (26R1+)
+      { name: 'Get Unmanaged Endpoints', value: 'getUnmanagedEndpoints', description: 'Get all unmanaged endpoints (bMS 26R1+)', action: 'Get unmanaged endpoints' },
+      { name: 'Get Unmanaged Endpoint', value: 'getUnmanagedEndpoint', description: 'Get an unmanaged endpoint by ID (bMS 26R1+)', action: 'Get unmanaged endpoint' },
+      { name: 'Delete Unmanaged Endpoint', value: 'deleteUnmanagedEndpoint', description: 'Delete an unmanaged endpoint by ID (bMS 26R1+)', action: 'Delete unmanaged endpoint' },
+    ],
+    default: 'getMany',
+  },
+];
+
+/** @deprecated Use endpointOperations25R2 and endpointOperations26R1 instead */
+export const endpointOperations: INodeProperties[] = [...endpointOperations25R2, ...endpointOperations26R1];
 
 export const endpointFields: INodeProperties[] = [
   // ----------------------------------

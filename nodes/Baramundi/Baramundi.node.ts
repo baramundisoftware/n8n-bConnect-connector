@@ -8,15 +8,15 @@ import type {
 } from 'n8n-workflow';
 
 import { activeDirectoryFields, activeDirectoryOperations } from './actions/activeDirectory/activeDirectory.fields';
-import { assetFields, assetOperations } from './actions/asset/asset.fields';
+import { assetFields, assetOperations25R2, assetOperations26R1 } from './actions/asset/asset.fields';
 import { complianceFields, complianceOperations } from './actions/compliance/compliance.fields';
 import { universalDynamicGroupsFields, universalDynamicGroupsOperations } from './actions/universalDynamicGroups/universalDynamicGroups.fields';
 import { defenseControlFields, defenseControlOperations } from './actions/defenseControl/defenseControl.fields';
-import { endpointFields, endpointOperations } from './actions/endpoint/endpoint.fields';
+import { endpointFields, endpointOperations25R2, endpointOperations26R1 } from './actions/endpoint/endpoint.fields';
 import { jobFields, jobOperations } from './actions/job/job.fields';
 import { operatingSystemFields, operatingSystemOperations } from './actions/operatingSystem/operatingSystem.fields';
 import { serverManagementFields, serverManagementOperations } from './actions/serverManagement/serverManagement.fields';
-import { softwareFields, softwareOperations } from './actions/software/software.fields';
+import { softwareFields, softwareOperations25R2, softwareOperations26R1 } from './actions/software/software.fields';
 import { updateManagementFields, updateManagementOperations } from './actions/updateManagement/updateManagement.fields';
 import { variableFields, variableOperations } from './actions/variable/variable.fields';
 import { router } from './actions/router';
@@ -136,13 +136,16 @@ export class Baramundi implements INodeType {
       ...complianceOperations,
       ...universalDynamicGroupsOperations,
       ...activeDirectoryOperations,
-      ...assetOperations,
+      ...assetOperations25R2,
+      ...assetOperations26R1,
       ...defenseControlOperations,
-      ...endpointOperations,
+      ...endpointOperations25R2,
+      ...endpointOperations26R1,
       ...jobOperations,
       ...operatingSystemOperations,
       ...serverManagementOperations,
-      ...softwareOperations,
+      ...softwareOperations25R2,
+      ...softwareOperations26R1,
       ...updateManagementOperations,
       ...variableOperations,
       // Fields
