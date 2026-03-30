@@ -411,3 +411,267 @@ When a new bMS version (e.g., 26R2) is released:
 3. **Version auto-detection**: Should the connector attempt to auto-detect bMS version from `/bconnect/v2.0/Info` or similar endpoint and pre-fill `bmsVersion`? Deferred to future enhancement.
 
 4. **25R2 sunset**: Expected end-of-life ~2028. The `25R2` option stays in the `bmsVersion` dropdown until then. Plan removal when EOL is officially confirmed.
+
+---
+
+## Audit Findings Phase — IT Audit 2026-03-30
+
+**Source**: Full IT audit conducted 2026-03-30.
+**Scope**: Source code, dependency chain, test coverage, credentials, file-system posture.
+
+| ID | Finding | Severity | Status |
+|---|---|---|---|
+| REQ-AUDIT-F1.1 | Basic Auth only — no token/API key support | MEDIUM | 📋 PLANNED |
+| REQ-AUDIT-F1.2 | SSL bypass silently disables TLS — no UI warning | MEDIUM | 📋 PLANNED |
+| REQ-AUDIT-F2.1 | ISO 8601 validator too permissive (`new Date()` accepts non-ISO) | MEDIUM | ✅ DONE |
+| REQ-AUDIT-F2.2 | Dropdown loaders silently truncate at 100 items | MEDIUM | ✅ DONE |
+| REQ-AUDIT-F3.1 | Critical/High CVEs in devDependencies (handlebars, minimatch) | HIGH | 📋 PLANNED |
+| REQ-AUDIT-F3.2 | Stale v0.1.0 distribution archives committed to repo | HIGH | 📋 PLANNED |
+| REQ-AUDIT-F4.1 | 12 `as any` casts in `Baramundi.node.ts` LoadOptions | LOW | 📋 PLANNED |
+| REQ-AUDIT-F4.2 | `any` parameters in error/validation utilities | LOW | 📋 PLANNED |
+| REQ-AUDIT-F5.1 | World-writable file permissions (777/666) | HIGH | 📋 PLANNED |
+| REQ-AUDIT-F5.2 | ESLint binary non-executable — linting not enforced in CI | MEDIUM | 📋 PLANNED |
+| REQ-AUDIT-F6.1 | Pagination cap allows 100K-item fetches (DoS risk) | MEDIUM | 📋 PLANNED |
+| REQ-AUDIT-F6.2 | No retry/backoff on HTTP 429/503 | MEDIUM | 📋 PLANNED |
+
+---
+
+### ✅ REQ-AUDIT-F2.1 — Strict ISO 8601 Datetime Validation
+
+**Status**: COMPLETED ✅ 2026-03-30
+
+**Description**: `validateIso8601DateTime()` used `new Date()` as its sole parse check, which silently accepts non-ISO formats such as `"March 30, 2026"`, `"01/22/2026"`, and `"2026-01-22 10:30:00"` (space separator). These are forwarded to the bConnect API, producing unclear errors.
+
+**Implementation**: Replaced with a strict regex (`ISO8601_STRICT`) that enforces `YYYY-MM-DDTHH:MM:SS[.sss][Z|±HH:MM]` before falling through to `new Date()` as a secondary calendar sanity check (catches e.g. Feb 30). 9 new unit tests added; all 105 validation tests pass.
+
+**Quality**:
+- [x] Strict regex enforces `T` separator, numeric month/day/hour ranges
+- [x] Date-only strings (`2026-01-22`) rejected
+- [x] Space-separated strings (`2026-01-22 10:30:00`) rejected
+- [x] Human-readable strings (`March 30, 2026`, `01/22/2026`) rejected
+- [x] Valid forms with Z, ±HH:MM offset, and milliseconds still accepted
+- [x] 105 validation unit tests passing
+
+---
+
+### ✅ REQ-AUDIT-F2.2 — Dropdown Loader Truncation Indicator
+
+**Status**: COMPLETED ✅ 2026-03-30
+
+**Description**: All six `LoadOptions` methods (`getEndpoints`, `getJobDefinitions`, `getOrgUnits`, `getLogicalGroups`, `getStaticGroups`, `getDynamicGroups`) fetched only the first page (100 items). In environments with >100 items the dropdown silently omitted remaining entries, potentially causing operators to select wrong targets.
+
+**Implementation**: Each method now reads `response.hasNextPage` from the bConnect V2.0 paginated response. When `true`, a sentinel option `"— showing first 100 results, use GUID input for more —"` is appended to the dropdown. No additional API calls are made.
+
+**Quality**:
+- [x] All 6 LoadOptions methods check `hasNextPage`
+- [x] Truncation sentinel appended only when `hasNextPage === true`
+- [x] No sentinel shown when all items fit in first page
+- [x] 471 unit tests passing
+
+---
+
+### 📋 REQ-AUDIT-F1.1 — Token / API Key Authentication Support
+
+**Status**: PLANNED 📋
+
+**Description**: The connector uses HTTP Basic Auth (username + password) on every request. If the bConnect API supports bearer tokens or API keys, an alternative credential type must be offered to enable credential expiry, rotation, and service-account separation.
+
+**Prerequisite**: Confirm with baramundi product team whether bConnect V2.0 supports:
+1. OAuth 2.0 client credentials flow
+2. Bearer token (`Authorization: Bearer <token>`)
+3. API key header — note: `GET /v2.0/ApiKeys` exists in 26R1, suggesting key-based auth may be available
+
+**Implementation (if confirmed)**:
+1. New credential type `BconnectApiToken` with `baseUrl`, `apiKey` (password type), `ignoreSslIssues`
+2. Register in `package.json` → `n8n.credentials`
+3. `requestApi.ts` detects credential type and sets appropriate auth header
+4. Unit tests for alternative auth path
+5. README.md updated with both credential types
+
+**Risk acceptance (if Basic Auth only)**: Document formal risk acceptance with system owner sign-off; add service-account guidance to credential description.
+
+**Quality**:
+- [ ] bConnect API documentation reviewed for non-Basic auth support
+- [ ] If supported: `BconnectApiToken` credential implemented and unit tested
+- [ ] If not supported: risk acceptance documented; service-account guidance in README
+- [ ] Existing `BconnectApi` credential unchanged to avoid breaking deployed workflows
+
+---
+
+### 📋 REQ-AUDIT-F1.2 — SSL Bypass UI Warning
+
+**Status**: PLANNED 📋
+
+**Description**: The `ignoreSslIssues` field defaults to `false` (secure) but provides no UI warning when enabled. Users can silently open all API traffic to MitM attacks with no visible indication.
+
+**Implementation**:
+1. Add `notice`-type property after `ignoreSslIssues` in `BconnectApi.credentials.ts`, visible only when `ignoreSslIssues: true`:
+   - Warning text: SSL validation disabled; MitM risk; test environments only; recommend CA import instead
+2. README.md: add section on importing a custom CA for self-signed bMS certificates as the preferred alternative
+
+**Quality**:
+- [ ] `notice` property implemented with `displayOptions: { show: { ignoreSslIssues: [true] } }`
+- [ ] Warning text names MitM risk and recommends CA import
+- [ ] README.md CA import guidance added
+- [ ] `ignoreSslIssues` default remains `false` in credential definition and all test mocks
+
+---
+
+### 📋 REQ-AUDIT-F3.1 — DevDependency CVE Monitoring
+
+**Status**: PLANNED 📋
+
+**Description**: 11 vulnerabilities remain in `devDependencies` after `npm audit fix` (2026-03-30): `handlebars` CRITICAL and `minimatch` HIGH via `@n8n/node-cli` have no upstream fix. Runtime package has 0 CVEs.
+
+**Requirements**:
+1. Add CI gate: `npm audit --omit=dev --audit-level=high` must exit 0 (runtime-only check)
+2. Track `@n8n/node-cli` upstream for handlebars/minimatch fixes; upgrade when available
+3. Document current devDependency risk acceptance in SECURITY.md or CHANGELOG with rationale
+
+**Quality**:
+- [ ] CI pipeline runs `npm audit --omit=dev --audit-level=high` as a required check
+- [ ] Upstream issue filed or tracked for `@n8n/node-cli` handlebars/minimatch
+- [ ] Risk acceptance note in CHANGELOG or SECURITY.md
+
+---
+
+### 📋 REQ-AUDIT-F3.2 — Remove Stale Distribution Archives
+
+**Status**: PLANNED 📋
+
+**Description**: Three v0.1.0 distribution artifacts are present in the working directory (`n8n-nodes-baramundi-0.1.0.tgz`, `n8n-baramundi-distribution-v0.1.0.tar.gz`, `n8n-baramundi-distribution-v0.1.0.zip`). These predate Phase 6 security remediations and could be deployed by mistake.
+
+**Implementation**:
+1. Delete all three files
+2. Add `*.tgz`, `*.tar.gz`, `*.zip` to `.gitignore`
+3. Verify `.gitignore` also excludes `dist/` from version control
+
+**Quality**:
+- [ ] All three v0.1.0 archives deleted from working directory
+- [ ] `.gitignore` excludes `*.tgz`, `*.tar.gz`, `*.zip`
+- [ ] `npm pack` remains the only mechanism for producing a distributable
+
+---
+
+### 📋 REQ-AUDIT-F4.1 — Replace `as any` Casts in LoadOptions
+
+**Status**: PLANNED 📋
+
+**Description**: 12 `as any` casts in `Baramundi.node.ts` LoadOptions methods bypass TypeScript's type checker (`this as any`, `response.data as any[]`, `endpoint/job/group/orgUnit as any`). A malformed API response (object instead of array) produces unclear runtime failures.
+
+**Implementation**: Define a typed bConnect V2.0 paginated response interface and use it in all LoadOptions methods.
+
+```typescript
+interface BConnectPagedResponse<T> {
+  data: T[];
+  totalItems: number;
+  hasNextPage: boolean;
+}
+```
+
+**Quality**:
+- [ ] `BConnectPagedResponse<T>` interface defined in a shared types file
+- [ ] All `response.data as any[]` casts replaced with typed access
+- [ ] `endpoint/job/group as any` casts replaced with typed interfaces per resource
+- [ ] `this as any` in LoadOptions documented with a comment explaining the n8n framework constraint
+- [ ] TypeScript strict mode still passing with 0 errors
+
+---
+
+### 📋 REQ-AUDIT-F4.2 — Replace `any` in Utility Function Signatures
+
+**Status**: PLANNED 📋
+
+**Description**: Error utility functions use `error: any` parameters; `extractResourceLocatorValue` uses `value: any`. The `any` type disables type narrowing and allows invalid inputs to silently produce empty-string returns.
+
+**Implementation**:
+1. Change `error: any` to `error: unknown` in `errorMessages.ts` — add explicit type narrowing guards
+2. Change `value: any` to `value: unknown` in `extractResourceLocatorValue` — add type guards for string and resourceLocator object
+
+**Quality**:
+- [ ] All `error: any` parameters replaced with `error: unknown`
+- [ ] All `value: any` parameters replaced with `value: unknown`
+- [ ] Explicit type narrowing (`typeof`, `instanceof`, `in`) used before accessing properties
+- [ ] 0 TypeScript errors, all existing tests passing
+
+---
+
+### 📋 REQ-AUDIT-F5.1 — File and Directory Permission Hardening
+
+**Status**: PLANNED 📋
+
+**Description**: All project files are world-writable (`666`) and directories world-writable (`777`). On a shared system or container, any local process can modify source files or the compiled `dist/` output that n8n executes.
+
+**Implementation**:
+```bash
+find /home/ansible/MCP/n8nconnector -type d -exec chmod 755 {} \;
+find /home/ansible/MCP/n8nconnector -type f -exec chmod 644 {} \;
+chmod 755 start-n8n-dev.sh
+```
+
+Add a CI step to verify permissions after checkout, or configure the repository's `umask` in the container entrypoint.
+
+**Quality**:
+- [ ] All source files: `644` (owner rw, group/other r)
+- [ ] All directories: `755` (owner rwx, group/other rx)
+- [ ] Executable scripts (`start-n8n-dev.sh`): `755`
+- [ ] CI pipeline does not run from a world-writable checkout
+
+---
+
+### 📋 REQ-AUDIT-F5.2 — ESLint CI Enforcement
+
+**Status**: PLANNED 📋
+
+**Description**: The ESLint binary in `node_modules/.bin/` is not executable (`npm run lint` fails with `Permission denied`). This means linting — including 50+ n8n-specific security/convention rules — has not been running on recent commits.
+
+**Implementation**:
+1. Fix immediately: `chmod +x node_modules/.bin/eslint node_modules/.bin/eslint-config-prettier`
+2. Add `npm run lint` as a required step in the CI pipeline (non-zero exit code blocks merge)
+3. Address root cause: ensure `npm install` preserves executable bits (related to F5.1 permission issue)
+
+**Quality**:
+- [ ] `npm run lint` exits 0 with no errors or warnings
+- [ ] CI pipeline has a mandatory lint step that blocks on failure
+- [ ] All 50+ `n8n-nodes-base` ESLint rules enforced at error severity
+
+---
+
+### 📋 REQ-AUDIT-F6.1 — Pagination Cap and Max-Items Parameter
+
+**Status**: PLANNED 📋
+
+**Description**: `apiRequestAllItems()` has a safety break at `page > 1000` (100,000 items). In large environments this can issue 1,000 sequential API calls, exhaust server resources, trigger rate-limits, time out the n8n worker, or exhaust worker memory.
+
+**Implementation**:
+1. Lower default cap to 50 pages (5,000 items)
+2. Expose a `Max Items` user parameter on operations that call `apiRequestAllItems` (default 500, max 5,000)
+3. Log a warning in the node output when the cap is reached: `{ warning: "Result set truncated at N items. Increase Max Items or filter results." }`
+
+**Quality**:
+- [ ] Default page cap reduced to 50
+- [ ] `Max Items` parameter available on all "Get Many" operations
+- [ ] Truncation warning included in output when cap is reached
+- [ ] Existing "Get Many" unit tests updated to reflect new parameter
+
+---
+
+### 📋 REQ-AUDIT-F6.2 — HTTP Retry with Exponential Backoff
+
+**Status**: PLANNED 📋
+
+**Description**: `apiRequest()` has no retry logic. HTTP 429 (rate limit) and 503 (service unavailable) responses fail immediately. Workflows triggered at high frequency (cron) will produce cascading failures with no self-healing.
+
+**Implementation**: Add retry logic in `requestApi.ts` for transient errors:
+- Retry on: HTTP 429, 503, network timeouts (`ETIMEDOUT`)
+- Maximum retries: 3
+- Backoff: exponential with jitter — wait `(2^attempt × 100ms) + random(0–100ms)` before each retry
+- Respect `Retry-After` header if present on 429 responses
+- Do not retry on: 400, 401, 403, 404, 409, 422 (client errors — retrying won't help)
+
+**Quality**:
+- [ ] Retry logic implemented for 429, 503, ETIMEDOUT
+- [ ] Maximum 3 retries with exponential backoff
+- [ ] `Retry-After` header honoured on 429 responses
+- [ ] Client error codes (4xx except 429) are not retried
+- [ ] Unit tests cover retry behaviour (mock clock / fake timers)
