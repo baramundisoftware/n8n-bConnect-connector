@@ -26,6 +26,11 @@ import {
   updateSecurityProfile,
   deleteSecurityProfile,
   updateObjectPermissions,
+  getDipsMSWCleanup,
+  simulateMSWCleanup,
+  getApiKeys,
+  getDownloadJobs,
+  getDownloadJob,
 } from '../../../../../nodes/Baramundi/actions/serverManagement/serverManagement.execute';
 
 // Mock helper function to create IExecuteFunctions
@@ -658,6 +663,63 @@ describe('Server Management Operations', () => {
           skipSslCertificateValidation: true,
         }),
       );
+    });
+  });
+});
+
+// ============================================================================
+// Phase 4: ServerManagement Operations
+// ============================================================================
+
+const pageResponseSM = (data: any[]) => ({ data, currentPage: 0, pageSize: 50, totalCount: data.length });
+
+describe('ServerManagement Phase 4 - New Operations', () => {
+  describe('getDipsMSWCleanup()', () => {
+    it('should return status started', async () => {
+      const mockContext = createMockExecuteFunctions({}, {}, { status: 'started' });
+      const result = await getDipsMSWCleanup.call(mockContext, 0);
+      expect(result[0].json.status).toBe('started');
+    });
+  });
+
+  describe('simulateMSWCleanup()', () => {
+    it('should return simulation result', async () => {
+      const mockContext = createMockExecuteFunctions({}, {}, { simulationResult: 'ok' });
+      const result = await simulateMSWCleanup.call(mockContext, 0);
+      expect(result[0].json.simulationResult).toBe('ok');
+    });
+  });
+
+  describe('getApiKeys()', () => {
+    it('should return api keys array', async () => {
+      const mockContext = createMockExecuteFunctions({}, {}, [{ id: 'key1', name: 'ApiKey1' }]);
+      const result = await getApiKeys.call(mockContext, 0);
+      expect(result).toHaveLength(1);
+    });
+  });
+
+  describe('getDownloadJobs()', () => {
+    it('should return paginated download jobs when returnAll is false', async () => {
+      const mockContext = createMockExecuteFunctions(
+        { returnAll: false, limit: 5 },
+        {},
+        pageResponseSM([{ id: 'job1' }, { id: 'job2' }]),
+      );
+      const result = await getDownloadJobs.call(mockContext, 0);
+      expect(result).toHaveLength(2);
+    });
+  });
+
+  describe('getDownloadJob()', () => {
+    it('should return the download job by id', async () => {
+      const downloadJobId = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
+      const mockContext = createMockExecuteFunctions(
+        { downloadJobId },
+        {},
+        { id: downloadJobId },
+      );
+      const result = await getDownloadJob.call(mockContext, 0);
+      expect(result[0].json.id).toBe(downloadJobId);
     });
   });
 });

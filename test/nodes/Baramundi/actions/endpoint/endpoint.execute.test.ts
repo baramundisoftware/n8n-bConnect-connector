@@ -6,7 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
-import { get, getMany, search, deleteEndpoint, create, update, startEnrollment, triggerIntuneInstallation, getLogicalGroup, getLogicalGroups, createLogicalGroup, updateLogicalGroup, deleteLogicalGroup, getStaticGroup, getStaticGroups, createStaticGroup, updateStaticGroup, deleteStaticGroup, getDynamicGroup, getDynamicGroups } from '../../../../../nodes/Baramundi/actions/endpoint/endpoint.execute';
+import { get, getMany, search, deleteEndpoint, create, update, startEnrollment, triggerIntuneInstallation, getLogicalGroup, getLogicalGroups, createLogicalGroup, updateLogicalGroup, deleteLogicalGroup, getStaticGroup, getStaticGroups, createStaticGroup, updateStaticGroup, deleteStaticGroup, getDynamicGroup, getDynamicGroups, setEntraIdData, deleteEntraIdData, getEntraIdDataByDeviceId, getUnmanagedEndpoints, getUnmanagedEndpoint, deleteUnmanagedEndpoint, putEndpointMaintenanceWindow, putGroupMaintenanceWindow } from '../../../../../nodes/Baramundi/actions/endpoint/endpoint.execute';
 
 /**
  * Create a mock IExecuteFunctions instance for testing
@@ -2658,6 +2658,147 @@ describe('Endpoint Operations - Unit Tests', () => {
       // Assert
       expect(result).toBeDefined();
       expect(result).toHaveLength(0);
+    });
+  });
+});
+
+// ============================================================================
+// Phase 4: New Endpoint Operations
+// ============================================================================
+
+const pageResponse = (data: any[]) => ({ data, currentPage: 0, pageSize: 50, totalCount: data.length });
+
+describe('Endpoint Phase 4 - EntraId Operations', () => {
+  describe('setEntraIdData()', () => {
+    it('should return array of length 1 on success', async () => {
+      const mockContext = createMockExecuteFunctions(
+        {
+          endpointSelection: '__custom__',
+          endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+          entraIdDeviceId: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+          additionalFields: {},
+        },
+        {},
+        {},
+      );
+      const result = await setEntraIdData.call(mockContext, 0);
+      expect(result).toHaveLength(1);
+    });
+  });
+
+  describe('deleteEntraIdData()', () => {
+    it('should return success true', async () => {
+      const mockContext = createMockExecuteFunctions(
+        {
+          endpointSelection: '__custom__',
+          endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+        },
+        {},
+        {},
+      );
+      const result = await deleteEntraIdData.call(mockContext, 0);
+      expect(result[0].json.success).toBe(true);
+    });
+  });
+
+  describe('getEntraIdDataByDeviceId()', () => {
+    it('should return device data with matching id', async () => {
+      const deviceId = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
+      const mockContext = createMockExecuteFunctions(
+        { deviceId },
+        {},
+        { id: deviceId, displayName: 'TestDevice' },
+      );
+      const result = await getEntraIdDataByDeviceId.call(mockContext, 0);
+      expect(result[0].json.id).toBe(deviceId);
+    });
+  });
+});
+
+describe('Endpoint Phase 4 - UnmanagedEndpoints Operations', () => {
+  describe('getUnmanagedEndpoints()', () => {
+    it('should return paginated results when returnAll is false', async () => {
+      const mockContext = createMockExecuteFunctions(
+        { returnAll: false, limit: 5 },
+        {},
+        pageResponse([{ id: 'u1' }, { id: 'u2' }]),
+      );
+      const result = await getUnmanagedEndpoints.call(mockContext, 0);
+      expect(result).toHaveLength(2);
+    });
+
+    it('should return all results when returnAll is true', async () => {
+      const mockContext = createMockExecuteFunctions(
+        { returnAll: true },
+        {},
+        pageResponse([{ id: 'u1' }, { id: 'u2' }, { id: 'u3' }]),
+      );
+      const result = await getUnmanagedEndpoints.call(mockContext, 0);
+      expect(result).toHaveLength(3);
+    });
+  });
+
+  describe('getUnmanagedEndpoint()', () => {
+    it('should return the unmanaged endpoint by id', async () => {
+      const unmanagedEndpointId = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
+      const mockContext = createMockExecuteFunctions(
+        { unmanagedEndpointId },
+        {},
+        { id: unmanagedEndpointId },
+      );
+      const result = await getUnmanagedEndpoint.call(mockContext, 0);
+      expect(result[0].json.id).toBe(unmanagedEndpointId);
+    });
+  });
+
+  describe('deleteUnmanagedEndpoint()', () => {
+    it('should return success true', async () => {
+      const unmanagedEndpointId = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
+      const mockContext = createMockExecuteFunctions(
+        { unmanagedEndpointId },
+        {},
+        {},
+      );
+      const result = await deleteUnmanagedEndpoint.call(mockContext, 0);
+      expect(result[0].json.success).toBe(true);
+    });
+  });
+});
+
+describe('Endpoint Phase 4 - MaintenanceWindow PUT Operations', () => {
+  describe('putEndpointMaintenanceWindow()', () => {
+    it('should call httpRequest with method PUT', async () => {
+      const mockContext = createMockExecuteFunctions(
+        {
+          endpointSelection: '__custom__',
+          endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+          windowId: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+          maintenanceWindowJson: '{"maintenanceWindowDefinitionType":"daily","intervals":[]}',
+        },
+        {},
+        { id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901' },
+      );
+      await putEndpointMaintenanceWindow.call(mockContext, 0);
+      const httpRequest = mockContext.helpers.httpRequest as ReturnType<typeof vi.fn>;
+      expect(httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'PUT' }));
+    });
+  });
+
+  describe('putGroupMaintenanceWindow()', () => {
+    it('should call httpRequest with method PUT', async () => {
+      const mockContext = createMockExecuteFunctions(
+        {
+          groupId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+          groupType: 'logical',
+          windowId: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+          maintenanceWindowJson: '{"maintenanceWindowDefinitionType":"daily","intervals":[]}',
+        },
+        {},
+        { id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901' },
+      );
+      await putGroupMaintenanceWindow.call(mockContext, 0);
+      const httpRequest = mockContext.helpers.httpRequest as ReturnType<typeof vi.fn>;
+      expect(httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'PUT' }));
     });
   });
 });

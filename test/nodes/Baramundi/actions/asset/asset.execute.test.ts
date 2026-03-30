@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
-import { get, getMany, create, update, deleteAsset, getAssetTypes, getAssetType, getAssetsByEndpoint, getAssetsByLogicalGroup, createAssetType, deleteAssetType, getAssetStockAssets, getAssetStockFolders, createAssetStockFolder, updateAssetStockFolder, deleteAssetStockFolder } from '../../../../../nodes/Baramundi/actions/asset/asset.execute';
+import { get, getMany, create, update, deleteAsset, getAssetTypes, getAssetType, getAssetsByEndpoint, getAssetsByLogicalGroup, createAssetType, deleteAssetType, getAssetStockAssets, getAssetStockFolders, createAssetStockFolder, updateAssetStockFolder, deleteAssetStockFolder, getAssetsByADObject, getAssetsByOrgUnit } from '../../../../../nodes/Baramundi/actions/asset/asset.execute';
 
 // Mock helper function to create IExecuteFunctions
 function createMockExecuteFunctions(
@@ -1103,6 +1103,38 @@ describe('Asset Operations', () => {
           url: expect.stringContaining(`/assets/v2.0/AssetStock/Folders/${folderId}`),
         })
       );
+    });
+  });
+});
+
+// ============================================================================
+// Phase 4: Asset Operations
+// ============================================================================
+
+const pageResponseAsset = (data: any[]) => ({ data, currentPage: 0, pageSize: 50, totalCount: data.length });
+
+describe('Asset Phase 4 - AD Object and OrgUnit Operations', () => {
+  describe('getAssetsByADObject()', () => {
+    it('should return paginated assets for an AD object', async () => {
+      const mockContext = createMockExecuteFunctions(
+        { adObjectId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', returnAll: false, limit: 5 },
+        {},
+        pageResponseAsset([{ id: 'asset1' }, { id: 'asset2' }]),
+      );
+      const result = await getAssetsByADObject.call(mockContext, 0);
+      expect(result).toHaveLength(2);
+    });
+  });
+
+  describe('getAssetsByOrgUnit()', () => {
+    it('should return paginated assets for an org unit', async () => {
+      const mockContext = createMockExecuteFunctions(
+        { orgUnitId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', returnAll: false, limit: 5 },
+        {},
+        pageResponseAsset([{ id: 'asset3' }]),
+      );
+      const result = await getAssetsByOrgUnit.call(mockContext, 0);
+      expect(result).toHaveLength(1);
     });
   });
 });

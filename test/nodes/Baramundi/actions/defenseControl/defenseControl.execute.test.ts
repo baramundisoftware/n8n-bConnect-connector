@@ -12,6 +12,8 @@ import {
   getMicrosoftDefenderThreatsByLogicalGroup,
   getMicrosoftDefenderWindowsEndpoints,
   getMicrosoftDefenderWindowsEndpoint,
+  getBitLockerSecrets,
+  patchBitLockerSecrets,
 } from '../../../../../nodes/Baramundi/actions/defenseControl/defenseControl.execute';
 
 // Mock helper function to create IExecuteFunctions
@@ -437,6 +439,41 @@ describe('Defense Control Operations', () => {
           skipSslCertificateValidation: true,
         }),
       );
+    });
+  });
+});
+
+// ============================================================================
+// Phase 4: BitLocker Secrets Operations
+// ============================================================================
+
+describe('DefenseControl Phase 4 - BitLocker Secrets', () => {
+  describe('getBitLockerSecrets()', () => {
+    it('should return bitlocker secrets for an endpoint', async () => {
+      const mockResponse = { keyProtectors: [] };
+      const mockContext = createMockExecuteFunctions(
+        { endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' },
+        {},
+        mockResponse,
+      );
+      const result = await getBitLockerSecrets.call(mockContext, 0);
+      expect(result[0].json).toEqual(mockResponse);
+    });
+  });
+
+  describe('patchBitLockerSecrets()', () => {
+    it('should call httpRequest with method PATCH', async () => {
+      const mockContext = createMockExecuteFunctions(
+        {
+          endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+          patchOperations: '[{"op":"replace","path":"/InitialStartupPin","value":"12345"}]',
+        },
+        {},
+        { success: true },
+      );
+      await patchBitLockerSecrets.call(mockContext, 0);
+      const httpRequest = mockContext.helpers.httpRequest as ReturnType<typeof vi.fn>;
+      expect(httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'PATCH' }));
     });
   });
 });

@@ -147,6 +147,11 @@
 | ID | Task | Completed |
 |----|------|-----------|
 | P4.1 | `endpoint` module: added EntraId (3 ops) + UnmanagedEndpoints (3 ops), gated `bmsVersion: ['26R1']` | 2026-03-30 |
+| P4.2 | `defenseControl` module: added getBitLockerSecrets + patchBitLockerSecrets, gated `bmsVersion: ['26R1']` | 2026-03-30 |
+| P4.3 | `software` module: added 10 Bundle/BundleFolder/BundleApplications ops, gated `bmsVersion: ['26R1']` | 2026-03-30 |
+| P4.4 | `asset` module: added getAssetsByADObject + getAssetsByOrgUnit, gated `bmsVersion: ['26R1']` | 2026-03-30 |
+| P4.5 | `serverManagement` module: added 5 ops (MSWCleanup, SimulateMSW, ApiKeys, DownloadJobs), gated `bmsVersion: ['26R1']` | 2026-03-30 |
+| P4.6 | REQ-CHANGED-1: added PUT variants (25R2) + gated PATCH updates to 26R1 for MaintenanceWindow | 2026-03-30 |
 
 ---
 
