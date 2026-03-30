@@ -1,0 +1,47 @@
+{
+  "name": "Baramundi - List Endpoints",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "When clicking 'Test workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "resource": "endpoint",
+        "operation": "getMany",
+        "returnAll": true
+      },
+      "id": "baramundi-node",
+      "name": "Baramundi - Get Endpoints",
+      "type": "n8n-nodes-baramundi.baramundi",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "bconnectApi": {
+          "id": "1",
+          "name": "baramundi bConnect API account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking 'Test workflow'": {
+      "main": [
+        [
+          {
+            "node": "Baramundi - Get Endpoints",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

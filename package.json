@@ -1,0 +1,87 @@
+{
+  "name": "n8n-nodes-baramundi",
+  "version": "0.1.0",
+  "description": "n8n community node for baramundi Management Suite - Automate endpoint management, job execution, software deployment, and MDM operations via bConnect API",
+  "keywords": [
+    "n8n-community-node-package",
+    "n8n",
+    "baramundi",
+    "bconnect",
+    "endpoint-management",
+    "uem",
+    "unified-endpoint-management",
+    "it-automation",
+    "device-management",
+    "software-deployment",
+    "patch-management",
+    "mdm",
+    "mobile-device-management"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/baramundi-software/n8n-nodes-baramundi#readme",
+  "bugs": {
+    "url": "https://github.com/baramundi-software/n8n-nodes-baramundi/issues"
+  },
+  "author": {
+    "name": "baramundi software GmbH",
+    "email": "support@baramundi.com",
+    "url": "https://www.baramundi.com"
+  },
+  "contributors": [
+    {
+      "name": "Bernd Wiedemann",
+      "email": "wiedemann.bernd@gmx.de"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/baramundi-software/n8n-nodes-baramundi.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "main": "dist/nodes/Baramundi/Baramundi.node.js",
+  "scripts": {
+    "dev": "npx @n8n/node-cli dev",
+    "build": "npx @n8n/node-cli build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,json}\"",
+    "test": "vitest run",
+    "test:unit": "vitest run --exclude 'test/system/**'",
+    "test:system": "vitest run test/system",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "prepublishOnly": "npm run build"
+  },
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "nodes": [
+      "dist/nodes/Baramundi/Baramundi.node.js"
+    ],
+    "credentials": [
+      "dist/credentials/BconnectApi.credentials.js"
+    ]
+  },
+  "files": [
+    "dist",
+    "LICENSE.md",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "devDependencies": {
+    "@n8n/node-cli": "^0.17.0",
+    "@types/node": "^20.0.0",
+    "@vitest/coverage-v8": "^1.6.0",
+    "axios": "^1.13.2",
+    "eslint": "^9.0.0",
+    "eslint-plugin-n8n-nodes-base": "^1.16.0",
+    "prettier": "^3.2.0",
+    "typescript": "^5.4.0",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^1.6.0"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
+}

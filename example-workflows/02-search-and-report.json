@@ -1,0 +1,72 @@
+{
+  "name": "Baramundi - Search and Report",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "When clicking 'Test workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "resource": "endpoint",
+        "operation": "search",
+        "searchQuery": "WIN",
+        "returnAll": true,
+        "additionalFields": {
+          "orderBy": "DisplayName asc"
+        }
+      },
+      "id": "search-endpoints",
+      "name": "Search Windows Endpoints",
+      "type": "n8n-nodes-baramundi.baramundi",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "bconnectApi": {
+          "id": "1",
+          "name": "baramundi bConnect API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract key information\nconst endpoints = items.map(item => ({\n  name: item.json.DisplayName,\n  id: item.json.Id,\n  lastContact: item.json.LastContact,\n  primaryUser: item.json.PrimaryUser || 'N/A'\n}));\n\nreturn [\n  {\n    json: {\n      count: endpoints.length,\n      endpoints: endpoints\n    }\n  }\n];"
+      },
+      "id": "process-results",
+      "name": "Process Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    }
+  ],
+  "connections": {
+    "When clicking 'Test workflow'": {
+      "main": [
+        [
+          {
+            "node": "Search Windows Endpoints",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Windows Endpoints": {
+      "main": [
+        [
+          {
+            "node": "Process Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
