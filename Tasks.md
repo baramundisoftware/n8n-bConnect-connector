@@ -198,7 +198,6 @@
 | ID | Task | Role | Priority | Severity | Depends on |
 |----|------|------|----------|----------|------------|
 | P6.1 | `npm audit fix` + pin `axios >=1.14.0`; re-run audit and document remaining findings | DevOps Engineer | CRITICAL | C-1 | — |
-| P6.7 | Sanitise API URLs in user-facing error messages in `requestApi.ts` — truncate to `{host}/.../{resource}` | Backend Developer | MEDIUM | M-2 | — |
 | P6.8 | Add RFC 6902 patch validation in `defenseControl.execute.ts` `patchBitLockerSecrets` and `endpoint.execute.ts` PATCH maintenance window operations | Backend Developer | MEDIUM | M-3 | — |
 | P6.9 | Bump `package.json` version to `0.2.0`; add CHANGELOG entry for 0.2.0 release with semver rationale (breaking: V1.1 removal) | Technical Writer | LOW | L-3 | P6.1–P6.8 |
 
@@ -212,6 +211,7 @@
 | P6.4 | Split softwareOperations into 25R2/26R1 (Bundles + UDG software ops gated to 26R1). Split assetOperations into 25R2/26R1 (getAssetsByADObject + getAssetsByOrgUnit gated to 26R1). | 2026-03-30 |
 | P6.5 | Passwords already `test-password-do-not-use`. Changed `ignoreSslIssues` default from `true` → `false` in all 13 unit test mocks; updated `skipSslCertificateValidation` assertions. 436 tests passing. | 2026-03-30 |
 | P6.6 | Added 5 tests for `updateEndpointMaintenanceWindow` and `updateGroupMaintenanceWindow` (26R1 PATCH ops). All other 26R1 ops already had coverage. 441 tests passing. | 2026-03-30 |
+| P6.7 | Added `sanitiseUrl()` to `requestApi.ts`; replaces full URL with `{host}/.../resource` in all error messages. Also sanitised `operation` string to prevent GUID leakage. 2 new tests added. 442 tests passing. | 2026-03-30 |
 
 ---
 

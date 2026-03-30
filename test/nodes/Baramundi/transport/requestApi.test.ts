@@ -157,17 +157,38 @@ describe('Request API Transport Layer', () => {
       ).rejects.toThrow(/Resource Not Found/);
     });
 
-    it('should include full URL in error message', async () => {
+    it('should include sanitised URL in error message (no GUIDs or full paths)', async () => {
       // Arrange
       const mockContext = createMockExecuteFunctions();
       mockContext.helpers.httpRequest = vi.fn(async () => {
         throw new Error('Request failed with status code 404');
       });
 
-      // Act & Assert
+      // Act & Assert — URL is truncated to {host}/.../Endpoints, not the full path with IDs
+      const endpointGuid = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
       await expect(
-        apiRequest.call(mockContext, 'GET', '/endpoints/v2.0/Endpoints/test-id')
-      ).rejects.toThrow(/https:\/\/bms-win22srv:444\/bconnect\/endpoints\/v2.0\/Endpoints\/test-id/);
+        apiRequest.call(mockContext, 'GET', `/endpoints/v2.0/Endpoints/${endpointGuid}`)
+      ).rejects.toThrow(/https:\/\/bms-win22srv:444\/bconnect\/\.\.\.\/Endpoints/);
+    });
+
+    it('should not include GUID in the URL portion of the error message', async () => {
+      // Arrange
+      const mockContext = createMockExecuteFunctions();
+      mockContext.helpers.httpRequest = vi.fn(async () => {
+        throw new Error('Request failed with status code 404');
+      });
+
+      // Act & Assert — GUID must NOT appear in the URL: line of the error message
+      const guid = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
+      try {
+        await apiRequest.call(mockContext, 'GET', `/endpoints/v2.0/Endpoints/${guid}`);
+        throw new Error('Expected apiRequest to throw');
+      } catch (err: any) {
+        // The URL: line should not contain the GUID
+        const urlLine = (err.message as string).split('\n').find((l: string) => l.startsWith('URL:')) ?? '';
+        expect(urlLine).not.toMatch(guid);
+        expect(urlLine).toMatch(/bms-win22srv.*\/\.\.\.\/Endpoints/);
+      }
     });
   });
 

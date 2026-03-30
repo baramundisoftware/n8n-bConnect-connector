@@ -15,6 +15,19 @@ import {
   isSslError,
 } from '../utils/errorMessages';
 
+const GUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Sanitise a full API URL for error messages — strips GUIDs to avoid leaking identifiers.
+ * Returns `{baseUrl}/.../{lastResourceSegment}`.
+ */
+function sanitiseUrl(baseUrl: string, endpoint: string): string {
+  const segments = endpoint.split('/').filter(Boolean);
+  const lastResource =
+    [...segments].reverse().find((s) => !GUID_PATTERN.test(s)) ?? segments[segments.length - 1];
+  return `${baseUrl}/.../${lastResource ?? ''}`;
+}
+
 /**
  * Make an API request to bConnect
  */
@@ -49,7 +62,7 @@ export async function apiRequest(
     const response = await this.helpers.httpRequest(options);
     return response as JsonObject;
   } catch (error) {
-    const fullUrl = `${options.baseURL}${options.url}`;
+    const safeUrl = sanitiseUrl(options.baseURL as string, options.url as string);
     const errorMessage = (error as Error).message || 'Unknown error';
 
     // Check for network errors first
@@ -58,7 +71,7 @@ export async function apiRequest(
       const troubleshooting = formatTroubleshootingHints(networkErrorInfo.troubleshooting);
 
       throw new NodeApiError(this.getNode(), error as JsonObject, {
-        message: `${networkErrorInfo.message}${troubleshooting}\n\nURL: ${fullUrl}`,
+        message: `${networkErrorInfo.message}${troubleshooting}\n\nURL: ${safeUrl}`,
       });
     }
 
@@ -68,26 +81,26 @@ export async function apiRequest(
       const troubleshooting = formatTroubleshootingHints(sslErrorInfo.troubleshooting);
 
       throw new NodeApiError(this.getNode(), error as JsonObject, {
-        message: `${sslErrorInfo.message}${troubleshooting}\n\nURL: ${fullUrl}`,
+        message: `${sslErrorInfo.message}${troubleshooting}\n\nURL: ${safeUrl}`,
       });
     }
 
     // Handle HTTP status code errors
     const statusCode = extractStatusCode(error);
     if (statusCode > 0) {
-      const operation = `${method} ${endpoint}`;
+      const operation = `${method} ${safeUrl}`;
       const enhancedError = getEnhancedErrorInfo(statusCode, errorMessage, operation);
       const troubleshooting = formatTroubleshootingHints(enhancedError.troubleshooting);
 
       throw new NodeApiError(this.getNode(), error as JsonObject, {
-        message: `${enhancedError.message}${troubleshooting}\n\nURL: ${fullUrl}`,
+        message: `${enhancedError.message}${troubleshooting}\n\nURL: ${safeUrl}`,
         httpCode: String(statusCode),
       });
     }
 
     // Fallback for unknown errors
     throw new NodeApiError(this.getNode(), error as JsonObject, {
-      message: `bConnect API Error: ${errorMessage}\n\nURL: ${fullUrl}\n\nTroubleshooting:\n1. Check the error message above for details\n2. Verify your credentials and permissions\n3. Review baramundi server logs`,
+      message: `bConnect API Error: ${errorMessage}\n\nURL: ${safeUrl}\n\nTroubleshooting:\n1. Check the error message above for details\n2. Verify your credentials and permissions\n3. Review baramundi server logs`,
     });
   }
 }
