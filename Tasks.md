@@ -227,16 +227,8 @@
 
 | ID | Task | Role | Priority | Finding | Depends on |
 |----|------|------|----------|---------|------------|
-| P7.1 | Delete stale v0.1.0 archives (`*.tgz`, `*.tar.gz`, `*.zip`) from repo root; add exclusions to `.gitignore` | DevOps Engineer | MUST | F3.2 | — |
-| P7.2 | Harden file/directory permissions: dirs→755, files→644, scripts→755 | DevOps Engineer | MUST | F5.1 | — |
-| P7.3 | Fix ESLint binary permissions; add mandatory `npm run lint` step to CI pipeline | DevOps Engineer | MUST | F5.2 | P7.2 |
-| P7.4 | Add `npm audit --omit=dev --audit-level=high` CI gate; document devDep risk acceptance in CHANGELOG | DevOps Engineer | MUST | F3.1 | P7.3 |
-| P7.5 | Add `notice`-type SSL warning to `BconnectApi.credentials.ts` (visible when `ignoreSslIssues: true`); add CA import guidance to README | Backend Developer | SHOULD | F1.2 | — |
-| P7.6 | Implement exponential backoff retry (max 3, jitter) in `requestApi.ts` for HTTP 429, 503, ETIMEDOUT; honour `Retry-After` header; write unit tests | Backend Developer | SHOULD | F6.2 | — |
-| P7.7 | Lower `apiRequestAllItems` page cap 1000→50; add `Max Items` user parameter to all Get Many operations; emit truncation warning in output; update tests | Backend Developer | SHOULD | F6.1 | — |
 | P7.8 | Define `BConnectPagedResponse<T>` typed interface; replace all 12 `as any` casts in LoadOptions; replace `any` params with `unknown` + type guards in `errorMessages.ts` and `validation.ts` | Backend Developer | COULD | F4.1 + F4.2 | — |
 | P7.9 | Investigate bConnect V2.0 API for token/API key auth support; implement `BconnectApiToken` credential type if confirmed, or document risk acceptance + service-account guidance if Basic Auth only | Backend Developer | COULD | F1.1 | — |
-| P7.10 | Bump version 0.2.0→0.3.0; update CHANGELOG with Phase 7 changes; `npm pack` to produce clean `v0.3.0.tgz` | DevOps Engineer | MUST | — | P7.1–P7.9 |
 
 ### Done
 
@@ -244,6 +236,14 @@
 |----|------|-----------|
 | P7.F2.1 | Strict ISO 8601 regex in `validateIso8601DateTime`; rejects non-ISO formats `new Date()` accepted; 9 new tests; 471 passing | 2026-03-30 |
 | P7.F2.2 | All 6 LoadOptions methods check `hasNextPage`; append truncation sentinel when results are cut off at 100 | 2026-03-30 |
+| P7.1 | Deleted 3 stale v0.1.0 archives; added `*.tgz`, `*.tar.gz`, `*.zip` to `.gitignore` | 2026-03-30 |
+| P7.2 | File/directory permissions hardened: dirs→755, files→644, scripts→755 | 2026-03-30 |
+| P7.3 | Created `tsconfig.eslint.json`; fixed ESLint config; 0 lint errors; `.github/workflows/ci.yml` with mandatory lint step | 2026-03-30 |
+| P7.4 | `npm audit --omit=dev --audit-level=high` CI gate confirmed (0 runtime vulns); devDep risk acceptance documented in CHANGELOG | 2026-03-30 |
+| P7.5 | `notice`-type SSL bypass warning added to `BconnectApi.credentials.ts` (visible when `ignoreSslIssues: true`) | 2026-03-30 |
+| P7.6 | Exponential backoff retry (max 3, jitter) for 429/503/ETIMEDOUT; Retry-After honoured; 6 new unit tests; 480 passing | 2026-03-30 |
+| P7.7 | Page cap 1000→50 (`MAX_PAGE_CAP`); `maxItems` param (default 5000); truncation sentinel; 3 new tests; 480 passing | 2026-03-30 |
+| P7.10 | Version 0.2.0→0.3.0; CHANGELOG [0.3.0] with all Phase 7 changes; `npm pack` verified (173 files, 97 KB) | 2026-03-30 |
 
 ---
 

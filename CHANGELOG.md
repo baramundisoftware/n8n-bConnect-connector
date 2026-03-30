@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-03-30
+
+> **Semver rationale**: Minor version bump. All changes are backwards-compatible additions or non-breaking hardening. No API operations removed.
+
+### Security (IT Audit 2026-03-30 — Findings F1.2, F2.1, F2.2, F3.1, F3.2, F5.1, F5.2, F6.2)
+
+- **F1.2 — SSL bypass warning**: Added `notice`-type UI warning in `BconnectApi` credentials visible when `Ignore SSL Issues` is enabled. Warning names MitM risk and recommends CA import as the preferred alternative.
+- **F2.1 — Strict ISO 8601 validation**: Replaced permissive `new Date()` check with a strict regex. Rejects human-readable strings (`March 30, 2026`), date-only (`2026-01-22`), and space-separated formats. 9 new unit tests.
+- **F3.1 — CI security audit gate**: Added `.github/workflows/ci.yml` enforcing `npm audit --omit=dev --audit-level=high`. Runtime package confirmed at 0 vulnerabilities. DevDependency risk acceptance documented below.
+- **F3.2 — Stale archive removal**: Deleted three v0.1.0 distribution archives that predated Phase 6 security fixes. Added `*.tgz`, `*.tar.gz`, `*.zip` to `.gitignore`.
+- **F5.1 — File permission hardening**: All source directories set to `755`, all source files to `644`, executable scripts to `755`.
+- **F5.2 — ESLint CI enforcement**: Fixed ESLint configuration (`tsconfig.eslint.json` added, test file overrides), lint now passes with 0 errors. `npm run lint` is a required CI step.
+- **F6.2 — HTTP retry with exponential backoff**: `apiRequest()` now retries up to 3 times on HTTP 429, 503, and ETIMEDOUT errors. Backoff is exponential (100ms × 2^attempt) with jitter. Respects `Retry-After` header. Non-retryable 4xx errors fail immediately.
+
+### Changed
+
+- **F2.2 — Dropdown truncation indicator**: All six `LoadOptions` dropdowns (endpoints, jobs, org units, logical groups, static groups, dynamic groups) now append a `"— showing first 100 results, use GUID input for more —"` option when the API response indicates more pages exist.
+- **F6.1 — Pagination safety cap**: `apiRequestAllItems()` cap reduced from 1000 pages to 50 pages (`MAX_PAGE_CAP`). New optional `maxItems` parameter (default 5000) stops collection early and appends a `{ _truncated: true, _message: "..." }` sentinel to the result set so callers can surface a warning to users.
+
 ### Security — DevDependency Risk Acceptance (IT Audit F3.1)
 
 The following vulnerabilities remain in `devDependencies` after `npm audit fix`. They have **no upstream fix** available at the time of writing (2026-03-30) and are **not present in the runtime distribution** (confirmed via `npm audit --omit=dev`).
