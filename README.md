@@ -14,6 +14,7 @@ An n8n community node for integrating with [baramundi Management Suite](https://
 - [Testing](#testing)
 - [Running n8n with Custom Node](#running-n8n-with-custom-node)
 - [Credentials Configuration](#credentials-configuration)
+- [bMS Version Targeting](#bms-version-targeting)
 - [Available Resources & Operations](#available-resources--operations)
 - [Example Workflows](#example-workflows)
 - [Project Structure](#project-structure)
@@ -262,6 +263,41 @@ After starting n8n, configure the baramundi bConnect credentials:
 ### Testing Credentials
 
 Click **Test Credential** to verify the connection. This calls `/v2.0/endpoints?PageSize=1` to validate access.
+
+## bMS Version Targeting
+
+The node requires you to select your **baramundi Management Suite version** before choosing a resource. This ensures only operations supported by your server version are shown, preventing API errors at runtime.
+
+### Setting the version
+
+In any Baramundi node, the first parameter is **baramundi Management Suite Version**:
+
+| Option | Targets |
+|--------|---------|
+| `25R2` | bMS 25R2 — shows only operations available in that release |
+| `26R1` | bMS 26R1 — shows all operations including 26R1 additions (default) |
+
+### Version compatibility table
+
+| Feature / Resource | 25R2 | 26R1 |
+|---|:---:|:---:|
+| Endpoints (core CRUD, search, groups) | ✅ | ✅ |
+| Jobs, Assets, Software (core), Variables | ✅ | ✅ |
+| Active Directory, Defense Control (core) | ✅ | ✅ |
+| Server Management (core), Update Management | ✅ | ✅ |
+| Maintenance Window — PUT (full replace) | ✅ | — |
+| Maintenance Window — PATCH (partial update) | — | ✅ |
+| Compliance (Rules, Vulnerabilities, Violations) | — | ✅ |
+| Universal Dynamic Groups | — | ✅ |
+| EntraId data (Endpoint) | — | ✅ |
+| Unmanaged Endpoints | — | ✅ |
+| BitLocker Secrets V2.0 | — | ✅ |
+| Software Bundles & Bundle Folders | — | ✅ |
+| Assets by AD Object / Org Unit | — | ✅ |
+| API Keys, Download Jobs | — | ✅ |
+| DIP MSW Cleanup / Simulate MSW Cleanup | — | ✅ |
+
+> **Note**: The `25R2` version option will remain available until baramundi Management Suite 25R2 reaches end-of-life (expected ~2028).
 
 ## Available Resources & Operations
 

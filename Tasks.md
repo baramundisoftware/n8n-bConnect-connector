@@ -171,8 +171,7 @@
 | P5.3 | Verify `bmsVersion: '26R1'` hides all 25R2-only resources | QA Engineer | HIGH | Phase 4 done |
 | P5.4 | Full test run including system tests (`npm run test`) — document pass/skip counts | QA Engineer | HIGH | Phase 4 done |
 | P5.5 | Build package (`npm run build && npm pack`) — verify `.tgz` installs cleanly in n8n | DevOps Engineer | HIGH | P5.4 |
-| P5.6 | Update CHANGELOG.md: document V1.1 removal, version targeting feature, new 26R1 operations | Technical Writer | MEDIUM | P5.5 |
-| P5.7 | Update README.md: document `bmsVersion` parameter and version compatibility table | Technical Writer | MEDIUM | P5.5 |
+*(empty)*
 
 ### Done
 
@@ -183,6 +182,8 @@
 | P5.3 | Fixed: `bmsVersion: ['25R2']` constraint on PUT MaintenanceWindow fields confirmed. 25R2-only fields hidden under 26R1 | 2026-03-30 |
 | P5.4 | Full test run: 436 unit tests passing, 84 system tests skipped (no live server), 17 skipped | 2026-03-30 |
 | P5.5 | Build successful (TypeScript 0 errors), `n8n-nodes-baramundi-0.1.0.tgz` created (173 files) | 2026-03-30 |
+| P5.6 | Updated CHANGELOG.md: documented V1.1 removal breaking changes, bmsVersion feature, all 26R1 additions | 2026-03-30 |
+| P5.7 | Updated README.md: added bMS Version Targeting section with compatibility table and ToC entry | 2026-03-30 |
 
 ---
 

@@ -7,13 +7,80 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- **V1.1 API modules removed**: All V1.1 API operations have been removed. The connector now exposes only bConnect V2.0 API operations. Workflows using the following resources must be migrated to the V2.0 equivalents listed below:
+
+| Removed Resource | V2.0 Replacement |
+|---|---|
+| BitLocker Secrets (V1.1) | Defense Control → Get/Update BitLocker Secrets (26R1+) |
+| Compliance Violations (V1.1) | Compliance → Get Detected Rule Violations (26R1+) |
+| Org Units (V1.1) | Endpoint → Group operations |
+| Endpoint Inventory Software (V1.1) | Software → Get Installed Windows Software |
+| Boot Environments, Hardware Profiles, Images, SSH, VPP, Inventory scans | No direct replacement — remove from workflows |
+
 ### Added
-- **Job Operations - Get All Job Instances**: New operation to retrieve job instances across all jobs without requiring a specific job ID
+
+- **`bmsVersion` parameter**: New required parameter added before the Resource selector. Select your baramundi Management Suite version (25R2 or 26R1) to show only operations supported by that version. Default: `26R1`.
+
+- **Compliance module** (26R1+): New resource for querying compliance data
+  - Get Rules / Get Rule by ID
+  - Get Vulnerabilities / Get Vulnerability by ID
+  - Get Detected Vulnerabilities (all endpoints or per Windows endpoint)
+  - Get Detected Rule Violations (all endpoints or per endpoint)
+
+- **Universal Dynamic Groups module** (26R1+): New resource for managing universal dynamic groups
+  - Get Groups / Get Group by ID
+  - Get Groups by Folder
+  - Get Folders / Get Folder by ID / Get Sub-Folders
+
+- **Endpoint module — EntraId operations** (26R1+):
+  - Set Entra ID Data (POST)
+  - Delete Entra ID Data (DELETE)
+  - Get Entra ID Data by Endpoint ID
+  - Get Entra ID Data by Device ID
+
+- **Endpoint module — Unmanaged Endpoints** (26R1+):
+  - List Unmanaged Endpoints
+  - Get Unmanaged Endpoint by ID
+  - Delete Unmanaged Endpoint
+
+- **Defense Control module — BitLocker Secrets V2.0** (26R1+):
+  - Get BitLocker Secrets (`GET /v2.0/BitLocker/WindowsEndpoints/{id}/Secrets`)
+  - Update BitLocker Secrets (`PATCH /v2.0/BitLocker/WindowsEndpoints/{id}/Secrets`)
+
+- **Software module — Bundle operations** (26R1+):
+  - List/Get/Create Bundles
+  - List Bundle Applications / Delete Bundle Application
+  - List/Get/Create/Update/Delete Bundle Folders
+
+- **Asset module** (26R1+):
+  - Get Assets by AD Object
+  - Get Assets by Org Unit
+
+- **Server Management module** (26R1+):
+  - Perform MSW Cleanup (POST — deletes unused software files on Master DIP)
+  - Simulate MSW Cleanup (POST — dry-run preview)
+  - List API Keys
+  - List/Get Download Jobs
+
+- **Endpoint module — Maintenance Window versioning**:
+  - Replace Maintenance Window (PUT) — gated to `bmsVersion: 25R2`
+  - Update Maintenance Window (PATCH) — gated to `bmsVersion: 26R1`
+  - Same gating applied to Group Maintenance Window operations
+
+- **Job Operations - Get All Job Instances**: Retrieve job instances across all jobs without a job ID
   - Supports pagination with `returnAll` and `limit` parameters
-  - Optional OData filters: `searchQuery` (e.g., `state eq 'Running'`) and `orderBy` (e.g., `start desc`)
-  - Retrieves instances from multiple jobs in a single operation
-  - Complements existing `Get Instances` operation (which requires a job ID)
-  - Fully tested with 7 unit tests and 8 system tests
+  - Optional OData filters: `searchQuery` and `orderBy`
+
+### Fixed
+
+- Compliance and Universal Dynamic Groups operations now correctly hidden when `bmsVersion` is set to `25R2`
+
+### Testing
+
+- 436 unit tests passing (0 skipped)
+- TypeScript strict mode: 0 errors
 
 ## [0.1.0] - 2026-01-22
 
