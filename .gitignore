@@ -37,3 +37,8 @@ coverage/
 *.tmp
 *.temp
 .cache/
+
+# Distribution archives — produced by npm pack, never committed
+*.tgz
+*.tar.gz
+*.zip
