@@ -187,6 +187,32 @@
 
 ---
 
+## Phase 6 — Audit Remediation (IT Audit 2026-03-30)
+
+**Goal**: Resolve all findings from the IT audit. No production deployment until P6.1–P6.5 are complete.
+
+**Prerequisite**: Phase 5 complete.
+
+### Backlog
+
+| ID | Task | Role | Priority | Severity | Depends on |
+|----|------|------|----------|----------|------------|
+| P6.1 | `npm audit fix` + pin `axios >=1.14.0`; re-run audit and document remaining findings | DevOps Engineer | CRITICAL | C-1 | — |
+| P6.2 | Add `validateGuid()` to `compliance.execute.ts` for `getRule` (ruleId) and `getVulnerability` (vulnerabilityId) — match pattern in `endpoint.execute.ts:109` | Backend Developer | CRITICAL | C-2 | — |
+| P6.3 | Gate EntraId (4 ops) + UnmanagedEndpoints (3 ops) operation options to `bmsVersion: ['26R1']`; gate `putEndpointMaintenanceWindow` + `putGroupMaintenanceWindow` to `bmsVersion: ['25R2']` | Backend Developer | HIGH | H-1, H-2 | — |
+| P6.4 | Gate Software Bundle (10 ops) and Asset by ADObject/OrgUnit (2 ops) operation options to `bmsVersion: ['26R1']` | Backend Developer | HIGH | H-3 | — |
+| P6.5 | Replace hardcoded password in test fixtures with `test-password-do-not-use`; set `ignoreSslIssues: false` in all unit test mocks | Test Engineer | HIGH | H-4 | — |
+| P6.6 | Write unit tests for ungated 26R1 operations: EntraId (4), UnmanagedEndpoints (3), Software Bundles (10), Asset by ADObject/OrgUnit (2), ServerManagement MSW/ApiKeys/DownloadJobs (5), MaintenanceWindow PATCH (2) | Test Engineer | MEDIUM | M-4 | P6.3, P6.4 |
+| P6.7 | Sanitise API URLs in user-facing error messages in `requestApi.ts` — truncate to `{host}/.../{resource}` | Backend Developer | MEDIUM | M-2 | — |
+| P6.8 | Add RFC 6902 patch validation in `defenseControl.execute.ts` `patchBitLockerSecrets` and `endpoint.execute.ts` PATCH maintenance window operations | Backend Developer | MEDIUM | M-3 | — |
+| P6.9 | Bump `package.json` version to `0.2.0`; add CHANGELOG entry for 0.2.0 release with semver rationale (breaking: V1.1 removal) | Technical Writer | LOW | L-3 | P6.1–P6.8 |
+
+### Done
+
+*(empty)*
+
+---
+
 ## Notes
 
 - **System tests** (`test/system/`) require a live bMS server. They are skipped in CI unless `BMS_URL` env var is set. Do not block phases on system test results.
