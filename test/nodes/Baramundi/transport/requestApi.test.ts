@@ -31,8 +31,8 @@ function createMockExecuteFunctions(
     getCredentials: vi.fn(async () => ({
       baseUrl: 'https://bms-win22srv:444/bconnect',
       username: 'Administrator',
-      password: 'baramundi-2008',
-      ignoreSslIssues: true,
+      password: 'test-password-do-not-use',
+      ignoreSslIssues: false,
     })),
     helpers: {
       httpRequest,
@@ -69,10 +69,10 @@ describe('Request API Transport Layer', () => {
           baseURL: 'https://bms-win22srv:444/bconnect',
           url: '/endpoints/v2.0/Endpoints/1',
           json: true,
-          skipSslCertificateValidation: true,
+          skipSslCertificateValidation: false,
           auth: {
             username: 'Administrator',
-            password: 'baramundi-2008',
+            password: 'test-password-do-not-use',
           },
         })
       );
@@ -387,7 +387,7 @@ describe('Request API Transport Layer', () => {
       const customCredentials = {
         baseUrl: 'https://custom-server:444/bconnect',
         username: 'CustomUser',
-        password: 'CustomPassword',
+        password: 'test-password-do-not-use',
         ignoreSslIssues: false,
       };
 
@@ -408,7 +408,7 @@ describe('Request API Transport Layer', () => {
           skipSslCertificateValidation: false,
           auth: {
             username: 'CustomUser',
-            password: 'CustomPassword',
+            password: 'test-password-do-not-use',
           },
         })
       );

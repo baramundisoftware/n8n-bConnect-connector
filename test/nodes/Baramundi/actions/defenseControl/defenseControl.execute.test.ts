@@ -29,8 +29,8 @@ function createMockExecuteFunctions(
     getCredentials: vi.fn(async () => ({
       baseUrl: 'https://bms-win22srv:444/bconnect',
       username: 'Administrator',
-      password: 'baramundi-2008',
-      ignoreSslIssues: true,
+      password: 'test-password-do-not-use',
+      ignoreSslIssues: false,
       ...credentials,
     })),
     helpers: {

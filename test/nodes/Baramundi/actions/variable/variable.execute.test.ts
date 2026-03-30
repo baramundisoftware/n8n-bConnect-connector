@@ -16,8 +16,8 @@ function createMockExecuteFunctions(
 		getCredentials: vi.fn(async () => ({
 			baseUrl: credentials.baseUrl || 'https://bms-win22srv:444/bconnect',
 			username: 'testuser',
-			password: 'testpass',
-			ignoreSslIssues: credentials.ignoreSslIssues ?? true,
+			password: 'test-password-do-not-use',
+			ignoreSslIssues: credentials.ignoreSslIssues ?? false,
 		})),
 		helpers: {
 			httpRequest: vi.fn(async () => mockResponse),
