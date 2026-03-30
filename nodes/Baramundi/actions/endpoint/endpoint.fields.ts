@@ -143,10 +143,16 @@ export const endpointOperations: INodeProperties[] = [
         action: 'Create endpoint maintenance window',
       },
       {
-        name: 'Update Endpoint Maintenance Window',
+        name: 'Update Endpoint Maintenance Window (PATCH)',
         value: 'updateEndpointMaintenanceWindow',
-        description: 'Update a maintenance window for an endpoint',
+        description: 'Update a maintenance window for an endpoint using JSON Patch (requires bMS 26R1+)',
         action: 'Update endpoint maintenance window',
+      },
+      {
+        name: 'Replace Endpoint Maintenance Window (PUT)',
+        value: 'putEndpointMaintenanceWindow',
+        description: 'Replace a maintenance window for an endpoint with a full body (requires bMS 25R2)',
+        action: 'Replace endpoint maintenance window',
       },
       {
         name: 'Delete Endpoint Maintenance Window',
@@ -161,10 +167,16 @@ export const endpointOperations: INodeProperties[] = [
         action: 'Create group maintenance window',
       },
       {
-        name: 'Update Group Maintenance Window',
+        name: 'Update Group Maintenance Window (PATCH)',
         value: 'updateGroupMaintenanceWindow',
-        description: 'Update a maintenance window for a group',
+        description: 'Update a maintenance window for a group using JSON Patch (requires bMS 26R1+)',
         action: 'Update group maintenance window',
+      },
+      {
+        name: 'Replace Group Maintenance Window (PUT)',
+        value: 'putGroupMaintenanceWindow',
+        description: 'Replace a maintenance window for a group with a full body (requires bMS 25R2)',
+        action: 'Replace group maintenance window',
       },
       {
         name: 'Delete Group Maintenance Window',
@@ -985,7 +997,7 @@ export const endpointFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['endpoint'],
-        operation: ['createEndpointMaintenanceWindow', 'updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow'],
+        operation: ['createEndpointMaintenanceWindow', 'updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow', 'putEndpointMaintenanceWindow'],
       },
     },
     typeOptions: {
@@ -1008,7 +1020,7 @@ export const endpointFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['endpoint'],
-        operation: ['createEndpointMaintenanceWindow', 'updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow'],
+        operation: ['createEndpointMaintenanceWindow', 'updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow', 'putEndpointMaintenanceWindow'],
         endpointSelection: ['__custom__'],
       },
     },
@@ -1024,10 +1036,25 @@ export const endpointFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['endpoint'],
-        operation: ['updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow'],
+        operation: ['updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow', 'putEndpointMaintenanceWindow'],
       },
     },
     description: 'The GUID of the maintenance window',
+  },
+  {
+    displayName: 'Maintenance Window (JSON)',
+    name: 'maintenanceWindowJson',
+    type: 'json',
+    required: true,
+    default: '{"maintenanceWindowDefinitionType":"daily","intervals":[]}',
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['putEndpointMaintenanceWindow'],
+        bmsVersion: ['25R2'],
+      },
+    },
+    description: 'Full MaintenanceWindow JSON body for PUT replacement (bMS 25R2). See API docs for schema.',
   },
   {
     displayName: 'Start Time',
@@ -1098,6 +1125,7 @@ export const endpointFields: INodeProperties[] = [
       show: {
         resource: ['endpoint'],
         operation: ['updateEndpointMaintenanceWindow'],
+        bmsVersion: ['26R1'],
       },
     },
     options: [
@@ -1146,7 +1174,7 @@ export const endpointFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['endpoint'],
-        operation: ['createGroupMaintenanceWindow', 'updateGroupMaintenanceWindow', 'deleteGroupMaintenanceWindow'],
+        operation: ['createGroupMaintenanceWindow', 'updateGroupMaintenanceWindow', 'deleteGroupMaintenanceWindow', 'putGroupMaintenanceWindow'],
       },
     },
     description: 'The GUID of the group',
@@ -1160,7 +1188,7 @@ export const endpointFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['endpoint'],
-        operation: ['createGroupMaintenanceWindow', 'updateGroupMaintenanceWindow', 'deleteGroupMaintenanceWindow'],
+        operation: ['createGroupMaintenanceWindow', 'updateGroupMaintenanceWindow', 'deleteGroupMaintenanceWindow', 'putGroupMaintenanceWindow'],
       },
     },
     options: [
@@ -1179,10 +1207,25 @@ export const endpointFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['endpoint'],
-        operation: ['updateGroupMaintenanceWindow', 'deleteGroupMaintenanceWindow'],
+        operation: ['updateGroupMaintenanceWindow', 'deleteGroupMaintenanceWindow', 'putGroupMaintenanceWindow'],
       },
     },
     description: 'The GUID of the maintenance window',
+  },
+  {
+    displayName: 'Maintenance Window (JSON)',
+    name: 'maintenanceWindowJson',
+    type: 'json',
+    required: true,
+    default: '{"maintenanceWindowDefinitionType":"daily","intervals":[]}',
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['putGroupMaintenanceWindow'],
+        bmsVersion: ['25R2'],
+      },
+    },
+    description: 'Full MaintenanceWindow JSON body for PUT replacement (bMS 25R2). See API docs for schema.',
   },
   {
     displayName: 'Start Time',
@@ -1253,6 +1296,7 @@ export const endpointFields: INodeProperties[] = [
       show: {
         resource: ['endpoint'],
         operation: ['updateGroupMaintenanceWindow'],
+        bmsVersion: ['26R1'],
       },
     },
     options: [

@@ -810,6 +810,68 @@ export async function deleteGroupMaintenanceWindow(
 }
 
 // ----------------------------------
+//   MaintenanceWindow PUT variants (25R2)
+// ----------------------------------
+
+export async function putEndpointMaintenanceWindow(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const endpointSelection = this.getNodeParameter('endpointSelection', index) as string;
+  const endpointId = endpointSelection === '__custom__'
+    ? this.getNodeParameter('endpointId', index) as string
+    : endpointSelection;
+  const windowId = this.getNodeParameter('windowId', index) as string;
+  const maintenanceWindowJson = this.getNodeParameter('maintenanceWindowJson', index) as string;
+
+  const validation = validateGuid(endpointId);
+  if (!validation.valid) {
+    throw new NodeOperationError(
+      this.getNode(),
+      `Invalid endpoint ID:\n${validation.errors.join('\n')}`,
+      { itemIndex: index },
+    );
+  }
+
+  let body: IDataObject;
+  try {
+    body = JSON.parse(maintenanceWindowJson) as IDataObject;
+  } catch {
+    throw new Error('maintenanceWindowJson must be a valid JSON object');
+  }
+
+  const response = await apiRequest.call(this, 'PUT', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindows/${windowId}`, body);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function putGroupMaintenanceWindow(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const groupId = this.getNodeParameter('groupId', index) as string;
+  const groupType = this.getNodeParameter('groupType', index) as string;
+  const windowId = this.getNodeParameter('windowId', index) as string;
+  const maintenanceWindowJson = this.getNodeParameter('maintenanceWindowJson', index) as string;
+
+  const groupTypeMap: Record<string, string> = {
+    logical: 'LogicalGroups',
+    static: 'StaticGroups',
+    dynamic: 'DynamicGroups',
+  };
+
+  let body: IDataObject;
+  try {
+    body = JSON.parse(maintenanceWindowJson) as IDataObject;
+  } catch {
+    throw new Error('maintenanceWindowJson must be a valid JSON object');
+  }
+
+  const groupTypePath = groupTypeMap[groupType];
+  const response = await apiRequest.call(this, 'PUT', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindows/${windowId}`, body);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+// ----------------------------------
 //   EntraId operations (26R1+)
 // ----------------------------------
 

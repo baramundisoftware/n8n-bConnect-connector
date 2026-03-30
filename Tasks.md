@@ -144,7 +144,9 @@
 
 ### Done
 
-*(empty)*
+| ID | Task | Completed |
+|----|------|-----------|
+| P4.1 | `endpoint` module: added EntraId (3 ops) + UnmanagedEndpoints (3 ops), gated `bmsVersion: ['26R1']` | 2026-03-30 |
 
 ---
 

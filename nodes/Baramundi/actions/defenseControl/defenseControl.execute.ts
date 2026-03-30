@@ -280,3 +280,34 @@ export async function getMicrosoftDefenderWindowsEndpoint(
   const response = await apiRequest.call(this, 'GET', `/defensecontrol/v2.0/MicrosoftDefender/WindowsEndpoints/${endpointId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
+
+// ============================================================================
+// BITLOCKER SECRETS OPERATIONS (26R1+)
+// ============================================================================
+
+export async function getBitLockerSecrets(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const response = await apiRequest.call(this, 'GET', `/defensecontrol/v2.0/BitLocker/WindowsEndpoints/${endpointId}/Secrets`);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function patchBitLockerSecrets(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const patchOperations = this.getNodeParameter('patchOperations', index) as string;
+
+  let body: IDataObject[];
+  try {
+    body = JSON.parse(patchOperations) as IDataObject[];
+  } catch {
+    throw new Error('patchOperations must be a valid JSON array');
+  }
+
+  const response = await apiRequest.call(this, 'PATCH', `/defensecontrol/v2.0/BitLocker/WindowsEndpoints/${endpointId}/Secrets`, body as unknown as IDataObject);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}

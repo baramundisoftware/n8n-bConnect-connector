@@ -78,6 +78,18 @@ export const defenseControlOperations: INodeProperties[] = [
         description: 'Get a single Defender endpoint by ID',
         action: 'Get a Defender endpoint',
       },
+      {
+        name: 'Get BitLocker Secrets',
+        value: 'getBitLockerSecrets',
+        description: 'Get BitLocker secrets for an endpoint (requires bMS 26R1+)',
+        action: 'Get BitLocker secrets',
+      },
+      {
+        name: 'Patch BitLocker Secrets',
+        value: 'patchBitLockerSecrets',
+        description: 'Update BitLocker secrets for an endpoint using JSON Patch (requires bMS 26R1+)',
+        action: 'Patch BitLocker secrets',
+      },
     ],
     default: 'getBitLockerWindowsEndpoints',
   },
@@ -189,10 +201,31 @@ export const defenseControlFields: INodeProperties[] = [
           'patchLocalAdminUserCredentials',
           'getMicrosoftDefenderThreatsByEndpoint',
           'getMicrosoftDefenderWindowsEndpoint',
+          'getBitLockerSecrets',
+          'patchBitLockerSecrets',
         ],
       },
     },
     description: 'The GUID of the endpoint',
+  },
+
+  // ----------------------------------
+  //         defenseControl:patchBitLockerSecrets (26R1+)
+  // ----------------------------------
+  {
+    displayName: 'Patch Operations (JSON)',
+    name: 'patchOperations',
+    type: 'json',
+    required: true,
+    default: '[{"op":"replace","path":"/InitialStartupPin","value":"12345678"}]',
+    displayOptions: {
+      show: {
+        resource: ['defenseControl'],
+        operation: ['patchBitLockerSecrets'],
+        bmsVersion: ['26R1'],
+      },
+    },
+    description: 'JSON Patch operations array (RFC 6902). E.g. [{"op":"replace","path":"/InitialStartupPin","value":"12345678"}]',
   },
 
   // ============================================================================

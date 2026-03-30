@@ -162,6 +162,36 @@ export const serverManagementOperations: INodeProperties[] = [
         description: 'Restart a microservice',
         action: 'Restart microservice',
       },
+      {
+        name: 'Get DIPs MSW Cleanup',
+        value: 'getDipsMSWCleanup',
+        description: 'Trigger DIPs MSW cleanup (requires bMS 26R1+)',
+        action: 'Get DIPs MSW cleanup',
+      },
+      {
+        name: 'Simulate MSW Cleanup',
+        value: 'simulateMSWCleanup',
+        description: 'Simulate MSW cleanup (requires bMS 26R1+)',
+        action: 'Simulate MSW cleanup',
+      },
+      {
+        name: 'Get API Keys',
+        value: 'getApiKeys',
+        description: 'Get all API keys (requires bMS 26R1+)',
+        action: 'Get API keys',
+      },
+      {
+        name: 'Get Download Jobs',
+        value: 'getDownloadJobs',
+        description: 'Get all download jobs (requires bMS 26R1+)',
+        action: 'Get download jobs',
+      },
+      {
+        name: 'Get Download Job',
+        value: 'getDownloadJob',
+        description: 'Get a download job by ID (requires bMS 26R1+)',
+        action: 'Get download job',
+      },
     ],
     default: 'getManagementServer',
   },
@@ -518,5 +548,55 @@ export const serverManagementFields: INodeProperties[] = [
         description: 'JSON array of security profile access rights assignments',
       },
     ],
+  },
+
+  // ============================================================================
+  // DOWNLOAD JOBS OPERATIONS (bMS 26R1+)
+  // ============================================================================
+
+  {
+    displayName: 'Return All',
+    name: 'returnAll',
+    type: 'boolean',
+    default: false,
+    displayOptions: {
+      show: {
+        resource: ['serverManagement'],
+        operation: ['getDownloadJobs'],
+        bmsVersion: ['26R1'],
+      },
+    },
+    description: 'Whether to return all results or only up to a given limit',
+  },
+  {
+    displayName: 'Limit',
+    name: 'limit',
+    type: 'number',
+    typeOptions: { minValue: 1 },
+    default: 50,
+    displayOptions: {
+      show: {
+        resource: ['serverManagement'],
+        operation: ['getDownloadJobs'],
+        bmsVersion: ['26R1'],
+        returnAll: [false],
+      },
+    },
+    description: 'Max number of results to return',
+  },
+  {
+    displayName: 'Download Job ID',
+    name: 'downloadJobId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['serverManagement'],
+        operation: ['getDownloadJob'],
+        bmsVersion: ['26R1'],
+      },
+    },
+    description: 'The GUID of the download job',
   },
 ];

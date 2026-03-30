@@ -374,3 +374,60 @@ export async function restartMicroservice(
   await apiRequest.call(this, 'POST', `/servermanagement/v2.0/Microservices/${microserviceId}/Restart`);
   return this.helpers.returnJsonArray({ success: true, microserviceId, action: 'restart' });
 }
+
+// ============================================================================
+// DIPS / API KEYS / DOWNLOAD JOBS (bMS 26R1+)
+// ============================================================================
+
+export async function getDipsMSWCleanup(
+  this: IExecuteFunctions,
+  _index: number,
+): Promise<INodeExecutionData[]> {
+  const response = await apiRequest.call(this, 'POST', '/servermanagement/v2.0/Dips/MSWCleanup');
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function simulateMSWCleanup(
+  this: IExecuteFunctions,
+  _index: number,
+): Promise<INodeExecutionData[]> {
+  const response = await apiRequest.call(this, 'POST', '/servermanagement/v2.0/Dips/SimulateMSWCleanup');
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function getApiKeys(
+  this: IExecuteFunctions,
+  _index: number,
+): Promise<INodeExecutionData[]> {
+  const response = await apiRequest.call(this, 'GET', '/servermanagement/v2.0/ApiKeys');
+  return this.helpers.returnJsonArray(response as unknown as IDataObject[]);
+}
+
+export async function getDownloadJobs(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+
+  const qs: Record<string, string | number> = {};
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', '/servermanagement/v2.0/DownloadJobs', {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', '/servermanagement/v2.0/DownloadJobs', {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getDownloadJob(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const downloadJobId = this.getNodeParameter('downloadJobId', index) as string;
+  const response = await apiRequest.call(this, 'GET', `/servermanagement/v2.0/DownloadJobs/${downloadJobId}`);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}

@@ -116,6 +116,12 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
             case 'deleteAssetStockFolder':
               responseData = await asset.deleteAssetStockFolder.call(this, i);
               break;
+            case 'getAssetsByADObject':
+              responseData = await asset.getAssetsByADObject.call(this, i);
+              break;
+            case 'getAssetsByOrgUnit':
+              responseData = await asset.getAssetsByOrgUnit.call(this, i);
+              break;
             default:
               throw new NodeOperationError(
                 this.getNode(),
@@ -158,6 +164,12 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
               break;
             case 'getMicrosoftDefenderWindowsEndpoint':
               responseData = await defenseControl.getMicrosoftDefenderWindowsEndpoint.call(this, i);
+              break;
+            case 'getBitLockerSecrets':
+              responseData = await defenseControl.getBitLockerSecrets.call(this, i);
+              break;
+            case 'patchBitLockerSecrets':
+              responseData = await defenseControl.patchBitLockerSecrets.call(this, i);
               break;
             default:
               throw new NodeOperationError(
@@ -246,6 +258,12 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
               break;
             case 'deleteGroupMaintenanceWindow':
               responseData = await endpoint.deleteGroupMaintenanceWindow.call(this, i);
+              break;
+            case 'putEndpointMaintenanceWindow':
+              responseData = await endpoint.putEndpointMaintenanceWindow.call(this, i);
+              break;
+            case 'putGroupMaintenanceWindow':
+              responseData = await endpoint.putGroupMaintenanceWindow.call(this, i);
               break;
             case 'setEntraIdData':
               responseData = await endpoint.setEntraIdData.call(this, i);
@@ -466,6 +484,21 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
             case 'restartMicroservice':
               responseData = await serverManagement.restartMicroservice.call(this, i);
               break;
+            case 'getDipsMSWCleanup':
+              responseData = await serverManagement.getDipsMSWCleanup.call(this, i);
+              break;
+            case 'simulateMSWCleanup':
+              responseData = await serverManagement.simulateMSWCleanup.call(this, i);
+              break;
+            case 'getApiKeys':
+              responseData = await serverManagement.getApiKeys.call(this, i);
+              break;
+            case 'getDownloadJobs':
+              responseData = await serverManagement.getDownloadJobs.call(this, i);
+              break;
+            case 'getDownloadJob':
+              responseData = await serverManagement.getDownloadJob.call(this, i);
+              break;
             default:
               throw new NodeOperationError(
                 this.getNode(),
@@ -487,6 +520,36 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
               break;
             case 'getInstalledSoftwareByUniversalDynamicGroup':
               responseData = await software.getInstalledSoftwareByUniversalDynamicGroup.call(this, i);
+              break;
+            case 'getBundles':
+              responseData = await software.getBundles.call(this, i);
+              break;
+            case 'getBundle':
+              responseData = await software.getBundle.call(this, i);
+              break;
+            case 'createBundle':
+              responseData = await software.createBundle.call(this, i);
+              break;
+            case 'deleteBundle':
+              responseData = await software.deleteBundle.call(this, i);
+              break;
+            case 'getBundleFolders':
+              responseData = await software.getBundleFolders.call(this, i);
+              break;
+            case 'getBundleFolder':
+              responseData = await software.getBundleFolder.call(this, i);
+              break;
+            case 'getBundleSubFolders':
+              responseData = await software.getBundleSubFolders.call(this, i);
+              break;
+            case 'createBundleFolder':
+              responseData = await software.createBundleFolder.call(this, i);
+              break;
+            case 'deleteBundleFolder':
+              responseData = await software.deleteBundleFolder.call(this, i);
+              break;
+            case 'getBundleApplicationsByBundle':
+              responseData = await software.getBundleApplicationsByBundle.call(this, i);
               break;
             default:
               throw new NodeOperationError(

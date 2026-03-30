@@ -108,6 +108,18 @@ export const assetOperations: INodeProperties[] = [
         description: 'Delete an asset stock folder',
         action: 'Delete asset stock folder',
       },
+      {
+        name: 'Get Assets by AD Object',
+        value: 'getAssetsByADObject',
+        description: 'Get assets linked to an AD object (requires bMS 26R1+)',
+        action: 'Get assets by AD object',
+      },
+      {
+        name: 'Get Assets by Org Unit',
+        value: 'getAssetsByOrgUnit',
+        description: 'Get assets linked to an org unit (requires bMS 26R1+)',
+        action: 'Get assets by org unit',
+      },
     ],
     default: 'getMany',
   },
@@ -617,5 +629,70 @@ export const assetFields: INodeProperties[] = [
         description: 'GUID of the parent folder',
       },
     ],
+  },
+
+  // ============================================================================
+  // AD OBJECT / ORG UNIT ASSET OPERATIONS (bMS 26R1+)
+  // ============================================================================
+
+  {
+    displayName: 'Return All',
+    name: 'returnAll',
+    type: 'boolean',
+    default: false,
+    displayOptions: {
+      show: {
+        resource: ['asset'],
+        operation: ['getAssetsByADObject', 'getAssetsByOrgUnit'],
+        bmsVersion: ['26R1'],
+      },
+    },
+    description: 'Whether to return all results or only up to a given limit',
+  },
+  {
+    displayName: 'Limit',
+    name: 'limit',
+    type: 'number',
+    typeOptions: { minValue: 1 },
+    default: 50,
+    displayOptions: {
+      show: {
+        resource: ['asset'],
+        operation: ['getAssetsByADObject', 'getAssetsByOrgUnit'],
+        bmsVersion: ['26R1'],
+        returnAll: [false],
+      },
+    },
+    description: 'Max number of results to return',
+  },
+  {
+    displayName: 'AD Object ID',
+    name: 'adObjectId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['asset'],
+        operation: ['getAssetsByADObject'],
+        bmsVersion: ['26R1'],
+      },
+    },
+    description: 'The GUID of the AD object',
+  },
+  {
+    displayName: 'Org Unit ID',
+    name: 'orgUnitId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['asset'],
+        operation: ['getAssetsByOrgUnit'],
+        bmsVersion: ['26R1'],
+      },
+    },
+    description: 'The GUID of the org unit',
   },
 ];

@@ -398,3 +398,49 @@ export async function deleteAssetStockFolder(
   await apiRequest.call(this, 'DELETE', `/assets/v2.0/AssetStock/Folders/${folderId}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: folderId });
 }
+
+// ============================================================================
+// AD OBJECT / ORG UNIT ASSET OPERATIONS (bMS 26R1+)
+// ============================================================================
+
+export async function getAssetsByADObject(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const adObjectId = this.getNodeParameter('adObjectId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+
+  const qs: Record<string, string | number> = {};
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/assets/v2.0/ADObjects/${adObjectId}/Assets`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/assets/v2.0/ADObjects/${adObjectId}/Assets`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getAssetsByOrgUnit(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const orgUnitId = this.getNodeParameter('orgUnitId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+
+  const qs: Record<string, string | number> = {};
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/assets/v2.0/OrgUnits/${orgUnitId}/Assets`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/assets/v2.0/OrgUnits/${orgUnitId}/Assets`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
