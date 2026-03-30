@@ -154,8 +154,16 @@ export async function apiRequest(
   }
 }
 
+/** Maximum number of pages fetched by apiRequestAllItems regardless of maxItems. */
+export const MAX_PAGE_CAP = 50;
+
 /**
- * Make an API request to bConnect V2.0 and return all results (handles pagination)
+ * Make an API request to bConnect V2.0 and return all results (handles pagination).
+ *
+ * @param maxItems  Stop collecting once this many items have been retrieved.
+ *                  When the cap is hit a sentinel `{ _truncated: true, _message: "..." }`
+ *                  is appended so callers can surface a warning to users.
+ *                  Defaults to 5000 (50 pages × 100 items).
  */
 export async function apiRequestAllItems(
   this: IExecuteFunctions,
@@ -163,6 +171,7 @@ export async function apiRequestAllItems(
   endpoint: string,
   body: object = {},
   qs: Record<string, string | number> = {},
+  maxItems = 5000,
 ): Promise<JsonObject[]> {
   const returnData: JsonObject[] = [];
   let page = 0;
@@ -181,14 +190,29 @@ export async function apiRequestAllItems(
     const data = (response.data as JsonObject[]) || [];
     const hasNext = (response.hasNextPage as boolean) || false;
 
-    returnData.push(...data);
+    for (const item of data) {
+      if (returnData.length >= maxItems) {
+        returnData.push({
+          _truncated: true,
+          _message: `Result set truncated at ${maxItems} items. Increase Max Items or filter results.`,
+        });
+        return returnData;
+      }
+      returnData.push(item);
+    }
 
     // Check if there are more pages
     hasMorePages = hasNext && data.length > 0;
     page++;
 
-    // Safety limit to prevent infinite loops
-    if (page > 1000) {
+    // Safety cap to prevent runaway pagination
+    if (page >= MAX_PAGE_CAP) {
+      if (hasMorePages) {
+        returnData.push({
+          _truncated: true,
+          _message: `Result set truncated at ${MAX_PAGE_CAP} pages (${returnData.length} items). Increase Max Items or filter results.`,
+        });
+      }
       break;
     }
   }

@@ -6,7 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { IExecuteFunctions, IHttpRequestOptions } from 'n8n-workflow';
-import { apiRequest, apiRequestAllItems } from '../../../../nodes/Baramundi/transport/requestApi';
+import { apiRequest, apiRequestAllItems, MAX_PAGE_CAP } from '../../../../nodes/Baramundi/transport/requestApi';
 
 /**
  * Create a mock IExecuteFunctions for transport testing
@@ -346,7 +346,7 @@ describe('Request API Transport Layer', () => {
       );
     });
 
-    it('should stop after safety limit (1000 pages)', async () => {
+    it('should stop after MAX_PAGE_CAP pages and append truncation sentinel', async () => {
       // Arrange - Always return hasNextPage: true
       const mockResponse = {
         hasNextPage: true,
@@ -362,9 +362,10 @@ describe('Request API Transport Layer', () => {
         '/endpoints/v2.0/Endpoints'
       );
 
-      // Assert - Should stop at 1001 pages (page counter goes 0-1000)
-      expect(mockContext.helpers.httpRequest).toHaveBeenCalledTimes(1001);
-      expect(result).toHaveLength(1001);
+      // Assert - Should stop at MAX_PAGE_CAP (50) pages + 1 truncation sentinel
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledTimes(MAX_PAGE_CAP);
+      expect(result).toHaveLength(MAX_PAGE_CAP + 1);
+      expect(result[result.length - 1]).toHaveProperty('_truncated', true);
     });
 
     it('should fetch data from multiple pages sequentially', async () => {
@@ -433,6 +434,64 @@ describe('Request API Transport Layer', () => {
           },
         })
       );
+    });
+  });
+
+  describe('pagination cap and maxItems', () => {
+    it('should export MAX_PAGE_CAP constant equal to 50', () => {
+      expect(MAX_PAGE_CAP).toBe(50);
+    });
+
+    it('should stop at maxItems and include truncation warning', async () => {
+      // 3 pages of 2 items each; maxItems=3 should stop after page 1 (2 items) then partial
+      const page0 = { data: [{ id: '1' }, { id: '2' }], hasNextPage: true };
+      const page1 = { data: [{ id: '3' }, { id: '4' }], hasNextPage: true };
+      let calls = 0;
+      const mockContext = {
+        getCredentials: vi.fn(async () => ({
+          baseUrl: 'https://bms-win22srv:444/bconnect',
+          username: 'Administrator',
+          password: 'test-password-do-not-use',
+          ignoreSslIssues: false,
+        })),
+        helpers: {
+          httpRequest: vi.fn(async () => {
+            return calls++ === 0 ? page0 : page1;
+          }),
+        },
+        getNode: vi.fn(() => ({ name: 'Baramundi', type: 'baramundi', typeVersion: 1, position: [0, 0], parameters: {} })),
+      } as unknown as IExecuteFunctions;
+
+      const result = await apiRequestAllItems.call(mockContext, 'GET', '/endpoint', {}, {}, 3);
+
+      // Should have 4 items: 3 data items (maxItems=3) + 1 truncation sentinel
+      expect(result.length).toBe(4);
+      // Last item should be truncation warning sentinel
+      const last = result[result.length - 1];
+      expect(last).toHaveProperty('_truncated', true);
+    });
+
+    it('should return all items without truncation sentinel when under maxItems', async () => {
+      const mockContext = {
+        getCredentials: vi.fn(async () => ({
+          baseUrl: 'https://bms-win22srv:444/bconnect',
+          username: 'Administrator',
+          password: 'test-password-do-not-use',
+          ignoreSslIssues: false,
+        })),
+        helpers: {
+          httpRequest: vi.fn(async () => ({
+            data: [{ id: '1' }, { id: '2' }],
+            hasNextPage: false,
+          })),
+        },
+        getNode: vi.fn(() => ({ name: 'Baramundi', type: 'baramundi', typeVersion: 1, position: [0, 0], parameters: {} })),
+      } as unknown as IExecuteFunctions;
+
+      const result = await apiRequestAllItems.call(mockContext, 'GET', '/endpoint', {}, {}, 500);
+
+      expect(result).toHaveLength(2);
+      expect(result[0]).toEqual({ id: '1' });
     });
   });
 
