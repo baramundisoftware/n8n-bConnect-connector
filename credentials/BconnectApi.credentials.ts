@@ -7,7 +7,8 @@ import type {
 
 export class BconnectApi implements ICredentialType {
   name = 'bconnectApi';
-  displayName = 'baramundi bConnect API';
+  displayName = 'Baramundi bConnect API';
+  // eslint-disable-next-line n8n-nodes-base/cred-class-field-documentation-url-miscased
   documentationUrl = 'https://docs.baramundi.com/';
 
   properties: INodeProperties[] = [
@@ -46,6 +47,18 @@ export class BconnectApi implements ICredentialType {
       default: false,
       description:
         'Whether to connect even if SSL certificate validation fails (use with caution)',
+    },
+    {
+      displayName:
+        'Warning: TLS validation is disabled. All API traffic between n8n and the bMS server can be intercepted (man-in-the-middle attack). Use only in isolated test environments. For self-signed certificates the recommended solution is to import your internal CA into the n8n host trust store instead of disabling validation.',
+      name: 'sslWarning',
+      type: 'notice',
+      default: '',
+      displayOptions: {
+        show: {
+          ignoreSslIssues: [true],
+        },
+      },
     },
   ];
 
