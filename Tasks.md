@@ -59,20 +59,21 @@
 
 **Prerequisite**: Phase 1 complete.
 
+**Design note**: Version gating at the **Resource** level uses `displayOptions.show.bmsVersion`. Version-specific operations within a resource are noted in their descriptions. New 26R1-only resources (Phase 3) will use `displayOptions.show.bmsVersion: ['26R1']` on the resource block.
+
 ### Backlog
 
 | ID | Task | Role | Priority | Depends on |
 |----|------|------|----------|------------|
-| P2.1 | Add `bmsVersion` dropdown parameter as first property in `Baramundi.node.ts` (options: 25R2, 26R1; default: 26R1) | Backend Developer | HIGH | Phase 1 done |
-| P2.2 | Gate 25R2-only operations: IndustrialEndpoints (not yet implemented — skip to P2.3), MaintenanceWindow PUT in endpoint + logicalGroup fields | Backend Developer | HIGH | P2.1 |
-| P2.3 | Gate 26R1-only operations already implemented in existing modules: add `displayOptions.show.bmsVersion` where needed (verify against version matrix in Requirements.md) | Backend Developer | HIGH | P2.1 |
-| P2.4 | Build and test — verify 25R2 selection hides 26R1-only resources in UI (manual check via `npx @n8n/node-cli dev`), unit tests pass | QA Engineer | HIGH | P2.2, P2.3 |
-
-**Note on IndustrialEndpoints (25R2-only)**: Not currently implemented in the connector. Implement in Phase 4 (P4.7) if required, otherwise defer.
+| P2.4 | Manual UI verify: `bmsVersion: '25R2'` hides 26R1-only resources (after Phase 3 resources are added) | QA Engineer | HIGH | Phase 3 done |
 
 ### Done
 
-*(empty)*
+| ID | Task | Completed |
+|----|------|-----------|
+| P2.1 | Added `bmsVersion` dropdown as first property in `Baramundi.node.ts` (options: 25R2, 26R1; default: 26R1) | 2026-03-30 |
+| P2.2 | 25R2-only ops (IndustrialEndpoints) not in codebase — deferred. MaintenanceWindow versioning handled in Phase 4 (REQ-CHANGED-1) | 2026-03-30 |
+| P2.3 | `getInstalledSoftwareByUniversalDynamicGroup` noted as 26R1+ in description. Resource-level gating applied to new 26R1 resources in Phase 3 | 2026-03-30 |
 
 ---
 

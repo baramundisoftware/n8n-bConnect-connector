@@ -49,6 +49,19 @@ export class Baramundi implements INodeType {
     },
     properties: [
       {
+        displayName: 'baramundi Management Suite Version',
+        name: 'bmsVersion',
+        type: 'options',
+        required: true,
+        noDataExpression: true,
+        default: '26R1',
+        description: 'Select the version of your baramundi Management Suite installation. Only operations supported by this version are shown.',
+        options: [
+          { name: '25R2', value: '25R2' },
+          { name: '26R1', value: '26R1' },
+        ],
+      },
+      {
         displayName: 'Resource',
         name: 'resource',
         type: 'options',

@@ -7,7 +7,7 @@ export const softwareOperations: INodeProperties[] = [{
 		{ name: 'Get Installed Software', value: 'getInstalledWindowsSoftware', description: 'Get all installed Windows software', action: 'Get installed software' },
 		{ name: 'Get Software by Endpoint', value: 'getInstalledSoftwareByEndpoint', description: 'Get installed software for an endpoint', action: 'Get software by endpoint' },
 		{ name: 'Get Software by Logical Group', value: 'getInstalledSoftwareByLogicalGroup', description: 'Get installed software for a logical group', action: 'Get software by logical group' },
-		{ name: 'Get Software by Universal Dynamic Group', value: 'getInstalledSoftwareByUniversalDynamicGroup', description: 'Get installed software for a universal dynamic group', action: 'Get software by universal dynamic group' },
+		{ name: 'Get Software by Universal Dynamic Group', value: 'getInstalledSoftwareByUniversalDynamicGroup', description: 'Get installed software for a universal dynamic group (requires bMS 26R1+)', action: 'Get software by universal dynamic group' },
 	],
 	default: 'getInstalledWindowsSoftware',
 }];
