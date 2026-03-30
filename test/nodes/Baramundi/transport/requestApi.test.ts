@@ -435,4 +435,163 @@ describe('Request API Transport Layer', () => {
       );
     });
   });
+
+  describe('retry behaviour', () => {
+    it('should succeed on first retry after HTTP 429', async () => {
+      let calls = 0;
+      const mockContext = {
+        getCredentials: vi.fn(async () => ({
+          baseUrl: 'https://bms-win22srv:444/bconnect',
+          username: 'Administrator',
+          password: 'test-password-do-not-use',
+          ignoreSslIssues: false,
+        })),
+        helpers: {
+          httpRequest: vi.fn(async () => {
+            calls++;
+            if (calls === 1) {
+              const err = Object.assign(new Error('Too Many Requests'), { response: { status: 429 } });
+              throw err;
+            }
+            return { id: 'ok' };
+          }),
+        },
+        getNode: vi.fn(() => ({ name: 'Baramundi', type: 'baramundi', typeVersion: 1, position: [0, 0], parameters: {} })),
+      } as unknown as IExecuteFunctions;
+
+      const result = await apiRequest.call(mockContext, 'GET', '/endpoints/v2.0/Endpoints');
+
+      expect(calls).toBe(2);
+      expect(result).toEqual({ id: 'ok' });
+    });
+
+    it('should succeed on first retry after HTTP 503', async () => {
+      let calls = 0;
+      const mockContext = {
+        getCredentials: vi.fn(async () => ({
+          baseUrl: 'https://bms-win22srv:444/bconnect',
+          username: 'Administrator',
+          password: 'test-password-do-not-use',
+          ignoreSslIssues: false,
+        })),
+        helpers: {
+          httpRequest: vi.fn(async () => {
+            calls++;
+            if (calls === 1) {
+              const err = Object.assign(new Error('Service Unavailable'), { response: { status: 503 } });
+              throw err;
+            }
+            return { id: 'ok' };
+          }),
+        },
+        getNode: vi.fn(() => ({ name: 'Baramundi', type: 'baramundi', typeVersion: 1, position: [0, 0], parameters: {} })),
+      } as unknown as IExecuteFunctions;
+
+      const result = await apiRequest.call(mockContext, 'GET', '/endpoints/v2.0/Endpoints');
+
+      expect(calls).toBe(2);
+      expect(result).toEqual({ id: 'ok' });
+    });
+
+    it('should throw after exhausting 3 retries on persistent 429', async () => {
+      const mockContext = {
+        getCredentials: vi.fn(async () => ({
+          baseUrl: 'https://bms-win22srv:444/bconnect',
+          username: 'Administrator',
+          password: 'test-password-do-not-use',
+          ignoreSslIssues: false,
+        })),
+        helpers: {
+          httpRequest: vi.fn(async () => {
+            const err = Object.assign(new Error('Too Many Requests'), { response: { status: 429 } });
+            throw err;
+          }),
+        },
+        getNode: vi.fn(() => ({ name: 'Baramundi', type: 'baramundi', typeVersion: 1, position: [0, 0], parameters: {} })),
+      } as unknown as IExecuteFunctions;
+
+      await expect(
+        apiRequest.call(mockContext, 'GET', '/endpoints/v2.0/Endpoints')
+      ).rejects.toThrow();
+
+      // 1 initial + 3 retries = 4 total calls
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledTimes(4);
+    });
+
+    it('should NOT retry on HTTP 404 (client error)', async () => {
+      const mockContext = {
+        getCredentials: vi.fn(async () => ({
+          baseUrl: 'https://bms-win22srv:444/bconnect',
+          username: 'Administrator',
+          password: 'test-password-do-not-use',
+          ignoreSslIssues: false,
+        })),
+        helpers: {
+          httpRequest: vi.fn(async () => {
+            const err = Object.assign(new Error('Not Found'), { response: { status: 404 } });
+            throw err;
+          }),
+        },
+        getNode: vi.fn(() => ({ name: 'Baramundi', type: 'baramundi', typeVersion: 1, position: [0, 0], parameters: {} })),
+      } as unknown as IExecuteFunctions;
+
+      await expect(
+        apiRequest.call(mockContext, 'GET', '/endpoints/v2.0/Endpoints/nonexistent')
+      ).rejects.toThrow();
+
+      // No retries — exactly 1 call
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledTimes(1);
+    });
+
+    it('should NOT retry on HTTP 401 (auth error)', async () => {
+      const mockContext = {
+        getCredentials: vi.fn(async () => ({
+          baseUrl: 'https://bms-win22srv:444/bconnect',
+          username: 'Administrator',
+          password: 'test-password-do-not-use',
+          ignoreSslIssues: false,
+        })),
+        helpers: {
+          httpRequest: vi.fn(async () => {
+            const err = Object.assign(new Error('Unauthorized'), { response: { status: 401 } });
+            throw err;
+          }),
+        },
+        getNode: vi.fn(() => ({ name: 'Baramundi', type: 'baramundi', typeVersion: 1, position: [0, 0], parameters: {} })),
+      } as unknown as IExecuteFunctions;
+
+      await expect(
+        apiRequest.call(mockContext, 'GET', '/endpoints/v2.0/Endpoints')
+      ).rejects.toThrow();
+
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledTimes(1);
+    });
+
+    it('should retry on ETIMEDOUT network error', async () => {
+      let calls = 0;
+      const mockContext = {
+        getCredentials: vi.fn(async () => ({
+          baseUrl: 'https://bms-win22srv:444/bconnect',
+          username: 'Administrator',
+          password: 'test-password-do-not-use',
+          ignoreSslIssues: false,
+        })),
+        helpers: {
+          httpRequest: vi.fn(async () => {
+            calls++;
+            if (calls === 1) {
+              const err = Object.assign(new Error('ETIMEDOUT'), { code: 'ETIMEDOUT' });
+              throw err;
+            }
+            return { id: 'ok' };
+          }),
+        },
+        getNode: vi.fn(() => ({ name: 'Baramundi', type: 'baramundi', typeVersion: 1, position: [0, 0], parameters: {} })),
+      } as unknown as IExecuteFunctions;
+
+      const result = await apiRequest.call(mockContext, 'GET', '/endpoints/v2.0/Endpoints');
+      expect(calls).toBe(2);
+      expect(result).toEqual({ id: 'ok' });
+    });
+  });
 });

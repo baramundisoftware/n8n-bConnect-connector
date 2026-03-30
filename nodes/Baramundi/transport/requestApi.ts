@@ -17,6 +17,41 @@ import {
 
 const GUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+const RETRY_STATUS_CODES = new Set([429, 503]);
+const MAX_RETRIES = 3;
+
+/** Returns true for status codes that are worth retrying (rate-limit / server unavailable). */
+function isRetryableError(error: unknown): boolean {
+  const status = extractStatusCodeFromError(error);
+  if (RETRY_STATUS_CODES.has(status)) return true;
+  // Retry on timeout (the request never reached the server)
+  const code = (error as Record<string, unknown>)?.code;
+  return code === 'ETIMEDOUT';
+}
+
+function extractStatusCodeFromError(error: unknown): number {
+  const response = (error as Record<string, unknown>)?.response as Record<string, unknown> | undefined;
+  const status = response?.status ?? response?.statusCode;
+  return typeof status === 'number' ? status : 0;
+}
+
+/** Exponential backoff with jitter: base 100ms, doubles each attempt, ±50ms jitter. */
+function backoffMs(attempt: number): number {
+  return Math.pow(2, attempt) * 100 + Math.floor(Math.random() * 100);
+}
+
+/** Parse Retry-After header value (seconds or HTTP-date) → ms to wait, or null. */
+function retryAfterMs(error: unknown): number | null {
+  const headers = ((error as Record<string, unknown>)?.response as Record<string, unknown>)?.headers as Record<string, string> | undefined;
+  const value = headers?.['retry-after'];
+  if (!value) return null;
+  const seconds = Number(value);
+  if (!isNaN(seconds) && seconds > 0) return seconds * 1000;
+  const date = Date.parse(value);
+  if (!isNaN(date)) return Math.max(0, date - Date.now());
+  return null;
+}
+
 /**
  * Sanitise a full API URL for error messages — strips GUIDs to avoid leaking identifiers.
  * Returns `{baseUrl}/.../{lastResourceSegment}`.
@@ -58,10 +93,24 @@ export async function apiRequest(
     delete options.body;
   }
 
-  try {
-    const response = await this.helpers.httpRequest(options);
-    return response as JsonObject;
-  } catch (error) {
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const response = await this.helpers.httpRequest(options);
+      return response as JsonObject;
+    } catch (error) {
+      lastError = error;
+      if (attempt < MAX_RETRIES && isRetryableError(error)) {
+        const wait = retryAfterMs(error) ?? backoffMs(attempt);
+        await new Promise((resolve) => setTimeout(resolve, wait));
+        continue;
+      }
+      break;
+    }
+  }
+
+  {
+    const error = lastError;
     const safeUrl = sanitiseUrl(options.baseURL as string, options.url as string);
     const errorMessage = (error as Error).message || 'Unknown error';
 
