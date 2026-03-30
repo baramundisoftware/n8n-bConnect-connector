@@ -9,6 +9,8 @@ import type {
 
 import { activeDirectoryFields, activeDirectoryOperations } from './actions/activeDirectory/activeDirectory.fields';
 import { assetFields, assetOperations } from './actions/asset/asset.fields';
+import { complianceFields, complianceOperations } from './actions/compliance/compliance.fields';
+import { universalDynamicGroupsFields, universalDynamicGroupsOperations } from './actions/universalDynamicGroups/universalDynamicGroups.fields';
 import { defenseControlFields, defenseControlOperations } from './actions/defenseControl/defenseControl.fields';
 import { endpointFields, endpointOperations } from './actions/endpoint/endpoint.fields';
 import { jobFields, jobOperations } from './actions/job/job.fields';
@@ -117,10 +119,22 @@ export class Baramundi implements INodeType {
             value: 'variable',
             description: 'Manage baramundi variables and variable instances',
           },
+          {
+            name: 'Compliance',
+            value: 'compliance',
+            description: 'Query compliance rules, vulnerabilities, and violations (requires bMS 26R1+)',
+          },
+          {
+            name: 'Universal Dynamic Groups',
+            value: 'universalDynamicGroups',
+            description: 'Manage universal dynamic groups and folders (requires bMS 26R1+)',
+          },
         ],
         default: 'endpoint',
       },
       // Operations
+      ...complianceOperations,
+      ...universalDynamicGroupsOperations,
       ...activeDirectoryOperations,
       ...assetOperations,
       ...defenseControlOperations,
@@ -132,6 +146,8 @@ export class Baramundi implements INodeType {
       ...updateManagementOperations,
       ...variableOperations,
       // Fields
+      ...complianceFields,
+      ...universalDynamicGroupsFields,
       ...activeDirectoryFields,
       ...assetFields,
       ...defenseControlFields,

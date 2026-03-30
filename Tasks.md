@@ -113,7 +113,13 @@
 
 ### Done
 
-*(empty)*
+| ID | Task | Completed |
+|----|------|-----------|
+| P3.1 | Implemented `compliance` module (8 read operations) | 2026-03-30 |
+| P3.2 | Written 14 unit tests for `compliance` module — all passing | 2026-03-30 |
+| P3.3 | Implemented `universalDynamicGroups` module (6 read operations) | 2026-03-30 |
+| P3.4 | Written 12 unit tests for `universalDynamicGroups` module — all passing | 2026-03-30 |
+| P3.5 | Registered both modules in `Baramundi.node.ts` and `router.ts`; 407 tests passing, TypeScript 0 errors | 2026-03-30 |
 
 ---
 

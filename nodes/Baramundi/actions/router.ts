@@ -3,6 +3,8 @@ import { NodeOperationError } from 'n8n-workflow';
 
 import { activeDirectory } from './activeDirectory';
 import { asset } from './asset';
+import { compliance } from './compliance';
+import { universalDynamicGroups } from './universalDynamicGroups';
 import { defenseControl } from './defenseControl';
 import { endpoint } from './endpoint';
 import { job } from './job';
@@ -534,6 +536,68 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
               throw new NodeOperationError(
                 this.getNode(),
                 `Unknown operation "${operation}" for resource "variable"`,
+              );
+          }
+          break;
+
+        case 'compliance':
+          switch (operation) {
+            case 'getRules':
+              responseData = await compliance.getRules.call(this, i);
+              break;
+            case 'getRule':
+              responseData = await compliance.getRule.call(this, i);
+              break;
+            case 'getVulnerabilities':
+              responseData = await compliance.getVulnerabilities.call(this, i);
+              break;
+            case 'getVulnerability':
+              responseData = await compliance.getVulnerability.call(this, i);
+              break;
+            case 'getDetectedVulnerabilities':
+              responseData = await compliance.getDetectedVulnerabilities.call(this, i);
+              break;
+            case 'getDetectedVulnerabilitiesByEndpoint':
+              responseData = await compliance.getDetectedVulnerabilitiesByEndpoint.call(this, i);
+              break;
+            case 'getDetectedRuleViolations':
+              responseData = await compliance.getDetectedRuleViolations.call(this, i);
+              break;
+            case 'getDetectedRuleViolationsByEndpoint':
+              responseData = await compliance.getDetectedRuleViolationsByEndpoint.call(this, i);
+              break;
+            default:
+              throw new NodeOperationError(
+                this.getNode(),
+                `Unknown operation "${operation}" for resource "compliance"`,
+              );
+          }
+          break;
+
+        case 'universalDynamicGroups':
+          switch (operation) {
+            case 'getMany':
+              responseData = await universalDynamicGroups.getMany.call(this, i);
+              break;
+            case 'get':
+              responseData = await universalDynamicGroups.get.call(this, i);
+              break;
+            case 'getFolders':
+              responseData = await universalDynamicGroups.getFolders.call(this, i);
+              break;
+            case 'getFolder':
+              responseData = await universalDynamicGroups.getFolder.call(this, i);
+              break;
+            case 'getSubFolders':
+              responseData = await universalDynamicGroups.getSubFolders.call(this, i);
+              break;
+            case 'getGroupsByFolder':
+              responseData = await universalDynamicGroups.getGroupsByFolder.call(this, i);
+              break;
+            default:
+              throw new NodeOperationError(
+                this.getNode(),
+                `Unknown operation "${operation}" for resource "universalDynamicGroups"`,
               );
           }
           break;
