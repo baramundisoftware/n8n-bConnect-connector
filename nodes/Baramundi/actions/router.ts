@@ -247,6 +247,24 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
             case 'deleteGroupMaintenanceWindow':
               responseData = await endpoint.deleteGroupMaintenanceWindow.call(this, i);
               break;
+            case 'setEntraIdData':
+              responseData = await endpoint.setEntraIdData.call(this, i);
+              break;
+            case 'deleteEntraIdData':
+              responseData = await endpoint.deleteEntraIdData.call(this, i);
+              break;
+            case 'getEntraIdDataByDeviceId':
+              responseData = await endpoint.getEntraIdDataByDeviceId.call(this, i);
+              break;
+            case 'getUnmanagedEndpoints':
+              responseData = await endpoint.getUnmanagedEndpoints.call(this, i);
+              break;
+            case 'getUnmanagedEndpoint':
+              responseData = await endpoint.getUnmanagedEndpoint.call(this, i);
+              break;
+            case 'deleteUnmanagedEndpoint':
+              responseData = await endpoint.deleteUnmanagedEndpoint.call(this, i);
+              break;
             default:
               throw new NodeOperationError(
                 this.getNode(),

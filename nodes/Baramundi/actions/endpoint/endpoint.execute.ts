@@ -808,3 +808,140 @@ export async function deleteGroupMaintenanceWindow(
   await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindows/${windowId}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: windowId });
 }
+
+// ----------------------------------
+//   EntraId operations (26R1+)
+// ----------------------------------
+
+export async function setEntraIdData(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const endpointSelection = this.getNodeParameter('endpointSelection', index) as string;
+  const endpointId = endpointSelection === '__custom__'
+    ? this.getNodeParameter('endpointId', index) as string
+    : endpointSelection;
+
+  const validation = validateGuid(endpointId);
+  if (!validation.valid) {
+    throw new NodeOperationError(
+      this.getNode(),
+      `Invalid endpoint ID:\n${validation.errors.join('\n')}`,
+      { itemIndex: index },
+    );
+  }
+
+  const entraIdDeviceId = this.getNodeParameter('entraIdDeviceId', index) as string;
+  const additionalFields = this.getNodeParameter('additionalFields', index, {}) as {
+    entraIdTenantId?: string;
+    entraIdUserId?: string;
+  };
+
+  const body: IDataObject = { entraIdDeviceId };
+  if (additionalFields.entraIdTenantId) body.entraIdTenantId = additionalFields.entraIdTenantId;
+  if (additionalFields.entraIdUserId) body.entraIdUserId = additionalFields.entraIdUserId;
+
+  const response = await apiRequest.call(this, 'POST', `/endpoints/v2.0/Endpoints/${endpointId}/EntraIdData`, body);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function deleteEntraIdData(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const endpointSelection = this.getNodeParameter('endpointSelection', index) as string;
+  const endpointId = endpointSelection === '__custom__'
+    ? this.getNodeParameter('endpointId', index) as string
+    : endpointSelection;
+
+  const validation = validateGuid(endpointId);
+  if (!validation.valid) {
+    throw new NodeOperationError(
+      this.getNode(),
+      `Invalid endpoint ID:\n${validation.errors.join('\n')}`,
+      { itemIndex: index },
+    );
+  }
+
+  await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/Endpoints/${endpointId}/EntraIdData`);
+  return this.helpers.returnJsonArray({ success: true, deletedEndpointId: endpointId });
+}
+
+export async function getEntraIdDataByDeviceId(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const deviceId = this.getNodeParameter('deviceId', index) as string;
+
+  const validation = validateGuid(deviceId);
+  if (!validation.valid) {
+    throw new NodeOperationError(
+      this.getNode(),
+      `Invalid device ID:\n${validation.errors.join('\n')}`,
+      { itemIndex: index },
+    );
+  }
+
+  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/EntraIdData/${deviceId}`);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+// ----------------------------------
+//   UnmanagedEndpoints operations (26R1+)
+// ----------------------------------
+
+export async function getUnmanagedEndpoints(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+
+  if (returnAll) {
+    const data = await apiRequestAllItems.call(this, 'GET', '/endpoints/v2.0/UnmanagedEndpoints', {}, {});
+    return this.helpers.returnJsonArray(data as IDataObject[]);
+  }
+
+  const qs: Record<string, number> = { PageSize: limit, Page: 0 };
+  const response = await apiRequest.call(this, 'GET', '/endpoints/v2.0/UnmanagedEndpoints', {}, qs);
+  const data = (response.data as IDataObject[]) || [];
+  return this.helpers.returnJsonArray(data);
+}
+
+export async function getUnmanagedEndpoint(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const id = this.getNodeParameter('unmanagedEndpointId', index) as string;
+
+  const validation = validateGuid(id);
+  if (!validation.valid) {
+    throw new NodeOperationError(
+      this.getNode(),
+      `Invalid unmanaged endpoint ID:\n${validation.errors.join('\n')}`,
+      { itemIndex: index },
+    );
+  }
+
+  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/UnmanagedEndpoints/${id}`);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function deleteUnmanagedEndpoint(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const id = this.getNodeParameter('unmanagedEndpointId', index) as string;
+
+  const validation = validateGuid(id);
+  if (!validation.valid) {
+    throw new NodeOperationError(
+      this.getNode(),
+      `Invalid unmanaged endpoint ID:\n${validation.errors.join('\n')}`,
+      { itemIndex: index },
+    );
+  }
+
+  await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/UnmanagedEndpoints/${id}`);
+  return this.helpers.returnJsonArray({ success: true, deletedId: id });
+}

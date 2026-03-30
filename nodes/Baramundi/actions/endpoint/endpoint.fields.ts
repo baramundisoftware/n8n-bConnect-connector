@@ -172,6 +172,44 @@ export const endpointOperations: INodeProperties[] = [
         description: 'Delete a maintenance window for a group',
         action: 'Delete group maintenance window',
       },
+      // EntraId Operations (26R1+)
+      {
+        name: 'Set Entra ID Data',
+        value: 'setEntraIdData',
+        description: 'Create or update Entra ID data for an endpoint (requires bMS 26R1+)',
+        action: 'Set Entra ID data for endpoint',
+      },
+      {
+        name: 'Delete Entra ID Data',
+        value: 'deleteEntraIdData',
+        description: 'Delete Entra ID data for an endpoint (requires bMS 26R1+)',
+        action: 'Delete Entra ID data for endpoint',
+      },
+      {
+        name: 'Get Entra ID Data By Device ID',
+        value: 'getEntraIdDataByDeviceId',
+        description: 'Get Entra ID endpoint data by Entra ID device ID (requires bMS 26R1+)',
+        action: 'Get Entra ID data by device ID',
+      },
+      // UnmanagedEndpoints Operations (26R1+)
+      {
+        name: 'Get Unmanaged Endpoints',
+        value: 'getUnmanagedEndpoints',
+        description: 'Get all unmanaged endpoints (requires bMS 26R1+)',
+        action: 'Get unmanaged endpoints',
+      },
+      {
+        name: 'Get Unmanaged Endpoint',
+        value: 'getUnmanagedEndpoint',
+        description: 'Get an unmanaged endpoint by ID (requires bMS 26R1+)',
+        action: 'Get unmanaged endpoint',
+      },
+      {
+        name: 'Delete Unmanaged Endpoint',
+        value: 'deleteUnmanagedEndpoint',
+        description: 'Delete an unmanaged endpoint by ID (requires bMS 26R1+)',
+        action: 'Delete unmanaged endpoint',
+      },
     ],
     default: 'getMany',
   },
@@ -1249,5 +1287,164 @@ export const endpointFields: INodeProperties[] = [
         description: 'Comment for the maintenance window',
       },
     ],
+  },
+
+  // ----------------------------------
+  //         EntraId operations (26R1+)
+  // ----------------------------------
+  {
+    displayName: 'Endpoint Selection',
+    name: 'endpointSelection',
+    type: 'options',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['setEntraIdData', 'deleteEntraIdData'],
+        bmsVersion: ['26R1'],
+      },
+    },
+    typeOptions: {
+      loadOptionsMethod: 'getEndpoints',
+    },
+    options: [
+      {
+        name: 'Enter Custom GUID...',
+        value: '__custom__',
+      },
+    ],
+    description: 'Select an endpoint from the list or enter a custom GUID',
+  },
+  {
+    displayName: 'Endpoint ID',
+    name: 'endpointId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['setEntraIdData', 'deleteEntraIdData'],
+        bmsVersion: ['26R1'],
+        endpointSelection: ['__custom__'],
+      },
+    },
+    placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
+    description: 'Enter the endpoint GUID manually',
+  },
+  {
+    displayName: 'Entra ID Device ID',
+    name: 'entraIdDeviceId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['setEntraIdData'],
+        bmsVersion: ['26R1'],
+      },
+    },
+    placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
+    description: 'The Entra ID device ID (GUID)',
+  },
+  {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['setEntraIdData'],
+        bmsVersion: ['26R1'],
+      },
+    },
+    options: [
+      {
+        displayName: 'Entra ID Tenant ID',
+        name: 'entraIdTenantId',
+        type: 'string',
+        default: '',
+        placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
+        description: 'The Entra ID tenant ID (GUID)',
+      },
+      {
+        displayName: 'Entra ID User ID',
+        name: 'entraIdUserId',
+        type: 'string',
+        default: '',
+        placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
+        description: 'The Entra ID user ID (GUID)',
+      },
+    ],
+  },
+  {
+    displayName: 'Device ID',
+    name: 'deviceId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['getEntraIdDataByDeviceId'],
+        bmsVersion: ['26R1'],
+      },
+    },
+    placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
+    description: 'The Entra ID device ID (GUID)',
+  },
+
+  // ----------------------------------
+  //         UnmanagedEndpoints operations (26R1+)
+  // ----------------------------------
+  {
+    displayName: 'Return All',
+    name: 'returnAll',
+    type: 'boolean',
+    default: false,
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['getUnmanagedEndpoints'],
+        bmsVersion: ['26R1'],
+      },
+    },
+    description: 'Whether to return all results or only up to a given limit',
+  },
+  {
+    displayName: 'Limit',
+    name: 'limit',
+    type: 'number',
+    typeOptions: { minValue: 1 },
+    default: 50,
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['getUnmanagedEndpoints'],
+        bmsVersion: ['26R1'],
+        returnAll: [false],
+      },
+    },
+    description: 'Max number of results to return',
+  },
+  {
+    displayName: 'Unmanaged Endpoint ID',
+    name: 'unmanagedEndpointId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['getUnmanagedEndpoint', 'deleteUnmanagedEndpoint'],
+        bmsVersion: ['26R1'],
+      },
+    },
+    placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
+    description: 'The GUID of the unmanaged endpoint',
   },
 ];
