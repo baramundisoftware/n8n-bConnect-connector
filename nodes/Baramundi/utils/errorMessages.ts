@@ -5,6 +5,13 @@
  * for common HTTP status codes and baramundi API error scenarios
  */
 
+import type { ErrorLike } from './types';
+
+/** Narrow an unknown caught value to ErrorLike for safe field access. */
+function asErrorLike(error: unknown): ErrorLike {
+	return (error ?? {}) as ErrorLike;
+}
+
 export interface EnhancedErrorInfo {
 	message: string;
 	troubleshooting: string[];
@@ -200,15 +207,16 @@ export function formatTroubleshootingHints(hints: string[]): string {
  * @param error - Error object from API request
  * @returns HTTP status code or 0 if not found
  */
-export function extractStatusCode(error: any): number {
+export function extractStatusCode(error: unknown): number {
+	const e = asErrorLike(error);
 	// Try different common error object structures
-	if (error.statusCode) return error.statusCode;
-	if (error.response?.status) return error.response.status;
-	if (error.response?.statusCode) return error.response.statusCode;
-	if (error.status) return error.status;
+	if (e.statusCode) return e.statusCode;
+	if (e.response?.status) return e.response.status;
+	if (e.response?.statusCode) return e.response.statusCode;
+	if (e.status) return e.status;
 
 	// Try to extract from error message
-	const statusMatch = error.message?.match(/status code (\d+)/i);
+	const statusMatch = e.message?.match(/status code (\d+)/i);
 	if (statusMatch) return parseInt(statusMatch[1], 10);
 
 	return 0;
@@ -219,9 +227,10 @@ export function extractStatusCode(error: any): number {
  * @param error - Error object
  * @returns True if network error
  */
-export function isNetworkError(error: any): boolean {
-	const message = error.message?.toLowerCase() || '';
-	const code = error.code || '';
+export function isNetworkError(error: unknown): boolean {
+	const e = asErrorLike(error);
+	const message = e.message?.toLowerCase() || '';
+	const code = e.code || '';
 
 	return (
 		message.includes('econnrefused') ||
@@ -240,12 +249,13 @@ export function isNetworkError(error: any): boolean {
  * @param baseUrl - Base URL being accessed
  * @returns Enhanced error information
  */
-export function getNetworkErrorInfo(error: any, baseUrl: string): EnhancedErrorInfo {
-	const code = error.code || '';
+export function getNetworkErrorInfo(error: unknown, baseUrl: string): EnhancedErrorInfo {
+	const e = asErrorLike(error);
+	const code = e.code || '';
 	let message = '';
 	let troubleshooting: string[] = [];
 
-	if (code === 'ECONNREFUSED' || error.message?.includes('ECONNREFUSED')) {
+	if (code === 'ECONNREFUSED' || e.message?.includes('ECONNREFUSED')) {
 		message = `Cannot connect to baramundi server at ${baseUrl}`;
 		troubleshooting = [
 			'Verify the server URL is correct',
@@ -254,7 +264,7 @@ export function getNetworkErrorInfo(error: any, baseUrl: string): EnhancedErrorI
 			'Check firewall rules allow connections to the server',
 			'Verify the port number is correct (typically 443 or 444 for bConnect)',
 		];
-	} else if (code === 'ENOTFOUND' || error.message?.includes('ENOTFOUND')) {
+	} else if (code === 'ENOTFOUND' || e.message?.includes('ENOTFOUND')) {
 		message = `Cannot resolve hostname: ${baseUrl}`;
 		troubleshooting = [
 			'Check that the server hostname is spelled correctly',
@@ -262,7 +272,7 @@ export function getNetworkErrorInfo(error: any, baseUrl: string): EnhancedErrorI
 			'Try using the IP address instead of hostname',
 			'Check network connectivity',
 		];
-	} else if (code === 'ETIMEDOUT' || error.message?.includes('ETIMEDOUT')) {
+	} else if (code === 'ETIMEDOUT' || e.message?.includes('ETIMEDOUT')) {
 		message = `Connection to ${baseUrl} timed out`;
 		troubleshooting = [
 			'Check network connectivity to the server',
@@ -271,7 +281,7 @@ export function getNetworkErrorInfo(error: any, baseUrl: string): EnhancedErrorI
 			'Try increasing the timeout value',
 		];
 	} else {
-		message = `Network error: ${error.message}`;
+		message = `Network error: ${e.message}`;
 		troubleshooting = [
 			'Check network connectivity',
 			'Verify server URL and credentials',
@@ -288,9 +298,10 @@ export function getNetworkErrorInfo(error: any, baseUrl: string): EnhancedErrorI
  * @param error - Error object
  * @returns True if SSL error
  */
-export function isSslError(error: any): boolean {
-	const message = error.message?.toLowerCase() || '';
-	const code = error.code || '';
+export function isSslError(error: unknown): boolean {
+	const e = asErrorLike(error);
+	const message = e.message?.toLowerCase() || '';
+	const code = e.code || '';
 
 	return (
 		message.includes('certificate') ||
@@ -308,9 +319,10 @@ export function isSslError(error: any): boolean {
  * @param error - Error object
  * @returns Enhanced error information
  */
-export function getSslErrorInfo(error: any): EnhancedErrorInfo {
+export function getSslErrorInfo(error: unknown): EnhancedErrorInfo {
+	const e = asErrorLike(error);
 	return {
-		message: `SSL Certificate Error: ${error.message}`,
+		message: `SSL Certificate Error: ${e.message}`,
 		troubleshooting: [
 			'The server is using a self-signed or invalid SSL certificate',
 			'Enable "Ignore SSL Issues" in the baramundi credentials configuration',

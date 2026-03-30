@@ -227,7 +227,7 @@
 
 | ID | Task | Role | Priority | Finding | Depends on |
 |----|------|------|----------|---------|------------|
-| P7.8 | Define `BConnectPagedResponse<T>` typed interface; replace all 12 `as any` casts in LoadOptions; replace `any` params with `unknown` + type guards in `errorMessages.ts` and `validation.ts` | Backend Developer | COULD | F4.1 + F4.2 | — |
+~~| P7.8 | Define `BConnectPagedResponse<T>` typed interface; replace all 12 `as any` casts in LoadOptions; replace `any` params with `unknown` + type guards in `errorMessages.ts` and `validation.ts` | Backend Developer | COULD | F4.1 + F4.2 | — |~~
 | P7.9 | Investigate bConnect V2.0 API for token/API key auth support; implement `BconnectApiToken` credential type if confirmed, or document risk acceptance + service-account guidance if Basic Auth only | Backend Developer | COULD | F1.1 | — |
 
 ### Done
@@ -244,6 +244,7 @@
 | P7.6 | Exponential backoff retry (max 3, jitter) for 429/503/ETIMEDOUT; Retry-After honoured; 6 new unit tests; 480 passing | 2026-03-30 |
 | P7.7 | Page cap 1000→50 (`MAX_PAGE_CAP`); `maxItems` param (default 5000); truncation sentinel; 3 new tests; 480 passing | 2026-03-30 |
 | P7.10 | Version 0.2.0→0.3.0; CHANGELOG [0.3.0] with all Phase 7 changes; `npm pack` verified (173 files, 97 KB) | 2026-03-30 |
+| P7.8 | Created `utils/types.ts` with `BConnectPagedResponse<T>`, `BConnectEndpointItem`, `BConnectJobDefinitionItem`, `BConnectNamedItem`, `ErrorLike`. Replaced all 12 `as any` with typed casts in LoadOptions; `this as unknown as IExecuteFunctions` with comment. `error: any` → `error: unknown` + `asErrorLike()` in `errorMessages.ts`. `value: any` → `value: unknown` + type guard in `extractResourceLocatorValue`. 0 lint errors, 480 tests passing. | 2026-03-30 |
 
 ---
 

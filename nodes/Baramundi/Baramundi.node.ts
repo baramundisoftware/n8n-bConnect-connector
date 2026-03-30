@@ -20,6 +20,12 @@ import { softwareFields, softwareOperations25R2, softwareOperations26R1 } from '
 import { updateManagementFields, updateManagementOperations } from './actions/updateManagement/updateManagement.fields';
 import { variableFields, variableOperations } from './actions/variable/variable.fields';
 import { router } from './actions/router';
+import type {
+  BConnectEndpointItem,
+  BConnectJobDefinitionItem,
+  BConnectNamedItem,
+  BConnectPagedResponse,
+} from './utils/types';
 
 export class Baramundi implements INodeType {
   description: INodeTypeDescription = {
@@ -171,18 +177,21 @@ export class Baramundi implements INodeType {
         const { apiRequest } = await import('./transport/requestApi');
 
         try {
+          // ILoadOptionsFunctions is structurally compatible with IExecuteFunctions
+          // for the httpRequest + getCredentials subset that apiRequest uses.
           const response = await apiRequest.call(
-            this as any,
+            this as unknown as IExecuteFunctions,
             'GET',
             '/endpoints/v2.0/Endpoints',
             {},
             { PageSize: 100, Page: 0, OrderBy: 'DisplayName asc' }
           );
 
-          const data = (response.data as any[]) || [];
-          const truncated = (response.hasNextPage as boolean) || false;
+          const paged = response as unknown as BConnectPagedResponse<BConnectEndpointItem>;
+          const data = paged.data ?? [];
+          const truncated = paged.hasNextPage ?? false;
 
-          const options: INodePropertyOptions[] = data.map((endpoint: any) => ({
+          const options: INodePropertyOptions[] = data.map((endpoint) => ({
             name: `${endpoint.displayName}${endpoint.hostName ? ` (${endpoint.hostName})` : ''}`,
             value: endpoint.id,
           }));
@@ -204,17 +213,18 @@ export class Baramundi implements INodeType {
 
         try {
           const response = await apiRequest.call(
-            this as any,
+            this as unknown as IExecuteFunctions,
             'GET',
             '/jobs/v2.0/JobDefinitions',
             {},
             { PageSize: 100, Page: 0, OrderBy: 'Name asc' }
           );
 
-          const data = (response.data as any[]) || [];
-          const truncated = (response.hasNextPage as boolean) || false;
+          const paged = response as unknown as BConnectPagedResponse<BConnectJobDefinitionItem>;
+          const data = paged.data ?? [];
+          const truncated = paged.hasNextPage ?? false;
 
-          const options: INodePropertyOptions[] = data.map((job: any) => ({
+          const options: INodePropertyOptions[] = data.map((job) => ({
             name: `${job.name}${job.type ? ` [${job.type}]` : ''}`,
             value: job.id,
           }));
@@ -236,18 +246,19 @@ export class Baramundi implements INodeType {
 
         try {
           const response = await apiRequest.call(
-            this as any,
+            this as unknown as IExecuteFunctions,
             'GET',
             '/organizationalunits/v2.0/OrganizationalUnits',
             {},
             { PageSize: 100, Page: 0, OrderBy: 'Name asc' }
           );
 
-          const data = (response.data as any[]) || [];
-          const truncated = (response.hasNextPage as boolean) || false;
+          const paged = response as unknown as BConnectPagedResponse<BConnectNamedItem>;
+          const data = paged.data ?? [];
+          const truncated = paged.hasNextPage ?? false;
 
-          const options: INodePropertyOptions[] = data.map((orgUnit: any) => ({
-            name: orgUnit.name || orgUnit.id,
+          const options: INodePropertyOptions[] = data.map((orgUnit) => ({
+            name: orgUnit.name ?? orgUnit.id,
             value: orgUnit.id,
           }));
 
@@ -268,18 +279,19 @@ export class Baramundi implements INodeType {
 
         try {
           const response = await apiRequest.call(
-            this as any,
+            this as unknown as IExecuteFunctions,
             'GET',
             '/endpoints/v2.0/LogicalGroups',
             {},
             { PageSize: 100, Page: 0, OrderBy: 'Name asc' }
           );
 
-          const data = (response.data as any[]) || [];
-          const truncated = (response.hasNextPage as boolean) || false;
+          const paged = response as unknown as BConnectPagedResponse<BConnectNamedItem>;
+          const data = paged.data ?? [];
+          const truncated = paged.hasNextPage ?? false;
 
-          const options: INodePropertyOptions[] = data.map((group: any) => ({
-            name: group.name || group.id,
+          const options: INodePropertyOptions[] = data.map((group) => ({
+            name: group.name ?? group.id,
             value: group.id,
           }));
 
@@ -300,18 +312,19 @@ export class Baramundi implements INodeType {
 
         try {
           const response = await apiRequest.call(
-            this as any,
+            this as unknown as IExecuteFunctions,
             'GET',
             '/endpoints/v2.0/StaticGroups',
             {},
             { PageSize: 100, Page: 0, OrderBy: 'Name asc' }
           );
 
-          const data = (response.data as any[]) || [];
-          const truncated = (response.hasNextPage as boolean) || false;
+          const paged = response as unknown as BConnectPagedResponse<BConnectNamedItem>;
+          const data = paged.data ?? [];
+          const truncated = paged.hasNextPage ?? false;
 
-          const options: INodePropertyOptions[] = data.map((group: any) => ({
-            name: group.name || group.id,
+          const options: INodePropertyOptions[] = data.map((group) => ({
+            name: group.name ?? group.id,
             value: group.id,
           }));
 
@@ -332,18 +345,19 @@ export class Baramundi implements INodeType {
 
         try {
           const response = await apiRequest.call(
-            this as any,
+            this as unknown as IExecuteFunctions,
             'GET',
             '/endpoints/v2.0/DynamicGroups',
             {},
             { PageSize: 100, Page: 0, OrderBy: 'Name asc' }
           );
 
-          const data = (response.data as any[]) || [];
-          const truncated = (response.hasNextPage as boolean) || false;
+          const paged = response as unknown as BConnectPagedResponse<BConnectNamedItem>;
+          const data = paged.data ?? [];
+          const truncated = paged.hasNextPage ?? false;
 
-          const options: INodePropertyOptions[] = data.map((group: any) => ({
-            name: group.name || group.id,
+          const options: INodePropertyOptions[] = data.map((group) => ({
+            name: group.name ?? group.id,
             value: group.id,
           }));
 

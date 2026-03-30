@@ -310,7 +310,7 @@ export function validateRfc6902Patch(operations: unknown): ValidationResult {
  * @param value - Either a string GUID or resourceLocator object
  * @returns Extracted GUID string (trimmed), or empty string if invalid
  */
-export function extractResourceLocatorValue(value: any): string {
+export function extractResourceLocatorValue(value: unknown): string {
 	// Handle null/undefined
 	if (value === null || value === undefined) {
 		return '';
@@ -321,9 +321,12 @@ export function extractResourceLocatorValue(value: any): string {
 		return value.trim();
 	}
 
-	// Handle new resourceLocator object format
-	if (typeof value === 'object' && value.value) {
-		return typeof value.value === 'string' ? value.value.trim() : '';
+	// Handle new resourceLocator object format: { value: string, ... }
+	if (typeof value === 'object') {
+		const locator = value as Record<string, unknown>;
+		if (typeof locator['value'] === 'string') {
+			return locator['value'].trim();
+		}
 	}
 
 	return '';
