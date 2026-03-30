@@ -13,34 +13,10 @@ export const operatingSystemOperations: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Get Folders',
-				value: 'getFolders',
-				description: 'Get many OS folders',
-				action: 'Get OS folders',
-			},
-			{
-				name: 'Get Folder',
-				value: 'getFolder',
-				description: 'Get a single OS folder by ID',
-				action: 'Get an OS folder',
-			},
-			{
-				name: 'Get Subfolders',
-				value: 'getFoldersByFolderId',
-				description: 'Get subfolders of a folder',
-				action: 'Get subfolders',
-			},
-			{
 				name: 'Create Folder',
 				value: 'createFolder',
 				description: 'Create a new OS folder',
 				action: 'Create an OS folder',
-			},
-			{
-				name: 'Update Folder',
-				value: 'updateFolder',
-				description: 'Update an OS folder',
-				action: 'Update an OS folder',
 			},
 			{
 				name: 'Delete Folder',
@@ -49,16 +25,40 @@ export const operatingSystemOperations: INodeProperties[] = [
 				action: 'Delete an OS folder',
 			},
 			{
-				name: 'Get Windows Endpoints',
-				value: 'getWindowsEndpoints',
-				description: 'Get Windows endpoints OS info',
-				action: 'Get Windows endpoints OS info',
+				name: 'Get Folder',
+				value: 'getFolder',
+				description: 'Get a single OS folder by ID',
+				action: 'Get an OS folder',
+			},
+			{
+				name: 'Get Folders',
+				value: 'getFolders',
+				description: 'Get many OS folders',
+				action: 'Get OS folders',
+			},
+			{
+				name: 'Get Subfolders',
+				value: 'getFoldersByFolderId',
+				description: 'Get subfolders of a folder',
+				action: 'Get subfolders',
 			},
 			{
 				name: 'Get Windows Endpoint',
 				value: 'getWindowsEndpoint',
 				description: 'Get a Windows endpoint OS info by ID',
 				action: 'Get a Windows endpoint OS info',
+			},
+			{
+				name: 'Get Windows Endpoints',
+				value: 'getWindowsEndpoints',
+				description: 'Get Windows endpoints OS info',
+				action: 'Get Windows endpoints OS info',
+			},
+			{
+				name: 'Update Folder',
+				value: 'updateFolder',
+				description: 'Update an OS folder',
+				action: 'Update an OS folder',
 			},
 			{
 				name: 'Update Windows Endpoint',

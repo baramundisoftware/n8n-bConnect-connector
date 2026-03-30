@@ -17,6 +17,11 @@ import {
 
 const GUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/** Safely coerce an unknown caught value to the JsonObject shape required by NodeApiError. */
+function toJsonObject(e: unknown): JsonObject {
+  return (typeof e === 'object' && e !== null ? e : { message: String(e) }) as JsonObject;
+}
+
 const RETRY_STATUS_CODES = new Set([429, 503]);
 const MAX_RETRIES = 3;
 
@@ -119,7 +124,7 @@ export async function apiRequest(
       const networkErrorInfo = getNetworkErrorInfo(error, options.baseURL as string);
       const troubleshooting = formatTroubleshootingHints(networkErrorInfo.troubleshooting);
 
-      throw new NodeApiError(this.getNode(), error as JsonObject, {
+      throw new NodeApiError(this.getNode(), toJsonObject(error), {
         message: `${networkErrorInfo.message}${troubleshooting}\n\nURL: ${safeUrl}`,
       });
     }
@@ -129,7 +134,7 @@ export async function apiRequest(
       const sslErrorInfo = getSslErrorInfo(error);
       const troubleshooting = formatTroubleshootingHints(sslErrorInfo.troubleshooting);
 
-      throw new NodeApiError(this.getNode(), error as JsonObject, {
+      throw new NodeApiError(this.getNode(), toJsonObject(error), {
         message: `${sslErrorInfo.message}${troubleshooting}\n\nURL: ${safeUrl}`,
       });
     }
@@ -141,14 +146,14 @@ export async function apiRequest(
       const enhancedError = getEnhancedErrorInfo(statusCode, errorMessage, operation);
       const troubleshooting = formatTroubleshootingHints(enhancedError.troubleshooting);
 
-      throw new NodeApiError(this.getNode(), error as JsonObject, {
+      throw new NodeApiError(this.getNode(), toJsonObject(error), {
         message: `${enhancedError.message}${troubleshooting}\n\nURL: ${safeUrl}`,
         httpCode: String(statusCode),
       });
     }
 
     // Fallback for unknown errors
-    throw new NodeApiError(this.getNode(), error as JsonObject, {
+    throw new NodeApiError(this.getNode(), toJsonObject(error), {
       message: `bConnect API Error: ${errorMessage}\n\nURL: ${safeUrl}\n\nTroubleshooting:\n1. Check the error message above for details\n2. Verify your credentials and permissions\n3. Review baramundi server logs`,
     });
   }

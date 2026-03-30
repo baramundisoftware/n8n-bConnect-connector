@@ -41,7 +41,7 @@ export async function updateWindowsEndpoint(
 	const endpointId = this.getNodeParameter('endpointId', index) as string;
 	const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
-	const patchOperations: Array<{ op: string; path: string; value: any }> = [];
+	const patchOperations: Array<{ op: string; path: string; value: unknown }> = [];
 	for (const [key, value] of Object.entries(updateFields)) {
 		if (value !== undefined && value !== null && value !== '') {
 			patchOperations.push({ op: 'replace', path: `/${key}`, value });

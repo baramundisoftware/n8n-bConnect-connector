@@ -264,7 +264,7 @@ export async function update(
   }
 
   // Build JSON Patch document for PATCH request
-  const patchOperations: Array<{op: string; path: string; value: any}> = [];
+  const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
 
   for (const [key, value] of Object.entries(updateFields)) {
     if (value !== undefined && value !== null && value !== '') {
@@ -453,7 +453,7 @@ export async function updateLogicalGroup(
   const groupId = this.getNodeParameter('groupId', index) as string;
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
-  const patchOperations: Array<{op: string; path: string; value: any}> = [];
+  const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
 
   for (const [key, value] of Object.entries(updateFields)) {
     if (value !== undefined && value !== null && value !== '') {
@@ -553,7 +553,7 @@ export async function updateStaticGroup(
   const groupId = this.getNodeParameter('groupId', index) as string;
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
-  const patchOperations: Array<{op: string; path: string; value: any}> = [];
+  const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
 
   for (const [key, value] of Object.entries(updateFields)) {
     if (value !== undefined && value !== null && value !== '') {
@@ -689,7 +689,7 @@ export async function updateEndpointMaintenanceWindow(
   const windowId = this.getNodeParameter('windowId', index) as string;
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
-  const patchOperations: Array<{op: string; path: string; value: any}> = [];
+  const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
 
   for (const [key, value] of Object.entries(updateFields)) {
     if (value !== undefined && value !== null && value !== '') {
@@ -771,7 +771,7 @@ export async function updateGroupMaintenanceWindow(
   const windowId = this.getNodeParameter('windowId', index) as string;
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
-  const patchOperations: Array<{op: string; path: string; value: any}> = [];
+  const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
 
   for (const [key, value] of Object.entries(updateFields)) {
     if (value !== undefined && value !== null && value !== '') {

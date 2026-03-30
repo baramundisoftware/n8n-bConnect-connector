@@ -12,12 +12,17 @@ export const variableOperations: INodeProperties[] = [
 			},
 		},
 		options: [
-			// Variable Definitions
 			{
-				name: 'Get Variable Definitions',
-				value: 'getVariableDefinitions',
-				description: 'Get many variable definitions',
-				action: 'Get variable definitions',
+				name: 'Create Variable Definition',
+				value: 'createVariableDefinition',
+				description: 'Create a new variable definition',
+				action: 'Create a variable definition',
+			},
+			{
+				name: 'Delete Variable Definition',
+				value: 'deleteVariableDefinition',
+				description: 'Delete a variable definition',
+				action: 'Delete a variable definition',
 			},
 			{
 				name: 'Get Variable Definition',
@@ -26,29 +31,10 @@ export const variableOperations: INodeProperties[] = [
 				action: 'Get a variable definition',
 			},
 			{
-				name: 'Create Variable Definition',
-				value: 'createVariableDefinition',
-				description: 'Create a new variable definition',
-				action: 'Create a variable definition',
-			},
-			{
-				name: 'Update Variable Definition',
-				value: 'updateVariableDefinition',
-				description: 'Update a variable definition',
-				action: 'Update a variable definition',
-			},
-			{
-				name: 'Delete Variable Definition',
-				value: 'deleteVariableDefinition',
-				description: 'Delete a variable definition',
-				action: 'Delete a variable definition',
-			},
-			// Variable Instances
-			{
-				name: 'Get Variable Instances',
-				value: 'getVariableInstances',
-				description: 'Get many variable instances',
-				action: 'Get variable instances',
+				name: 'Get Variable Definitions',
+				value: 'getVariableDefinitions',
+				description: 'Get many variable definitions',
+				action: 'Get variable definitions',
 			},
 			{
 				name: 'Get Variable Instance',
@@ -57,12 +43,17 @@ export const variableOperations: INodeProperties[] = [
 				action: 'Get a variable instance',
 			},
 			{
-				name: 'Update Variable Instance',
-				value: 'updateVariableInstance',
-				description: 'Update a variable instance',
-				action: 'Update a variable instance',
+				name: 'Get Variable Instances',
+				value: 'getVariableInstances',
+				description: 'Get many variable instances',
+				action: 'Get variable instances',
 			},
-			// By Entity
+			{
+				name: 'Get Variables by AD Object',
+				value: 'getVariableInstancesByADObject',
+				description: 'Get variable instances for an AD object',
+				action: 'Get variables by AD object',
+			},
 			{
 				name: 'Get Variables by Endpoint',
 				value: 'getVariableInstancesByEndpoint',
@@ -76,10 +67,16 @@ export const variableOperations: INodeProperties[] = [
 				action: 'Get variables by logical group',
 			},
 			{
-				name: 'Get Variables by AD Object',
-				value: 'getVariableInstancesByADObject',
-				description: 'Get variable instances for an AD object',
-				action: 'Get variables by AD object',
+				name: 'Update Variable Definition',
+				value: 'updateVariableDefinition',
+				description: 'Update a variable definition',
+				action: 'Update a variable definition',
+			},
+			{
+				name: 'Update Variable Instance',
+				value: 'updateVariableInstance',
+				description: 'Update a variable instance',
+				action: 'Update a variable instance',
 			},
 		],
 		default: 'getVariableDefinitions',

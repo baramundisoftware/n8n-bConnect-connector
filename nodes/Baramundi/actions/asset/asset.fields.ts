@@ -13,9 +13,9 @@ const COMMON_ASSET_OPTIONS = [
   { name: 'Get Assets by Endpoint', value: 'getAssetsByEndpoint', description: 'Get assets linked to an endpoint', action: 'Get assets by endpoint' },
   { name: 'Get Assets by Logical Group', value: 'getAssetsByLogicalGroup', description: 'Get assets in a logical group', action: 'Get assets by logical group' },
   { name: 'Get Asset Stock Assets', value: 'getAssetStockAssets', description: 'Get assets in stock', action: 'Get asset stock assets' },
-  { name: 'Get Asset Stock Folders', value: 'getAssetStockFolders', description: 'Get asset stock folders', action: 'Get asset stock folders' },
+  { name: 'Get Asset Stock Folders', value: 'getAssetStockFolders', action: 'Get asset stock folders' },
   { name: 'Create Asset Stock Folder', value: 'createAssetStockFolder', description: 'Create a new asset stock folder', action: 'Create asset stock folder' },
-  { name: 'Update Asset Stock Folder', value: 'updateAssetStockFolder', description: 'Update an asset stock folder', action: 'Update asset stock folder' },
+  { name: 'Update Asset Stock Folder', value: 'updateAssetStockFolder', action: 'Update asset stock folder' },
   { name: 'Delete Asset Stock Folder', value: 'deleteAssetStockFolder', description: 'Delete an asset stock folder', action: 'Delete asset stock folder' },
 ];
 

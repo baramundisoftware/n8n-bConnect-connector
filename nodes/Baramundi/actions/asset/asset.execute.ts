@@ -74,7 +74,7 @@ export async function update(
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
   // Build JSON Patch document for PATCH request
-  const patchOperations: Array<{op: string; path: string; value: any}> = [];
+  const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
 
   for (const [key, value] of Object.entries(updateFields)) {
     if (value !== undefined && value !== null && value !== '') {
@@ -367,7 +367,7 @@ export async function updateAssetStockFolder(
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
   // Build JSON Patch document for PATCH request
-  const patchOperations: Array<{op: string; path: string; value: any}> = [];
+  const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
 
   for (const [key, value] of Object.entries(updateFields)) {
     if (value !== undefined && value !== null && value !== '') {

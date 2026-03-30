@@ -7,11 +7,11 @@ export const universalDynamicGroupsOperations: INodeProperties[] = [{
 	noDataExpression: true,
 	displayOptions: { show: { resource: ['universalDynamicGroups'], bmsVersion: ['26R1'] } },
 	options: [
+		{ name: 'Get Folder', value: 'getFolder', description: 'Get a universal dynamic groups folder by ID', action: 'Get folder' },
+		{ name: 'Get Folders', value: 'getFolders', description: 'Get all universal dynamic group folders', action: 'Get folders' },
 		{ name: 'Get Group', value: 'get', description: 'Get a universal dynamic group by ID', action: 'Get universal dynamic group' },
 		{ name: 'Get Groups', value: 'getMany', description: 'Get all universal dynamic groups', action: 'Get universal dynamic groups' },
 		{ name: 'Get Groups by Folder', value: 'getGroupsByFolder', description: 'Get universal dynamic groups in a folder', action: 'Get groups by folder' },
-		{ name: 'Get Folder', value: 'getFolder', description: 'Get a universal dynamic groups folder by ID', action: 'Get folder' },
-		{ name: 'Get Folders', value: 'getFolders', description: 'Get all universal dynamic group folders', action: 'Get folders' },
 		{ name: 'Get Sub-Folders', value: 'getSubFolders', description: 'Get sub-folders within a folder', action: 'Get sub-folders' },
 	],
 	default: 'getMany',

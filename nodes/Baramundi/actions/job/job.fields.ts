@@ -13,28 +13,22 @@ export const jobOperations: INodeProperties[] = [
     },
     options: [
       {
-        name: 'Get',
-        value: 'get',
-        description: 'Get a job by ID',
-        action: 'Get a job',
-      },
-      {
-        name: 'Get Many',
-        value: 'getMany',
-        description: 'Get many jobs',
-        action: 'Get many jobs',
-      },
-      {
         name: 'Create',
         value: 'create',
         description: 'Create a new job definition',
         action: 'Create a job definition',
       },
       {
-        name: 'Update',
-        value: 'update',
-        description: 'Update a job definition',
-        action: 'Update a job definition',
+        name: 'Create Folder',
+        value: 'createFolder',
+        description: 'Create a new job folder',
+        action: 'Create a job folder',
+      },
+      {
+        name: 'Create Kiosk Release',
+        value: 'createKioskRelease',
+        description: 'Create a new kiosk release',
+        action: 'Create a kiosk release',
       },
       {
         name: 'Delete',
@@ -43,16 +37,28 @@ export const jobOperations: INodeProperties[] = [
         action: 'Delete a job definition',
       },
       {
+        name: 'Delete Folder',
+        value: 'deleteFolder',
+        description: 'Delete a job folder',
+        action: 'Delete a job folder',
+      },
+      {
+        name: 'Delete Job Instance',
+        value: 'deleteJobInstance',
+        description: 'Delete a job instance',
+        action: 'Delete a job instance',
+      },
+      {
         name: 'Execute',
         value: 'execute',
         description: 'Execute a job on one or more endpoints',
         action: 'Execute a job',
       },
       {
-        name: 'Get Instances',
-        value: 'getInstances',
-        description: 'Get job instances (execution history)',
-        action: 'Get job instances',
+        name: 'Get',
+        value: 'get',
+        description: 'Get a job by ID',
+        action: 'Get a job',
       },
       {
         name: 'Get All Job Instances',
@@ -61,16 +67,58 @@ export const jobOperations: INodeProperties[] = [
         action: 'Get all job instances',
       },
       {
+        name: 'Get Endpoint Job Instances',
+        value: 'getEndpointJobInstances',
+        description: 'Get all job instances for a specific endpoint',
+        action: 'Get endpoint job instances',
+      },
+      {
+        name: 'Get Folder',
+        value: 'getFolder',
+        description: 'Get a job folder by ID',
+        action: 'Get a job folder',
+      },
+      {
+        name: 'Get Folders',
+        value: 'getFolders',
+        description: 'Get many job folders',
+        action: 'Get job folders',
+      },
+      {
+        name: 'Get Instances',
+        value: 'getInstances',
+        description: 'Get job instances (execution history)',
+        action: 'Get job instances',
+      },
+      {
         name: 'Get Job Instance',
         value: 'getJobInstance',
         description: 'Get a specific job instance by ID',
         action: 'Get a job instance',
       },
       {
-        name: 'Get Endpoint Job Instances',
-        value: 'getEndpointJobInstances',
-        description: 'Get all job instances for a specific endpoint',
-        action: 'Get endpoint job instances',
+        name: 'Get Kiosk Release',
+        value: 'getKioskRelease',
+        description: 'Get a kiosk release by ID',
+        action: 'Get a kiosk release',
+      },
+      {
+        name: 'Get Kiosk Releases',
+        value: 'getKioskReleases',
+        description: 'Get many kiosk releases',
+        action: 'Get kiosk releases',
+      },
+      {
+        name: 'Get Many',
+        value: 'getMany',
+        description: 'Get many jobs',
+        action: 'Get many jobs',
+      },
+      {
+        name: 'Resume Job Instance',
+        value: 'resumeJobInstance',
+        description: 'Resume a stopped job instance',
+        action: 'Resume a job instance',
       },
       {
         name: 'Start Job Instance',
@@ -85,64 +133,16 @@ export const jobOperations: INodeProperties[] = [
         action: 'Stop a job instance',
       },
       {
-        name: 'Resume Job Instance',
-        value: 'resumeJobInstance',
-        description: 'Resume a stopped job instance',
-        action: 'Resume a job instance',
-      },
-      {
-        name: 'Delete Job Instance',
-        value: 'deleteJobInstance',
-        description: 'Delete a job instance',
-        action: 'Delete a job instance',
-      },
-      {
-        name: 'Get Folders',
-        value: 'getFolders',
-        description: 'Get many job folders',
-        action: 'Get job folders',
-      },
-      {
-        name: 'Get Folder',
-        value: 'getFolder',
-        description: 'Get a job folder by ID',
-        action: 'Get a job folder',
-      },
-      {
-        name: 'Create Folder',
-        value: 'createFolder',
-        description: 'Create a new job folder',
-        action: 'Create a job folder',
+        name: 'Update',
+        value: 'update',
+        description: 'Update a job definition',
+        action: 'Update a job definition',
       },
       {
         name: 'Update Folder',
         value: 'updateFolder',
         description: 'Update a job folder',
         action: 'Update a job folder',
-      },
-      {
-        name: 'Delete Folder',
-        value: 'deleteFolder',
-        description: 'Delete a job folder',
-        action: 'Delete a job folder',
-      },
-      {
-        name: 'Get Kiosk Releases',
-        value: 'getKioskReleases',
-        description: 'Get many kiosk releases',
-        action: 'Get kiosk releases',
-      },
-      {
-        name: 'Get Kiosk Release',
-        value: 'getKioskRelease',
-        description: 'Get a kiosk release by ID',
-        action: 'Get a kiosk release',
-      },
-      {
-        name: 'Create Kiosk Release',
-        value: 'createKioskRelease',
-        description: 'Create a new kiosk release',
-        action: 'Create a kiosk release',
       },
       {
         name: 'Withdraw Kiosk Release',
@@ -160,7 +160,7 @@ export const jobFields: INodeProperties[] = [
   //         job:get
   // ----------------------------------
   {
-    displayName: 'Job Selection',
+    displayName: 'Job Name or ID',
     name: 'jobSelection',
     type: 'options',
     required: true,
@@ -180,7 +180,7 @@ export const jobFields: INodeProperties[] = [
         operation: ['get'],
       },
     },
-    description: 'Select a job from the dropdown or enter a custom GUID',
+    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
   },
   {
     displayName: 'Job ID',
@@ -266,7 +266,7 @@ export const jobFields: INodeProperties[] = [
   //         job:execute
   // ----------------------------------
   {
-    displayName: 'Job Selection',
+    displayName: 'Job Name or ID',
     name: 'jobSelection',
     type: 'options',
     required: true,
@@ -286,7 +286,7 @@ export const jobFields: INodeProperties[] = [
         operation: ['execute'],
       },
     },
-    description: 'Select a job from the dropdown or enter a custom GUID',
+    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
   },
   {
     displayName: 'Job ID',
@@ -356,7 +356,7 @@ export const jobFields: INodeProperties[] = [
   //         job:getInstances
   // ----------------------------------
   {
-    displayName: 'Job Selection',
+    displayName: 'Job Name or ID',
     name: 'jobSelection',
     type: 'options',
     required: true,
@@ -376,7 +376,7 @@ export const jobFields: INodeProperties[] = [
         operation: ['getInstances'],
       },
     },
-    description: 'Select a job from the dropdown or enter a custom GUID',
+    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
   },
   {
     displayName: 'Job ID',
@@ -475,7 +475,7 @@ export const jobFields: INodeProperties[] = [
         name: 'searchQuery',
         type: 'string',
         default: '',
-        description: 'OData filter query. Examples: "Status eq \'Running\'", "JobDefinitionId eq \'{guid}\'", "StartTime gt 2026-01-20"',
+        description: 'OData filter query. Examples: "Status eq \'Running\'", "JobDefinitionId eq \'{guid}\'", "StartTime gt 2026-01-20".',
         placeholder: "Status eq 'Running'",
       },
       {
@@ -511,7 +511,7 @@ export const jobFields: INodeProperties[] = [
   //         job:getEndpointJobInstances
   // ----------------------------------
   {
-    displayName: 'Endpoint Selection',
+    displayName: 'Endpoint Name or ID',
     name: 'endpointSelection',
     type: 'options',
     required: true,
@@ -531,7 +531,7 @@ export const jobFields: INodeProperties[] = [
         operation: ['getEndpointJobInstances'],
       },
     },
-    description: 'Select an endpoint from the dropdown or enter a custom GUID',
+    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
   },
   {
     displayName: 'Endpoint ID',
@@ -938,7 +938,7 @@ export const jobFields: INodeProperties[] = [
   //         job:createKioskRelease
   // ----------------------------------
   {
-    displayName: 'Job Definition Selection',
+    displayName: 'Job Definition Name or ID',
     name: 'jobDefinitionSelection',
     type: 'options',
     required: true,
@@ -958,7 +958,7 @@ export const jobFields: INodeProperties[] = [
         operation: ['createKioskRelease'],
       },
     },
-    description: 'Select a job from the dropdown or enter a custom GUID',
+    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
   },
   {
     displayName: 'Job Definition ID',
@@ -1152,7 +1152,7 @@ export const jobFields: INodeProperties[] = [
   //         job:update
   // ----------------------------------
   {
-    displayName: 'Job Selection',
+    displayName: 'Job Name or ID',
     name: 'jobSelection',
     type: 'options',
     required: true,
@@ -1172,7 +1172,7 @@ export const jobFields: INodeProperties[] = [
         operation: ['update'],
       },
     },
-    description: 'Select a job from the dropdown or enter a custom GUID',
+    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
   },
   {
     displayName: 'Job ID',
@@ -1237,7 +1237,7 @@ export const jobFields: INodeProperties[] = [
   //         job:delete
   // ----------------------------------
   {
-    displayName: 'Job Selection',
+    displayName: 'Job Name or ID',
     name: 'jobSelection',
     type: 'options',
     required: true,
@@ -1257,7 +1257,7 @@ export const jobFields: INodeProperties[] = [
         operation: ['delete'],
       },
     },
-    description: 'Select a job from the dropdown or enter a custom GUID',
+    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
   },
   {
     displayName: 'Job ID',

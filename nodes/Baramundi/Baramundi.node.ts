@@ -86,6 +86,11 @@ export class Baramundi implements INodeType {
             description: 'Manage assets in baramundi',
           },
           {
+            name: 'Compliance',
+            value: 'compliance',
+            description: 'Query compliance rules, vulnerabilities, and violations (requires bMS 26R1+)',
+          },
+          {
             name: 'Defense Control',
             value: 'defenseControl',
             description: 'Manage BitLocker, local admin accounts, and Microsoft Defender',
@@ -116,6 +121,11 @@ export class Baramundi implements INodeType {
             description: 'Query installed Windows software inventory',
           },
           {
+            name: 'Universal Dynamic Group',
+            value: 'universalDynamicGroups',
+            description: 'Manage universal dynamic groups and folders (requires bMS 26R1+)',
+          },
+          {
             name: 'Update Management',
             value: 'updateManagement',
             description: 'Manage Windows endpoint update profiles',
@@ -124,16 +134,6 @@ export class Baramundi implements INodeType {
             name: 'Variable',
             value: 'variable',
             description: 'Manage baramundi variables and variable instances',
-          },
-          {
-            name: 'Compliance',
-            value: 'compliance',
-            description: 'Query compliance rules, vulnerabilities, and violations (requires bMS 26R1+)',
-          },
-          {
-            name: 'Universal Dynamic Group',
-            value: 'universalDynamicGroups',
-            description: 'Manage universal dynamic groups and folders (requires bMS 26R1+)',
           },
         ],
         default: 'endpoint',

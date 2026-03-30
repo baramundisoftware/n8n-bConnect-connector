@@ -46,6 +46,7 @@ export const endpointOperations25R2: INodeProperties[] = [
       { name: 'Replace Endpoint Maintenance Window (PUT)', value: 'putEndpointMaintenanceWindow', description: 'Replace a maintenance window for an endpoint with a full body (bMS 25R2)', action: 'Replace endpoint maintenance window' },
       { name: 'Replace Group Maintenance Window (PUT)', value: 'putGroupMaintenanceWindow', description: 'Replace a maintenance window for a group with a full body (bMS 25R2)', action: 'Replace group maintenance window' },
     ],
+    // eslint-disable-next-line n8n-nodes-base/node-param-default-wrong-for-options -- 'getMany' is in COMMON_ENDPOINT_OPTIONS spread; ESLint cannot resolve spread
     default: 'getMany',
   },
 ];
@@ -72,6 +73,7 @@ export const endpointOperations26R1: INodeProperties[] = [
       { name: 'Get Unmanaged Endpoint', value: 'getUnmanagedEndpoint', description: 'Get an unmanaged endpoint by ID (bMS 26R1+)', action: 'Get unmanaged endpoint' },
       { name: 'Delete Unmanaged Endpoint', value: 'deleteUnmanagedEndpoint', description: 'Delete an unmanaged endpoint by ID (bMS 26R1+)', action: 'Delete unmanaged endpoint' },
     ],
+    // eslint-disable-next-line n8n-nodes-base/node-param-default-wrong-for-options -- 'getMany' is in COMMON_ENDPOINT_OPTIONS spread; ESLint cannot resolve spread
     default: 'getMany',
   },
 ];
@@ -84,7 +86,7 @@ export const endpointFields: INodeProperties[] = [
   //         endpoint:get, endpoint:delete
   // ----------------------------------
   {
-    displayName: 'Endpoint Selection',
+    displayName: 'Endpoint Name or ID',
     name: 'endpointSelection',
     type: 'options',
     required: true,
@@ -104,7 +106,7 @@ export const endpointFields: INodeProperties[] = [
         value: '__custom__',
       },
     ],
-    description: 'Select an endpoint from the list or enter a custom GUID',
+    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
   },
   {
     displayName: 'Endpoint ID',
@@ -252,9 +254,14 @@ export const endpointFields: INodeProperties[] = [
     },
     options: [
       {
-        name: 'Windows',
-        value: 'windows',
-        description: 'Windows desktop/server endpoint',
+        name: 'Android',
+        value: 'android',
+        description: 'Android mobile device',
+      },
+      {
+        name: 'iOS',
+        value: 'ios',
+        description: 'iOS mobile device',
       },
       {
         name: 'Linux',
@@ -267,14 +274,9 @@ export const endpointFields: INodeProperties[] = [
         description: 'macOS endpoint',
       },
       {
-        name: 'Android',
-        value: 'android',
-        description: 'Android mobile device',
-      },
-      {
-        name: 'iOS',
-        value: 'ios',
-        description: 'iOS mobile device',
+        name: 'Windows',
+        value: 'windows',
+        description: 'Windows desktop/server endpoint',
       },
     ],
     description: 'The type of endpoint to create',
@@ -449,7 +451,7 @@ export const endpointFields: INodeProperties[] = [
   //         endpoint:update
   // ----------------------------------
   {
-    displayName: 'Endpoint Selection',
+    displayName: 'Endpoint Name or ID',
     name: 'endpointSelection',
     type: 'options',
     required: true,
@@ -469,7 +471,7 @@ export const endpointFields: INodeProperties[] = [
         value: '__custom__',
       },
     ],
-    description: 'Select an endpoint from the list or enter a custom GUID',
+    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
   },
   {
     displayName: 'Endpoint ID',
@@ -556,7 +558,7 @@ export const endpointFields: INodeProperties[] = [
   //         endpoint:startEnrollment
   // ----------------------------------
   {
-    displayName: 'Endpoint Selection',
+    displayName: 'Endpoint Name or ID',
     name: 'endpointSelection',
     type: 'options',
     required: true,
@@ -576,7 +578,7 @@ export const endpointFields: INodeProperties[] = [
         value: '__custom__',
       },
     ],
-    description: 'Select an endpoint from the list or enter a custom GUID',
+    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
   },
   {
     displayName: 'Endpoint ID',
@@ -629,7 +631,7 @@ export const endpointFields: INodeProperties[] = [
   //         endpoint:triggerIntuneInstallation
   // ----------------------------------
   {
-    displayName: 'Endpoint Selection',
+    displayName: 'Endpoint Name or ID',
     name: 'endpointSelection',
     type: 'options',
     required: true,
@@ -649,7 +651,7 @@ export const endpointFields: INodeProperties[] = [
         value: '__custom__',
       },
     ],
-    description: 'Select an endpoint from the list or enter a custom GUID',
+    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
   },
   {
     displayName: 'Endpoint ID',
@@ -841,7 +843,7 @@ export const endpointFields: INodeProperties[] = [
   //         endpoint:createEndpointMaintenanceWindow, updateEndpointMaintenanceWindow, deleteEndpointMaintenanceWindow
   // ----------------------------------
   {
-    displayName: 'Endpoint Selection',
+    displayName: 'Endpoint Name or ID',
     name: 'endpointSelection',
     type: 'options',
     required: true,
@@ -861,7 +863,7 @@ export const endpointFields: INodeProperties[] = [
         value: '__custom__',
       },
     ],
-    description: 'Select an endpoint from the list or enter a custom GUID',
+    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
   },
   {
     displayName: 'Endpoint ID',
@@ -1189,7 +1191,7 @@ export const endpointFields: INodeProperties[] = [
   //         EntraId operations (26R1+)
   // ----------------------------------
   {
-    displayName: 'Endpoint Selection',
+    displayName: 'Endpoint Name or ID',
     name: 'endpointSelection',
     type: 'options',
     required: true,
@@ -1210,7 +1212,7 @@ export const endpointFields: INodeProperties[] = [
         value: '__custom__',
       },
     ],
-    description: 'Select an endpoint from the list or enter a custom GUID',
+    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
   },
   {
     displayName: 'Endpoint ID',

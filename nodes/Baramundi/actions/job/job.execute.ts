@@ -301,7 +301,7 @@ export async function updateFolder(
   const folderId = this.getNodeParameter('folderId', index) as string;
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
-  const patchOperations: Array<{op: string; path: string; value: any}> = [];
+  const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
 
   for (const [key, value] of Object.entries(updateFields)) {
     if (value !== undefined && value !== null && value !== '') {
@@ -442,7 +442,7 @@ export async function update(
     : jobSelection;
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
-  const patchOperations: Array<{op: string; path: string; value: any}> = [];
+  const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
 
   for (const [key, value] of Object.entries(updateFields)) {
     if (value !== undefined && value !== null && value !== '') {

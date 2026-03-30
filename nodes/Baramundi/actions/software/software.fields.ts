@@ -30,6 +30,7 @@ export const softwareOperations26R1: INodeProperties[] = [{
 		{ name: 'Delete Bundle Folder', value: 'deleteBundleFolder', description: 'Delete a bundle folder (bMS 26R1+)', action: 'Delete bundle folder' },
 		{ name: 'Get Bundle Applications by Bundle', value: 'getBundleApplicationsByBundle', description: 'Get applications in a bundle (bMS 26R1+)', action: 'Get bundle applications by bundle' },
 	],
+	// eslint-disable-next-line n8n-nodes-base/node-param-default-wrong-for-options -- 'getInstalledWindowsSoftware' is in COMMON_SOFTWARE_OPTIONS spread; ESLint cannot resolve spread
 	default: 'getInstalledWindowsSoftware',
 }];
 

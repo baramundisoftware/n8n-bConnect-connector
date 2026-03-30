@@ -14,7 +14,7 @@ const skipConfig = skipIfNoCredentials();
 describe.skipIf(skipConfig.skip)('Jobs API - System Tests', () => {
   let config: ReturnType<typeof getSystemTestConfig>;
   let createdFolderIds: string[] = [];
-  let createdInstanceIds: string[] = [];
+  const createdInstanceIds: string[] = [];
 
   beforeAll(() => {
     config = getSystemTestConfig();
