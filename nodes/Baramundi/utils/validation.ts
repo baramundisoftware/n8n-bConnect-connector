@@ -168,23 +168,17 @@ export function validateIpv4Address(ip: string): ValidationResult {
  * @param value - The date/time string to validate
  * @returns ValidationResult
  */
+// Strict ISO 8601 datetime: YYYY-MM-DDTHH:MM:SS[.sss][Z|±HH:MM]
+// Rejects human-readable, date-only, and space-separated formats.
+const ISO8601_STRICT =
+	/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):[0-5]\d:[0-5]\d(\.\d+)?(Z|[+-](0\d|1[0-4]):[0-5]\d)?$/;
+
 export function validateIso8601DateTime(value: string): ValidationResult {
 	if (!value || typeof value !== 'string') {
 		return { valid: false, errors: ['Date/time is required'] };
 	}
 
-	try {
-		const date = new Date(value);
-		if (isNaN(date.getTime())) {
-			return {
-				valid: false,
-				errors: [
-					`"${value}" is not a valid ISO 8601 date/time (expected format: 2026-01-22T10:30:00Z)`,
-				],
-			};
-		}
-		return { valid: true, errors: [] };
-	} catch (error) {
+	if (!ISO8601_STRICT.test(value)) {
 		return {
 			valid: false,
 			errors: [
@@ -192,6 +186,19 @@ export function validateIso8601DateTime(value: string): ValidationResult {
 			],
 		};
 	}
+
+	// Secondary sanity check via Date constructor (catches e.g. Feb 30)
+	const date = new Date(value);
+	if (isNaN(date.getTime())) {
+		return {
+			valid: false,
+			errors: [
+				`"${value}" is not a valid ISO 8601 date/time (expected format: 2026-01-22T10:30:00Z)`,
+			],
+		};
+	}
+
+	return { valid: true, errors: [] };
 }
 
 /**

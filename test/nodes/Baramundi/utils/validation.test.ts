@@ -383,6 +383,56 @@ describe('Validation Utilities', () => {
 			const result = validateIso8601DateTime(null as any);
 			expect(result.valid).toBe(false);
 		});
+
+		// Strict ISO 8601 — reject formats new Date() accepts but are not ISO 8601
+		it('should reject human-readable date string', () => {
+			const result = validateIso8601DateTime('March 30, 2026');
+			expect(result.valid).toBe(false);
+			expect(result.errors[0]).toContain('not a valid ISO 8601');
+		});
+
+		it('should reject US-style date string', () => {
+			const result = validateIso8601DateTime('01/22/2026');
+			expect(result.valid).toBe(false);
+			expect(result.errors[0]).toContain('not a valid ISO 8601');
+		});
+
+		it('should reject date-only string without time component', () => {
+			const result = validateIso8601DateTime('2026-01-22');
+			expect(result.valid).toBe(false);
+			expect(result.errors[0]).toContain('not a valid ISO 8601');
+		});
+
+		it('should reject date with space separator instead of T', () => {
+			const result = validateIso8601DateTime('2026-01-22 10:30:00');
+			expect(result.valid).toBe(false);
+			expect(result.errors[0]).toContain('not a valid ISO 8601');
+		});
+
+		it('should reject month out of range (13)', () => {
+			const result = validateIso8601DateTime('2026-13-01T10:30:00Z');
+			expect(result.valid).toBe(false);
+		});
+
+		it('should reject day out of range (32)', () => {
+			const result = validateIso8601DateTime('2026-01-32T10:30:00Z');
+			expect(result.valid).toBe(false);
+		});
+
+		it('should reject hour out of range (25)', () => {
+			const result = validateIso8601DateTime('2026-01-22T25:00:00Z');
+			expect(result.valid).toBe(false);
+		});
+
+		it('should accept negative UTC offset', () => {
+			const result = validateIso8601DateTime('2026-01-22T10:30:00-05:00');
+			expect(result.valid).toBe(true);
+		});
+
+		it('should accept milliseconds with timezone offset', () => {
+			const result = validateIso8601DateTime('2026-01-22T10:30:00.999+02:00');
+			expect(result.valid).toBe(true);
+		});
 	});
 
 	describe('validateMaintenanceWindow', () => {

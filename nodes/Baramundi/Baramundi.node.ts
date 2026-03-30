@@ -180,11 +180,18 @@ export class Baramundi implements INodeType {
           );
 
           const data = (response.data as any[]) || [];
+          const truncated = (response.hasNextPage as boolean) || false;
 
-          return data.map((endpoint: any) => ({
+          const options: INodePropertyOptions[] = data.map((endpoint: any) => ({
             name: `${endpoint.displayName}${endpoint.hostName ? ` (${endpoint.hostName})` : ''}`,
             value: endpoint.id,
           }));
+
+          if (truncated) {
+            options.push({ name: '— showing first 100 results, use GUID input for more —', value: '' });
+          }
+
+          return options;
         } catch (error) {
           // Return empty array if API call fails
           return [];
@@ -205,11 +212,18 @@ export class Baramundi implements INodeType {
           );
 
           const data = (response.data as any[]) || [];
+          const truncated = (response.hasNextPage as boolean) || false;
 
-          return data.map((job: any) => ({
+          const options: INodePropertyOptions[] = data.map((job: any) => ({
             name: `${job.name}${job.type ? ` [${job.type}]` : ''}`,
             value: job.id,
           }));
+
+          if (truncated) {
+            options.push({ name: '— showing first 100 results, use GUID input for more —', value: '' });
+          }
+
+          return options;
         } catch (error) {
           // Return empty array if API call fails
           return [];
@@ -230,11 +244,18 @@ export class Baramundi implements INodeType {
           );
 
           const data = (response.data as any[]) || [];
+          const truncated = (response.hasNextPage as boolean) || false;
 
-          return data.map((orgUnit: any) => ({
+          const options: INodePropertyOptions[] = data.map((orgUnit: any) => ({
             name: orgUnit.name || orgUnit.id,
             value: orgUnit.id,
           }));
+
+          if (truncated) {
+            options.push({ name: '— showing first 100 results, use GUID input for more —', value: '' });
+          }
+
+          return options;
         } catch (error) {
           // Return empty array if API call fails
           return [];
@@ -255,11 +276,18 @@ export class Baramundi implements INodeType {
           );
 
           const data = (response.data as any[]) || [];
+          const truncated = (response.hasNextPage as boolean) || false;
 
-          return data.map((group: any) => ({
+          const options: INodePropertyOptions[] = data.map((group: any) => ({
             name: group.name || group.id,
             value: group.id,
           }));
+
+          if (truncated) {
+            options.push({ name: '— showing first 100 results, use GUID input for more —', value: '' });
+          }
+
+          return options;
         } catch (error) {
           // Return empty array if API call fails
           return [];
@@ -280,11 +308,18 @@ export class Baramundi implements INodeType {
           );
 
           const data = (response.data as any[]) || [];
+          const truncated = (response.hasNextPage as boolean) || false;
 
-          return data.map((group: any) => ({
+          const options: INodePropertyOptions[] = data.map((group: any) => ({
             name: group.name || group.id,
             value: group.id,
           }));
+
+          if (truncated) {
+            options.push({ name: '— showing first 100 results, use GUID input for more —', value: '' });
+          }
+
+          return options;
         } catch (error) {
           // Return empty array if API call fails
           return [];
@@ -305,11 +340,18 @@ export class Baramundi implements INodeType {
           );
 
           const data = (response.data as any[]) || [];
+          const truncated = (response.hasNextPage as boolean) || false;
 
-          return data.map((group: any) => ({
+          const options: INodePropertyOptions[] = data.map((group: any) => ({
             name: group.name || group.id,
             value: group.id,
           }));
+
+          if (truncated) {
+            options.push({ name: '— showing first 100 results, use GUID input for more —', value: '' });
+          }
+
+          return options;
         } catch (error) {
           // Return empty array if API call fails
           return [];
