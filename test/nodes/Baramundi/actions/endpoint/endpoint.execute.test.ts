@@ -6,7 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
-import { get, getMany, search, deleteEndpoint, create, update, startEnrollment, triggerIntuneInstallation, getLogicalGroup, getLogicalGroups, createLogicalGroup, updateLogicalGroup, deleteLogicalGroup, getStaticGroup, getStaticGroups, createStaticGroup, updateStaticGroup, deleteStaticGroup, getDynamicGroup, getDynamicGroups, setEntraIdData, deleteEntraIdData, getEntraIdDataByDeviceId, getUnmanagedEndpoints, getUnmanagedEndpoint, deleteUnmanagedEndpoint, putEndpointMaintenanceWindow, putGroupMaintenanceWindow } from '../../../../../nodes/Baramundi/actions/endpoint/endpoint.execute';
+import { get, getMany, search, deleteEndpoint, create, update, startEnrollment, triggerIntuneInstallation, getLogicalGroup, getLogicalGroups, createLogicalGroup, updateLogicalGroup, deleteLogicalGroup, getStaticGroup, getStaticGroups, createStaticGroup, updateStaticGroup, deleteStaticGroup, getDynamicGroup, getDynamicGroups, setEntraIdData, deleteEntraIdData, getEntraIdDataByDeviceId, getUnmanagedEndpoints, getUnmanagedEndpoint, deleteUnmanagedEndpoint, putEndpointMaintenanceWindow, putGroupMaintenanceWindow, updateEndpointMaintenanceWindow, updateGroupMaintenanceWindow } from '../../../../../nodes/Baramundi/actions/endpoint/endpoint.execute';
 
 /**
  * Create a mock IExecuteFunctions instance for testing
@@ -2799,6 +2799,115 @@ describe('Endpoint Phase 4 - MaintenanceWindow PUT Operations', () => {
       await putGroupMaintenanceWindow.call(mockContext, 0);
       const httpRequest = mockContext.helpers.httpRequest as ReturnType<typeof vi.fn>;
       expect(httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'PUT' }));
+    });
+  });
+});
+
+describe('Endpoint Phase 6 - MaintenanceWindow PATCH Operations (26R1)', () => {
+  describe('updateEndpointMaintenanceWindow()', () => {
+    it('should call PATCH with JSON Patch operations', async () => {
+      const endpointId = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
+      const windowId = 'b2c3d4e5-f6a7-8901-bcde-f12345678901';
+      const mockContext = createMockExecuteFunctions(
+        {
+          endpointSelection: '__custom__',
+          endpointId,
+          windowId,
+          updateFields: { enabled: true },
+        },
+        {},
+        { id: windowId, enabled: true },
+      );
+      await updateEndpointMaintenanceWindow.call(mockContext, 0);
+      const httpRequest = mockContext.helpers.httpRequest as ReturnType<typeof vi.fn>;
+      expect(httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'PATCH',
+          url: `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindows/${windowId}`,
+          body: [{ op: 'replace', path: '/enabled', value: true }],
+        }),
+      );
+    });
+
+    it('should throw when no fields to update', async () => {
+      const mockContext = createMockExecuteFunctions(
+        {
+          endpointSelection: '__custom__',
+          endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+          windowId: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+          updateFields: {},
+        },
+        {},
+        {},
+      );
+      await expect(updateEndpointMaintenanceWindow.call(mockContext, 0)).rejects.toThrow(
+        'No fields to update specified',
+      );
+    });
+  });
+
+  describe('updateGroupMaintenanceWindow()', () => {
+    it('should call PATCH with correct group type path for logical group', async () => {
+      const groupId = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
+      const windowId = 'b2c3d4e5-f6a7-8901-bcde-f12345678901';
+      const mockContext = createMockExecuteFunctions(
+        {
+          groupId,
+          groupType: 'logical',
+          windowId,
+          updateFields: { enabled: false },
+        },
+        {},
+        { id: windowId, enabled: false },
+      );
+      await updateGroupMaintenanceWindow.call(mockContext, 0);
+      const httpRequest = mockContext.helpers.httpRequest as ReturnType<typeof vi.fn>;
+      expect(httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'PATCH',
+          url: `/endpoints/v2.0/LogicalGroups/${groupId}/MaintenanceWindows/${windowId}`,
+          body: [{ op: 'replace', path: '/enabled', value: false }],
+        }),
+      );
+    });
+
+    it('should use StaticGroups path when groupType is static', async () => {
+      const groupId = 'c3d4e5f6-a7b8-9012-cdef-123456789012';
+      const windowId = 'd4e5f6a7-b8c9-0123-defa-234567890123';
+      const mockContext = createMockExecuteFunctions(
+        {
+          groupId,
+          groupType: 'static',
+          windowId,
+          updateFields: { enabled: true },
+        },
+        {},
+        { id: windowId },
+      );
+      await updateGroupMaintenanceWindow.call(mockContext, 0);
+      const httpRequest = mockContext.helpers.httpRequest as ReturnType<typeof vi.fn>;
+      expect(httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'PATCH',
+          url: `/endpoints/v2.0/StaticGroups/${groupId}/MaintenanceWindows/${windowId}`,
+        }),
+      );
+    });
+
+    it('should throw when no fields to update', async () => {
+      const mockContext = createMockExecuteFunctions(
+        {
+          groupId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+          groupType: 'logical',
+          windowId: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
+          updateFields: {},
+        },
+        {},
+        {},
+      );
+      await expect(updateGroupMaintenanceWindow.call(mockContext, 0)).rejects.toThrow(
+        'No fields to update specified',
+      );
     });
   });
 });
