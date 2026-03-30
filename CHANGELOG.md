@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-03-30
+
+> **Semver rationale**: This is a **minor** version bump (0.1.0 → 0.2.0) despite the V1.1 removal breaking change, because the package has not yet reached stable 1.0.0. Under semver §4, breaking changes in pre-1.0 releases may be reflected as minor increments. The V1.1 removal is documented prominently in the Breaking Changes section so downstream users can plan migrations.
+
 ### Breaking Changes
 
 - **V1.1 API modules removed**: All V1.1 API operations have been removed. The connector now exposes only bConnect V2.0 API operations. Workflows using the following resources must be migrated to the V2.0 equivalents listed below:
@@ -77,9 +81,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Compliance and Universal Dynamic Groups operations now correctly hidden when `bmsVersion` is set to `25R2`
 
+### Security (Audit Remediation 2026-03-30)
+
+- **npm audit**: Reduced vulnerabilities from 21 → 11. Remaining 11 are all in `devDependencies` only (transitive via `@n8n/node-cli`): `handlebars` CRITICAL and `minimatch` HIGH have no upstream fix available; `esbuild` MODERATE affects only the dev server and is not exploitable in CI. **Runtime package has 0 vulnerabilities.**
+- **GUID validation**: Added `validateGuid()` to compliance operations (`getRule`, `getVulnerability`, `getDetectedVulnerabilitiesByEndpoint`, `getDetectedRuleViolationsByEndpoint`). Invalid GUIDs now throw a `NodeOperationError` before any API call.
+- **Version-gated operation dropdowns**: Split `endpointOperations`, `softwareOperations`, and `assetOperations` into 25R2/26R1 lists. PUT Maintenance Window operations are now hidden under 26R1; PATCH variants, EntraId, and Unmanaged Endpoints are hidden under 25R2.
+- **Test mock security**: All unit test credential mocks changed from `ignoreSslIssues: true` to `ignoreSslIssues: false` (secure by default). Passwords were already `test-password-do-not-use`.
+- **URL sanitisation in error messages**: API error messages no longer include full URLs with GUIDs or sensitive path segments. URLs are truncated to `{host}/.../{resource}` format.
+- **RFC 6902 patch validation**: `patchBitLockerSecrets`, `updateEndpointMaintenanceWindow`, and `updateGroupMaintenanceWindow` now validate patch documents against RFC 6902 before sending to the API.
+
 ### Testing
 
-- 436 unit tests passing (0 skipped)
+- 462 unit tests passing (0 skipped)
 - TypeScript strict mode: 0 errors
 
 ## [0.1.0] - 2026-01-22

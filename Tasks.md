@@ -198,7 +198,6 @@
 | ID | Task | Role | Priority | Severity | Depends on |
 |----|------|------|----------|----------|------------|
 | P6.1 | `npm audit fix` + pin `axios >=1.14.0`; re-run audit and document remaining findings | DevOps Engineer | CRITICAL | C-1 | — |
-| P6.9 | Bump `package.json` version to `0.2.0`; add CHANGELOG entry for 0.2.0 release with semver rationale (breaking: V1.1 removal) | Technical Writer | LOW | L-3 | P6.1–P6.8 |
 
 ### Done
 
@@ -212,6 +211,7 @@
 | P6.6 | Added 5 tests for `updateEndpointMaintenanceWindow` and `updateGroupMaintenanceWindow` (26R1 PATCH ops). All other 26R1 ops already had coverage. 441 tests passing. | 2026-03-30 |
 | P6.7 | Added `sanitiseUrl()` to `requestApi.ts`; replaces full URL with `{host}/.../resource` in all error messages. Also sanitised `operation` string to prevent GUID leakage. 2 new tests added. 442 tests passing. | 2026-03-30 |
 | P6.8 | Added `validateRfc6902Patch()` to validation.ts; applied in `patchBitLockerSecrets`, `updateEndpointMaintenanceWindow`, `updateGroupMaintenanceWindow`. 20 new tests. 462 tests passing. | 2026-03-30 |
+| P6.9 | Bumped `package.json` version 0.1.0 → 0.2.0. Promoted [Unreleased] → [0.2.0] in CHANGELOG with semver rationale and audit remediation Security section. | 2026-03-30 |
 
 ---
 
