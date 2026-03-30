@@ -152,6 +152,8 @@
 | P4.4 | `asset` module: added getAssetsByADObject + getAssetsByOrgUnit, gated `bmsVersion: ['26R1']` | 2026-03-30 |
 | P4.5 | `serverManagement` module: added 5 ops (MSWCleanup, SimulateMSW, ApiKeys, DownloadJobs), gated `bmsVersion: ['26R1']` | 2026-03-30 |
 | P4.6 | REQ-CHANGED-1: added PUT variants (25R2) + gated PATCH updates to 26R1 for MaintenanceWindow | 2026-03-30 |
+| P4.7 | Written 29 new unit tests for all P4.1-P4.6 operations — 436 tests total passing | 2026-03-30 |
+| P4.8 | TypeScript 0 errors, 436 unit tests passing | 2026-03-30 |
 
 ---
 
