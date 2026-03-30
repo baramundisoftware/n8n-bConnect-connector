@@ -16,6 +16,7 @@ import {
 	validateIso8601DateTime,
 	validateMaintenanceWindow,
 	extractResourceLocatorValue,
+	validateRfc6902Patch,
 	type ValidationResult,
 } from '../../../../nodes/Baramundi/utils/validation';
 
@@ -507,5 +508,101 @@ describe('Validation Utilities', () => {
 			});
 			expect(result).toBe('12345678-1234-1234-1234-123456789012');
 		});
+	});
+});
+
+describe('validateRfc6902Patch()', () => {
+	it('should accept a valid replace operation', () => {
+		const result = validateRfc6902Patch([{ op: 'replace', path: '/enabled', value: true }]);
+		expect(result.valid).toBe(true);
+		expect(result.errors).toHaveLength(0);
+	});
+
+	it('should accept a valid add operation', () => {
+		const result = validateRfc6902Patch([{ op: 'add', path: '/tags/0', value: 'new-tag' }]);
+		expect(result.valid).toBe(true);
+	});
+
+	it('should accept a valid remove operation (no value required)', () => {
+		const result = validateRfc6902Patch([{ op: 'remove', path: '/tags/0' }]);
+		expect(result.valid).toBe(true);
+	});
+
+	it('should accept a valid move operation with from', () => {
+		const result = validateRfc6902Patch([{ op: 'move', path: '/a/b', from: '/a/c' }]);
+		expect(result.valid).toBe(true);
+	});
+
+	it('should accept a valid copy operation with from', () => {
+		const result = validateRfc6902Patch([{ op: 'copy', path: '/a/b', from: '/a/c' }]);
+		expect(result.valid).toBe(true);
+	});
+
+	it('should accept a valid test operation', () => {
+		const result = validateRfc6902Patch([{ op: 'test', path: '/enabled', value: true }]);
+		expect(result.valid).toBe(true);
+	});
+
+	it('should reject non-array input', () => {
+		const result = validateRfc6902Patch({ op: 'replace', path: '/x', value: 1 });
+		expect(result.valid).toBe(false);
+		expect(result.errors[0]).toMatch(/must be a JSON array/);
+	});
+
+	it('should reject empty array', () => {
+		const result = validateRfc6902Patch([]);
+		expect(result.valid).toBe(false);
+		expect(result.errors[0]).toMatch(/at least one operation/i);
+	});
+
+	it('should reject invalid op value', () => {
+		const result = validateRfc6902Patch([{ op: 'update', path: '/x', value: 1 }]);
+		expect(result.valid).toBe(false);
+		expect(result.errors[0]).toMatch(/"op" must be one of/);
+	});
+
+	it('should reject path not starting with /', () => {
+		const result = validateRfc6902Patch([{ op: 'replace', path: 'enabled', value: true }]);
+		expect(result.valid).toBe(false);
+		expect(result.errors[0]).toMatch(/"path" must be a string starting with/);
+	});
+
+	it('should reject replace without value', () => {
+		const result = validateRfc6902Patch([{ op: 'replace', path: '/x' }]);
+		expect(result.valid).toBe(false);
+		expect(result.errors[0]).toMatch(/"value" is required for "replace"/);
+	});
+
+	it('should reject add without value', () => {
+		const result = validateRfc6902Patch([{ op: 'add', path: '/x' }]);
+		expect(result.valid).toBe(false);
+		expect(result.errors[0]).toMatch(/"value" is required for "add"/);
+	});
+
+	it('should reject move without from', () => {
+		const result = validateRfc6902Patch([{ op: 'move', path: '/a/b' }]);
+		expect(result.valid).toBe(false);
+		expect(result.errors[0]).toMatch(/"from" must be a string/);
+	});
+
+	it('should reject copy without from', () => {
+		const result = validateRfc6902Patch([{ op: 'copy', path: '/a/b' }]);
+		expect(result.valid).toBe(false);
+		expect(result.errors[0]).toMatch(/"from" must be a string/);
+	});
+
+	it('should collect errors from multiple invalid operations', () => {
+		const result = validateRfc6902Patch([
+			{ op: 'replace', path: '/x' },        // missing value
+			{ op: 'bad-op', path: '/y', value: 1 }, // invalid op
+		]);
+		expect(result.valid).toBe(false);
+		expect(result.errors).toHaveLength(2);
+	});
+
+	it('should reject non-object items in the array', () => {
+		const result = validateRfc6902Patch(['not-an-object']);
+		expect(result.valid).toBe(false);
+		expect(result.errors[0]).toMatch(/must be an object/);
 	});
 });

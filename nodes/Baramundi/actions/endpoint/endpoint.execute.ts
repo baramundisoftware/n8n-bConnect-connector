@@ -8,6 +8,7 @@ import {
 	validateMacAddress,
 	validateIpv4Address,
 	validateMaintenanceWindow,
+	validateRfc6902Patch,
 } from '../../utils/validation';
 
 export async function get(
@@ -704,6 +705,15 @@ export async function updateEndpointMaintenanceWindow(
     throw new Error('No fields to update specified');
   }
 
+  const mwValidation = validateRfc6902Patch(patchOperations);
+  if (!mwValidation.valid) {
+    throw new NodeOperationError(
+      this.getNode(),
+      `Invalid RFC 6902 patch document:\n${mwValidation.errors.join('\n')}`,
+      { itemIndex: index },
+    );
+  }
+
   await apiRequest.call(this, 'PATCH', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindows/${windowId}`, patchOperations);
 
   const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindows/${windowId}`);
@@ -775,6 +785,15 @@ export async function updateGroupMaintenanceWindow(
 
   if (patchOperations.length === 0) {
     throw new Error('No fields to update specified');
+  }
+
+  const groupMwValidation = validateRfc6902Patch(patchOperations);
+  if (!groupMwValidation.valid) {
+    throw new NodeOperationError(
+      this.getNode(),
+      `Invalid RFC 6902 patch document:\n${groupMwValidation.errors.join('\n')}`,
+      { itemIndex: index },
+    );
   }
 
   const groupTypeMap: Record<string, string> = {

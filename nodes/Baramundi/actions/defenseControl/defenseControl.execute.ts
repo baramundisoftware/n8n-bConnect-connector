@@ -1,5 +1,7 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../transport/requestApi';
+import { validateRfc6902Patch } from '../../utils/validation';
 
 // ============================================================================
 // BITLOCKER OPERATIONS
@@ -306,6 +308,15 @@ export async function patchBitLockerSecrets(
     body = JSON.parse(patchOperations) as IDataObject[];
   } catch {
     throw new Error('patchOperations must be a valid JSON array');
+  }
+
+  const validation = validateRfc6902Patch(body);
+  if (!validation.valid) {
+    throw new NodeOperationError(
+      this.getNode(),
+      `Invalid RFC 6902 patch document:\n${validation.errors.join('\n')}`,
+      { itemIndex: index },
+    );
   }
 
   const response = await apiRequest.call(this, 'PATCH', `/defensecontrol/v2.0/BitLocker/WindowsEndpoints/${endpointId}/Secrets`, body as unknown as IDataObject);

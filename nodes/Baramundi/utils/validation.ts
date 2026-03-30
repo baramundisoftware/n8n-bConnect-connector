@@ -245,6 +245,58 @@ export function validateMaintenanceWindow(
 	};
 }
 
+const RFC6902_OPS = new Set(['add', 'remove', 'replace', 'move', 'copy', 'test']);
+
+/**
+ * Validate a JSON Patch document against RFC 6902.
+ * Each operation must have an `op` (add|remove|replace|move|copy|test),
+ * a `path` string starting with "/", and (where required) a `value` field.
+ * @param operations - Parsed array of patch operations
+ * @returns ValidationResult
+ */
+export function validateRfc6902Patch(operations: unknown): ValidationResult {
+	const errors: string[] = [];
+
+	if (!Array.isArray(operations)) {
+		return { valid: false, errors: ['Patch body must be a JSON array of operations'] };
+	}
+
+	if (operations.length === 0) {
+		return { valid: false, errors: ['Patch body must contain at least one operation'] };
+	}
+
+	for (let i = 0; i < operations.length; i++) {
+		const op = operations[i] as Record<string, unknown>;
+		const prefix = `Operation [${i}]`;
+
+		if (typeof op !== 'object' || op === null || Array.isArray(op)) {
+			errors.push(`${prefix}: must be an object`);
+			continue;
+		}
+
+		if (typeof op.op !== 'string' || !RFC6902_OPS.has(op.op)) {
+			errors.push(
+				`${prefix}: "op" must be one of ${[...RFC6902_OPS].join(', ')} (got: ${JSON.stringify(op.op)})`,
+			);
+		}
+
+		if (typeof op.path !== 'string' || !op.path.startsWith('/')) {
+			errors.push(`${prefix}: "path" must be a string starting with "/" (got: ${JSON.stringify(op.path)})`);
+		}
+
+		const opStr = typeof op.op === 'string' ? op.op : '';
+		if (['add', 'replace', 'test'].includes(opStr) && !('value' in op)) {
+			errors.push(`${prefix}: "value" is required for "${opStr}" operations`);
+		}
+
+		if (['move', 'copy'].includes(opStr) && typeof op.from !== 'string') {
+			errors.push(`${prefix}: "from" must be a string for "${opStr}" operations`);
+		}
+	}
+
+	return { valid: errors.length === 0, errors };
+}
+
 /**
  * Extract value from resourceLocator or string parameter
  * Handles both legacy string format and new resourceLocator object format

@@ -475,5 +475,58 @@ describe('DefenseControl Phase 4 - BitLocker Secrets', () => {
       const httpRequest = mockContext.helpers.httpRequest as ReturnType<typeof vi.fn>;
       expect(httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'PATCH' }));
     });
+
+    it('should throw for invalid JSON in patchOperations', async () => {
+      const mockContext = createMockExecuteFunctions(
+        { endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', patchOperations: 'not-json' },
+        {},
+        {},
+      );
+      await expect(patchBitLockerSecrets.call(mockContext, 0)).rejects.toThrow(
+        'patchOperations must be a valid JSON array',
+      );
+    });
+
+    it('should throw for RFC 6902 violations — invalid op', async () => {
+      const mockContext = createMockExecuteFunctions(
+        {
+          endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+          patchOperations: '[{"op":"update","path":"/x","value":1}]',
+        },
+        {},
+        {},
+      );
+      await expect(patchBitLockerSecrets.call(mockContext, 0)).rejects.toThrow(
+        /Invalid RFC 6902 patch document/,
+      );
+    });
+
+    it('should throw for RFC 6902 violations — replace missing value', async () => {
+      const mockContext = createMockExecuteFunctions(
+        {
+          endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+          patchOperations: '[{"op":"replace","path":"/x"}]',
+        },
+        {},
+        {},
+      );
+      await expect(patchBitLockerSecrets.call(mockContext, 0)).rejects.toThrow(
+        /Invalid RFC 6902 patch document/,
+      );
+    });
+
+    it('should throw for RFC 6902 violations — path not starting with /', async () => {
+      const mockContext = createMockExecuteFunctions(
+        {
+          endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+          patchOperations: '[{"op":"replace","path":"InitialStartupPin","value":"1"}]',
+        },
+        {},
+        {},
+      );
+      await expect(patchBitLockerSecrets.call(mockContext, 0)).rejects.toThrow(
+        /Invalid RFC 6902 patch document/,
+      );
+    });
   });
 });
