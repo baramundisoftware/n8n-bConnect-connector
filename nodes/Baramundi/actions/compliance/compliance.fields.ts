@@ -5,7 +5,7 @@ export const complianceOperations: INodeProperties[] = [{
 	name: 'operation',
 	type: 'options',
 	noDataExpression: true,
-	displayOptions: { show: { resource: ['compliance'] } },
+	displayOptions: { show: { resource: ['compliance'], bmsVersion: ['26R1'] } },
 	options: [
 		{ name: 'Get Detected Rule Violations', value: 'getDetectedRuleViolations', description: 'Get all detected configuration rule violations', action: 'Get detected rule violations' },
 		{ name: 'Get Detected Rule Violations by Endpoint', value: 'getDetectedRuleViolationsByEndpoint', description: 'Get detected rule violations for a specific endpoint', action: 'Get detected rule violations by endpoint' },
@@ -26,7 +26,7 @@ export const complianceFields: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		displayOptions: { show: { resource: ['compliance'], operation: ['getRule'] } },
+		displayOptions: { show: { resource: ['compliance'], operation: ['getRule'], bmsVersion: ['26R1'] } },
 		description: 'The GUID of the compliance rule',
 	},
 	{
@@ -35,7 +35,7 @@ export const complianceFields: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		displayOptions: { show: { resource: ['compliance'], operation: ['getVulnerability'] } },
+		displayOptions: { show: { resource: ['compliance'], operation: ['getVulnerability'], bmsVersion: ['26R1'] } },
 		description: 'The GUID of the vulnerability',
 	},
 	{
@@ -44,7 +44,7 @@ export const complianceFields: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		displayOptions: { show: { resource: ['compliance'], operation: ['getDetectedVulnerabilitiesByEndpoint', 'getDetectedRuleViolationsByEndpoint'] } },
+		displayOptions: { show: { resource: ['compliance'], operation: ['getDetectedVulnerabilitiesByEndpoint', 'getDetectedRuleViolationsByEndpoint'], bmsVersion: ['26R1'] } },
 		description: 'The GUID of the endpoint',
 	},
 	{
@@ -52,7 +52,7 @@ export const complianceFields: INodeProperties[] = [
 		name: 'returnAll',
 		type: 'boolean',
 		default: false,
-		displayOptions: { show: { resource: ['compliance'], operation: ['getRules', 'getVulnerabilities', 'getDetectedVulnerabilities', 'getDetectedVulnerabilitiesByEndpoint', 'getDetectedRuleViolations', 'getDetectedRuleViolationsByEndpoint'] } },
+		displayOptions: { show: { resource: ['compliance'], operation: ['getRules', 'getVulnerabilities', 'getDetectedVulnerabilities', 'getDetectedVulnerabilitiesByEndpoint', 'getDetectedRuleViolations', 'getDetectedRuleViolationsByEndpoint'], bmsVersion: ['26R1'] } },
 		description: 'Whether to return all results or only up to a given limit',
 	},
 	{
@@ -61,7 +61,7 @@ export const complianceFields: INodeProperties[] = [
 		type: 'number',
 		typeOptions: { minValue: 1 },
 		default: 50,
-		displayOptions: { show: { resource: ['compliance'], operation: ['getRules', 'getVulnerabilities', 'getDetectedVulnerabilities', 'getDetectedVulnerabilitiesByEndpoint', 'getDetectedRuleViolations', 'getDetectedRuleViolationsByEndpoint'], returnAll: [false] } },
+		displayOptions: { show: { resource: ['compliance'], operation: ['getRules', 'getVulnerabilities', 'getDetectedVulnerabilities', 'getDetectedVulnerabilitiesByEndpoint', 'getDetectedRuleViolations', 'getDetectedRuleViolationsByEndpoint'], returnAll: [false], bmsVersion: ['26R1'] } },
 		description: 'Max number of results to return',
 	},
 	{
@@ -70,7 +70,7 @@ export const complianceFields: INodeProperties[] = [
 		type: 'collection',
 		placeholder: 'Add Option',
 		default: {},
-		displayOptions: { show: { resource: ['compliance'], operation: ['getRules', 'getVulnerabilities', 'getDetectedVulnerabilities', 'getDetectedRuleViolations'] } },
+		displayOptions: { show: { resource: ['compliance'], operation: ['getRules', 'getVulnerabilities', 'getDetectedVulnerabilities', 'getDetectedRuleViolations'], bmsVersion: ['26R1'] } },
 		options: [
 			{ displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order for results' },
 		],

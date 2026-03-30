@@ -5,7 +5,7 @@ export const universalDynamicGroupsOperations: INodeProperties[] = [{
 	name: 'operation',
 	type: 'options',
 	noDataExpression: true,
-	displayOptions: { show: { resource: ['universalDynamicGroups'] } },
+	displayOptions: { show: { resource: ['universalDynamicGroups'], bmsVersion: ['26R1'] } },
 	options: [
 		{ name: 'Get Group', value: 'get', description: 'Get a universal dynamic group by ID', action: 'Get universal dynamic group' },
 		{ name: 'Get Groups', value: 'getMany', description: 'Get all universal dynamic groups', action: 'Get universal dynamic groups' },
@@ -24,7 +24,7 @@ export const universalDynamicGroupsFields: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['get'] } },
+		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['get'], bmsVersion: ['26R1'] } },
 		description: 'The GUID of the universal dynamic group',
 	},
 	{
@@ -33,7 +33,7 @@ export const universalDynamicGroupsFields: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['getFolder', 'getSubFolders', 'getGroupsByFolder'] } },
+		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['getFolder', 'getSubFolders', 'getGroupsByFolder'], bmsVersion: ['26R1'] } },
 		description: 'The GUID of the folder',
 	},
 	{
@@ -41,7 +41,7 @@ export const universalDynamicGroupsFields: INodeProperties[] = [
 		name: 'returnAll',
 		type: 'boolean',
 		default: false,
-		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['getMany', 'getFolders', 'getSubFolders', 'getGroupsByFolder'] } },
+		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['getMany', 'getFolders', 'getSubFolders', 'getGroupsByFolder'], bmsVersion: ['26R1'] } },
 		description: 'Whether to return all results or only up to a given limit',
 	},
 	{
@@ -50,7 +50,7 @@ export const universalDynamicGroupsFields: INodeProperties[] = [
 		type: 'number',
 		typeOptions: { minValue: 1 },
 		default: 50,
-		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['getMany', 'getFolders', 'getSubFolders', 'getGroupsByFolder'], returnAll: [false] } },
+		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['getMany', 'getFolders', 'getSubFolders', 'getGroupsByFolder'], returnAll: [false], bmsVersion: ['26R1'] } },
 		description: 'Max number of results to return',
 	},
 	{
@@ -59,7 +59,7 @@ export const universalDynamicGroupsFields: INodeProperties[] = [
 		type: 'collection',
 		placeholder: 'Add Option',
 		default: {},
-		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['getMany'] } },
+		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['getMany'], bmsVersion: ['26R1'] } },
 		options: [
 			{ displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order for results' },
 		],

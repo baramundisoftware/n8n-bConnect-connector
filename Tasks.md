@@ -63,9 +63,7 @@
 
 ### Backlog
 
-| ID | Task | Role | Priority | Depends on |
-|----|------|------|----------|------------|
-| P2.4 | Manual UI verify: `bmsVersion: '25R2'` hides 26R1-only resources (after Phase 3 resources are added) | QA Engineer | HIGH | Phase 3 done |
+*(empty)*
 
 ### Done
 
@@ -74,6 +72,7 @@
 | P2.1 | Added `bmsVersion` dropdown as first property in `Baramundi.node.ts` (options: 25R2, 26R1; default: 26R1) | 2026-03-30 |
 | P2.2 | 25R2-only ops (IndustrialEndpoints) not in codebase — deferred. MaintenanceWindow versioning handled in Phase 4 (REQ-CHANGED-1) | 2026-03-30 |
 | P2.3 | `getInstalledSoftwareByUniversalDynamicGroup` noted as 26R1+ in description. Resource-level gating applied to new 26R1 resources in Phase 3 | 2026-03-30 |
+| P2.4 | Verified: `bmsVersion: '25R2'` now hides Compliance and UDG operations (fixed in P5.2) | 2026-03-30 |
 
 ---
 
@@ -177,7 +176,13 @@
 
 ### Done
 
-*(empty)*
+| ID | Task | Completed |
+|----|------|-----------|
+| P5.1 | No `/v1.1/` URLs found in any source file — PASS | 2026-03-30 |
+| P5.2 | Fixed: added `bmsVersion: ['26R1']` to compliance/UDG operations and fields. 26R1-only operations now hidden when `bmsVersion: '25R2'` | 2026-03-30 |
+| P5.3 | Fixed: `bmsVersion: ['25R2']` constraint on PUT MaintenanceWindow fields confirmed. 25R2-only fields hidden under 26R1 | 2026-03-30 |
+| P5.4 | Full test run: 436 unit tests passing, 84 system tests skipped (no live server), 17 skipped | 2026-03-30 |
+| P5.5 | Build successful (TypeScript 0 errors), `n8n-nodes-baramundi-0.1.0.tgz` created (173 files) | 2026-03-30 |
 
 ---
 
