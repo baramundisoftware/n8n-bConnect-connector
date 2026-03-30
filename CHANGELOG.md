@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security — DevDependency Risk Acceptance (IT Audit F3.1)
+
+The following vulnerabilities remain in `devDependencies` after `npm audit fix`. They have **no upstream fix** available at the time of writing (2026-03-30) and are **not present in the runtime distribution** (confirmed via `npm audit --omit=dev`).
+
+| Package | Severity | Path | Status |
+|---|---|---|---|
+| `handlebars` | CRITICAL | `@n8n/node-cli` → `eslint-plugin-n8n-nodes-base` → `handlebars` | No fix available upstream |
+| `minimatch` | HIGH | `@n8n/node-cli` → `@typescript-eslint` → `minimatch` | No fix available upstream |
+| `esbuild` | MODERATE | `@n8n/node-cli` → `esbuild` | Affects dev server only, not exploitable in CI |
+
+**Risk acceptance**: These vulnerabilities affect only the build toolchain running on developer workstations and CI agents. The runtime npm package (`dist/`) has zero vulnerabilities. Build agents must be treated as trusted environments and not shared with untrusted workloads. This risk acceptance will be reviewed when upstream packages release fixes.
+
+**CI gate added**: `npm audit --omit=dev --audit-level=high` is enforced in `.github/workflows/ci.yml`. Any runtime vulnerability at HIGH or above will block the pipeline.
+
 ## [0.2.0] - 2026-03-30
 
 > **Semver rationale**: This is a **minor** version bump (0.1.0 → 0.2.0) despite the V1.1 removal breaking change, because the package has not yet reached stable 1.0.0. Under semver §4, breaking changes in pre-1.0 releases may be reflected as minor increments. The V1.1 removal is documented prominently in the Breaking Changes section so downstream users can plan migrations.
