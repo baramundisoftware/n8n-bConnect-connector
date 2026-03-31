@@ -405,6 +405,11 @@
 | P8C.2 | `getEndpointsByUDG` gated with `bmsVersion: ['26R1']` in fields | 2026-03-31 |
 | P8C.3 | Written 8 unit tests for all 8 endpoint operations — 504 tests total passing | 2026-03-31 |
 | P8C.4 | Build + unit test — 0 errors, 504 tests passing | 2026-03-31 |
+| P8D.1 | Implemented 7 job folder/instance read operations: getSubFolders, getJobDefinitionsByFolder, getKioskReleasesByJobDefinition, getJobInstancesByLogicalGroup/StaticGroup/DynamicGroup/UDG | 2026-03-31 |
+| P8D.2 | Implemented 4 assignJobTo* POST operations: LogicalGroup, StaticGroup, DynamicGroup, UDG | 2026-03-31 |
+| P8D.3 | Implemented 3 kiosk release by-entity read operations: getKioskReleasesByEndpoint/LogicalGroup/ADObject | 2026-03-31 |
+| P8D.4 | Written 14 unit tests for all job operations — 518 tests total passing | 2026-03-31 |
+| P8D.5 | Build + unit test — 0 errors, 518 tests passing | 2026-03-31 |
 
 ---
 

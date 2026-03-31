@@ -475,3 +475,227 @@ export async function deleteJob(
   await apiRequest.call(this, 'DELETE', `/jobs/v2.0/JobDefinitions/${jobId}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: jobId });
 }
+
+// ============================================================================
+// JOB GAPS (Phase 8D)
+// ============================================================================
+
+export async function getSubFolders(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const folderId = this.getNodeParameter('folderId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const qs: Record<string, string | number> = {};
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/jobs/v2.0/Folders/${folderId}/Folders`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit; qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/jobs/v2.0/Folders/${folderId}/Folders`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getJobDefinitionsByFolder(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const folderId = this.getNodeParameter('folderId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const qs: Record<string, string | number> = {};
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/jobs/v2.0/Folders/${folderId}/JobDefinitions`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit; qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/jobs/v2.0/Folders/${folderId}/JobDefinitions`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getKioskReleasesByJobDefinition(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const jobId = this.getNodeParameter('jobId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const qs: Record<string, string | number> = {};
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/jobs/v2.0/JobDefinitions/${jobId}/KioskReleases`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit; qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/jobs/v2.0/JobDefinitions/${jobId}/KioskReleases`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getJobInstancesByLogicalGroup(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const logicalGroupId = this.getNodeParameter('logicalGroupId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const qs: Record<string, string | number> = {};
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/jobs/v2.0/LogicalGroups/${logicalGroupId}/JobInstances`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit; qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/jobs/v2.0/LogicalGroups/${logicalGroupId}/JobInstances`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getJobInstancesByStaticGroup(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const staticGroupId = this.getNodeParameter('staticGroupId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const qs: Record<string, string | number> = {};
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/jobs/v2.0/StaticGroups/${staticGroupId}/JobInstances`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit; qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/jobs/v2.0/StaticGroups/${staticGroupId}/JobInstances`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getJobInstancesByDynamicGroup(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const dynamicGroupId = this.getNodeParameter('dynamicGroupId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const qs: Record<string, string | number> = {};
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/jobs/v2.0/DynamicGroups/${dynamicGroupId}/JobInstances`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit; qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/jobs/v2.0/DynamicGroups/${dynamicGroupId}/JobInstances`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getJobInstancesByUDG(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const udgId = this.getNodeParameter('udgId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const qs: Record<string, string | number> = {};
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/jobs/v2.0/UniversalDynamicGroups/${udgId}/JobInstances`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit; qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/jobs/v2.0/UniversalDynamicGroups/${udgId}/JobInstances`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function assignJobToLogicalGroup(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const logicalGroupId = this.getNodeParameter('logicalGroupId', index) as string;
+  const jobDefinitionId = this.getNodeParameter('jobDefinitionId', index) as string;
+  const response = await apiRequest.call(this, 'POST', `/jobs/v2.0/LogicalGroups/${logicalGroupId}/AssignJobDefinition`, { jobDefinitionId });
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function assignJobToStaticGroup(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const staticGroupId = this.getNodeParameter('staticGroupId', index) as string;
+  const jobDefinitionId = this.getNodeParameter('jobDefinitionId', index) as string;
+  const response = await apiRequest.call(this, 'POST', `/jobs/v2.0/StaticGroups/${staticGroupId}/AssignJobDefinition`, { jobDefinitionId });
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function assignJobToDynamicGroup(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const dynamicGroupId = this.getNodeParameter('dynamicGroupId', index) as string;
+  const jobDefinitionId = this.getNodeParameter('jobDefinitionId', index) as string;
+  const response = await apiRequest.call(this, 'POST', `/jobs/v2.0/DynamicGroups/${dynamicGroupId}/AssignJobDefinition`, { jobDefinitionId });
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function assignJobToUDG(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const udgId = this.getNodeParameter('udgId', index) as string;
+  const jobDefinitionId = this.getNodeParameter('jobDefinitionId', index) as string;
+  const response = await apiRequest.call(this, 'POST', `/jobs/v2.0/UniversalDynamicGroups/${udgId}/AssignJobDefinition`, { jobDefinitionId });
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function getKioskReleasesByEndpoint(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const qs: Record<string, string | number> = {};
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/jobs/v2.0/Endpoints/${endpointId}/KioskReleases`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit; qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/jobs/v2.0/Endpoints/${endpointId}/KioskReleases`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getKioskReleasesByLogicalGroup(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const logicalGroupId = this.getNodeParameter('logicalGroupId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const qs: Record<string, string | number> = {};
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/jobs/v2.0/LogicalGroups/${logicalGroupId}/KioskReleases`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit; qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/jobs/v2.0/LogicalGroups/${logicalGroupId}/KioskReleases`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getKioskReleasesByADObject(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const adObjectId = this.getNodeParameter('adObjectId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const qs: Record<string, string | number> = {};
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/jobs/v2.0/ADObjects/${adObjectId}/KioskReleases`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit; qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/jobs/v2.0/ADObjects/${adObjectId}/KioskReleases`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}

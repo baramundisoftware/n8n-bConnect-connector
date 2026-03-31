@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
-import { get, getMany, execute, getInstances, getAllJobInstances, getJobInstance, getEndpointJobInstances, startJobInstance, stopJobInstance, resumeJobInstance, deleteJobInstance, getFolders, getFolder, createFolder, updateFolder, deleteFolder, getKioskReleases, getKioskRelease, createKioskRelease, withdrawKioskRelease, create, update, deleteJob } from '../../../../../nodes/Baramundi/actions/job/job.execute';
+import { get, getMany, execute, getInstances, getAllJobInstances, getJobInstance, getEndpointJobInstances, startJobInstance, stopJobInstance, resumeJobInstance, deleteJobInstance, getFolders, getFolder, createFolder, updateFolder, deleteFolder, getKioskReleases, getKioskRelease, createKioskRelease, withdrawKioskRelease, create, update, deleteJob, getSubFolders, getJobDefinitionsByFolder, getKioskReleasesByJobDefinition, getJobInstancesByLogicalGroup, getJobInstancesByStaticGroup, getJobInstancesByDynamicGroup, getJobInstancesByUDG, assignJobToLogicalGroup, assignJobToStaticGroup, assignJobToDynamicGroup, assignJobToUDG, getKioskReleasesByEndpoint, getKioskReleasesByLogicalGroup, getKioskReleasesByADObject } from '../../../../../nodes/Baramundi/actions/job/job.execute';
 
 // Mock helper function to create IExecuteFunctions
 function createMockExecuteFunctions(
@@ -2168,5 +2168,117 @@ describe('Job Operations', () => {
 
       await expect(deleteJob.call(mockContext, 0)).rejects.toThrow('Cannot delete job: active instances exist');
     });
+  });
+});
+
+describe('Job Phase 8D - Folder/Group/Kiosk Navigation', () => {
+  const pageResponse = (items: any[]) => ({
+    currentPage: 0, pageSize: 50, totalPages: 1, totalItems: items.length,
+    hasPreviousPage: false, hasNextPage: false, data: items,
+  });
+
+  function createCtx(params: Record<string, any>, response: any) {
+    return {
+      getNodeParameter: vi.fn((name: string, _idx: number, def?: any) => params[name] ?? def),
+      getCredentials: vi.fn(async () => ({ baseUrl: 'https://bms:444/bconnect', username: 'u', password: 'test-password-do-not-use', ignoreSslIssues: false })),
+      helpers: {
+        httpRequest: vi.fn(async () => response),
+        returnJsonArray: vi.fn((data: any) => (Array.isArray(data) ? data : [data]).map((j: any) => ({ json: j }))),
+      },
+      getNode: vi.fn(() => ({ name: 'Baramundi', type: 'n8n-nodes-baramundi.baramundi', typeVersion: 1, position: [0,0], parameters: {} })),
+    } as any;
+  }
+
+  it('getSubFolders — returns sub-folders for a folder', async () => {
+    const ctx = createCtx({ folderId: 'f-1', returnAll: false, limit: 50 }, pageResponse([{ id: 'sf-1', name: 'Sub' }]));
+    const result = await getSubFolders.call(ctx, 0);
+    expect(result).toHaveLength(1);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/Folders/f-1/Folders') }));
+  });
+
+  it('getJobDefinitionsByFolder — returns job defs in a folder', async () => {
+    const ctx = createCtx({ folderId: 'f-2', returnAll: false, limit: 50 }, pageResponse([{ id: 'jd-1' }, { id: 'jd-2' }]));
+    const result = await getJobDefinitionsByFolder.call(ctx, 0);
+    expect(result).toHaveLength(2);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/Folders/f-2/JobDefinitions') }));
+  });
+
+  it('getKioskReleasesByJobDefinition — returns kiosk releases for a job def', async () => {
+    const ctx = createCtx({ jobId: 'jd-3', returnAll: false, limit: 50 }, pageResponse([{ id: 'kr-1' }]));
+    const result = await getKioskReleasesByJobDefinition.call(ctx, 0);
+    expect(result).toHaveLength(1);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/JobDefinitions/jd-3/KioskReleases') }));
+  });
+
+  it('getJobInstancesByLogicalGroup — returns job instances', async () => {
+    const ctx = createCtx({ logicalGroupId: 'lg-1', returnAll: false, limit: 50 }, pageResponse([{ id: 'ji-1' }]));
+    const result = await getJobInstancesByLogicalGroup.call(ctx, 0);
+    expect(result).toHaveLength(1);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/LogicalGroups/lg-1/JobInstances') }));
+  });
+
+  it('getJobInstancesByStaticGroup — returns job instances', async () => {
+    const ctx = createCtx({ staticGroupId: 'sg-1', returnAll: false, limit: 50 }, pageResponse([{ id: 'ji-2' }, { id: 'ji-3' }]));
+    const result = await getJobInstancesByStaticGroup.call(ctx, 0);
+    expect(result).toHaveLength(2);
+  });
+
+  it('getJobInstancesByDynamicGroup — returns job instances', async () => {
+    const ctx = createCtx({ dynamicGroupId: 'dg-1', returnAll: false, limit: 50 }, pageResponse([{ id: 'ji-4' }]));
+    const result = await getJobInstancesByDynamicGroup.call(ctx, 0);
+    expect(result).toHaveLength(1);
+  });
+
+  it('getJobInstancesByUDG — returns job instances', async () => {
+    const ctx = createCtx({ udgId: 'udg-1', returnAll: false, limit: 50 }, pageResponse([{ id: 'ji-5' }]));
+    const result = await getJobInstancesByUDG.call(ctx, 0);
+    expect(result).toHaveLength(1);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/UniversalDynamicGroups/udg-1/JobInstances') }));
+  });
+
+  it('assignJobToLogicalGroup — POSTs with jobDefinitionId', async () => {
+    const ctx = createCtx({ logicalGroupId: 'lg-2', jobDefinitionId: 'jd-assign' }, { success: true });
+    const result = await assignJobToLogicalGroup.call(ctx, 0);
+    expect(result).toHaveLength(1);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'POST', url: expect.stringContaining('/jobs/v2.0/LogicalGroups/lg-2/AssignJobDefinition') }));
+  });
+
+  it('assignJobToStaticGroup — POSTs with jobDefinitionId', async () => {
+    const ctx = createCtx({ staticGroupId: 'sg-2', jobDefinitionId: 'jd-assign' }, { success: true });
+    const result = await assignJobToStaticGroup.call(ctx, 0);
+    expect(result).toHaveLength(1);
+  });
+
+  it('assignJobToDynamicGroup — POSTs with jobDefinitionId', async () => {
+    const ctx = createCtx({ dynamicGroupId: 'dg-2', jobDefinitionId: 'jd-assign' }, { success: true });
+    const result = await assignJobToDynamicGroup.call(ctx, 0);
+    expect(result).toHaveLength(1);
+  });
+
+  it('assignJobToUDG — POSTs with jobDefinitionId', async () => {
+    const ctx = createCtx({ udgId: 'udg-2', jobDefinitionId: 'jd-assign' }, { success: true });
+    const result = await assignJobToUDG.call(ctx, 0);
+    expect(result).toHaveLength(1);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/UniversalDynamicGroups/udg-2/AssignJobDefinition') }));
+  });
+
+  it('getKioskReleasesByEndpoint — returns kiosk releases', async () => {
+    const ctx = createCtx({ endpointId: 'ep-1', returnAll: false, limit: 50 }, pageResponse([{ id: 'kr-2' }]));
+    const result = await getKioskReleasesByEndpoint.call(ctx, 0);
+    expect(result).toHaveLength(1);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/Endpoints/ep-1/KioskReleases') }));
+  });
+
+  it('getKioskReleasesByLogicalGroup — returns kiosk releases', async () => {
+    const ctx = createCtx({ logicalGroupId: 'lg-3', returnAll: false, limit: 50 }, pageResponse([{ id: 'kr-3' }, { id: 'kr-4' }]));
+    const result = await getKioskReleasesByLogicalGroup.call(ctx, 0);
+    expect(result).toHaveLength(2);
+  });
+
+  it('getKioskReleasesByADObject — returns kiosk releases', async () => {
+    const ctx = createCtx({ adObjectId: 'obj-1', returnAll: false, limit: 50 }, pageResponse([{ id: 'kr-5' }]));
+    const result = await getKioskReleasesByADObject.call(ctx, 0);
+    expect(result).toHaveLength(1);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/ADObjects/obj-1/KioskReleases') }));
   });
 });

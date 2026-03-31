@@ -428,6 +428,48 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
             case 'withdrawKioskRelease':
               responseData = await job.withdrawKioskRelease.call(this, i);
               break;
+            case 'getSubFolders':
+              responseData = await job.getSubFolders.call(this, i);
+              break;
+            case 'getJobDefinitionsByFolder':
+              responseData = await job.getJobDefinitionsByFolder.call(this, i);
+              break;
+            case 'getKioskReleasesByJobDefinition':
+              responseData = await job.getKioskReleasesByJobDefinition.call(this, i);
+              break;
+            case 'getJobInstancesByLogicalGroup':
+              responseData = await job.getJobInstancesByLogicalGroup.call(this, i);
+              break;
+            case 'getJobInstancesByStaticGroup':
+              responseData = await job.getJobInstancesByStaticGroup.call(this, i);
+              break;
+            case 'getJobInstancesByDynamicGroup':
+              responseData = await job.getJobInstancesByDynamicGroup.call(this, i);
+              break;
+            case 'getJobInstancesByUDG':
+              responseData = await job.getJobInstancesByUDG.call(this, i);
+              break;
+            case 'assignJobToLogicalGroup':
+              responseData = await job.assignJobToLogicalGroup.call(this, i);
+              break;
+            case 'assignJobToStaticGroup':
+              responseData = await job.assignJobToStaticGroup.call(this, i);
+              break;
+            case 'assignJobToDynamicGroup':
+              responseData = await job.assignJobToDynamicGroup.call(this, i);
+              break;
+            case 'assignJobToUDG':
+              responseData = await job.assignJobToUDG.call(this, i);
+              break;
+            case 'getKioskReleasesByEndpoint':
+              responseData = await job.getKioskReleasesByEndpoint.call(this, i);
+              break;
+            case 'getKioskReleasesByLogicalGroup':
+              responseData = await job.getKioskReleasesByLogicalGroup.call(this, i);
+              break;
+            case 'getKioskReleasesByADObject':
+              responseData = await job.getKioskReleasesByADObject.call(this, i);
+              break;
             default:
               throw new NodeOperationError(
                 this.getNode(),
