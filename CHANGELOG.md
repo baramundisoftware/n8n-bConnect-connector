@@ -7,6 +7,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-03-31
+
+> **Semver rationale**: Minor bump. Phase 8 adds ~43 new read/write operations across 6 resource modules (activeDirectory, asset, endpoint, job, software, variable). No breaking changes to existing operations.
+
+### Added (Phase 8 — API Coverage Gaps)
+
+#### Active Directory (Phase 8A — 6 new operations)
+- `getADGroupsByADGroup`: Get sub-groups within an AD group
+- `getADObjectsByADGroup`: Get AD objects in an AD group
+- `getADObjectMemberships`: Get AD group memberships of an AD object
+- `getADObjectsByOrgUnit`: Get AD objects in an organizational unit
+- `getADUsersByOrgUnit`: Get AD users in an organizational unit
+- `getOrgUnitsByOrgUnit`: Get sub-OUs within an organizational unit
+
+#### Asset (Phase 8B — 8 new operations)
+- `getAssetStockFolder`: Get a single asset stock folder by ID
+- `getAssetStockSubFolders`: Get sub-folders of an asset stock folder
+- `getAssetTypeFolders`: Get all asset type folders
+- `getAssetTypeFolder`: Get a single asset type folder by ID
+- `createAssetTypeFolder`: Create a new asset type folder
+- `updateAssetTypeFolder`: Update an asset type folder (PATCH)
+- `deleteAssetTypeFolder`: Delete an asset type folder
+- `getAssetTypeFolderSubFolders`: Get sub-folders of an asset type folder
+
+#### Endpoint (Phase 8C — 8 new operations)
+- `getEndpointMaintenanceWindow`: Get the maintenance window for an endpoint
+- `getGroupMaintenanceWindow`: Get the maintenance window for a logical group
+- `getLogicalGroupSubGroups`: Get sub-groups of a logical group
+- `getEndpointsByLogicalGroup`: Get endpoints in a logical group
+- `getEndpointsByStaticGroup`: Get endpoints in a static group
+- `getEndpointsByDynamicGroup`: Get endpoints in a dynamic group
+- `getEndpointsByADUser`: Get endpoints assigned to an AD user
+- `getEndpointsByUDG`: Get endpoints in a Universal Dynamic Group (26R1+)
+
+#### Job (Phase 8D — 14 new operations)
+- `getSubFolders`: Get sub-folders of a job folder
+- `getJobDefinitionsByFolder`: Get job definitions in a folder
+- `getKioskReleasesByJobDefinition`: Get kiosk releases for a job definition
+- `getJobInstancesByLogicalGroup/StaticGroup/DynamicGroup/UDG`: Job instances by group type
+- `assignJobToLogicalGroup/StaticGroup/DynamicGroup/UDG`: Assign job definition to group
+- `getKioskReleasesByEndpoint`: Get kiosk releases for an endpoint
+- `getKioskReleasesByLogicalGroup`: Get kiosk releases for a logical group
+- `getKioskReleasesByADObject`: Get kiosk releases for an AD object
+
+#### Software (Phase 8E — 5 new operations, all 26R1+)
+- `addApplicationToBundle`: Add an application to a bundle
+- `replaceApplicationInBundle`: Update a bundle application via PATCH
+- `updateBundleFolder`: Update a bundle folder
+- `getBundleApplications`: Get all bundle applications
+- `deleteBundleApplication`: Delete a bundle application
+
+#### Variable (Phase 8F — 2 new operations)
+- `getVariableInstancesByApplication`: Get variable instances for a Windows application
+- `getVariableInstancesByJobDefinition`: Get variable instances for a Windows job definition
+
+### Tests
+- Added 44 new unit tests; total 526 passing (from 480)
+
 ## [0.3.1] - 2026-03-31
 
 > **Semver rationale**: Patch bump. All changes are non-breaking quality fixes: lint errors, type safety, file permissions. No new features or API changes.

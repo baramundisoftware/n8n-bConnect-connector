@@ -67,6 +67,18 @@ export const variableOperations: INodeProperties[] = [
 				action: 'Get variables by logical group',
 			},
 			{
+				name: 'Get Variables by Application',
+				value: 'getVariableInstancesByApplication',
+				description: 'Get variable instances for a Windows application',
+				action: 'Get variables by application',
+			},
+			{
+				name: 'Get Variables by Job Definition',
+				value: 'getVariableInstancesByJobDefinition',
+				description: 'Get variable instances for a Windows job definition',
+				action: 'Get variables by job definition',
+			},
+			{
 				name: 'Update Variable Definition',
 				value: 'updateVariableDefinition',
 				description: 'Update a variable definition',
@@ -400,4 +412,10 @@ export const variableFields: INodeProperties[] = [
 		},
 		description: 'The GUID of the AD object',
 	},
+
+	// Phase 8F
+	{ displayName: 'Application ID', name: 'applicationId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['variable'], operation: ['getVariableInstancesByApplication'] } }, description: 'The GUID of the Windows application' },
+	{ displayName: 'Job Definition ID', name: 'jobDefinitionId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['variable'], operation: ['getVariableInstancesByJobDefinition'] } }, description: 'The GUID of the Windows job definition' },
+	{ displayName: 'Return All', name: 'returnAll', type: 'boolean', default: false, displayOptions: { show: { resource: ['variable'], operation: ['getVariableInstancesByApplication', 'getVariableInstancesByJobDefinition'] } }, description: 'Whether to return all results or only up to a given limit' },
+	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 1 }, default: 50, displayOptions: { show: { resource: ['variable'], operation: ['getVariableInstancesByApplication', 'getVariableInstancesByJobDefinition'], returnAll: [false] } }, description: 'Max number of results to return' },
 ];

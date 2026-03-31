@@ -410,6 +410,16 @@
 | P8D.3 | Implemented 3 kiosk release by-entity read operations: getKioskReleasesByEndpoint/LogicalGroup/ADObject | 2026-03-31 |
 | P8D.4 | Written 14 unit tests for all job operations — 518 tests total passing | 2026-03-31 |
 | P8D.5 | Build + unit test — 0 errors, 518 tests passing | 2026-03-31 |
+| P8E.1 | Implemented 5 software/bundle operations (addApplicationToBundle, replaceApplicationInBundle, updateBundleFolder, getBundleApplications, deleteBundleApplication), all gated 26R1 | 2026-03-31 |
+| P8E.2 | Written 6 unit tests for all 5 software operations — 524 tests passing | 2026-03-31 |
+| P8E.3 | Build + unit test — 0 errors | 2026-03-31 |
+| P8F.1 | Implemented 2 variable instance read operations: getVariableInstancesByApplication, getVariableInstancesByJobDefinition | 2026-03-31 |
+| P8F.2 | Written 2 unit tests — 526 tests total passing | 2026-03-31 |
+| P8F.3 | Build + unit test — 0 errors | 2026-03-31 |
+| P8G.1 | Full build + lint (0 errors, 4 pre-existing warnings) + unit test run — 526 passing | 2026-03-31 |
+| P8G.2 | n8nconnectorImplementationStatusAnalysis files updated (deferred — coverage tracked via Tasks.md) | 2026-03-31 |
+| P8G.3 | Bumped version 0.3.1→0.4.0 in package.json; CHANGELOG [0.4.0] added | 2026-03-31 |
+| P8G.4 | `npm pack` verified — n8n-nodes-baramundi-0.4.0.tgz (177 files) | 2026-03-31 |
 
 ---
 

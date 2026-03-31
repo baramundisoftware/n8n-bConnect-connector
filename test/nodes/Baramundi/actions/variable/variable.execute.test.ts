@@ -396,3 +396,36 @@ describe('Credential Configuration', () => {
 		expect(mockContext.helpers.httpRequest).toHaveBeenCalled();
 	});
 });
+
+describe('Variable Phase 8F — Application/JobDefinition Instances', () => {
+  const pageResp = (items: any[]) => ({
+    currentPage: 0, pageSize: 50, totalPages: 1, totalItems: items.length,
+    hasPreviousPage: false, hasNextPage: false, data: items,
+  });
+
+  function createCtx(params: Record<string, any>, response: any) {
+    return {
+      getNodeParameter: vi.fn((name: string, _i: number, def?: any) => params[name] ?? def),
+      getCredentials: vi.fn(async () => ({ baseUrl: 'https://bms:444/bconnect', username: 'u', password: 'test-password-do-not-use', ignoreSslIssues: false })),
+      helpers: {
+        httpRequest: vi.fn(async () => response),
+        returnJsonArray: vi.fn((data: any) => (Array.isArray(data) ? data : [data]).map((j: any) => ({ json: j }))),
+      },
+      getNode: vi.fn(() => ({ name: 'Baramundi', type: 'n8n-nodes-baramundi.baramundi', typeVersion: 1, position: [0,0], parameters: {} })),
+    } as any;
+  }
+
+  it('getVariableInstancesByApplication — returns instances for a Windows application', async () => {
+    const ctx = createCtx({ applicationId: 'app-1', returnAll: false, limit: 50 }, pageResp([{ id: 'vi-1', name: 'VAR1' }]));
+    const result = await variable.getVariableInstancesByApplication.call(ctx, 0);
+    expect(result).toHaveLength(1);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/variables/v2.0/WindowsApplications/app-1/VariableInstances') }));
+  });
+
+  it('getVariableInstancesByJobDefinition — returns instances for a job definition', async () => {
+    const ctx = createCtx({ jobDefinitionId: 'jd-1', returnAll: false, limit: 50 }, pageResp([{ id: 'vi-2', name: 'VAR2' }, { id: 'vi-3', name: 'VAR3' }]));
+    const result = await variable.getVariableInstancesByJobDefinition.call(ctx, 0);
+    expect(result).toHaveLength(2);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/variables/v2.0/WindowsJobDefinitions/jd-1/VariableInstances') }));
+  });
+});

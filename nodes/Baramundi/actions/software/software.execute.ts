@@ -250,3 +250,92 @@ export async function getBundleApplicationsByBundle(
 		return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
 	}
 }
+
+// ============================================================================
+// SOFTWARE GAPS (Phase 8E) — all 26R1-only
+// ============================================================================
+
+export async function addApplicationToBundle(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const bundleId = this.getNodeParameter('bundleId', index) as string;
+  const applicationId = this.getNodeParameter('applicationId', index) as string;
+  const additionalFields = this.getNodeParameter('additionalFields', index, {}) as IDataObject;
+
+  const body: IDataObject = { applicationId, ...additionalFields };
+  const response = await apiRequest.call(this, 'POST', `/software/v2.0/Bundles/${bundleId}/BundleApplications`, body);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function replaceApplicationInBundle(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const bundleId = this.getNodeParameter('bundleId', index) as string;
+  const bundleApplicationId = this.getNodeParameter('bundleApplicationId', index) as string;
+  const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
+
+  const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
+  for (const [key, value] of Object.entries(updateFields)) {
+    if (value !== undefined && value !== null && value !== '') {
+      patchOperations.push({ op: 'replace', path: `/${key}`, value });
+    }
+  }
+
+  if (patchOperations.length === 0) {
+    throw new Error('No fields to update specified');
+  }
+
+  const response = await apiRequest.call(this, 'PATCH', `/software/v2.0/Bundles/${bundleId}/BundleApplications/${bundleApplicationId}`, patchOperations);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function updateBundleFolder(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const bundleFolderId = this.getNodeParameter('bundleFolderId', index) as string;
+  const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
+
+  const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
+  for (const [key, value] of Object.entries(updateFields)) {
+    if (value !== undefined && value !== null && value !== '') {
+      patchOperations.push({ op: 'replace', path: `/${key}`, value });
+    }
+  }
+
+  if (patchOperations.length === 0) {
+    throw new Error('No fields to update specified');
+  }
+
+  const response = await apiRequest.call(this, 'PATCH', `/software/v2.0/Bundle/Folders/${bundleFolderId}`, patchOperations);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function getBundleApplications(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const qs: Record<string, string | number> = {};
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', '/software/v2.0/BundleApplications', {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit; qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', '/software/v2.0/BundleApplications', {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function deleteBundleApplication(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const bundleApplicationId = this.getNodeParameter('bundleApplicationId', index) as string;
+  await apiRequest.call(this, 'DELETE', `/software/v2.0/BundleApplications/${bundleApplicationId}`);
+  return this.helpers.returnJsonArray({ success: true, deletedId: bundleApplicationId });
+}

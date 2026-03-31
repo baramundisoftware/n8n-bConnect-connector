@@ -385,3 +385,43 @@ export async function getVariableInstancesByADObject(
 		return this.helpers.returnJsonArray(data);
 	}
 }
+
+// ============================================================================
+// VARIABLE GAPS (Phase 8F)
+// ============================================================================
+
+export async function getVariableInstancesByApplication(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const applicationId = this.getNodeParameter('applicationId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const qs: Record<string, string | number> = {};
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/variables/v2.0/WindowsApplications/${applicationId}/VariableInstances`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit; qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/variables/v2.0/WindowsApplications/${applicationId}/VariableInstances`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getVariableInstancesByJobDefinition(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const jobDefinitionId = this.getNodeParameter('jobDefinitionId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const qs: Record<string, string | number> = {};
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/variables/v2.0/WindowsJobDefinitions/${jobDefinitionId}/VariableInstances`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit; qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/variables/v2.0/WindowsJobDefinitions/${jobDefinitionId}/VariableInstances`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}

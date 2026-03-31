@@ -184,3 +184,62 @@ describe('Software Phase 4 - Bundle Operations', () => {
     });
   });
 });
+
+describe('Software Phase 8E — Bundle Application / Folder Operations', () => {
+  const pageResp = (items: any[]) => ({
+    currentPage: 0, pageSize: 50, totalPages: 1, totalItems: items.length,
+    hasPreviousPage: false, hasNextPage: false, data: items,
+  });
+
+  function createCtx(params: Record<string, any>, response: any) {
+    return {
+      getNodeParameter: vi.fn((name: string, _i: number, def?: any) => params[name] ?? def),
+      getCredentials: vi.fn(async () => ({ baseUrl: 'https://bms:444/bconnect', username: 'u', password: 'test-password-do-not-use', ignoreSslIssues: false })),
+      helpers: {
+        httpRequest: vi.fn(async () => response),
+        returnJsonArray: vi.fn((data: any) => (Array.isArray(data) ? data : [data]).map((j: any) => ({ json: j }))),
+      },
+      getNode: vi.fn(() => ({ name: 'Baramundi', type: 'n8n-nodes-baramundi.baramundi', typeVersion: 1, position: [0,0], parameters: {} })),
+    } as any;
+  }
+
+  it('addApplicationToBundle — POSTs to Bundles/{id}/BundleApplications', async () => {
+    const ctx = createCtx({ bundleId: 'b-1', applicationId: 'app-1', additionalFields: {} }, { id: 'ba-1' });
+    const result = await software.addApplicationToBundle.call(ctx, 0);
+    expect(result).toHaveLength(1);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'POST', url: expect.stringContaining('/software/v2.0/Bundles/b-1/BundleApplications') }));
+  });
+
+  it('replaceApplicationInBundle — PATCHes bundle application', async () => {
+    const ctx = createCtx({ bundleId: 'b-2', bundleApplicationId: 'ba-2', updateFields: { applicationId: 'app-new' } }, { id: 'ba-2' });
+    const result = await software.replaceApplicationInBundle.call(ctx, 0);
+    expect(result).toHaveLength(1);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'PATCH', url: expect.stringContaining('/software/v2.0/Bundles/b-2/BundleApplications/ba-2') }));
+  });
+
+  it('replaceApplicationInBundle — throws when no update fields', async () => {
+    const ctx = createCtx({ bundleId: 'b-2', bundleApplicationId: 'ba-2', updateFields: {} }, {});
+    await expect(software.replaceApplicationInBundle.call(ctx, 0)).rejects.toThrow('No fields to update specified');
+  });
+
+  it('updateBundleFolder — PATCHes bundle folder', async () => {
+    const ctx = createCtx({ bundleFolderId: 'bf-1', updateFields: { name: 'Updated' } }, { id: 'bf-1' });
+    const result = await software.updateBundleFolder.call(ctx, 0);
+    expect(result).toHaveLength(1);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'PATCH', url: expect.stringContaining('/software/v2.0/Bundle/Folders/bf-1') }));
+  });
+
+  it('getBundleApplications — returns paginated results', async () => {
+    const ctx = createCtx({ returnAll: false, limit: 50 }, pageResp([{ id: 'ba-3' }, { id: 'ba-4' }]));
+    const result = await software.getBundleApplications.call(ctx, 0);
+    expect(result).toHaveLength(2);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/software/v2.0/BundleApplications') }));
+  });
+
+  it('deleteBundleApplication — deletes bundle application', async () => {
+    const ctx = createCtx({ bundleApplicationId: 'ba-5' }, {});
+    const result = await software.deleteBundleApplication.call(ctx, 0);
+    expect(result[0].json).toEqual({ success: true, deletedId: 'ba-5' });
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'DELETE', url: expect.stringContaining('/software/v2.0/BundleApplications/ba-5') }));
+  });
+});

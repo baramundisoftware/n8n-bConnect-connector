@@ -659,6 +659,21 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
             case 'getBundleApplicationsByBundle':
               responseData = await software.getBundleApplicationsByBundle.call(this, i);
               break;
+            case 'addApplicationToBundle':
+              responseData = await software.addApplicationToBundle.call(this, i);
+              break;
+            case 'replaceApplicationInBundle':
+              responseData = await software.replaceApplicationInBundle.call(this, i);
+              break;
+            case 'updateBundleFolder':
+              responseData = await software.updateBundleFolder.call(this, i);
+              break;
+            case 'getBundleApplications':
+              responseData = await software.getBundleApplications.call(this, i);
+              break;
+            case 'deleteBundleApplication':
+              responseData = await software.deleteBundleApplication.call(this, i);
+              break;
             default:
               throw new NodeOperationError(
                 this.getNode(),
@@ -720,6 +735,12 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
               break;
             case 'getVariableInstancesByADObject':
               responseData = await variable.getVariableInstancesByADObject.call(this, i);
+              break;
+            case 'getVariableInstancesByApplication':
+              responseData = await variable.getVariableInstancesByApplication.call(this, i);
+              break;
+            case 'getVariableInstancesByJobDefinition':
+              responseData = await variable.getVariableInstancesByJobDefinition.call(this, i);
               break;
             default:
               throw new NodeOperationError(

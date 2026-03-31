@@ -29,6 +29,11 @@ export const softwareOperations26R1: INodeProperties[] = [{
 		{ name: 'Create Bundle Folder', value: 'createBundleFolder', description: 'Create a bundle folder (bMS 26R1+)', action: 'Create bundle folder' },
 		{ name: 'Delete Bundle Folder', value: 'deleteBundleFolder', description: 'Delete a bundle folder (bMS 26R1+)', action: 'Delete bundle folder' },
 		{ name: 'Get Bundle Applications by Bundle', value: 'getBundleApplicationsByBundle', description: 'Get applications in a bundle (bMS 26R1+)', action: 'Get bundle applications by bundle' },
+		{ name: 'Add Application to Bundle', value: 'addApplicationToBundle', description: 'Add an application to a bundle (bMS 26R1+)', action: 'Add application to bundle' },
+		{ name: 'Replace Application in Bundle', value: 'replaceApplicationInBundle', description: 'Update a bundle application via PATCH (bMS 26R1+)', action: 'Replace application in bundle' },
+		{ name: 'Update Bundle Folder', value: 'updateBundleFolder', description: 'Update a bundle folder (bMS 26R1+)', action: 'Update bundle folder' },
+		{ name: 'Get Bundle Applications', value: 'getBundleApplications', description: 'Get all bundle applications (bMS 26R1+)', action: 'Get bundle applications' },
+		{ name: 'Delete Bundle Application', value: 'deleteBundleApplication', description: 'Delete a bundle application (bMS 26R1+)', action: 'Delete bundle application' },
 	],
 	// eslint-disable-next-line n8n-nodes-base/node-param-default-wrong-for-options -- 'getInstalledWindowsSoftware' is in COMMON_SOFTWARE_OPTIONS spread; ESLint cannot resolve spread
 	default: 'getInstalledWindowsSoftware',
@@ -73,7 +78,7 @@ export const softwareFields: INodeProperties[] = [
 	// BUNDLE FOLDER OPERATIONS (bMS 26R1+)
 	// ============================================================================
 
-	{ displayName: 'Bundle Folder ID', name: 'bundleFolderId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['getBundleFolder', 'getBundleSubFolders', 'deleteBundleFolder'], bmsVersion: ['26R1'] } }, description: 'The GUID of the bundle folder' },
+	{ displayName: 'Bundle Folder ID', name: 'bundleFolderId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['getBundleFolder', 'getBundleSubFolders', 'deleteBundleFolder', 'updateBundleFolder'], bmsVersion: ['26R1'] } }, description: 'The GUID of the bundle folder' },
 	{
 		displayName: 'Additional Fields',
 		name: 'additionalFields',
@@ -86,4 +91,25 @@ export const softwareFields: INodeProperties[] = [
 			{ displayName: 'Comment', name: 'comment', type: 'string', default: '', description: 'Optional comment' },
 		],
 	},
+
+	// ============================================================================
+	// PHASE 8E — new fields
+	// ============================================================================
+
+	// addApplicationToBundle
+	{ displayName: 'Bundle ID', name: 'bundleId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['addApplicationToBundle'], bmsVersion: ['26R1'] } }, description: 'The GUID of the bundle' },
+	{ displayName: 'Application ID', name: 'applicationId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['addApplicationToBundle'], bmsVersion: ['26R1'] } }, description: 'The GUID of the application to add' },
+	{ displayName: 'Additional Fields', name: 'additionalFields', type: 'collection', placeholder: 'Add Field', default: {}, displayOptions: { show: { resource: ['software'], operation: ['addApplicationToBundle'], bmsVersion: ['26R1'] } }, options: [{ displayName: 'Priority', name: 'priority', type: 'number', default: 0, description: 'Priority of the application in the bundle' }] },
+
+	// replaceApplicationInBundle
+	{ displayName: 'Bundle ID', name: 'bundleId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['replaceApplicationInBundle'], bmsVersion: ['26R1'] } }, description: 'The GUID of the bundle' },
+	{ displayName: 'Bundle Application ID', name: 'bundleApplicationId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['replaceApplicationInBundle', 'deleteBundleApplication'], bmsVersion: ['26R1'] } }, description: 'The GUID of the bundle application' },
+	{ displayName: 'Update Fields', name: 'updateFields', type: 'collection', placeholder: 'Add Field', default: {}, displayOptions: { show: { resource: ['software'], operation: ['replaceApplicationInBundle'], bmsVersion: ['26R1'] } }, options: [{ displayName: 'Application ID', name: 'applicationId', type: 'string', default: '', description: 'New application GUID' }, { displayName: 'Priority', name: 'priority', type: 'number', default: 0, description: 'New priority' }] },
+
+	// updateBundleFolder
+	{ displayName: 'Update Fields', name: 'updateFields', type: 'collection', placeholder: 'Add Field', default: {}, displayOptions: { show: { resource: ['software'], operation: ['updateBundleFolder'], bmsVersion: ['26R1'] } }, options: [{ displayName: 'Name', name: 'name', type: 'string', default: '', description: 'New folder name' }] },
+
+	// getBundleApplications
+	{ displayName: 'Return All', name: 'returnAll', type: 'boolean', default: false, displayOptions: { show: { resource: ['software'], operation: ['getBundleApplications'], bmsVersion: ['26R1'] } }, description: 'Whether to return all results or only up to a given limit' },
+	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 1 }, default: 50, displayOptions: { show: { resource: ['software'], operation: ['getBundleApplications'], bmsVersion: ['26R1'], returnAll: [false] } }, description: 'Max number of results to return' },
 ];
