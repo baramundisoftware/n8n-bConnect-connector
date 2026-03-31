@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
-import { get, getMany, create, update, deleteAsset, getAssetTypes, getAssetType, getAssetsByEndpoint, getAssetsByLogicalGroup, createAssetType, deleteAssetType, getAssetStockAssets, getAssetStockFolders, createAssetStockFolder, updateAssetStockFolder, deleteAssetStockFolder, getAssetsByADObject, getAssetsByOrgUnit } from '../../../../../nodes/Baramundi/actions/asset/asset.execute';
+import { get, getMany, create, update, deleteAsset, getAssetTypes, getAssetType, getAssetsByEndpoint, getAssetsByLogicalGroup, createAssetType, deleteAssetType, getAssetStockAssets, getAssetStockFolders, createAssetStockFolder, updateAssetStockFolder, deleteAssetStockFolder, getAssetsByADObject, getAssetsByOrgUnit, getAssetStockFolder, getAssetStockSubFolders, getAssetTypeFolders, getAssetTypeFolder, createAssetTypeFolder, updateAssetTypeFolder, deleteAssetTypeFolder, getAssetTypeFolderSubFolders } from '../../../../../nodes/Baramundi/actions/asset/asset.execute';
 
 // Mock helper function to create IExecuteFunctions
 function createMockExecuteFunctions(
@@ -1135,6 +1135,155 @@ describe('Asset Phase 4 - AD Object and OrgUnit Operations', () => {
       );
       const result = await getAssetsByOrgUnit.call(mockContext, 0);
       expect(result).toHaveLength(1);
+    });
+  });
+
+  // ============================================================================
+  // PHASE 8B — Asset Stock / Asset Type Folder Operations
+  // ============================================================================
+
+  describe('getAssetStockFolder()', () => {
+    it('should fetch a single asset stock folder by ID', async () => {
+      const folderId = 'folder-123';
+      const mockFolder = { id: folderId, name: 'Stock Folder A' };
+      const mockContext = createMockExecuteFunctions({ folderId }, {}, mockFolder);
+
+      const result = await getAssetStockFolder.call(mockContext, 0);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].json).toEqual(mockFolder);
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ method: 'GET', url: expect.stringContaining(`/assets/v2.0/AssetStock/Folders/${folderId}`) }),
+      );
+    });
+  });
+
+  describe('getAssetStockSubFolders()', () => {
+    it('should fetch sub-folders of an asset stock folder', async () => {
+      const folderId = 'folder-parent';
+      const mockContext = createMockExecuteFunctions(
+        { folderId, returnAll: false, limit: 50 },
+        {},
+        pageResponseAsset([{ id: 'sub-1', name: 'Sub A' }, { id: 'sub-2', name: 'Sub B' }]),
+      );
+
+      const result = await getAssetStockSubFolders.call(mockContext, 0);
+
+      expect(result).toHaveLength(2);
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: expect.stringContaining(`/assets/v2.0/AssetStock/Folders/${folderId}/Folders`) }),
+      );
+    });
+  });
+
+  describe('getAssetTypeFolders()', () => {
+    it('should fetch asset type folders with pagination', async () => {
+      const mockContext = createMockExecuteFunctions(
+        { returnAll: false, limit: 50 },
+        {},
+        pageResponseAsset([{ id: 'tf-1', name: 'Type Folder A' }]),
+      );
+
+      const result = await getAssetTypeFolders.call(mockContext, 0);
+
+      expect(result).toHaveLength(1);
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: expect.stringContaining('/assets/v2.0/AssetTypes/Folders') }),
+      );
+    });
+  });
+
+  describe('getAssetTypeFolder()', () => {
+    it('should fetch a single asset type folder by ID', async () => {
+      const assetTypeFolderId = 'atf-123';
+      const mockFolder = { id: assetTypeFolderId, name: 'Type Folder X' };
+      const mockContext = createMockExecuteFunctions({ assetTypeFolderId }, {}, mockFolder);
+
+      const result = await getAssetTypeFolder.call(mockContext, 0);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].json).toEqual(mockFolder);
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: expect.stringContaining(`/assets/v2.0/AssetTypes/Folders/${assetTypeFolderId}`) }),
+      );
+    });
+  });
+
+  describe('createAssetTypeFolder()', () => {
+    it('should create an asset type folder', async () => {
+      const mockFolder = { id: 'new-atf', name: 'New Type Folder' };
+      const mockContext = createMockExecuteFunctions(
+        { name: 'New Type Folder', additionalFields: {} }, {}, mockFolder,
+      );
+
+      const result = await createAssetTypeFolder.call(mockContext, 0);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].json.name).toBe('New Type Folder');
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ method: 'POST', url: expect.stringContaining('/assets/v2.0/AssetTypes/Folders') }),
+      );
+    });
+  });
+
+  describe('updateAssetTypeFolder()', () => {
+    it('should update an asset type folder via PATCH', async () => {
+      const assetTypeFolderId = 'atf-456';
+      const mockFolder = { id: assetTypeFolderId, name: 'Updated Folder' };
+      const mockContext = createMockExecuteFunctions(
+        { assetTypeFolderId, updateFields: { name: 'Updated Folder' } },
+        {},
+        mockFolder,
+      );
+
+      const result = await updateAssetTypeFolder.call(mockContext, 0);
+
+      expect(result).toHaveLength(1);
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ method: 'PATCH', url: expect.stringContaining(`/assets/v2.0/AssetTypes/Folders/${assetTypeFolderId}`) }),
+      );
+    });
+
+    it('should throw when no update fields provided', async () => {
+      const assetTypeFolderId = 'atf-456';
+      const mockContext = createMockExecuteFunctions(
+        { assetTypeFolderId, updateFields: {} }, {}, {},
+      );
+
+      await expect(updateAssetTypeFolder.call(mockContext, 0)).rejects.toThrow('No fields to update specified');
+    });
+  });
+
+  describe('deleteAssetTypeFolder()', () => {
+    it('should delete an asset type folder', async () => {
+      const assetTypeFolderId = 'atf-789';
+      const mockContext = createMockExecuteFunctions({ assetTypeFolderId }, {}, {});
+
+      const result = await deleteAssetTypeFolder.call(mockContext, 0);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].json).toEqual({ success: true, deletedId: assetTypeFolderId });
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ method: 'DELETE', url: expect.stringContaining(`/assets/v2.0/AssetTypes/Folders/${assetTypeFolderId}`) }),
+      );
+    });
+  });
+
+  describe('getAssetTypeFolderSubFolders()', () => {
+    it('should fetch sub-folders of an asset type folder', async () => {
+      const assetTypeFolderId = 'atf-parent';
+      const mockContext = createMockExecuteFunctions(
+        { assetTypeFolderId, returnAll: false, limit: 50 },
+        {},
+        pageResponseAsset([{ id: 'sub-atf-1', name: 'Sub Type Folder' }]),
+      );
+
+      const result = await getAssetTypeFolderSubFolders.call(mockContext, 0);
+
+      expect(result).toHaveLength(1);
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: expect.stringContaining(`/assets/v2.0/AssetTypes/Folders/${assetTypeFolderId}/Folders`) }),
+      );
     });
   });
 });

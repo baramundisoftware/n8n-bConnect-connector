@@ -444,3 +444,144 @@ export async function getAssetsByOrgUnit(
     return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
   }
 }
+
+// ============================================================================
+// ASSET STOCK FOLDER OPERATIONS (Phase 8B)
+// ============================================================================
+
+export async function getAssetStockFolder(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const folderId = this.getNodeParameter('folderId', index) as string;
+  const response = await apiRequest.call(this, 'GET', `/assets/v2.0/AssetStock/Folders/${folderId}`);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function getAssetStockSubFolders(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const folderId = this.getNodeParameter('folderId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/assets/v2.0/AssetStock/Folders/${folderId}/Folders`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/assets/v2.0/AssetStock/Folders/${folderId}/Folders`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+// ============================================================================
+// ASSET TYPE FOLDER OPERATIONS (Phase 8B)
+// ============================================================================
+
+export async function getAssetTypeFolders(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', '/assets/v2.0/AssetTypes/Folders', {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', '/assets/v2.0/AssetTypes/Folders', {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getAssetTypeFolder(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const assetTypeFolderId = this.getNodeParameter('assetTypeFolderId', index) as string;
+  const response = await apiRequest.call(this, 'GET', `/assets/v2.0/AssetTypes/Folders/${assetTypeFolderId}`);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function createAssetTypeFolder(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const name = this.getNodeParameter('name', index) as string;
+  const additionalFields = this.getNodeParameter('additionalFields', index, {}) as IDataObject;
+
+  const body: IDataObject = { name, ...additionalFields };
+  const response = await apiRequest.call(this, 'POST', '/assets/v2.0/AssetTypes/Folders', body);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function updateAssetTypeFolder(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const assetTypeFolderId = this.getNodeParameter('assetTypeFolderId', index) as string;
+  const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
+
+  const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
+  for (const [key, value] of Object.entries(updateFields)) {
+    if (value !== undefined && value !== null && value !== '') {
+      patchOperations.push({ op: 'replace', path: `/${key}`, value });
+    }
+  }
+
+  if (patchOperations.length === 0) {
+    throw new Error('No fields to update specified');
+  }
+
+  await apiRequest.call(this, 'PATCH', `/assets/v2.0/AssetTypes/Folders/${assetTypeFolderId}`, patchOperations);
+  const response = await apiRequest.call(this, 'GET', `/assets/v2.0/AssetTypes/Folders/${assetTypeFolderId}`);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function deleteAssetTypeFolder(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const assetTypeFolderId = this.getNodeParameter('assetTypeFolderId', index) as string;
+  await apiRequest.call(this, 'DELETE', `/assets/v2.0/AssetTypes/Folders/${assetTypeFolderId}`);
+  return this.helpers.returnJsonArray({ success: true, deletedId: assetTypeFolderId });
+}
+
+export async function getAssetTypeFolderSubFolders(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const assetTypeFolderId = this.getNodeParameter('assetTypeFolderId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/assets/v2.0/AssetTypes/Folders/${assetTypeFolderId}/Folders`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/assets/v2.0/AssetTypes/Folders/${assetTypeFolderId}/Folders`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}

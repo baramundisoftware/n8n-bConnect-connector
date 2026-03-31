@@ -17,6 +17,14 @@ const COMMON_ASSET_OPTIONS = [
   { name: 'Create Asset Stock Folder', value: 'createAssetStockFolder', description: 'Create a new asset stock folder', action: 'Create asset stock folder' },
   { name: 'Update Asset Stock Folder', value: 'updateAssetStockFolder', action: 'Update asset stock folder' },
   { name: 'Delete Asset Stock Folder', value: 'deleteAssetStockFolder', description: 'Delete an asset stock folder', action: 'Delete asset stock folder' },
+  { name: 'Get Asset Stock Folder', value: 'getAssetStockFolder', description: 'Get a single asset stock folder by ID', action: 'Get asset stock folder' },
+  { name: 'Get Asset Stock Sub-Folders', value: 'getAssetStockSubFolders', description: 'Get sub-folders of an asset stock folder', action: 'Get asset stock sub-folders' },
+  { name: 'Get Asset Type Folders', value: 'getAssetTypeFolders', description: 'Get asset type folders', action: 'Get asset type folders' },
+  { name: 'Get Asset Type Folder', value: 'getAssetTypeFolder', description: 'Get a single asset type folder by ID', action: 'Get asset type folder' },
+  { name: 'Create Asset Type Folder', value: 'createAssetTypeFolder', description: 'Create a new asset type folder', action: 'Create asset type folder' },
+  { name: 'Update Asset Type Folder', value: 'updateAssetTypeFolder', description: 'Update an asset type folder', action: 'Update asset type folder' },
+  { name: 'Delete Asset Type Folder', value: 'deleteAssetTypeFolder', description: 'Delete an asset type folder', action: 'Delete asset type folder' },
+  { name: 'Get Asset Type Folder Sub-Folders', value: 'getAssetTypeFolderSubFolders', description: 'Get sub-folders of an asset type folder', action: 'Get asset type folder sub-folders' },
 ];
 
 export const assetOperations25R2: INodeProperties[] = [
@@ -613,5 +621,209 @@ export const assetFields: INodeProperties[] = [
       },
     },
     description: 'The GUID of the org unit',
+  },
+
+  // ----------------------------------
+  //  asset:getAssetStockFolder
+  // ----------------------------------
+  {
+    displayName: 'Folder ID',
+    name: 'folderId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: { show: { resource: ['asset'], operation: ['getAssetStockFolder'] } },
+    description: 'The GUID of the asset stock folder',
+  },
+
+  // ----------------------------------
+  //  asset:getAssetStockSubFolders
+  // ----------------------------------
+  {
+    displayName: 'Folder ID',
+    name: 'folderId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: { show: { resource: ['asset'], operation: ['getAssetStockSubFolders'] } },
+    description: 'The GUID of the parent asset stock folder',
+  },
+  {
+    displayName: 'Return All',
+    name: 'returnAll',
+    type: 'boolean',
+    default: false,
+    displayOptions: { show: { resource: ['asset'], operation: ['getAssetStockSubFolders'] } },
+    description: 'Whether to return all results or only up to a given limit',
+  },
+  {
+    displayName: 'Limit',
+    name: 'limit',
+    type: 'number',
+    typeOptions: { minValue: 1 },
+    default: 50,
+    displayOptions: { show: { resource: ['asset'], operation: ['getAssetStockSubFolders'], returnAll: [false] } },
+    description: 'Max number of results to return',
+  },
+  {
+    displayName: 'Options',
+    name: 'options',
+    type: 'collection',
+    placeholder: 'Add Option',
+    default: {},
+    displayOptions: { show: { resource: ['asset'], operation: ['getAssetStockSubFolders'] } },
+    options: [
+      { displayName: 'Search Query', name: 'searchQuery', type: 'string', default: '', description: 'Filter folders by name' },
+      { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order' },
+    ],
+  },
+
+  // ----------------------------------
+  //  asset:getAssetTypeFolders
+  // ----------------------------------
+  {
+    displayName: 'Return All',
+    name: 'returnAll',
+    type: 'boolean',
+    default: false,
+    displayOptions: { show: { resource: ['asset'], operation: ['getAssetTypeFolders'] } },
+    description: 'Whether to return all results or only up to a given limit',
+  },
+  {
+    displayName: 'Limit',
+    name: 'limit',
+    type: 'number',
+    typeOptions: { minValue: 1 },
+    default: 50,
+    displayOptions: { show: { resource: ['asset'], operation: ['getAssetTypeFolders'], returnAll: [false] } },
+    description: 'Max number of results to return',
+  },
+  {
+    displayName: 'Options',
+    name: 'options',
+    type: 'collection',
+    placeholder: 'Add Option',
+    default: {},
+    displayOptions: { show: { resource: ['asset'], operation: ['getAssetTypeFolders'] } },
+    options: [
+      { displayName: 'Search Query', name: 'searchQuery', type: 'string', default: '', description: 'Filter folders by name' },
+      { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order' },
+    ],
+  },
+
+  // ----------------------------------
+  //  asset:getAssetTypeFolder
+  // ----------------------------------
+  {
+    displayName: 'Asset Type Folder ID',
+    name: 'assetTypeFolderId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: { show: { resource: ['asset'], operation: ['getAssetTypeFolder'] } },
+    description: 'The GUID of the asset type folder',
+  },
+
+  // ----------------------------------
+  //  asset:createAssetTypeFolder
+  // ----------------------------------
+  {
+    displayName: 'Name',
+    name: 'name',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: { show: { resource: ['asset'], operation: ['createAssetTypeFolder'] } },
+    description: 'Name of the new asset type folder',
+  },
+  {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: { show: { resource: ['asset'], operation: ['createAssetTypeFolder'] } },
+    options: [
+      { displayName: 'Parent Folder ID', name: 'parentFolderId', type: 'string', default: '', description: 'The GUID of the parent folder' },
+    ],
+  },
+
+  // ----------------------------------
+  //  asset:updateAssetTypeFolder
+  // ----------------------------------
+  {
+    displayName: 'Asset Type Folder ID',
+    name: 'assetTypeFolderId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: { show: { resource: ['asset'], operation: ['updateAssetTypeFolder'] } },
+    description: 'The GUID of the asset type folder to update',
+  },
+  {
+    displayName: 'Update Fields',
+    name: 'updateFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: { show: { resource: ['asset'], operation: ['updateAssetTypeFolder'] } },
+    options: [
+      { displayName: 'Name', name: 'name', type: 'string', default: '', description: 'New name for the folder' },
+    ],
+  },
+
+  // ----------------------------------
+  //  asset:deleteAssetTypeFolder
+  // ----------------------------------
+  {
+    displayName: 'Asset Type Folder ID',
+    name: 'assetTypeFolderId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: { show: { resource: ['asset'], operation: ['deleteAssetTypeFolder'] } },
+    description: 'The GUID of the asset type folder to delete',
+  },
+
+  // ----------------------------------
+  //  asset:getAssetTypeFolderSubFolders
+  // ----------------------------------
+  {
+    displayName: 'Asset Type Folder ID',
+    name: 'assetTypeFolderId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: { show: { resource: ['asset'], operation: ['getAssetTypeFolderSubFolders'] } },
+    description: 'The GUID of the parent asset type folder',
+  },
+  {
+    displayName: 'Return All',
+    name: 'returnAll',
+    type: 'boolean',
+    default: false,
+    displayOptions: { show: { resource: ['asset'], operation: ['getAssetTypeFolderSubFolders'] } },
+    description: 'Whether to return all results or only up to a given limit',
+  },
+  {
+    displayName: 'Limit',
+    name: 'limit',
+    type: 'number',
+    typeOptions: { minValue: 1 },
+    default: 50,
+    displayOptions: { show: { resource: ['asset'], operation: ['getAssetTypeFolderSubFolders'], returnAll: [false] } },
+    description: 'Max number of results to return',
+  },
+  {
+    displayName: 'Options',
+    name: 'options',
+    type: 'collection',
+    placeholder: 'Add Option',
+    default: {},
+    displayOptions: { show: { resource: ['asset'], operation: ['getAssetTypeFolderSubFolders'] } },
+    options: [
+      { displayName: 'Search Query', name: 'searchQuery', type: 'string', default: '', description: 'Filter folders by name' },
+      { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order' },
+    ],
   },
 ];

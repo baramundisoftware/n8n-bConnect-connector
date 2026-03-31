@@ -140,6 +140,30 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
             case 'getAssetsByOrgUnit':
               responseData = await asset.getAssetsByOrgUnit.call(this, i);
               break;
+            case 'getAssetStockFolder':
+              responseData = await asset.getAssetStockFolder.call(this, i);
+              break;
+            case 'getAssetStockSubFolders':
+              responseData = await asset.getAssetStockSubFolders.call(this, i);
+              break;
+            case 'getAssetTypeFolders':
+              responseData = await asset.getAssetTypeFolders.call(this, i);
+              break;
+            case 'getAssetTypeFolder':
+              responseData = await asset.getAssetTypeFolder.call(this, i);
+              break;
+            case 'createAssetTypeFolder':
+              responseData = await asset.createAssetTypeFolder.call(this, i);
+              break;
+            case 'updateAssetTypeFolder':
+              responseData = await asset.updateAssetTypeFolder.call(this, i);
+              break;
+            case 'deleteAssetTypeFolder':
+              responseData = await asset.deleteAssetTypeFolder.call(this, i);
+              break;
+            case 'getAssetTypeFolderSubFolders':
+              responseData = await asset.getAssetTypeFolderSubFolders.call(this, i);
+              break;
             default:
               throw new NodeOperationError(
                 this.getNode(),
