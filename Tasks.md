@@ -248,6 +248,185 @@
 
 ---
 
+## Phase 8 — Close API Coverage Gaps (REQ-COVERAGE-1)
+
+**Goal**: Implement ~43 missing operations identified in the 25R2/26R1 implementation status analysis. Bring 26R1 coverage from ~62.5% to ~95% and 25R2 from ~54% to ~85%.
+
+**Prerequisite**: Phase 7 complete.
+
+**Analysis**: See `n8nconnectorImplementationStatusAnalysis26R1.md` and `n8nconnectorImplementationStatusAnalysis25R2.md`.
+
+**Pattern**: Nearly all new operations are read-only "get many by parent ID" queries following the exact same pattern as `activeDirectory.getADUsersByGroup` (parent ID param + returnAll/limit + `apiRequestAllItems`).
+
+### Phase 8A — Active Directory Sub-Navigation (6 ops)
+
+**Files**: `activeDirectory.fields.ts`, `activeDirectory.execute.ts`, `router.ts`
+
+| ID | Task | Role | Priority | Depends on |
+|----|------|------|----------|------------|
+| P8A.1 | Implement 6 AD sub-navigation read operations (see table below) | Backend Developer | MEDIUM | Phase 7 done |
+| P8A.2 | Write unit tests for all 6 operations | Test Engineer | MEDIUM | P8A.1 |
+| P8A.3 | Build + unit test — 0 errors | QA Engineer | MEDIUM | P8A.2 |
+
+| Operation | API Path | Pattern |
+|-----------|----------|---------|
+| `getADGroupsByADGroup` | GET `/activedirectory/v2.0/ADGroups/{id}/ADGroups` | getMany by parent |
+| `getADObjectsByADGroup` | GET `/activedirectory/v2.0/ADGroups/{id}/ADObjects` | getMany by parent |
+| `getADObjectMemberships` | GET `/activedirectory/v2.0/ADObjects/{id}/ADGroupMemberships` | getMany by parent |
+| `getADObjectsByOrgUnit` | GET `/activedirectory/v2.0/OrgUnits/{id}/ADObjects` | getMany by parent |
+| `getADUsersByOrgUnit` | GET `/activedirectory/v2.0/OrgUnits/{id}/ADUsers` | getMany by parent |
+| `getOrgUnitsByOrgUnit` | GET `/activedirectory/v2.0/OrgUnits/{id}/OrgUnits` | getMany by parent |
+
+### Phase 8B — Asset Gaps (8 ops)
+
+**Files**: `asset.fields.ts`, `asset.execute.ts`, `router.ts`
+
+| ID | Task | Role | Priority | Depends on |
+|----|------|------|----------|------------|
+| P8B.1 | Implement 8 asset operations (see table below) | Backend Developer | MEDIUM | Phase 7 done |
+| P8B.2 | Write unit tests for all 8 operations | Test Engineer | MEDIUM | P8B.1 |
+| P8B.3 | Build + unit test — 0 errors | QA Engineer | MEDIUM | P8B.2 |
+
+| Operation | API Path | Pattern |
+|-----------|----------|---------|
+| `getAssetStockFolder` | GET `/assets/v2.0/AssetStock/Folders/{id}` | get single |
+| `getAssetStockSubFolders` | GET `/assets/v2.0/AssetStock/Folders/{id}/Folders` | getMany by parent |
+| `getAssetTypeFolders` | GET `/assets/v2.0/AssetTypes/Folders` | getMany |
+| `getAssetTypeFolder` | GET `/assets/v2.0/AssetTypes/Folders/{id}` | get single |
+| `createAssetTypeFolder` | POST `/assets/v2.0/AssetTypes/Folders` | create |
+| `updateAssetTypeFolder` | PATCH `/assets/v2.0/AssetTypes/Folders/{id}` | update |
+| `deleteAssetTypeFolder` | DELETE `/assets/v2.0/AssetTypes/Folders/{id}` | delete |
+| `getAssetTypeFolderSubFolders` | GET `/assets/v2.0/AssetTypes/Folders/{id}/Folders` | getMany by parent |
+
+### Phase 8C — Endpoint Missing Reads (8 ops)
+
+**Files**: `endpoint.fields.ts`, `endpoint.execute.ts`, `router.ts`
+
+| ID | Task | Role | Priority | Depends on |
+|----|------|------|----------|------------|
+| P8C.1 | Implement 8 endpoint read operations (see table below) | Backend Developer | HIGH | Phase 7 done |
+| P8C.2 | Gate `getEndpointsByUDG` with `bmsVersion: ['26R1']` | Backend Developer | HIGH | P8C.1 |
+| P8C.3 | Write unit tests for all 8 operations | Test Engineer | HIGH | P8C.1 |
+| P8C.4 | Build + unit test — 0 errors | QA Engineer | HIGH | P8C.3 |
+
+| Operation | API Path | Pattern | Version |
+|-----------|----------|---------|---------|
+| `getEndpointMaintenanceWindow` | GET `/endpoints/v2.0/Endpoints/{id}/MaintenanceWindow` | get single | both |
+| `getGroupMaintenanceWindow` | GET `/endpoints/v2.0/LogicalGroups/{id}/MaintenanceWindow` | get single | both |
+| `getLogicalGroupSubGroups` | GET `/endpoints/v2.0/LogicalGroups/{id}/LogicalGroups` | getMany by parent | both |
+| `getEndpointsByLogicalGroup` | GET `/endpoints/v2.0/LogicalGroups/{id}/Endpoints` | getMany by parent | both |
+| `getEndpointsByStaticGroup` | GET `/endpoints/v2.0/StaticGroups/{id}/Endpoints` | getMany by parent | both |
+| `getEndpointsByDynamicGroup` | GET `/endpoints/v2.0/DynamicGroups/{id}/Endpoints` | getMany by parent | both |
+| `getEndpointsByUDG` | GET `/endpoints/v2.0/UniversalDynamicGroups/{id}/Endpoints` | getMany by parent | 26R1 only |
+| `getEndpointsByADUser` | GET `/endpoints/v2.0/ADUsers/{id}/Endpoints` | getMany by parent | both |
+
+### Phase 8D — Job Gaps (14 ops)
+
+**Files**: `job.fields.ts`, `job.execute.ts`, `router.ts`
+
+| ID | Task | Role | Priority | Depends on |
+|----|------|------|----------|------------|
+| P8D.1 | Implement 7 job read operations (folders, instances by group, kiosk by entity) | Backend Developer | MEDIUM | Phase 7 done |
+| P8D.2 | Implement 4 `assignJobTo*` POST operations (body: `{ jobDefinitionId }`) | Backend Developer | MEDIUM | P8D.1 |
+| P8D.3 | Implement 3 kiosk release by-entity read operations | Backend Developer | MEDIUM | P8D.1 |
+| P8D.4 | Write unit tests for all 14 operations | Test Engineer | MEDIUM | P8D.2, P8D.3 |
+| P8D.5 | Build + unit test — 0 errors | QA Engineer | MEDIUM | P8D.4 |
+
+| Operation | API Path | Pattern |
+|-----------|----------|---------|
+| `getSubFolders` | GET `/jobs/v2.0/Folders/{id}/Folders` | getMany by parent |
+| `getJobDefinitionsByFolder` | GET `/jobs/v2.0/Folders/{id}/JobDefinitions` | getMany by parent |
+| `getKioskReleasesByJobDefinition` | GET `/jobs/v2.0/JobDefinitions/{id}/KioskReleases` | getMany by parent |
+| `getJobInstancesByLogicalGroup` | GET `/jobs/v2.0/LogicalGroups/{id}/JobInstances` | getMany by parent |
+| `getJobInstancesByStaticGroup` | GET `/jobs/v2.0/StaticGroups/{id}/JobInstances` | getMany by parent |
+| `getJobInstancesByDynamicGroup` | GET `/jobs/v2.0/DynamicGroups/{id}/JobInstances` | getMany by parent |
+| `getJobInstancesByUDG` | GET `/jobs/v2.0/UniversalDynamicGroups/{id}/JobInstances` | getMany by parent |
+| `assignJobToLogicalGroup` | POST `/jobs/v2.0/LogicalGroups/{id}/AssignJobDefinition` | POST with body `{ jobDefinitionId }` |
+| `assignJobToStaticGroup` | POST `/jobs/v2.0/StaticGroups/{id}/AssignJobDefinition` | POST with body `{ jobDefinitionId }` |
+| `assignJobToDynamicGroup` | POST `/jobs/v2.0/DynamicGroups/{id}/AssignJobDefinition` | POST with body `{ jobDefinitionId }` |
+| `assignJobToUDG` | POST `/jobs/v2.0/UniversalDynamicGroups/{id}/AssignJobDefinition` | POST with body `{ jobDefinitionId }` |
+| `getKioskReleasesByEndpoint` | GET `/jobs/v2.0/Endpoints/{id}/KioskReleases` | getMany by parent |
+| `getKioskReleasesByLogicalGroup` | GET `/jobs/v2.0/LogicalGroups/{id}/KioskReleases` | getMany by parent |
+| `getKioskReleasesByADObject` | GET `/jobs/v2.0/ADObjects/{id}/KioskReleases` | getMany by parent |
+
+### Phase 8E — Software Gaps (5 ops, 26R1-only)
+
+**Files**: `software.fields.ts`, `software.execute.ts`, `router.ts`
+
+| ID | Task | Role | Priority | Depends on |
+|----|------|------|----------|------------|
+| P8E.1 | Implement 5 software/bundle operations (see table below), gated `bmsVersion: ['26R1']` | Backend Developer | MEDIUM | Phase 7 done |
+| P8E.2 | Write unit tests for all 5 operations | Test Engineer | MEDIUM | P8E.1 |
+| P8E.3 | Build + unit test — 0 errors | QA Engineer | MEDIUM | P8E.2 |
+
+| Operation | API Path | Pattern |
+|-----------|----------|---------|
+| `addApplicationToBundle` | POST `/software/v2.0/Bundles/{id}/BundleApplications` | create sub-resource |
+| `replaceApplicationInBundle` | PATCH `/software/v2.0/Bundles/{bundleId}/BundleApplications/{id}` | update sub-resource |
+| `updateBundleFolder` | PATCH `/software/v2.0/Bundle/Folders/{id}` | update |
+| `getBundleApplications` | GET `/software/v2.0/BundleApplications` | getMany |
+| `deleteBundleApplication` | DELETE `/software/v2.0/BundleApplications/{id}` | delete |
+
+### Phase 8F — Variable Gaps (2 ops)
+
+**Files**: `variable.fields.ts`, `variable.execute.ts`, `router.ts`
+
+| ID | Task | Role | Priority | Depends on |
+|----|------|------|----------|------------|
+| P8F.1 | Implement 2 variable instance read operations (see table below) | Backend Developer | LOW | Phase 7 done |
+| P8F.2 | Write unit tests for both operations | Test Engineer | LOW | P8F.1 |
+| P8F.3 | Build + unit test — 0 errors | QA Engineer | LOW | P8F.2 |
+
+| Operation | API Path | Pattern |
+|-----------|----------|---------|
+| `getVariableInstancesByApplication` | GET `/variables/v2.0/WindowsApplications/{id}/VariableInstances` | getMany by parent |
+| `getVariableInstancesByJobDefinition` | GET `/variables/v2.0/WindowsJobDefinitions/{id}/VariableInstances` | getMany by parent |
+
+### Phase 8G — Final Verification
+
+| ID | Task | Role | Priority | Depends on |
+|----|------|------|----------|------------|
+| P8G.1 | Full build + lint + unit test run — 0 errors | QA Engineer | HIGH | P8A–P8F done |
+| P8G.2 | Update `n8nconnectorImplementationStatusAnalysis26R1.md` and `25R2.md` with new coverage | Tech Writer | MEDIUM | P8G.1 |
+| P8G.3 | Bump version in `package.json`, update CHANGELOG.md | DevOps Engineer | HIGH | P8G.1 |
+| P8G.4 | `npm pack` — verify distributable | DevOps Engineer | HIGH | P8G.3 |
+
+### Done
+
+| ID | Task | Completed |
+|----|------|-----------|
+| P8A.1 | Implemented 6 AD sub-navigation read operations in `activeDirectory.execute.ts`, `activeDirectory.fields.ts`, and `router.ts` | 2026-03-31 |
+| P8A.2 | Written 7 unit tests for all 6 AD sub-navigation operations — 487 tests total passing | 2026-03-31 |
+| P8A.3 | Build + unit test — 0 errors, 487 tests passing | 2026-03-31 |
+
+---
+
+## Phase 9 — Deferred Type-Specific Endpoint Operations (optional)
+
+**Goal**: Implement platform-specific endpoint CRUD and group-scoped type queries. Only if explicitly requested.
+
+**Prerequisite**: Phase 8 complete.
+
+**Reason for deferral**: The generic `/Endpoints` path covers GET/DELETE for all types. Type-specific CREATE/UPDATE require different request body schemas per platform (Windows, Android, iOS, Linux, macOS, Network). Type-specific group-scoped queries (e.g., `GetWindowsEndpointsByLogicalGroupId`) are redundant with the generic group-scoped queries added in Phase 8C.
+
+### Backlog
+
+| ID | Task | Role | Priority | Depends on |
+|----|------|------|----------|------------|
+| P9.1 | Implement Android endpoint CRUD: Create, Update, StartEnrollment + group-scoped queries | Backend Developer | LOW | Phase 8 done |
+| P9.2 | Implement iOS endpoint CRUD: Create, Update, StartEnrollment + group-scoped queries | Backend Developer | LOW | Phase 8 done |
+| P9.3 | Implement Linux endpoint CRUD: Create, Update + group-scoped queries | Backend Developer | LOW | Phase 8 done |
+| P9.4 | Implement macOS endpoint CRUD: Create, Update, StartEnrollment + group-scoped queries | Backend Developer | LOW | Phase 8 done |
+| P9.5 | Implement Network endpoint CRUD: Create, Update + group-scoped queries | Backend Developer | LOW | Phase 8 done |
+| P9.6 | Implement Industrial endpoint CRUD (25R2-only, removed in 26R1): 8 endpoints | Backend Developer | LOW | Phase 8 done |
+| P9.7 | Implement type-specific group-scoped queries (WindowsEndpoints/Android/iOS/etc. by LogicalGroup, StaticGroup, DynamicGroup, UDG, ADUser) | Backend Developer | LOW | Phase 8 done |
+
+### Done
+
+*(empty)*
+
+---
+
 ## Notes
 
 - **System tests** (`test/system/`) require a live bMS server. They are skipped in CI unless `BMS_URL` env var is set. Do not block phases on system test results.

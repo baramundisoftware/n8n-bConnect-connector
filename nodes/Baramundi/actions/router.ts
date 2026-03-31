@@ -58,6 +58,24 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
             case 'getOrgUnit':
               responseData = await activeDirectory.getOrgUnit.call(this, i);
               break;
+            case 'getADGroupsByADGroup':
+              responseData = await activeDirectory.getADGroupsByADGroup.call(this, i);
+              break;
+            case 'getADObjectsByADGroup':
+              responseData = await activeDirectory.getADObjectsByADGroup.call(this, i);
+              break;
+            case 'getADObjectMemberships':
+              responseData = await activeDirectory.getADObjectMemberships.call(this, i);
+              break;
+            case 'getADObjectsByOrgUnit':
+              responseData = await activeDirectory.getADObjectsByOrgUnit.call(this, i);
+              break;
+            case 'getADUsersByOrgUnit':
+              responseData = await activeDirectory.getADUsersByOrgUnit.call(this, i);
+              break;
+            case 'getOrgUnitsByOrgUnit':
+              responseData = await activeDirectory.getOrgUnitsByOrgUnit.call(this, i);
+              break;
             default:
               throw new NodeOperationError(
                 this.getNode(),

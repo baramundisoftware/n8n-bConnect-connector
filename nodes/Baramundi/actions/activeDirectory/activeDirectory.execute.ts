@@ -276,3 +276,199 @@ export async function getOrgUnit(
   const response = await apiRequest.call(this, 'GET', `/activedirectory/v2.0/OrgUnits/${orgUnitId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
+
+// ============================================================================
+// AD SUB-NAVIGATION OPERATIONS (Phase 8A)
+// ============================================================================
+
+export async function getADGroupsByADGroup(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const adGroupId = this.getNodeParameter('adGroupId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as {
+    searchQuery?: string;
+    orderBy?: string;
+  };
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(
+      this, 'GET', `/activedirectory/v2.0/ADGroups/${adGroupId}/ADGroups`, {}, qs,
+    );
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(
+      this, 'GET', `/activedirectory/v2.0/ADGroups/${adGroupId}/ADGroups`, {}, qs,
+    );
+    const data = (response.data || response) as IDataObject[];
+    return this.helpers.returnJsonArray(data);
+  }
+}
+
+export async function getADObjectsByADGroup(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const adGroupId = this.getNodeParameter('adGroupId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as {
+    searchQuery?: string;
+    orderBy?: string;
+  };
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(
+      this, 'GET', `/activedirectory/v2.0/ADGroups/${adGroupId}/ADObjects`, {}, qs,
+    );
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(
+      this, 'GET', `/activedirectory/v2.0/ADGroups/${adGroupId}/ADObjects`, {}, qs,
+    );
+    const data = (response.data || response) as IDataObject[];
+    return this.helpers.returnJsonArray(data);
+  }
+}
+
+export async function getADObjectMemberships(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const adObjectId = this.getNodeParameter('adObjectId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as {
+    searchQuery?: string;
+    orderBy?: string;
+  };
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(
+      this, 'GET', `/activedirectory/v2.0/ADObjects/${adObjectId}/ADGroupMemberships`, {}, qs,
+    );
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(
+      this, 'GET', `/activedirectory/v2.0/ADObjects/${adObjectId}/ADGroupMemberships`, {}, qs,
+    );
+    const data = (response.data || response) as IDataObject[];
+    return this.helpers.returnJsonArray(data);
+  }
+}
+
+export async function getADObjectsByOrgUnit(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const orgUnitId = this.getNodeParameter('orgUnitId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as {
+    searchQuery?: string;
+    orderBy?: string;
+  };
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(
+      this, 'GET', `/activedirectory/v2.0/OrgUnits/${orgUnitId}/ADObjects`, {}, qs,
+    );
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(
+      this, 'GET', `/activedirectory/v2.0/OrgUnits/${orgUnitId}/ADObjects`, {}, qs,
+    );
+    const data = (response.data || response) as IDataObject[];
+    return this.helpers.returnJsonArray(data);
+  }
+}
+
+export async function getADUsersByOrgUnit(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const orgUnitId = this.getNodeParameter('orgUnitId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as {
+    searchQuery?: string;
+    orderBy?: string;
+  };
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(
+      this, 'GET', `/activedirectory/v2.0/OrgUnits/${orgUnitId}/ADUsers`, {}, qs,
+    );
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(
+      this, 'GET', `/activedirectory/v2.0/OrgUnits/${orgUnitId}/ADUsers`, {}, qs,
+    );
+    const data = (response.data || response) as IDataObject[];
+    return this.helpers.returnJsonArray(data);
+  }
+}
+
+export async function getOrgUnitsByOrgUnit(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const orgUnitId = this.getNodeParameter('orgUnitId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as {
+    searchQuery?: string;
+    orderBy?: string;
+  };
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(
+      this, 'GET', `/activedirectory/v2.0/OrgUnits/${orgUnitId}/OrgUnits`, {}, qs,
+    );
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(
+      this, 'GET', `/activedirectory/v2.0/OrgUnits/${orgUnitId}/OrgUnits`, {}, qs,
+    );
+    const data = (response.data || response) as IDataObject[];
+    return this.helpers.returnJsonArray(data);
+  }
+}

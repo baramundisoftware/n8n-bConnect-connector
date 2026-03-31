@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
-import { getADGroups, getADGroup, getADGroupsByOrgUnit, getADUsersByGroup, getADUsers, getADUser, getADObjects, getADObject, getOrgUnits, getOrgUnit } from '../../../../../nodes/Baramundi/actions/activeDirectory/activeDirectory.execute';
+import { getADGroups, getADGroup, getADGroupsByOrgUnit, getADUsersByGroup, getADUsers, getADUser, getADObjects, getADObject, getOrgUnits, getOrgUnit, getADGroupsByADGroup, getADObjectsByADGroup, getADObjectMemberships, getADObjectsByOrgUnit, getADUsersByOrgUnit, getOrgUnitsByOrgUnit } from '../../../../../nodes/Baramundi/actions/activeDirectory/activeDirectory.execute';
 
 // Mock helper function to create IExecuteFunctions
 function createMockExecuteFunctions(
@@ -612,6 +612,207 @@ describe('Active Directory Operations', () => {
       });
 
       await expect(getOrgUnit.call(mockContext, 0)).rejects.toThrow('Not Found');
+    });
+  });
+
+  // ============================================================================
+  // AD SUB-NAVIGATION OPERATIONS (Phase 8A)
+  // ============================================================================
+
+  describe('getADGroupsByADGroup()', () => {
+    it('should fetch AD sub-groups in an AD group with pagination', async () => {
+      const adGroupId = 'group-parent-1';
+      const mockResponse = {
+        currentPage: 0, pageSize: 50, totalPages: 1, totalItems: 2,
+        hasPreviousPage: false, hasNextPage: false,
+        data: [
+          { id: 'group-child-1', name: 'SubGroup-A' },
+          { id: 'group-child-2', name: 'SubGroup-B' },
+        ],
+      };
+
+      const mockContext = createMockExecuteFunctions(
+        { adGroupId, returnAll: false, limit: 50 }, {}, mockResponse,
+      );
+
+      const result = await getADGroupsByADGroup.call(mockContext, 0);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].json.name).toBe('SubGroup-A');
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'GET',
+          url: expect.stringContaining(`/activedirectory/v2.0/ADGroups/${adGroupId}/ADGroups`),
+        }),
+      );
+    });
+
+    it('should fetch all AD sub-groups when returnAll is true', async () => {
+      const adGroupId = 'group-parent-1';
+      const mockPage1 = {
+        currentPage: 0, pageSize: 2, totalPages: 2, totalItems: 3,
+        hasPreviousPage: false, hasNextPage: true,
+        data: [{ id: 'g-1', name: 'G1' }, { id: 'g-2', name: 'G2' }],
+      };
+      const mockPage2 = {
+        currentPage: 1, pageSize: 2, totalPages: 2, totalItems: 3,
+        hasPreviousPage: true, hasNextPage: false,
+        data: [{ id: 'g-3', name: 'G3' }],
+      };
+
+      const mockContext = createMockExecuteFunctions(
+        { adGroupId, returnAll: true }, {}, {}, [mockPage1, mockPage2],
+      );
+
+      const result = await getADGroupsByADGroup.call(mockContext, 0);
+
+      expect(result).toHaveLength(3);
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('getADObjectsByADGroup()', () => {
+    it('should fetch AD objects in an AD group with pagination', async () => {
+      const adGroupId = 'group-1';
+      const mockResponse = {
+        currentPage: 0, pageSize: 50, totalPages: 1, totalItems: 2,
+        hasPreviousPage: false, hasNextPage: false,
+        data: [
+          { id: 'obj-1', name: 'Computer-001', objectClass: 'computer' },
+          { id: 'obj-2', name: 'User-001', objectClass: 'user' },
+        ],
+      };
+
+      const mockContext = createMockExecuteFunctions(
+        { adGroupId, returnAll: false, limit: 50 }, {}, mockResponse,
+      );
+
+      const result = await getADObjectsByADGroup.call(mockContext, 0);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].json.name).toBe('Computer-001');
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'GET',
+          url: expect.stringContaining(`/activedirectory/v2.0/ADGroups/${adGroupId}/ADObjects`),
+        }),
+      );
+    });
+  });
+
+  describe('getADObjectMemberships()', () => {
+    it('should fetch group memberships of an AD object', async () => {
+      const adObjectId = 'obj-123';
+      const mockResponse = {
+        currentPage: 0, pageSize: 50, totalPages: 1, totalItems: 2,
+        hasPreviousPage: false, hasNextPage: false,
+        data: [
+          { id: 'group-1', name: 'Domain Admins' },
+          { id: 'group-2', name: 'IT-Department' },
+        ],
+      };
+
+      const mockContext = createMockExecuteFunctions(
+        { adObjectId, returnAll: false, limit: 50 }, {}, mockResponse,
+      );
+
+      const result = await getADObjectMemberships.call(mockContext, 0);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].json.name).toBe('Domain Admins');
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'GET',
+          url: expect.stringContaining(`/activedirectory/v2.0/ADObjects/${adObjectId}/ADGroupMemberships`),
+        }),
+      );
+    });
+  });
+
+  describe('getADObjectsByOrgUnit()', () => {
+    it('should fetch AD objects in an organizational unit', async () => {
+      const orgUnitId = 'ou-123';
+      const mockResponse = {
+        currentPage: 0, pageSize: 50, totalPages: 1, totalItems: 2,
+        hasPreviousPage: false, hasNextPage: false,
+        data: [
+          { id: 'obj-1', name: 'Computer-001', objectClass: 'computer' },
+          { id: 'obj-2', name: 'Printer-001', objectClass: 'printer' },
+        ],
+      };
+
+      const mockContext = createMockExecuteFunctions(
+        { orgUnitId, returnAll: false, limit: 50 }, {}, mockResponse,
+      );
+
+      const result = await getADObjectsByOrgUnit.call(mockContext, 0);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].json.name).toBe('Computer-001');
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'GET',
+          url: expect.stringContaining(`/activedirectory/v2.0/OrgUnits/${orgUnitId}/ADObjects`),
+        }),
+      );
+    });
+  });
+
+  describe('getADUsersByOrgUnit()', () => {
+    it('should fetch AD users in an organizational unit', async () => {
+      const orgUnitId = 'ou-456';
+      const mockResponse = {
+        currentPage: 0, pageSize: 50, totalPages: 1, totalItems: 2,
+        hasPreviousPage: false, hasNextPage: false,
+        data: [
+          { id: 'user-1', name: 'John Doe', email: 'john@example.com' },
+          { id: 'user-2', name: 'Jane Smith', email: 'jane@example.com' },
+        ],
+      };
+
+      const mockContext = createMockExecuteFunctions(
+        { orgUnitId, returnAll: false, limit: 50 }, {}, mockResponse,
+      );
+
+      const result = await getADUsersByOrgUnit.call(mockContext, 0);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].json.name).toBe('John Doe');
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'GET',
+          url: expect.stringContaining(`/activedirectory/v2.0/OrgUnits/${orgUnitId}/ADUsers`),
+        }),
+      );
+    });
+  });
+
+  describe('getOrgUnitsByOrgUnit()', () => {
+    it('should fetch sub-OUs in an organizational unit', async () => {
+      const orgUnitId = 'ou-789';
+      const mockResponse = {
+        currentPage: 0, pageSize: 50, totalPages: 1, totalItems: 2,
+        hasPreviousPage: false, hasNextPage: false,
+        data: [
+          { id: 'ou-child-1', name: 'IT-Sub-OU' },
+          { id: 'ou-child-2', name: 'HR-Sub-OU' },
+        ],
+      };
+
+      const mockContext = createMockExecuteFunctions(
+        { orgUnitId, returnAll: false, limit: 50 }, {}, mockResponse,
+      );
+
+      const result = await getOrgUnitsByOrgUnit.call(mockContext, 0);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].json.name).toBe('IT-Sub-OU');
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'GET',
+          url: expect.stringContaining(`/activedirectory/v2.0/OrgUnits/${orgUnitId}/OrgUnits`),
+        }),
+      );
     });
   });
 
