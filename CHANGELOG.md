@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-03-31
+
+> **Semver rationale**: Patch bump. All changes are non-breaking quality fixes: lint errors, type safety, file permissions. No new features or API changes.
+
+### Fixed (IT Audit 2026-03-31 — Findings F7.1–F7.4)
+
+- **F7.1 — Eliminate `no-explicit-any` warnings**: Replaced `value: any` with `value: unknown` in `patchOperations` arrays across 8 action execute files (asset, defenseControl, endpoint, job, operatingSystem, serverManagement, updateManagement, variable). RFC 6902 patch value is intentionally untyped but `unknown` is the correct TypeScript widened type.
+- **F7.2 — Lint: 0 errors, 0 warnings**: Fixed 30 lint errors introduced by `eslint-plugin-n8n-nodes-base` upgrading from 1.16.3 → 1.16.6 (new rules: `node-param-display-name-wrong-for-dynamic-options`, `node-param-description-wrong-for-dynamic-options`, `node-param-default-wrong-for-options`). All dynamic dropdown fields now use n8n-standard "Name or ID" displayName and "Choose from the list…" description. Sorted 9 options arrays alphabetically. Removed 2 omittable descriptions identical to option name. Added `eslint-disable` comments with rationale for 3 spread-operator false positives.
+- **F7.3 — `tsconfig.eslint.json` permissions**: Normalised from 664 to 644 (consistent with all other config files).
+- **F7.4 — `error as JsonObject` forced cast**: Added `toJsonObject(e: unknown): JsonObject` helper in `requestApi.ts`. All 4 `NodeApiError` throw sites now use the helper instead of an unguarded type assertion. Handles non-object thrown values (strings, null) safely.
+- **INF-1 — `test/system/job.system.test.ts` permissions**: Normalised from 664 to 644.
+
 ## [0.3.0] - 2026-03-30
 
 > **Semver rationale**: Minor version bump. All changes are backwards-compatible additions or non-breaking hardening. No API operations removed.

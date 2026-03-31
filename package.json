@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-baramundi",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "n8n community node for baramundi Management Suite - Automate endpoint management, job execution, software deployment, and MDM operations via bConnect API",
   "keywords": [
     "n8n-community-node-package",
