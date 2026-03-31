@@ -401,6 +401,10 @@
 | P8B.1 | Implemented 8 asset operations: getAssetStockFolder, getAssetStockSubFolders, getAssetTypeFolders, getAssetTypeFolder, createAssetTypeFolder, updateAssetTypeFolder, deleteAssetTypeFolder, getAssetTypeFolderSubFolders | 2026-03-31 |
 | P8B.2 | Written 9 unit tests for all 8 asset operations — 496 tests total passing | 2026-03-31 |
 | P8B.3 | Build + unit test — 0 errors, 496 tests passing | 2026-03-31 |
+| P8C.1 | Implemented 8 endpoint read operations: getEndpointMaintenanceWindow, getGroupMaintenanceWindow, getLogicalGroupSubGroups, getEndpointsByLogicalGroup, getEndpointsByStaticGroup, getEndpointsByDynamicGroup, getEndpointsByADUser; + getEndpointsByUDG (26R1) | 2026-03-31 |
+| P8C.2 | `getEndpointsByUDG` gated with `bmsVersion: ['26R1']` in fields | 2026-03-31 |
+| P8C.3 | Written 8 unit tests for all 8 endpoint operations — 504 tests total passing | 2026-03-31 |
+| P8C.4 | Build + unit test — 0 errors, 504 tests passing | 2026-03-31 |
 
 ---
 

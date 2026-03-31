@@ -325,6 +325,30 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
             case 'deleteUnmanagedEndpoint':
               responseData = await endpoint.deleteUnmanagedEndpoint.call(this, i);
               break;
+            case 'getEndpointMaintenanceWindow':
+              responseData = await endpoint.getEndpointMaintenanceWindow.call(this, i);
+              break;
+            case 'getGroupMaintenanceWindow':
+              responseData = await endpoint.getGroupMaintenanceWindow.call(this, i);
+              break;
+            case 'getLogicalGroupSubGroups':
+              responseData = await endpoint.getLogicalGroupSubGroups.call(this, i);
+              break;
+            case 'getEndpointsByLogicalGroup':
+              responseData = await endpoint.getEndpointsByLogicalGroup.call(this, i);
+              break;
+            case 'getEndpointsByStaticGroup':
+              responseData = await endpoint.getEndpointsByStaticGroup.call(this, i);
+              break;
+            case 'getEndpointsByDynamicGroup':
+              responseData = await endpoint.getEndpointsByDynamicGroup.call(this, i);
+              break;
+            case 'getEndpointsByUDG':
+              responseData = await endpoint.getEndpointsByUDG.call(this, i);
+              break;
+            case 'getEndpointsByADUser':
+              responseData = await endpoint.getEndpointsByADUser.call(this, i);
+              break;
             default:
               throw new NodeOperationError(
                 this.getNode(),

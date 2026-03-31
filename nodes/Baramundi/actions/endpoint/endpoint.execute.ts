@@ -1026,3 +1026,169 @@ export async function deleteUnmanagedEndpoint(
   await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/UnmanagedEndpoints/${id}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: id });
 }
+
+// ============================================================================
+// ENDPOINT GROUP/MAINTENANCE READS (Phase 8C)
+// ============================================================================
+
+export async function getEndpointMaintenanceWindow(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function getGroupMaintenanceWindow(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const logicalGroupId = this.getNodeParameter('logicalGroupId', index) as string;
+  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/LogicalGroups/${logicalGroupId}/MaintenanceWindow`);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function getLogicalGroupSubGroups(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const logicalGroupId = this.getNodeParameter('logicalGroupId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/endpoints/v2.0/LogicalGroups/${logicalGroupId}/LogicalGroups`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/LogicalGroups/${logicalGroupId}/LogicalGroups`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getEndpointsByLogicalGroup(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const logicalGroupId = this.getNodeParameter('logicalGroupId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/endpoints/v2.0/LogicalGroups/${logicalGroupId}/Endpoints`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/LogicalGroups/${logicalGroupId}/Endpoints`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getEndpointsByStaticGroup(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const staticGroupId = this.getNodeParameter('staticGroupId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/endpoints/v2.0/StaticGroups/${staticGroupId}/Endpoints`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/StaticGroups/${staticGroupId}/Endpoints`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getEndpointsByDynamicGroup(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const dynamicGroupId = this.getNodeParameter('dynamicGroupId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/endpoints/v2.0/DynamicGroups/${dynamicGroupId}/Endpoints`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/DynamicGroups/${dynamicGroupId}/Endpoints`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getEndpointsByUDG(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const udgId = this.getNodeParameter('udgId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/endpoints/v2.0/UniversalDynamicGroups/${udgId}/Endpoints`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/UniversalDynamicGroups/${udgId}/Endpoints`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getEndpointsByADUser(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const adUserId = this.getNodeParameter('adUserId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/endpoints/v2.0/ADUsers/${adUserId}/Endpoints`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/ADUsers/${adUserId}/Endpoints`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}

@@ -6,7 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
-import { get, getMany, search, deleteEndpoint, create, update, startEnrollment, triggerIntuneInstallation, getLogicalGroup, getLogicalGroups, createLogicalGroup, updateLogicalGroup, deleteLogicalGroup, getStaticGroup, getStaticGroups, createStaticGroup, updateStaticGroup, deleteStaticGroup, getDynamicGroup, getDynamicGroups, setEntraIdData, deleteEntraIdData, getEntraIdDataByDeviceId, getUnmanagedEndpoints, getUnmanagedEndpoint, deleteUnmanagedEndpoint, putEndpointMaintenanceWindow, putGroupMaintenanceWindow, updateEndpointMaintenanceWindow, updateGroupMaintenanceWindow } from '../../../../../nodes/Baramundi/actions/endpoint/endpoint.execute';
+import { get, getMany, search, deleteEndpoint, create, update, startEnrollment, triggerIntuneInstallation, getLogicalGroup, getLogicalGroups, createLogicalGroup, updateLogicalGroup, deleteLogicalGroup, getStaticGroup, getStaticGroups, createStaticGroup, updateStaticGroup, deleteStaticGroup, getDynamicGroup, getDynamicGroups, setEntraIdData, deleteEntraIdData, getEntraIdDataByDeviceId, getUnmanagedEndpoints, getUnmanagedEndpoint, deleteUnmanagedEndpoint, putEndpointMaintenanceWindow, putGroupMaintenanceWindow, updateEndpointMaintenanceWindow, updateGroupMaintenanceWindow, getEndpointMaintenanceWindow, getGroupMaintenanceWindow, getLogicalGroupSubGroups, getEndpointsByLogicalGroup, getEndpointsByStaticGroup, getEndpointsByDynamicGroup, getEndpointsByUDG, getEndpointsByADUser } from '../../../../../nodes/Baramundi/actions/endpoint/endpoint.execute';
 
 /**
  * Create a mock IExecuteFunctions instance for testing
@@ -2907,6 +2907,152 @@ describe('Endpoint Phase 6 - MaintenanceWindow PATCH Operations (26R1)', () => {
       );
       await expect(updateGroupMaintenanceWindow.call(mockContext, 0)).rejects.toThrow(
         'No fields to update specified',
+      );
+    });
+  });
+});
+
+describe('Endpoint Phase 8C - Group Navigation Operations', () => {
+  const pageResponse = (items: any[]) => ({
+    currentPage: 0, pageSize: 50, totalPages: 1, totalItems: items.length,
+    hasPreviousPage: false, hasNextPage: false, data: items,
+  });
+
+  describe('getEndpointMaintenanceWindow()', () => {
+    it('should fetch the maintenance window for an endpoint', async () => {
+      const endpointId = 'ep-123';
+      const mockMW = { id: 'mw-1', startTime: '08:00', endTime: '10:00' };
+      const ctx = createMockExecuteFunctions({ endpointId }, {}, mockMW);
+
+      const result = await getEndpointMaintenanceWindow.call(ctx, 0);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].json).toEqual(mockMW);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: expect.stringContaining(`/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`) }),
+      );
+    });
+  });
+
+  describe('getGroupMaintenanceWindow()', () => {
+    it('should fetch the maintenance window for a logical group', async () => {
+      const logicalGroupId = 'lg-456';
+      const mockMW = { id: 'mw-2', startTime: '09:00', endTime: '11:00' };
+      const ctx = createMockExecuteFunctions({ logicalGroupId }, {}, mockMW);
+
+      const result = await getGroupMaintenanceWindow.call(ctx, 0);
+
+      expect(result).toHaveLength(1);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: expect.stringContaining(`/endpoints/v2.0/LogicalGroups/${logicalGroupId}/MaintenanceWindow`) }),
+      );
+    });
+  });
+
+  describe('getLogicalGroupSubGroups()', () => {
+    it('should fetch sub-groups of a logical group', async () => {
+      const logicalGroupId = 'lg-parent';
+      const ctx = createMockExecuteFunctions(
+        { logicalGroupId, returnAll: false, limit: 50 },
+        {},
+        pageResponse([{ id: 'sg-1', name: 'Sub Group A' }]),
+      );
+
+      const result = await getLogicalGroupSubGroups.call(ctx, 0);
+
+      expect(result).toHaveLength(1);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: expect.stringContaining(`/endpoints/v2.0/LogicalGroups/${logicalGroupId}/LogicalGroups`) }),
+      );
+    });
+  });
+
+  describe('getEndpointsByLogicalGroup()', () => {
+    it('should fetch endpoints in a logical group', async () => {
+      const logicalGroupId = 'lg-789';
+      const ctx = createMockExecuteFunctions(
+        { logicalGroupId, returnAll: false, limit: 50 },
+        {},
+        pageResponse([{ id: 'ep-1', displayName: 'PC-001' }, { id: 'ep-2', displayName: 'PC-002' }]),
+      );
+
+      const result = await getEndpointsByLogicalGroup.call(ctx, 0);
+
+      expect(result).toHaveLength(2);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: expect.stringContaining(`/endpoints/v2.0/LogicalGroups/${logicalGroupId}/Endpoints`) }),
+      );
+    });
+  });
+
+  describe('getEndpointsByStaticGroup()', () => {
+    it('should fetch endpoints in a static group', async () => {
+      const staticGroupId = 'sg-abc';
+      const ctx = createMockExecuteFunctions(
+        { staticGroupId, returnAll: false, limit: 50 },
+        {},
+        pageResponse([{ id: 'ep-3', displayName: 'Server-001' }]),
+      );
+
+      const result = await getEndpointsByStaticGroup.call(ctx, 0);
+
+      expect(result).toHaveLength(1);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: expect.stringContaining(`/endpoints/v2.0/StaticGroups/${staticGroupId}/Endpoints`) }),
+      );
+    });
+  });
+
+  describe('getEndpointsByDynamicGroup()', () => {
+    it('should fetch endpoints in a dynamic group', async () => {
+      const dynamicGroupId = 'dg-def';
+      const ctx = createMockExecuteFunctions(
+        { dynamicGroupId, returnAll: false, limit: 50 },
+        {},
+        pageResponse([{ id: 'ep-4', displayName: 'Laptop-001' }]),
+      );
+
+      const result = await getEndpointsByDynamicGroup.call(ctx, 0);
+
+      expect(result).toHaveLength(1);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: expect.stringContaining(`/endpoints/v2.0/DynamicGroups/${dynamicGroupId}/Endpoints`) }),
+      );
+    });
+  });
+
+  describe('getEndpointsByUDG()', () => {
+    it('should fetch endpoints in a Universal Dynamic Group (26R1+)', async () => {
+      const udgId = 'udg-ghi';
+      const ctx = createMockExecuteFunctions(
+        { udgId, returnAll: false, limit: 50 },
+        {},
+        pageResponse([{ id: 'ep-5', displayName: 'Mobile-001' }]),
+      );
+
+      const result = await getEndpointsByUDG.call(ctx, 0);
+
+      expect(result).toHaveLength(1);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: expect.stringContaining(`/endpoints/v2.0/UniversalDynamicGroups/${udgId}/Endpoints`) }),
+      );
+    });
+  });
+
+  describe('getEndpointsByADUser()', () => {
+    it('should fetch endpoints assigned to an AD user', async () => {
+      const adUserId = 'user-jkl';
+      const ctx = createMockExecuteFunctions(
+        { adUserId, returnAll: false, limit: 50 },
+        {},
+        pageResponse([{ id: 'ep-6', displayName: 'PC-John' }, { id: 'ep-7', displayName: 'Laptop-John' }]),
+      );
+
+      const result = await getEndpointsByADUser.call(ctx, 0);
+
+      expect(result).toHaveLength(2);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: expect.stringContaining(`/endpoints/v2.0/ADUsers/${adUserId}/Endpoints`) }),
       );
     });
   });

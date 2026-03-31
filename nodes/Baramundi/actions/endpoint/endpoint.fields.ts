@@ -25,11 +25,19 @@ const COMMON_ENDPOINT_OPTIONS = [
   // Dynamic Group Operations (Read-only)
   { name: 'Get Dynamic Group', value: 'getDynamicGroup', description: 'Get a dynamic group by ID', action: 'Get a dynamic group' },
   { name: 'Get Dynamic Groups', value: 'getDynamicGroups', description: 'Get many dynamic groups', action: 'Get many dynamic groups' },
-  // Maintenance Window — common create/delete
+  // Maintenance Window — common create/delete/get
   { name: 'Create Endpoint Maintenance Window', value: 'createEndpointMaintenanceWindow', description: 'Create a maintenance window for an endpoint', action: 'Create endpoint maintenance window' },
   { name: 'Delete Endpoint Maintenance Window', value: 'deleteEndpointMaintenanceWindow', description: 'Delete a maintenance window for an endpoint', action: 'Delete endpoint maintenance window' },
+  { name: 'Get Endpoint Maintenance Window', value: 'getEndpointMaintenanceWindow', description: 'Get the maintenance window for an endpoint', action: 'Get endpoint maintenance window' },
   { name: 'Create Group Maintenance Window', value: 'createGroupMaintenanceWindow', description: 'Create a maintenance window for a group', action: 'Create group maintenance window' },
   { name: 'Delete Group Maintenance Window', value: 'deleteGroupMaintenanceWindow', description: 'Delete a maintenance window for a group', action: 'Delete group maintenance window' },
+  { name: 'Get Group Maintenance Window', value: 'getGroupMaintenanceWindow', description: 'Get the maintenance window for a logical group', action: 'Get group maintenance window' },
+  // Sub-group / Endpoints by group queries
+  { name: 'Get Logical Group Sub-Groups', value: 'getLogicalGroupSubGroups', description: 'Get sub-groups of a logical group', action: 'Get logical group sub-groups' },
+  { name: 'Get Endpoints by Logical Group', value: 'getEndpointsByLogicalGroup', description: 'Get endpoints in a logical group', action: 'Get endpoints by logical group' },
+  { name: 'Get Endpoints by Static Group', value: 'getEndpointsByStaticGroup', description: 'Get endpoints in a static group', action: 'Get endpoints by static group' },
+  { name: 'Get Endpoints by Dynamic Group', value: 'getEndpointsByDynamicGroup', description: 'Get endpoints in a dynamic group', action: 'Get endpoints by dynamic group' },
+  { name: 'Get Endpoints by AD User', value: 'getEndpointsByADUser', description: 'Get endpoints assigned to an AD user', action: 'Get endpoints by AD user' },
 ];
 
 /** Operations shown when bmsVersion = 25R2 */
@@ -72,6 +80,7 @@ export const endpointOperations26R1: INodeProperties[] = [
       { name: 'Get Unmanaged Endpoints', value: 'getUnmanagedEndpoints', description: 'Get all unmanaged endpoints (bMS 26R1+)', action: 'Get unmanaged endpoints' },
       { name: 'Get Unmanaged Endpoint', value: 'getUnmanagedEndpoint', description: 'Get an unmanaged endpoint by ID (bMS 26R1+)', action: 'Get unmanaged endpoint' },
       { name: 'Delete Unmanaged Endpoint', value: 'deleteUnmanagedEndpoint', description: 'Delete an unmanaged endpoint by ID (bMS 26R1+)', action: 'Delete unmanaged endpoint' },
+      { name: 'Get Endpoints by UDG', value: 'getEndpointsByUDG', description: 'Get endpoints in a Universal Dynamic Group (bMS 26R1+)', action: 'Get endpoints by UDG' },
     ],
     // eslint-disable-next-line n8n-nodes-base/node-param-default-wrong-for-options -- 'getMany' is in COMMON_ENDPOINT_OPTIONS spread; ESLint cannot resolve spread
     default: 'getMany',
@@ -1344,5 +1353,92 @@ export const endpointFields: INodeProperties[] = [
     },
     placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
     description: 'The GUID of the unmanaged endpoint',
+  },
+
+  // ----------------------------------
+  //  Phase 8C — new field params
+  // ----------------------------------
+  {
+    displayName: 'Endpoint ID',
+    name: 'endpointId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointMaintenanceWindow'] } },
+    description: 'The GUID of the endpoint',
+  },
+  {
+    displayName: 'Logical Group ID',
+    name: 'logicalGroupId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getGroupMaintenanceWindow', 'getLogicalGroupSubGroups', 'getEndpointsByLogicalGroup'] } },
+    description: 'The GUID of the logical group',
+  },
+  {
+    displayName: 'Return All',
+    name: 'returnAll',
+    type: 'boolean',
+    default: false,
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getLogicalGroupSubGroups', 'getEndpointsByLogicalGroup', 'getEndpointsByStaticGroup', 'getEndpointsByDynamicGroup', 'getEndpointsByADUser', 'getEndpointsByUDG'] } },
+    description: 'Whether to return all results or only up to a given limit',
+  },
+  {
+    displayName: 'Limit',
+    name: 'limit',
+    type: 'number',
+    typeOptions: { minValue: 1 },
+    default: 50,
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getLogicalGroupSubGroups', 'getEndpointsByLogicalGroup', 'getEndpointsByStaticGroup', 'getEndpointsByDynamicGroup', 'getEndpointsByADUser', 'getEndpointsByUDG'], returnAll: [false] } },
+    description: 'Max number of results to return',
+  },
+  {
+    displayName: 'Options',
+    name: 'options',
+    type: 'collection',
+    placeholder: 'Add Option',
+    default: {},
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getLogicalGroupSubGroups', 'getEndpointsByLogicalGroup', 'getEndpointsByStaticGroup', 'getEndpointsByDynamicGroup', 'getEndpointsByADUser', 'getEndpointsByUDG'] } },
+    options: [
+      { displayName: 'Search Query', name: 'searchQuery', type: 'string', default: '', description: 'Filter results by name' },
+      { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order' },
+    ],
+  },
+  {
+    displayName: 'Static Group ID',
+    name: 'staticGroupId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByStaticGroup'] } },
+    description: 'The GUID of the static group',
+  },
+  {
+    displayName: 'Dynamic Group ID',
+    name: 'dynamicGroupId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByDynamicGroup'] } },
+    description: 'The GUID of the dynamic group',
+  },
+  {
+    displayName: 'AD User ID',
+    name: 'adUserId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByADUser'] } },
+    description: 'The GUID of the AD user',
+  },
+  {
+    displayName: 'Universal Dynamic Group ID',
+    name: 'udgId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByUDG'], bmsVersion: ['26R1'] } },
+    description: 'The GUID of the Universal Dynamic Group (bMS 26R1+)',
   },
 ];
