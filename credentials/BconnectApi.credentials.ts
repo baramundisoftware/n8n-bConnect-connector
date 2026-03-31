@@ -5,6 +5,24 @@ import type {
   INodeProperties,
 } from 'n8n-workflow';
 
+/**
+ * Authentication note (F1.1 risk acceptance — investigated 2026-04-01):
+ *
+ * The baramundi bConnect V2.0 API (both 25R2 and 26R1) supports ONLY HTTP Basic
+ * Authentication as defined in every OpenAPI security scheme (`basicAuth`).
+ * No token, API key, Bearer, or OAuth2 mechanism is offered by the API.
+ *
+ * Risk-acceptance guidance:
+ *  - Use a **dedicated service account** (least-privilege, no interactive logon).
+ *  - Rotate the service-account password on the same schedule as your bMS password policy.
+ *  - Store the credential in n8n's encrypted credential store (never in workflow JSON).
+ *  - Enable SSL validation (keep `ignoreSslIssues: false`) so the password cannot be
+ *    intercepted in transit.
+ *  - Restrict network access so only the n8n host can reach the bMS server on port 444.
+ *
+ * Future: if baramundi adds token/API-key auth in a later release, a separate
+ * `BconnectApiToken` credential type should be added and referenced from the node.
+ */
 export class BconnectApi implements ICredentialType {
   name = 'bconnectApi';
   displayName = 'Baramundi bConnect API';
