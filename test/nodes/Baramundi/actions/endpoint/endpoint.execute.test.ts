@@ -6,7 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
-import { get, getMany, search, deleteEndpoint, create, update, startEnrollment, triggerIntuneInstallation, getLogicalGroup, getLogicalGroups, createLogicalGroup, updateLogicalGroup, deleteLogicalGroup, getStaticGroup, getStaticGroups, createStaticGroup, updateStaticGroup, deleteStaticGroup, getDynamicGroup, getDynamicGroups, setEntraIdData, deleteEntraIdData, getEntraIdDataByDeviceId, getUnmanagedEndpoints, getUnmanagedEndpoint, deleteUnmanagedEndpoint, putEndpointMaintenanceWindow, putGroupMaintenanceWindow, updateEndpointMaintenanceWindow, updateGroupMaintenanceWindow, getEndpointMaintenanceWindow, getGroupMaintenanceWindow, getLogicalGroupSubGroups, getEndpointsByLogicalGroup, getEndpointsByStaticGroup, getEndpointsByDynamicGroup, getEndpointsByUDG, getEndpointsByADUser } from '../../../../../nodes/Baramundi/actions/endpoint/endpoint.execute';
+import { get, getMany, search, deleteEndpoint, create, update, startEnrollment, triggerIntuneInstallation, getLogicalGroup, getLogicalGroups, createLogicalGroup, updateLogicalGroup, deleteLogicalGroup, getStaticGroup, getStaticGroups, createStaticGroup, updateStaticGroup, deleteStaticGroup, getDynamicGroup, getDynamicGroups, setEntraIdData, deleteEntraIdData, getEntraIdDataByDeviceId, getUnmanagedEndpoints, getUnmanagedEndpoint, deleteUnmanagedEndpoint, putEndpointMaintenanceWindow, putGroupMaintenanceWindow, updateEndpointMaintenanceWindow, updateGroupMaintenanceWindow, getEndpointMaintenanceWindow, getGroupMaintenanceWindow, getLogicalGroupSubGroups, getEndpointsByLogicalGroup, getEndpointsByStaticGroup, getEndpointsByDynamicGroup, getEndpointsByUDG, getEndpointsByADUser, getTypedEndpoints, getTypedEndpoint, updateTypedEndpoint, deleteTypedEndpoint, startTypedEnrollment, getTypedEndpointsByGroup, getIndustrialEndpoints, getIndustrialEndpoint, createIndustrialEndpoint, updateIndustrialEndpoint, deleteIndustrialEndpoint, getIndustrialEndpointsByGroup } from '../../../../../nodes/Baramundi/actions/endpoint/endpoint.execute';
 
 /**
  * Create a mock IExecuteFunctions instance for testing
@@ -3053,6 +3053,237 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
       expect(result).toHaveLength(2);
       expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({ url: expect.stringContaining(`/endpoints/v2.0/ADUsers/${adUserId}/Endpoints`) }),
+      );
+    });
+  });
+
+  // ============================================================================
+  // Phase 9 — Type-specific endpoint operations
+  // ============================================================================
+
+  describe('getTypedEndpoints()', () => {
+    it('should fetch Android endpoints from type-specific path', async () => {
+      const ctx = createMockExecuteFunctions(
+        { platformType: 'android', returnAll: false, limit: 50 },
+        {},
+        pageResponse([{ id: 'and-1', displayName: 'Phone-01' }]),
+      );
+      const result = await getTypedEndpoints.call(ctx, 0);
+      expect(result).toHaveLength(1);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: '/endpoints/v2.0/AndroidEndpoints' }),
+      );
+    });
+
+    it('should fetch Network endpoints from type-specific path', async () => {
+      const ctx = createMockExecuteFunctions(
+        { platformType: 'network', returnAll: false, limit: 50 },
+        {},
+        pageResponse([{ id: 'net-1', displayName: 'Switch-01' }]),
+      );
+      const result = await getTypedEndpoints.call(ctx, 0);
+      expect(result).toHaveLength(1);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: '/endpoints/v2.0/NetworkEndpoints' }),
+      );
+    });
+  });
+
+  describe('getTypedEndpoint()', () => {
+    it('should fetch a single iOS endpoint by ID', async () => {
+      const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
+      const ctx = createMockExecuteFunctions(
+        { platformType: 'ios', typedEndpointId: endpointId },
+        {},
+        { id: endpointId, displayName: 'iPhone-01' },
+      );
+      const result = await getTypedEndpoint.call(ctx, 0);
+      expect(result).toHaveLength(1);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: `/endpoints/v2.0/IosEndpoints/${endpointId}` }),
+      );
+    });
+  });
+
+  describe('updateTypedEndpoint()', () => {
+    it('should PATCH a Linux endpoint at type-specific path', async () => {
+      const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
+      const ctx = createMockExecuteFunctions(
+        { platformType: 'linux', typedEndpointId: endpointId, updateFields: { displayName: 'linux-01' } },
+        {},
+        { id: endpointId, displayName: 'linux-01' },
+      );
+      const result = await updateTypedEndpoint.call(ctx, 0);
+      expect(result).toHaveLength(1);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ method: 'PATCH', url: `/endpoints/v2.0/LinuxEndpoints/${endpointId}` }),
+      );
+    });
+  });
+
+  describe('deleteTypedEndpoint()', () => {
+    it('should DELETE a Mac endpoint at type-specific path', async () => {
+      const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
+      const ctx = createMockExecuteFunctions(
+        { platformType: 'mac', typedEndpointId: endpointId },
+        {},
+        {},
+      );
+      const result = await deleteTypedEndpoint.call(ctx, 0);
+      expect(result[0].json).toMatchObject({ success: true, deletedId: endpointId });
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ method: 'DELETE', url: `/endpoints/v2.0/MacEndpoints/${endpointId}` }),
+      );
+    });
+  });
+
+  describe('startTypedEnrollment()', () => {
+    it('should POST enrollment for an Android endpoint', async () => {
+      const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
+      const ctx = createMockExecuteFunctions(
+        { platformType: 'android', typedEndpointId: endpointId, enrollmentOptions: {} },
+        {},
+        {},
+      );
+      const result = await startTypedEnrollment.call(ctx, 0);
+      expect(result[0].json).toMatchObject({ success: true, endpointId });
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: `/endpoints/v2.0/AndroidEndpoints/${endpointId}/StartEnrollment` }),
+      );
+    });
+
+    it('should throw for Network endpoints which do not support enrollment', async () => {
+      const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
+      const ctx = createMockExecuteFunctions(
+        { platformType: 'network', typedEndpointId: endpointId, enrollmentOptions: {} },
+        {},
+        {},
+      );
+      await expect(startTypedEnrollment.call(ctx, 0)).rejects.toThrow('Enrollment not supported');
+    });
+  });
+
+  describe('getTypedEndpointsByGroup()', () => {
+    it('should fetch iOS endpoints in a logical group', async () => {
+      const groupId = 'grp-111';
+      const ctx = createMockExecuteFunctions(
+        { platformType: 'ios', groupType: 'logical', typedGroupId: groupId, returnAll: false, limit: 50 },
+        {},
+        pageResponse([{ id: 'ios-1', displayName: 'iPhone-01' }]),
+      );
+      const result = await getTypedEndpointsByGroup.call(ctx, 0);
+      expect(result).toHaveLength(1);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: `/endpoints/v2.0/LogicalGroups/${groupId}/IosEndpoints` }),
+      );
+    });
+
+    it('should fetch Android endpoints by AD user', async () => {
+      const groupId = 'user-aaa';
+      const ctx = createMockExecuteFunctions(
+        { platformType: 'android', groupType: 'adUser', typedGroupId: groupId, returnAll: false, limit: 50 },
+        {},
+        pageResponse([{ id: 'and-2', displayName: 'Phone-02' }]),
+      );
+      const result = await getTypedEndpointsByGroup.call(ctx, 0);
+      expect(result).toHaveLength(1);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: `/endpoints/v2.0/ADUsers/${groupId}/AndroidEndpoints` }),
+      );
+    });
+  });
+
+  // Industrial endpoint operations (25R2 only)
+  describe('getIndustrialEndpoints()', () => {
+    it('should fetch industrial endpoints', async () => {
+      const ctx = createMockExecuteFunctions(
+        { returnAll: false, limit: 50 },
+        {},
+        pageResponse([{ id: 'ind-1', displayName: 'PLC-01' }]),
+      );
+      const result = await getIndustrialEndpoints.call(ctx, 0);
+      expect(result).toHaveLength(1);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: '/endpoints/v2.0/IndustrialEndpoints' }),
+      );
+    });
+  });
+
+  describe('getIndustrialEndpoint()', () => {
+    it('should fetch a single industrial endpoint by ID', async () => {
+      const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
+      const ctx = createMockExecuteFunctions(
+        { industrialEndpointId: endpointId },
+        {},
+        { id: endpointId, displayName: 'PLC-01' },
+      );
+      const result = await getIndustrialEndpoint.call(ctx, 0);
+      expect(result).toHaveLength(1);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: `/endpoints/v2.0/IndustrialEndpoints/${endpointId}` }),
+      );
+    });
+  });
+
+  describe('createIndustrialEndpoint()', () => {
+    it('should POST to create an industrial endpoint', async () => {
+      const ctx = createMockExecuteFunctions(
+        { displayName: 'PLC-New', additionalFields: { primaryIP: '10.0.0.1' } },
+        {},
+        { id: 'ind-new', displayName: 'PLC-New' },
+      );
+      const result = await createIndustrialEndpoint.call(ctx, 0);
+      expect(result[0].json).toMatchObject({ id: 'ind-new' });
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ method: 'POST', url: '/endpoints/v2.0/IndustrialEndpoints' }),
+      );
+    });
+  });
+
+  describe('updateIndustrialEndpoint()', () => {
+    it('should PATCH an industrial endpoint', async () => {
+      const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
+      const ctx = createMockExecuteFunctions(
+        { industrialEndpointId: endpointId, updateFields: { displayName: 'PLC-Updated' } },
+        {},
+        { id: endpointId, displayName: 'PLC-Updated' },
+      );
+      const result = await updateIndustrialEndpoint.call(ctx, 0);
+      expect(result).toHaveLength(1);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ method: 'PATCH', url: `/endpoints/v2.0/IndustrialEndpoints/${endpointId}` }),
+      );
+    });
+  });
+
+  describe('deleteIndustrialEndpoint()', () => {
+    it('should DELETE an industrial endpoint', async () => {
+      const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
+      const ctx = createMockExecuteFunctions(
+        { industrialEndpointId: endpointId },
+        {},
+        {},
+      );
+      const result = await deleteIndustrialEndpoint.call(ctx, 0);
+      expect(result[0].json).toMatchObject({ success: true, deletedId: endpointId });
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ method: 'DELETE', url: `/endpoints/v2.0/IndustrialEndpoints/${endpointId}` }),
+      );
+    });
+  });
+
+  describe('getIndustrialEndpointsByGroup()', () => {
+    it('should fetch industrial endpoints in a static group', async () => {
+      const groupId = 'grp-static-001';
+      const ctx = createMockExecuteFunctions(
+        { industrialGroupType: 'static', industrialGroupId: groupId, returnAll: false, limit: 50 },
+        {},
+        pageResponse([{ id: 'ind-2', displayName: 'PLC-02' }]),
+      );
+      const result = await getIndustrialEndpointsByGroup.call(ctx, 0);
+      expect(result).toHaveLength(1);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: `/endpoints/v2.0/StaticGroups/${groupId}/IndustrialEndpoints` }),
       );
     });
   });

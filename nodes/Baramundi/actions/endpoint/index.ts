@@ -1,2 +1,2 @@
-export { endpointOperations, endpointFields } from './endpoint.fields';
+export { endpointOperations, endpointOperations25R2, endpointOperations26R1, endpointFields } from './endpoint.fields';
 export * as endpoint from './endpoint.execute';

@@ -1192,3 +1192,321 @@ export async function getEndpointsByADUser(
     return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
   }
 }
+
+// ============================================================================
+// PHASE 9 — TYPE-SPECIFIC ENDPOINT OPERATIONS
+// ============================================================================
+
+const TYPED_ENDPOINT_PATH: Record<string, string> = {
+  windows: 'WindowsEndpoints',
+  android: 'AndroidEndpoints',
+  ios: 'IosEndpoints',
+  linux: 'LinuxEndpoints',
+  mac: 'MacEndpoints',
+  network: 'NetworkEndpoints',
+};
+
+const ENROLLMENT_SUPPORTED_TYPES = new Set(['windows', 'android', 'ios', 'mac']);
+
+const GROUP_TYPE_PATH: Record<string, string> = {
+  logical: 'LogicalGroups',
+  static: 'StaticGroups',
+  dynamic: 'DynamicGroups',
+  udg: 'UniversalDynamicGroups',
+  adUser: 'ADUsers',
+};
+
+export async function getTypedEndpoints(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const platformType = this.getNodeParameter('platformType', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
+
+  const typePath = TYPED_ENDPOINT_PATH[platformType];
+  if (!typePath) throw new NodeOperationError(this.getNode(), `Unknown platform type: ${platformType}`, { itemIndex: index });
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', `/endpoints/v2.0/${typePath}`, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/${typePath}`, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getTypedEndpoint(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const platformType = this.getNodeParameter('platformType', index) as string;
+  const endpointId = this.getNodeParameter('typedEndpointId', index) as string;
+
+  const guidValidation = validateGuid(endpointId);
+  if (!guidValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid endpoint ID:\n${guidValidation.errors.join('\n')}`, { itemIndex: index });
+  }
+
+  const typePath = TYPED_ENDPOINT_PATH[platformType];
+  if (!typePath) throw new NodeOperationError(this.getNode(), `Unknown platform type: ${platformType}`, { itemIndex: index });
+
+  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/${typePath}/${endpointId}`);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function updateTypedEndpoint(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const platformType = this.getNodeParameter('platformType', index) as string;
+  const endpointId = this.getNodeParameter('typedEndpointId', index) as string;
+  const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
+
+  const guidValidation = validateGuid(endpointId);
+  if (!guidValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid endpoint ID:\n${guidValidation.errors.join('\n')}`, { itemIndex: index });
+  }
+
+  const typePath = TYPED_ENDPOINT_PATH[platformType];
+  if (!typePath) throw new NodeOperationError(this.getNode(), `Unknown platform type: ${platformType}`, { itemIndex: index });
+
+  const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
+  for (const [key, value] of Object.entries(updateFields)) {
+    if (value !== undefined && value !== null && value !== '') {
+      patchOperations.push({ op: 'replace', path: `/${key}`, value });
+    }
+  }
+  if (patchOperations.length === 0) throw new Error('No fields to update specified');
+
+  await apiRequest.call(this, 'PATCH', `/endpoints/v2.0/${typePath}/${endpointId}`, patchOperations);
+  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/${typePath}/${endpointId}`);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function deleteTypedEndpoint(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const platformType = this.getNodeParameter('platformType', index) as string;
+  const endpointId = this.getNodeParameter('typedEndpointId', index) as string;
+
+  const guidValidation = validateGuid(endpointId);
+  if (!guidValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid endpoint ID:\n${guidValidation.errors.join('\n')}`, { itemIndex: index });
+  }
+
+  const typePath = TYPED_ENDPOINT_PATH[platformType];
+  if (!typePath) throw new NodeOperationError(this.getNode(), `Unknown platform type: ${platformType}`, { itemIndex: index });
+
+  await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/${typePath}/${endpointId}`);
+  return this.helpers.returnJsonArray({ success: true, deletedId: endpointId });
+}
+
+export async function startTypedEnrollment(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const platformType = this.getNodeParameter('platformType', index) as string;
+  const endpointId = this.getNodeParameter('typedEndpointId', index) as string;
+  const enrollmentOptions = this.getNodeParameter('enrollmentOptions', index, {}) as IDataObject;
+
+  const guidValidation = validateGuid(endpointId);
+  if (!guidValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid endpoint ID:\n${guidValidation.errors.join('\n')}`, { itemIndex: index });
+  }
+
+  if (!ENROLLMENT_SUPPORTED_TYPES.has(platformType)) {
+    throw new NodeOperationError(this.getNode(), `Enrollment not supported for platform type: ${platformType}`, { itemIndex: index });
+  }
+
+  const typePath = TYPED_ENDPOINT_PATH[platformType];
+  const body: IDataObject = {};
+  if (enrollmentOptions.emailRecipient) {
+    const emailValidation = validateEmail(enrollmentOptions.emailRecipient as string);
+    if (!emailValidation.valid) {
+      throw new NodeOperationError(this.getNode(), `Invalid email recipient:\n${emailValidation.errors.join('\n')}`, { itemIndex: index });
+    }
+    body.emailRecipient = enrollmentOptions.emailRecipient;
+  }
+  if (enrollmentOptions.emailLanguageId) body.emailLanguageId = enrollmentOptions.emailLanguageId;
+
+  const response = await apiRequest.call(this, 'POST', `/endpoints/v2.0/${typePath}/${endpointId}/StartEnrollment`, body);
+  return this.helpers.returnJsonArray({ success: true, endpointId, enrollmentStatus: response || 'Enrollment started' });
+}
+
+export async function getTypedEndpointsByGroup(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const platformType = this.getNodeParameter('platformType', index) as string;
+  const groupType = this.getNodeParameter('groupType', index) as string;
+  const groupId = this.getNodeParameter('typedGroupId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
+
+  const typePath = TYPED_ENDPOINT_PATH[platformType];
+  if (!typePath) throw new NodeOperationError(this.getNode(), `Unknown platform type: ${platformType}`, { itemIndex: index });
+
+  const groupTypePath = GROUP_TYPE_PATH[groupType];
+  if (!groupTypePath) throw new NodeOperationError(this.getNode(), `Unknown group type: ${groupType}`, { itemIndex: index });
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  const url = `/endpoints/v2.0/${groupTypePath}/${groupId}/${typePath}`;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', url, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', url, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+// ============================================================================
+// INDUSTRIAL ENDPOINT OPERATIONS (25R2 only)
+// ============================================================================
+
+export async function getIndustrialEndpoints(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', '/endpoints/v2.0/IndustrialEndpoints', {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', '/endpoints/v2.0/IndustrialEndpoints', {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}
+
+export async function getIndustrialEndpoint(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const endpointId = this.getNodeParameter('industrialEndpointId', index) as string;
+
+  const guidValidation = validateGuid(endpointId);
+  if (!guidValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid endpoint ID:\n${guidValidation.errors.join('\n')}`, { itemIndex: index });
+  }
+
+  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/IndustrialEndpoints/${endpointId}`);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function createIndustrialEndpoint(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const displayName = this.getNodeParameter('displayName', index) as string;
+  const additionalFields = this.getNodeParameter('additionalFields', index, {}) as IDataObject;
+
+  const displayNameValidation = validateDisplayName(displayName);
+  if (!displayNameValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid display name:\n${displayNameValidation.errors.join('\n')}`, { itemIndex: index });
+  }
+
+  const body: IDataObject = { displayName, ...additionalFields };
+  const response = await apiRequest.call(this, 'POST', '/endpoints/v2.0/IndustrialEndpoints', body);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function updateIndustrialEndpoint(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const endpointId = this.getNodeParameter('industrialEndpointId', index) as string;
+  const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
+
+  const guidValidation = validateGuid(endpointId);
+  if (!guidValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid endpoint ID:\n${guidValidation.errors.join('\n')}`, { itemIndex: index });
+  }
+
+  const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
+  for (const [key, value] of Object.entries(updateFields)) {
+    if (value !== undefined && value !== null && value !== '') {
+      patchOperations.push({ op: 'replace', path: `/${key}`, value });
+    }
+  }
+  if (patchOperations.length === 0) throw new Error('No fields to update specified');
+
+  await apiRequest.call(this, 'PATCH', `/endpoints/v2.0/IndustrialEndpoints/${endpointId}`, patchOperations);
+  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/IndustrialEndpoints/${endpointId}`);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function deleteIndustrialEndpoint(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const endpointId = this.getNodeParameter('industrialEndpointId', index) as string;
+
+  const guidValidation = validateGuid(endpointId);
+  if (!guidValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid endpoint ID:\n${guidValidation.errors.join('\n')}`, { itemIndex: index });
+  }
+
+  await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/IndustrialEndpoints/${endpointId}`);
+  return this.helpers.returnJsonArray({ success: true, deletedId: endpointId });
+}
+
+export async function getIndustrialEndpointsByGroup(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const groupType = this.getNodeParameter('industrialGroupType', index) as string;
+  const groupId = this.getNodeParameter('industrialGroupId', index) as string;
+  const returnAll = this.getNodeParameter('returnAll', index) as boolean;
+  const limit = this.getNodeParameter('limit', index, 50) as number;
+  const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
+
+  const industrialGroupTypeMap: Record<string, string> = {
+    logical: 'LogicalGroups',
+    static: 'StaticGroups',
+    udg: 'UniversalDynamicGroups',
+  };
+
+  const groupTypePath = industrialGroupTypeMap[groupType];
+  if (!groupTypePath) throw new NodeOperationError(this.getNode(), `Unknown group type: ${groupType}`, { itemIndex: index });
+
+  const qs: Record<string, string | number> = {};
+  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
+  if (options.orderBy) qs.OrderBy = options.orderBy;
+
+  const url = `/endpoints/v2.0/${groupTypePath}/${groupId}/IndustrialEndpoints`;
+
+  if (returnAll) {
+    const response = await apiRequestAllItems.call(this, 'GET', url, {}, qs);
+    return this.helpers.returnJsonArray(response as IDataObject[]);
+  } else {
+    qs.PageSize = limit;
+    qs.Page = 0;
+    const response = await apiRequest.call(this, 'GET', url, {}, qs);
+    return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
+  }
+}

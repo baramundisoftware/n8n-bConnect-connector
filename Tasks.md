@@ -433,19 +433,16 @@
 
 ### Backlog
 
-| ID | Task | Role | Priority | Depends on |
-|----|------|------|----------|------------|
-| P9.1 | Implement Android endpoint CRUD: Create, Update, StartEnrollment + group-scoped queries | Backend Developer | LOW | Phase 8 done |
-| P9.2 | Implement iOS endpoint CRUD: Create, Update, StartEnrollment + group-scoped queries | Backend Developer | LOW | Phase 8 done |
-| P9.3 | Implement Linux endpoint CRUD: Create, Update + group-scoped queries | Backend Developer | LOW | Phase 8 done |
-| P9.4 | Implement macOS endpoint CRUD: Create, Update, StartEnrollment + group-scoped queries | Backend Developer | LOW | Phase 8 done |
-| P9.5 | Implement Network endpoint CRUD: Create, Update + group-scoped queries | Backend Developer | LOW | Phase 8 done |
-| P9.6 | Implement Industrial endpoint CRUD (25R2-only, removed in 26R1): 8 endpoints | Backend Developer | LOW | Phase 8 done |
-| P9.7 | Implement type-specific group-scoped queries (WindowsEndpoints/Android/iOS/etc. by LogicalGroup, StaticGroup, DynamicGroup, UDG, ADUser) | Backend Developer | LOW | Phase 8 done |
+*(empty)*
 
 ### Done
 
-*(empty)*
+| ID | Task | Completed |
+|----|------|-----------|
+| P9.1–P9.5 | Implemented type-specific CRUD and group queries for Windows, Android, iOS, Linux, Mac, Network via `getTypedEndpoints`, `getTypedEndpoint`, `updateTypedEndpoint`, `deleteTypedEndpoint`, `startTypedEnrollment`, `getTypedEndpointsByGroup` (platformType selector) | 2026-04-01 |
+| P9.6 | Implemented Industrial endpoint CRUD: `getIndustrialEndpoints`, `getIndustrialEndpoint`, `createIndustrialEndpoint`, `updateIndustrialEndpoint`, `deleteIndustrialEndpoint`, `getIndustrialEndpointsByGroup` (25R2-only) | 2026-04-01 |
+| P9.7 | Type-specific group queries implemented via `getTypedEndpointsByGroup` (platformType + groupType params: logical/static/dynamic/udg/adUser) and `getIndustrialEndpointsByGroup` (logical/static/udg) | 2026-04-01 |
+| P9.8 | 15 new unit tests added — 541 tests total passing, TypeScript 0 errors | 2026-04-01 |
 
 ---
 
