@@ -19,7 +19,7 @@ const COMMON_ASSET_OPTIONS = [
   { name: 'Delete Asset Stock Folder', value: 'deleteAssetStockFolder', description: 'Delete an asset stock folder', action: 'Delete asset stock folder' },
   { name: 'Get Asset Stock Folder', value: 'getAssetStockFolder', description: 'Get a single asset stock folder by ID', action: 'Get asset stock folder' },
   { name: 'Get Asset Stock Sub-Folders', value: 'getAssetStockSubFolders', description: 'Get sub-folders of an asset stock folder', action: 'Get asset stock sub-folders' },
-  { name: 'Get Asset Type Folders', value: 'getAssetTypeFolders', description: 'Get asset type folders', action: 'Get asset type folders' },
+  { name: 'Get Asset Type Folders', value: 'getAssetTypeFolders', action: 'Get asset type folders' },
   { name: 'Get Asset Type Folder', value: 'getAssetTypeFolder', description: 'Get a single asset type folder by ID', action: 'Get asset type folder' },
   { name: 'Create Asset Type Folder', value: 'createAssetTypeFolder', description: 'Create a new asset type folder', action: 'Create asset type folder' },
   { name: 'Update Asset Type Folder', value: 'updateAssetTypeFolder', description: 'Update an asset type folder', action: 'Update asset type folder' },

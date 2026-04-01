@@ -55,28 +55,28 @@ export const variableOperations: INodeProperties[] = [
 				action: 'Get variables by AD object',
 			},
 			{
-				name: 'Get Variables by Endpoint',
-				value: 'getVariableInstancesByEndpoint',
-				description: 'Get variable instances for an endpoint',
-				action: 'Get variables by endpoint',
-			},
-			{
-				name: 'Get Variables by Logical Group',
-				value: 'getVariableInstancesByLogicalGroup',
-				description: 'Get variable instances for a logical group',
-				action: 'Get variables by logical group',
-			},
-			{
 				name: 'Get Variables by Application',
 				value: 'getVariableInstancesByApplication',
 				description: 'Get variable instances for a Windows application',
 				action: 'Get variables by application',
 			},
 			{
+				name: 'Get Variables by Endpoint',
+				value: 'getVariableInstancesByEndpoint',
+				description: 'Get variable instances for an endpoint',
+				action: 'Get variables by endpoint',
+			},
+			{
 				name: 'Get Variables by Job Definition',
 				value: 'getVariableInstancesByJobDefinition',
 				description: 'Get variable instances for a Windows job definition',
 				action: 'Get variables by job definition',
+			},
+			{
+				name: 'Get Variables by Logical Group',
+				value: 'getVariableInstancesByLogicalGroup',
+				description: 'Get variable instances for a logical group',
+				action: 'Get variables by logical group',
 			},
 			{
 				name: 'Update Variable Definition',

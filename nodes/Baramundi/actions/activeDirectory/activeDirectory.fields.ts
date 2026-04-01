@@ -25,6 +25,12 @@ export const activeDirectoryOperations: INodeProperties[] = [
         action: 'Get AD groups',
       },
       {
+        name: 'Get AD Groups by AD Group',
+        value: 'getADGroupsByADGroup',
+        description: 'Get AD sub-groups in an AD group',
+        action: 'Get AD groups by AD group',
+      },
+      {
         name: 'Get AD Groups by OU',
         value: 'getADGroupsByOrgUnit',
         description: 'Get AD groups in an organizational unit',
@@ -37,10 +43,28 @@ export const activeDirectoryOperations: INodeProperties[] = [
         action: 'Get an AD object',
       },
       {
+        name: 'Get AD Object Group Memberships',
+        value: 'getADObjectMemberships',
+        description: 'Get AD group memberships of an AD object',
+        action: 'Get AD object group memberships',
+      },
+      {
         name: 'Get AD Objects',
         value: 'getADObjects',
         description: 'Get many Active Directory objects',
         action: 'Get AD objects',
+      },
+      {
+        name: 'Get AD Objects by AD Group',
+        value: 'getADObjectsByADGroup',
+        description: 'Get AD objects in an AD group',
+        action: 'Get AD objects by AD group',
+      },
+      {
+        name: 'Get AD Objects by OU',
+        value: 'getADObjectsByOrgUnit',
+        description: 'Get AD objects in an organizational unit',
+        action: 'Get AD objects by organizational unit',
       },
       {
         name: 'Get AD User',
@@ -61,6 +85,12 @@ export const activeDirectoryOperations: INodeProperties[] = [
         action: 'Get AD users by group',
       },
       {
+        name: 'Get AD Users by OU',
+        value: 'getADUsersByOrgUnit',
+        description: 'Get AD users in an organizational unit',
+        action: 'Get AD users by organizational unit',
+      },
+      {
         name: 'Get Organizational Unit',
         value: 'getOrgUnit',
         description: 'Get a single organizational unit by ID',
@@ -71,36 +101,6 @@ export const activeDirectoryOperations: INodeProperties[] = [
         value: 'getOrgUnits',
         description: 'Get many AD organizational units',
         action: 'Get organizational units',
-      },
-      {
-        name: 'Get AD Groups by AD Group',
-        value: 'getADGroupsByADGroup',
-        description: 'Get AD sub-groups in an AD group',
-        action: 'Get AD groups by AD group',
-      },
-      {
-        name: 'Get AD Objects by AD Group',
-        value: 'getADObjectsByADGroup',
-        description: 'Get AD objects in an AD group',
-        action: 'Get AD objects by AD group',
-      },
-      {
-        name: 'Get AD Object Group Memberships',
-        value: 'getADObjectMemberships',
-        description: 'Get AD group memberships of an AD object',
-        action: 'Get AD object group memberships',
-      },
-      {
-        name: 'Get AD Objects by OU',
-        value: 'getADObjectsByOrgUnit',
-        description: 'Get AD objects in an organizational unit',
-        action: 'Get AD objects by organizational unit',
-      },
-      {
-        name: 'Get AD Users by OU',
-        value: 'getADUsersByOrgUnit',
-        description: 'Get AD users in an organizational unit',
-        action: 'Get AD users by organizational unit',
       },
       {
         name: 'Get OUs by OU',
