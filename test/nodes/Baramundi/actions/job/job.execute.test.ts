@@ -82,7 +82,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle 404 errors for non-existent jobs', async () => {
-      const jobId = 'non-existent-job-id';
+      const jobId = '88888888-8888-8888-8888-888888888888';
       const mockContext = createMockExecuteFunctions({ jobSelection: jobId, jobId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -272,7 +272,7 @@ describe('Job Operations', () => {
   describe('execute()', () => {
     it('should execute a job on a single endpoint', async () => {
       const jobId = '12345678-1234-1234-1234-123456789abc';
-      const endpointId = 'endpoint-1';
+      const endpointId = '11111111-1111-1111-1111-111111111111';
       const mockResponse = {
         jobInstanceId: 'instance-123',
         status: 'Pending',
@@ -305,11 +305,11 @@ describe('Job Operations', () => {
 
     it('should execute a job on multiple endpoints', async () => {
       const jobId = '12345678-1234-1234-1234-123456789abc';
-      const endpointIds = 'endpoint-1, endpoint-2, endpoint-3';
+      const endpointIds = '11111111-1111-1111-1111-111111111111, 22222222-2222-2222-2222-222222222222, 33333333-3333-3333-3333-333333333333';
       const mockResponse = {
         jobInstanceId: 'instance-123',
         status: 'Pending',
-        endpointIds: ['endpoint-1', 'endpoint-2', 'endpoint-3'],
+        endpointIds: ['11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222', '33333333-3333-3333-3333-333333333333'],
       };
 
       const mockContext = createMockExecuteFunctions(
@@ -326,7 +326,7 @@ describe('Job Operations', () => {
       expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
           body: expect.objectContaining({
-            endpointId: "endpoint-1", jobDefinitionId: jobId,
+            endpointId: '11111111-1111-1111-1111-111111111111', jobDefinitionId: jobId,
           }),
         })
       );
@@ -334,7 +334,7 @@ describe('Job Operations', () => {
 
     it('should include optional comment in request', async () => {
       const jobId = '12345678-1234-1234-1234-123456789abc';
-      const endpointId = 'endpoint-1';
+      const endpointId = '11111111-1111-1111-1111-111111111111';
       const mockResponse = { jobInstanceId: 'instance-123' };
 
       const mockContext = createMockExecuteFunctions(
@@ -359,7 +359,7 @@ describe('Job Operations', () => {
 
     it('should include optional priority in request', async () => {
       const jobId = '12345678-1234-1234-1234-123456789abc';
-      const endpointId = 'endpoint-1';
+      const endpointId = '11111111-1111-1111-1111-111111111111';
       const mockResponse = { jobInstanceId: 'instance-123' };
 
       const mockContext = createMockExecuteFunctions(
@@ -384,7 +384,7 @@ describe('Job Operations', () => {
 
     it('should include both comment and priority when provided', async () => {
       const jobId = '12345678-1234-1234-1234-123456789abc';
-      const endpointId = 'endpoint-1';
+      const endpointId = '11111111-1111-1111-1111-111111111111';
       const mockResponse = { jobInstanceId: 'instance-123' };
 
       const mockContext = createMockExecuteFunctions(
@@ -412,8 +412,8 @@ describe('Job Operations', () => {
     });
 
     it('should handle errors when executing job', async () => {
-      const jobId = 'invalid-job-id';
-      const endpointId = 'endpoint-1';
+      const jobId = '88888888-8888-8888-8888-888888888888';
+      const endpointId = '11111111-1111-1111-1111-111111111111';
       const mockContext = createMockExecuteFunctions(
         { jobSelection: jobId, jobId,
         endpointIds: endpointId,
@@ -562,7 +562,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle errors when fetching job instances', async () => {
-      const jobId = 'invalid-job-id';
+      const jobId = '88888888-8888-8888-8888-888888888888';
       const mockContext = createMockExecuteFunctions(
         { jobSelection: jobId, jobId,
         returnAll: false,
@@ -854,7 +854,7 @@ describe('Job Operations', () => {
 
   describe('getJobInstance()', () => {
     it('should fetch a single job instance by ID', async () => {
-      const instanceId = 'instance-12345';
+      const instanceId = '99999999-9999-9999-9999-999999999999';
       const mockInstance = {
         id: instanceId,
         jobDefinitionId: 'job-123',
@@ -883,7 +883,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle 404 errors for non-existent job instances', async () => {
-      const instanceId = 'non-existent-instance';
+      const instanceId = '99999999-9999-9999-9999-999999999999';
       const mockContext = createMockExecuteFunctions({ instanceId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -898,7 +898,7 @@ describe('Job Operations', () => {
 
   describe('getEndpointJobInstances()', () => {
     it('should fetch job instances for a specific endpoint with pagination', async () => {
-      const endpointId = 'endpoint-12345';
+      const endpointId = '11111111-1111-1111-1111-111111111111';
       const mockInstances = {
         currentPage: 0,
         pageSize: 50,
@@ -963,7 +963,7 @@ describe('Job Operations', () => {
     });
 
     it('should fetch all endpoint job instances when returnAll is true', async () => {
-      const endpointId = 'endpoint-12345';
+      const endpointId = '11111111-1111-1111-1111-111111111111';
       const mockPage1 = {
         currentPage: 0,
         pageSize: 2,
@@ -1010,7 +1010,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle custom endpoint GUID input', async () => {
-      const customEndpointId = 'custom-endpoint-guid';
+      const customEndpointId = '11111111-1111-1111-1111-111111111111';
       const mockInstances = {
         currentPage: 0,
         pageSize: 50,
@@ -1046,7 +1046,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle empty job instances for endpoint', async () => {
-      const endpointId = 'endpoint-with-no-jobs';
+      const endpointId = '11111111-1111-1111-1111-111111111111';
       const mockEmptyInstances = {
         currentPage: 0,
         pageSize: 50,
@@ -1075,7 +1075,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle errors when fetching endpoint job instances', async () => {
-      const endpointId = 'non-existent-endpoint';
+      const endpointId = '11111111-1111-1111-1111-111111111111';
       const mockContext = createMockExecuteFunctions({
         endpointSelection: endpointId,
         endpointId,
@@ -1093,7 +1093,7 @@ describe('Job Operations', () => {
     });
 
     it('should support different page sizes', async () => {
-      const endpointId = 'endpoint-12345';
+      const endpointId = '11111111-1111-1111-1111-111111111111';
       const mockInstances = {
         currentPage: 0,
         pageSize: 10,
@@ -1138,7 +1138,7 @@ describe('Job Operations', () => {
 
   describe('startJobInstance()', () => {
     it('should start a job instance', async () => {
-      const instanceId = 'instance-12345';
+      const instanceId = '99999999-9999-9999-9999-999999999999';
       const mockResponse = { success: true };
 
       const mockContext = createMockExecuteFunctions(
@@ -1160,7 +1160,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle errors when starting job instance', async () => {
-      const instanceId = 'instance-12345';
+      const instanceId = '99999999-9999-9999-9999-999999999999';
       const mockContext = createMockExecuteFunctions({ instanceId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -1175,7 +1175,7 @@ describe('Job Operations', () => {
 
   describe('stopJobInstance()', () => {
     it('should stop a running job instance', async () => {
-      const instanceId = 'instance-12345';
+      const instanceId = '99999999-9999-9999-9999-999999999999';
       const mockResponse = { success: true };
 
       const mockContext = createMockExecuteFunctions(
@@ -1197,7 +1197,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle errors when stopping job instance', async () => {
-      const instanceId = 'instance-12345';
+      const instanceId = '99999999-9999-9999-9999-999999999999';
       const mockContext = createMockExecuteFunctions({ instanceId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -1212,7 +1212,7 @@ describe('Job Operations', () => {
 
   describe('resumeJobInstance()', () => {
     it('should resume a paused job instance', async () => {
-      const instanceId = 'instance-12345';
+      const instanceId = '99999999-9999-9999-9999-999999999999';
       const mockResponse = { success: true };
 
       const mockContext = createMockExecuteFunctions(
@@ -1234,7 +1234,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle errors when resuming job instance', async () => {
-      const instanceId = 'instance-12345';
+      const instanceId = '99999999-9999-9999-9999-999999999999';
       const mockContext = createMockExecuteFunctions({ instanceId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -1249,7 +1249,7 @@ describe('Job Operations', () => {
 
   describe('deleteJobInstance()', () => {
     it('should delete a job instance', async () => {
-      const instanceId = 'instance-12345';
+      const instanceId = '99999999-9999-9999-9999-999999999999';
       const mockResponse = {};
 
       const mockContext = createMockExecuteFunctions(
@@ -1271,7 +1271,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle 404 errors when deleting non-existent instance', async () => {
-      const instanceId = 'non-existent-instance';
+      const instanceId = '99999999-9999-9999-9999-999999999999';
       const mockContext = createMockExecuteFunctions({ instanceId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -1361,7 +1361,7 @@ describe('Job Operations', () => {
 
   describe('getFolder()', () => {
     it('should fetch a single folder by ID', async () => {
-      const folderId = 'folder-123';
+      const folderId = '77777777-7777-7777-7777-777777777777';
       const mockFolder = {
         id: folderId,
         name: 'Security Patches',
@@ -1389,7 +1389,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle 404 errors for non-existent folders', async () => {
-      const folderId = 'non-existent-folder';
+      const folderId = '77777777-7777-7777-7777-777777777777';
       const mockContext = createMockExecuteFunctions({ folderId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -1483,7 +1483,7 @@ describe('Job Operations', () => {
 
   describe('updateFolder()', () => {
     it('should update folder with single field', async () => {
-      const folderId = 'folder-123';
+      const folderId = '77777777-7777-7777-7777-777777777777';
       const newName = 'Updated Folder Name';
       const mockResponse = {
         id: folderId,
@@ -1520,7 +1520,7 @@ describe('Job Operations', () => {
     });
 
     it('should update folder with multiple fields', async () => {
-      const folderId = 'folder-123';
+      const folderId = '77777777-7777-7777-7777-777777777777';
       const mockResponse = {
         id: folderId,
         name: 'New Name',
@@ -1554,7 +1554,7 @@ describe('Job Operations', () => {
     });
 
     it('should throw error when no fields to update', async () => {
-      const folderId = 'folder-123';
+      const folderId = '77777777-7777-7777-7777-777777777777';
       const mockContext = createMockExecuteFunctions({
         folderId,
         updateFields: {},
@@ -1564,7 +1564,7 @@ describe('Job Operations', () => {
     });
 
     it('should ignore empty values in update', async () => {
-      const folderId = 'folder-123';
+      const folderId = '77777777-7777-7777-7777-777777777777';
       const mockResponse = { id: folderId, name: 'Name' };
 
       const mockContext = createMockExecuteFunctions(
@@ -1585,7 +1585,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle 404 errors when updating non-existent folder', async () => {
-      const folderId = 'non-existent';
+      const folderId = '77777777-7777-7777-7777-777777777777';
       const mockContext = createMockExecuteFunctions({
         folderId,
         updateFields: { name: 'New Name' },
@@ -1603,7 +1603,7 @@ describe('Job Operations', () => {
 
   describe('deleteFolder()', () => {
     it('should delete a folder', async () => {
-      const folderId = 'folder-123';
+      const folderId = '77777777-7777-7777-7777-777777777777';
       const mockResponse = {};
 
       const mockContext = createMockExecuteFunctions(
@@ -1625,7 +1625,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle 404 errors when deleting non-existent folder', async () => {
-      const folderId = 'non-existent';
+      const folderId = '77777777-7777-7777-7777-777777777777';
       const mockContext = createMockExecuteFunctions({ folderId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -1714,12 +1714,12 @@ describe('Job Operations', () => {
 
   describe('getKioskRelease()', () => {
     it('should fetch a single kiosk release by ID', async () => {
-      const releaseId = 'release-123';
+      const releaseId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
       const mockRelease = {
         id: releaseId,
-        jobDefinitionId: 'job-456',
+        jobDefinitionId: '88888888-8888-8888-8888-888888888888',
         targetType: 'LogicalGroup',
-        targetId: 'group-789',
+        targetId: '22222222-2222-2222-2222-222222222222',
       };
 
       const mockContext = createMockExecuteFunctions(
@@ -1742,7 +1742,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle 404 errors for non-existent kiosk releases', async () => {
-      const releaseId = 'non-existent';
+      const releaseId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
       const mockContext = createMockExecuteFunctions({ releaseId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -1757,9 +1757,9 @@ describe('Job Operations', () => {
 
   describe('createKioskRelease()', () => {
     it('should create a new kiosk release', async () => {
-      const jobDefinitionId = 'job-123';
+      const jobDefinitionId = '88888888-8888-8888-8888-888888888888';
       const targetType = 'Endpoint';
-      const targetId = 'endpoint-456';
+      const targetId = '80808080-8080-8080-8080-808080808080';
       const mockResponse = {
         id: 'release-new',
         jobDefinitionId,
@@ -1796,18 +1796,19 @@ describe('Job Operations', () => {
     it('should create kiosk release with additional fields', async () => {
       const mockResponse = {
         id: 'release-new',
-        jobDefinitionId: 'job-123',
+        jobDefinitionId: '88888888-8888-8888-8888-888888888888',
         targetType: 'LogicalGroup',
-        targetId: 'group-456',
+        targetId: '22222222-2222-2222-2222-222222222222',
         displayName: 'Self-Service Update',
         description: 'User can install updates',
       };
 
       const mockContext = createMockExecuteFunctions(
         {
-          jobDefinitionId: 'job-123',
+          jobDefinitionSelection: '88888888-8888-8888-8888-888888888888',
+          jobDefinitionId: '88888888-8888-8888-8888-888888888888',
           targetType: 'LogicalGroup',
-          targetId: 'group-456',
+          targetId: '22222222-2222-2222-2222-222222222222',
           additionalFields: {
             displayName: 'Self-Service Update',
             description: 'User can install updates',
@@ -1831,9 +1832,10 @@ describe('Job Operations', () => {
 
     it('should handle 409 errors when creating duplicate kiosk release', async () => {
       const mockContext = createMockExecuteFunctions({
-        jobDefinitionId: 'job-123',
+        jobDefinitionSelection: '88888888-8888-8888-8888-888888888888',
+        jobDefinitionId: '88888888-8888-8888-8888-888888888888',
         targetType: 'Endpoint',
-        targetId: 'endpoint-456',
+        targetId: '80808080-8080-8080-8080-808080808080',
       });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -1848,7 +1850,7 @@ describe('Job Operations', () => {
 
   describe('withdrawKioskRelease()', () => {
     it('should withdraw (delete) a kiosk release', async () => {
-      const releaseId = 'release-123';
+      const releaseId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
       const mockResponse = {};
 
       const mockContext = createMockExecuteFunctions(
@@ -1870,7 +1872,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle 404 errors when withdrawing non-existent release', async () => {
-      const releaseId = 'non-existent';
+      const releaseId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
       const mockContext = createMockExecuteFunctions({ releaseId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -2002,7 +2004,7 @@ describe('Job Operations', () => {
 
   describe('update()', () => {
     it('should update job definition with single field', async () => {
-      const jobId = 'job-123';
+      const jobId = '88888888-8888-8888-8888-888888888888';
       const newName = 'Updated Job Name';
       const mockResponse = {
         id: jobId,
@@ -2039,7 +2041,7 @@ describe('Job Operations', () => {
     });
 
     it('should update job with multiple fields', async () => {
-      const jobId = 'job-123';
+      const jobId = '88888888-8888-8888-8888-888888888888';
       const mockResponse = {
         id: jobId,
         name: 'New Name',
@@ -2075,7 +2077,7 @@ describe('Job Operations', () => {
     });
 
     it('should throw error when no fields to update', async () => {
-      const jobId = 'job-123';
+      const jobId = '88888888-8888-8888-8888-888888888888';
       const mockContext = createMockExecuteFunctions(
         { jobSelection: jobId, jobId,
         updateFields: {},
@@ -2085,7 +2087,7 @@ describe('Job Operations', () => {
     });
 
     it('should ignore empty values in update', async () => {
-      const jobId = 'job-123';
+      const jobId = '88888888-8888-8888-8888-888888888888';
       const mockResponse = { id: jobId, name: 'Name' };
 
       const mockContext = createMockExecuteFunctions(
@@ -2105,7 +2107,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle 404 errors when updating non-existent job', async () => {
-      const jobId = 'non-existent';
+      const jobId = '88888888-8888-8888-8888-888888888888';
       const mockContext = createMockExecuteFunctions(
         { jobSelection: jobId, jobId,
         updateFields: { name: 'New Name' },
@@ -2123,7 +2125,7 @@ describe('Job Operations', () => {
 
   describe('deleteJob()', () => {
     it('should delete a job definition', async () => {
-      const jobId = 'job-123';
+      const jobId = '88888888-8888-8888-8888-888888888888';
       const mockResponse = {};
 
       const mockContext = createMockExecuteFunctions({ jobSelection: jobId, jobId },
@@ -2144,7 +2146,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle 404 errors when deleting non-existent job', async () => {
-      const jobId = 'non-existent';
+      const jobId = '88888888-8888-8888-8888-888888888888';
       const mockContext = createMockExecuteFunctions({ jobSelection: jobId, jobId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -2157,7 +2159,7 @@ describe('Job Operations', () => {
     });
 
     it('should handle 409 errors when job is in use', async () => {
-      const jobId = 'job-in-use';
+      const jobId = '88888888-8888-8888-8888-888888888888';
       const mockContext = createMockExecuteFunctions({ jobSelection: jobId, jobId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -2190,95 +2192,95 @@ describe('Job Phase 8D - Folder/Group/Kiosk Navigation', () => {
   }
 
   it('getSubFolders — returns sub-folders for a folder', async () => {
-    const ctx = createCtx({ folderId: 'f-1', returnAll: false, limit: 50 }, pageResponse([{ id: 'sf-1', name: 'Sub' }]));
+    const ctx = createCtx({ folderId: '77777777-7777-7777-7777-777777777777', returnAll: false, limit: 50 }, pageResponse([{ id: 'sf-1', name: 'Sub' }]));
     const result = await getSubFolders.call(ctx, 0);
     expect(result).toHaveLength(1);
-    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/Folders/f-1/Folders') }));
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/Folders/77777777-7777-7777-7777-777777777777/Folders') }));
   });
 
   it('getJobDefinitionsByFolder — returns job defs in a folder', async () => {
-    const ctx = createCtx({ folderId: 'f-2', returnAll: false, limit: 50 }, pageResponse([{ id: 'jd-1' }, { id: 'jd-2' }]));
+    const ctx = createCtx({ folderId: '77777777-7777-7777-7777-777777777777', returnAll: false, limit: 50 }, pageResponse([{ id: 'jd-1' }, { id: 'jd-2' }]));
     const result = await getJobDefinitionsByFolder.call(ctx, 0);
     expect(result).toHaveLength(2);
-    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/Folders/f-2/JobDefinitions') }));
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/Folders/77777777-7777-7777-7777-777777777777/JobDefinitions') }));
   });
 
   it('getKioskReleasesByJobDefinition — returns kiosk releases for a job def', async () => {
-    const ctx = createCtx({ jobId: 'jd-3', returnAll: false, limit: 50 }, pageResponse([{ id: 'kr-1' }]));
+    const ctx = createCtx({ jobId: '88888888-8888-8888-8888-888888888888', returnAll: false, limit: 50 }, pageResponse([{ id: 'kr-1' }]));
     const result = await getKioskReleasesByJobDefinition.call(ctx, 0);
     expect(result).toHaveLength(1);
-    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/JobDefinitions/jd-3/KioskReleases') }));
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/JobDefinitions/88888888-8888-8888-8888-888888888888/KioskReleases') }));
   });
 
   it('getJobInstancesByLogicalGroup — returns job instances', async () => {
-    const ctx = createCtx({ logicalGroupId: 'lg-1', returnAll: false, limit: 50 }, pageResponse([{ id: 'ji-1' }]));
+    const ctx = createCtx({ logicalGroupId: '22222222-2222-2222-2222-222222222222', returnAll: false, limit: 50 }, pageResponse([{ id: 'ji-1' }]));
     const result = await getJobInstancesByLogicalGroup.call(ctx, 0);
     expect(result).toHaveLength(1);
-    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/LogicalGroups/lg-1/JobInstances') }));
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/LogicalGroups/22222222-2222-2222-2222-222222222222/JobInstances') }));
   });
 
   it('getJobInstancesByStaticGroup — returns job instances', async () => {
-    const ctx = createCtx({ staticGroupId: 'sg-1', returnAll: false, limit: 50 }, pageResponse([{ id: 'ji-2' }, { id: 'ji-3' }]));
+    const ctx = createCtx({ staticGroupId: '50505050-5050-5050-5050-505050505050', returnAll: false, limit: 50 }, pageResponse([{ id: 'ji-2' }, { id: 'ji-3' }]));
     const result = await getJobInstancesByStaticGroup.call(ctx, 0);
     expect(result).toHaveLength(2);
   });
 
   it('getJobInstancesByDynamicGroup — returns job instances', async () => {
-    const ctx = createCtx({ dynamicGroupId: 'dg-1', returnAll: false, limit: 50 }, pageResponse([{ id: 'ji-4' }]));
+    const ctx = createCtx({ dynamicGroupId: '60606060-6060-6060-6060-606060606060', returnAll: false, limit: 50 }, pageResponse([{ id: 'ji-4' }]));
     const result = await getJobInstancesByDynamicGroup.call(ctx, 0);
     expect(result).toHaveLength(1);
   });
 
   it('getJobInstancesByUDG — returns job instances', async () => {
-    const ctx = createCtx({ udgId: 'udg-1', returnAll: false, limit: 50 }, pageResponse([{ id: 'ji-5' }]));
+    const ctx = createCtx({ udgId: '70707070-7070-7070-7070-707070707070', returnAll: false, limit: 50 }, pageResponse([{ id: 'ji-5' }]));
     const result = await getJobInstancesByUDG.call(ctx, 0);
     expect(result).toHaveLength(1);
-    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/UniversalDynamicGroups/udg-1/JobInstances') }));
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/UniversalDynamicGroups/70707070-7070-7070-7070-707070707070/JobInstances') }));
   });
 
   it('assignJobToLogicalGroup — POSTs with jobDefinitionId', async () => {
-    const ctx = createCtx({ logicalGroupId: 'lg-2', jobDefinitionId: 'jd-assign' }, { success: true });
+    const ctx = createCtx({ logicalGroupId: '22222222-2222-2222-2222-222222222222', jobDefinitionId: '88888888-8888-8888-8888-888888888888' }, { success: true });
     const result = await assignJobToLogicalGroup.call(ctx, 0);
     expect(result).toHaveLength(1);
-    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'POST', url: expect.stringContaining('/jobs/v2.0/LogicalGroups/lg-2/AssignJobDefinition') }));
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'POST', url: expect.stringContaining('/jobs/v2.0/LogicalGroups/22222222-2222-2222-2222-222222222222/AssignJobDefinition') }));
   });
 
   it('assignJobToStaticGroup — POSTs with jobDefinitionId', async () => {
-    const ctx = createCtx({ staticGroupId: 'sg-2', jobDefinitionId: 'jd-assign' }, { success: true });
+    const ctx = createCtx({ staticGroupId: '50505050-5050-5050-5050-505050505050', jobDefinitionId: '88888888-8888-8888-8888-888888888888' }, { success: true });
     const result = await assignJobToStaticGroup.call(ctx, 0);
     expect(result).toHaveLength(1);
   });
 
   it('assignJobToDynamicGroup — POSTs with jobDefinitionId', async () => {
-    const ctx = createCtx({ dynamicGroupId: 'dg-2', jobDefinitionId: 'jd-assign' }, { success: true });
+    const ctx = createCtx({ dynamicGroupId: '60606060-6060-6060-6060-606060606060', jobDefinitionId: '88888888-8888-8888-8888-888888888888' }, { success: true });
     const result = await assignJobToDynamicGroup.call(ctx, 0);
     expect(result).toHaveLength(1);
   });
 
   it('assignJobToUDG — POSTs with jobDefinitionId', async () => {
-    const ctx = createCtx({ udgId: 'udg-2', jobDefinitionId: 'jd-assign' }, { success: true });
+    const ctx = createCtx({ udgId: '70707070-7070-7070-7070-707070707070', jobDefinitionId: '88888888-8888-8888-8888-888888888888' }, { success: true });
     const result = await assignJobToUDG.call(ctx, 0);
     expect(result).toHaveLength(1);
-    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/UniversalDynamicGroups/udg-2/AssignJobDefinition') }));
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/UniversalDynamicGroups/70707070-7070-7070-7070-707070707070/AssignJobDefinition') }));
   });
 
   it('getKioskReleasesByEndpoint — returns kiosk releases', async () => {
-    const ctx = createCtx({ endpointId: 'ep-1', returnAll: false, limit: 50 }, pageResponse([{ id: 'kr-2' }]));
+    const ctx = createCtx({ endpointId: '11111111-1111-1111-1111-111111111111', returnAll: false, limit: 50 }, pageResponse([{ id: 'kr-2' }]));
     const result = await getKioskReleasesByEndpoint.call(ctx, 0);
     expect(result).toHaveLength(1);
-    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/Endpoints/ep-1/KioskReleases') }));
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/Endpoints/11111111-1111-1111-1111-111111111111/KioskReleases') }));
   });
 
   it('getKioskReleasesByLogicalGroup — returns kiosk releases', async () => {
-    const ctx = createCtx({ logicalGroupId: 'lg-3', returnAll: false, limit: 50 }, pageResponse([{ id: 'kr-3' }, { id: 'kr-4' }]));
+    const ctx = createCtx({ logicalGroupId: '22222222-2222-2222-2222-222222222222', returnAll: false, limit: 50 }, pageResponse([{ id: 'kr-3' }, { id: 'kr-4' }]));
     const result = await getKioskReleasesByLogicalGroup.call(ctx, 0);
     expect(result).toHaveLength(2);
   });
 
   it('getKioskReleasesByADObject — returns kiosk releases', async () => {
-    const ctx = createCtx({ adObjectId: 'obj-1', returnAll: false, limit: 50 }, pageResponse([{ id: 'kr-5' }]));
+    const ctx = createCtx({ adObjectId: '66666666-6666-6666-6666-666666666666', returnAll: false, limit: 50 }, pageResponse([{ id: 'kr-5' }]));
     const result = await getKioskReleasesByADObject.call(ctx, 0);
     expect(result).toHaveLength(1);
-    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/ADObjects/obj-1/KioskReleases') }));
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/ADObjects/66666666-6666-6666-6666-666666666666/KioskReleases') }));
   });
 });

@@ -1,5 +1,7 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../transport/requestApi';
+import { validateGuid } from '../../utils/validation';
 
 // ============================================================================
 // VARIABLE DEFINITIONS OPERATIONS
@@ -55,6 +57,10 @@ export async function getVariableDefinition(
 	index: number,
 ): Promise<INodeExecutionData[]> {
 	const variableDefinitionId = this.getNodeParameter('variableDefinitionId', index) as string;
+	const _variableDefinitionIdValidation = validateGuid(variableDefinitionId);
+	if (!_variableDefinitionIdValidation.valid) {
+		throw new NodeOperationError(this.getNode(), _variableDefinitionIdValidation.errors.join(', '), { itemIndex: index });
+	}
 	const response = await apiRequest.call(
 		this,
 		'GET',
@@ -91,6 +97,10 @@ export async function updateVariableDefinition(
 	index: number,
 ): Promise<INodeExecutionData[]> {
 	const variableDefinitionId = this.getNodeParameter('variableDefinitionId', index) as string;
+	const _variableDefinitionIdValidation = validateGuid(variableDefinitionId);
+	if (!_variableDefinitionIdValidation.valid) {
+		throw new NodeOperationError(this.getNode(), _variableDefinitionIdValidation.errors.join(', '), { itemIndex: index });
+	}
 	const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
 	// Build JSON Patch document for PATCH request
@@ -131,6 +141,10 @@ export async function deleteVariableDefinition(
 	index: number,
 ): Promise<INodeExecutionData[]> {
 	const variableDefinitionId = this.getNodeParameter('variableDefinitionId', index) as string;
+	const _variableDefinitionIdValidation = validateGuid(variableDefinitionId);
+	if (!_variableDefinitionIdValidation.valid) {
+		throw new NodeOperationError(this.getNode(), _variableDefinitionIdValidation.errors.join(', '), { itemIndex: index });
+	}
 	await apiRequest.call(
 		this,
 		'DELETE',
@@ -196,6 +210,10 @@ export async function getVariableInstance(
 	index: number,
 ): Promise<INodeExecutionData[]> {
 	const variableInstanceId = this.getNodeParameter('variableInstanceId', index) as string;
+	const _variableInstanceIdValidation = validateGuid(variableInstanceId);
+	if (!_variableInstanceIdValidation.valid) {
+		throw new NodeOperationError(this.getNode(), _variableInstanceIdValidation.errors.join(', '), { itemIndex: index });
+	}
 	const response = await apiRequest.call(
 		this,
 		'GET',
@@ -209,6 +227,10 @@ export async function updateVariableInstance(
 	index: number,
 ): Promise<INodeExecutionData[]> {
 	const variableInstanceId = this.getNodeParameter('variableInstanceId', index) as string;
+	const _variableInstanceIdValidation = validateGuid(variableInstanceId);
+	if (!_variableInstanceIdValidation.valid) {
+		throw new NodeOperationError(this.getNode(), _variableInstanceIdValidation.errors.join(', '), { itemIndex: index });
+	}
 	const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
 	// Build JSON Patch document for PATCH request
@@ -253,6 +275,10 @@ export async function getVariableInstancesByEndpoint(
 	index: number,
 ): Promise<INodeExecutionData[]> {
 	const endpointId = this.getNodeParameter('endpointId', index) as string;
+	const _endpointIdValidation = validateGuid(endpointId);
+	if (!_endpointIdValidation.valid) {
+		throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
+	}
 	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
 	const limit = this.getNodeParameter('limit', index, 50) as number;
 	const options = this.getNodeParameter('options', index, {}) as {
@@ -299,6 +325,10 @@ export async function getVariableInstancesByLogicalGroup(
 	index: number,
 ): Promise<INodeExecutionData[]> {
 	const logicalGroupId = this.getNodeParameter('logicalGroupId', index) as string;
+	const _logicalGroupIdValidation = validateGuid(logicalGroupId);
+	if (!_logicalGroupIdValidation.valid) {
+		throw new NodeOperationError(this.getNode(), _logicalGroupIdValidation.errors.join(', '), { itemIndex: index });
+	}
 	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
 	const limit = this.getNodeParameter('limit', index, 50) as number;
 	const options = this.getNodeParameter('options', index, {}) as {
@@ -345,6 +375,10 @@ export async function getVariableInstancesByADObject(
 	index: number,
 ): Promise<INodeExecutionData[]> {
 	const adObjectId = this.getNodeParameter('adObjectId', index) as string;
+	const _adObjectIdValidation = validateGuid(adObjectId);
+	if (!_adObjectIdValidation.valid) {
+		throw new NodeOperationError(this.getNode(), _adObjectIdValidation.errors.join(', '), { itemIndex: index });
+	}
 	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
 	const limit = this.getNodeParameter('limit', index, 50) as number;
 	const options = this.getNodeParameter('options', index, {}) as {
@@ -395,6 +429,10 @@ export async function getVariableInstancesByApplication(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const applicationId = this.getNodeParameter('applicationId', index) as string;
+  const _applicationIdValidation = validateGuid(applicationId);
+  if (!_applicationIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _applicationIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const qs: Record<string, string | number> = {};
@@ -413,6 +451,10 @@ export async function getVariableInstancesByJobDefinition(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const jobDefinitionId = this.getNodeParameter('jobDefinitionId', index) as string;
+  const _jobDefinitionIdValidation = validateGuid(jobDefinitionId);
+  if (!_jobDefinitionIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _jobDefinitionIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const qs: Record<string, string | number> = {};

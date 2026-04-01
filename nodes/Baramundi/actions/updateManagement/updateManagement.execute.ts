@@ -1,5 +1,7 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../transport/requestApi';
+import { validateGuid } from '../../utils/validation';
 
 export async function getWindowsEndpoints(
 	this: IExecuteFunctions,
@@ -30,6 +32,10 @@ export async function getWindowsEndpoint(
 	index: number,
 ): Promise<INodeExecutionData[]> {
 	const endpointId = this.getNodeParameter('endpointId', index) as string;
+	const _endpointIdValidation = validateGuid(endpointId);
+	if (!_endpointIdValidation.valid) {
+		throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
+	}
 	const response = await apiRequest.call(this, 'GET', `/updatemanagement/v2.0/WindowsEndpoints/${endpointId}`);
 	return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -39,6 +45,10 @@ export async function updateWindowsEndpoint(
 	index: number,
 ): Promise<INodeExecutionData[]> {
 	const endpointId = this.getNodeParameter('endpointId', index) as string;
+	const _endpointIdValidation = validateGuid(endpointId);
+	if (!_endpointIdValidation.valid) {
+		throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
+	}
 	const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
 	const patchOperations: Array<{ op: string; path: string; value: unknown }> = [];

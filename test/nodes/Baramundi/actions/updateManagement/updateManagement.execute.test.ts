@@ -22,7 +22,7 @@ describe('Update Management Operations', () => {
 
 	it('should fetch single Windows endpoint update info', async () => {
 		const mockEndpoint = { id: 'ep-123', displayName: 'PC-001', updateProfileId: 'profile-1' };
-		const mockContext = createMockExecuteFunctions({ endpointId: 'ep-123' }, {}, mockEndpoint);
+		const mockContext = createMockExecuteFunctions({ endpointId: '11111111-1111-1111-1111-111111111111' }, {}, mockEndpoint);
 		const result = await updateManagement.getWindowsEndpoint.call(mockContext, 0);
 		expect(result).toHaveLength(1);
 		expect(result[0].json.updateProfileId).toBe('profile-1');
@@ -30,14 +30,14 @@ describe('Update Management Operations', () => {
 
 	it('should update Windows endpoint update config', async () => {
 		const mockUpdated = { id: 'ep-123', updateProfileId: 'profile-new' };
-		const mockContext = createMockExecuteFunctions({ endpointId: 'ep-123', updateFields: { updateProfileId: 'profile-new' } }, {}, mockUpdated);
+		const mockContext = createMockExecuteFunctions({ endpointId: '11111111-1111-1111-1111-111111111111', updateFields: { updateProfileId: 'profile-new' } }, {}, mockUpdated);
 		const result = await updateManagement.updateWindowsEndpoint.call(mockContext, 0);
 		expect(result).toHaveLength(1);
 		expect(result[0].json.updateProfileId).toBe('profile-new');
 	});
 
 	it('should throw error when no fields to update', async () => {
-		const mockContext = createMockExecuteFunctions({ endpointId: 'ep-123', updateFields: {} });
+		const mockContext = createMockExecuteFunctions({ endpointId: '11111111-1111-1111-1111-111111111111', updateFields: {} });
 		await expect(updateManagement.updateWindowsEndpoint.call(mockContext, 0)).rejects.toThrow('No fields to update');
 	});
 });

@@ -2920,7 +2920,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
 
   describe('getEndpointMaintenanceWindow()', () => {
     it('should fetch the maintenance window for an endpoint', async () => {
-      const endpointId = 'ep-123';
+      const endpointId = '11111111-1111-1111-1111-111111111111';
       const mockMW = { id: 'mw-1', startTime: '08:00', endTime: '10:00' };
       const ctx = createMockExecuteFunctions({ endpointId }, {}, mockMW);
 
@@ -2936,7 +2936,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
 
   describe('getGroupMaintenanceWindow()', () => {
     it('should fetch the maintenance window for a logical group', async () => {
-      const logicalGroupId = 'lg-456';
+      const logicalGroupId = '22222222-2222-2222-2222-222222222222';
       const mockMW = { id: 'mw-2', startTime: '09:00', endTime: '11:00' };
       const ctx = createMockExecuteFunctions({ logicalGroupId }, {}, mockMW);
 
@@ -2951,7 +2951,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
 
   describe('getLogicalGroupSubGroups()', () => {
     it('should fetch sub-groups of a logical group', async () => {
-      const logicalGroupId = 'lg-parent';
+      const logicalGroupId = '22222222-2222-2222-2222-222222222222';
       const ctx = createMockExecuteFunctions(
         { logicalGroupId, returnAll: false, limit: 50 },
         {},
@@ -2969,7 +2969,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
 
   describe('getEndpointsByLogicalGroup()', () => {
     it('should fetch endpoints in a logical group', async () => {
-      const logicalGroupId = 'lg-789';
+      const logicalGroupId = '22222222-2222-2222-2222-222222222222';
       const ctx = createMockExecuteFunctions(
         { logicalGroupId, returnAll: false, limit: 50 },
         {},
@@ -2987,7 +2987,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
 
   describe('getEndpointsByStaticGroup()', () => {
     it('should fetch endpoints in a static group', async () => {
-      const staticGroupId = 'sg-abc';
+      const staticGroupId = '50505050-5050-5050-5050-505050505050';
       const ctx = createMockExecuteFunctions(
         { staticGroupId, returnAll: false, limit: 50 },
         {},
@@ -3005,7 +3005,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
 
   describe('getEndpointsByDynamicGroup()', () => {
     it('should fetch endpoints in a dynamic group', async () => {
-      const dynamicGroupId = 'dg-def';
+      const dynamicGroupId = '60606060-6060-6060-6060-606060606060';
       const ctx = createMockExecuteFunctions(
         { dynamicGroupId, returnAll: false, limit: 50 },
         {},
@@ -3023,7 +3023,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
 
   describe('getEndpointsByUDG()', () => {
     it('should fetch endpoints in a Universal Dynamic Group (26R1+)', async () => {
-      const udgId = 'udg-ghi';
+      const udgId = '70707070-7070-7070-7070-707070707070';
       const ctx = createMockExecuteFunctions(
         { udgId, returnAll: false, limit: 50 },
         {},
@@ -3041,7 +3041,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
 
   describe('getEndpointsByADUser()', () => {
     it('should fetch endpoints assigned to an AD user', async () => {
-      const adUserId = 'user-jkl';
+      const adUserId = '55555555-5555-5555-5555-555555555555';
       const ctx = createMockExecuteFunctions(
         { adUserId, returnAll: false, limit: 50 },
         {},

@@ -129,7 +129,7 @@ describe('Defense Control Operations', () => {
 
     describe('getBitLockerWindowsEndpoint()', () => {
       it('should fetch a single BitLocker endpoint by ID', async () => {
-        const endpointId = 'ep-123';
+        const endpointId = '11111111-1111-1111-1111-111111111111';
         const mockEndpoint = {
           id: endpointId,
           name: 'WS-001',
@@ -152,7 +152,7 @@ describe('Defense Control Operations', () => {
       });
 
       it('should handle 404 errors for non-existent endpoints', async () => {
-        const endpointId = 'non-existent';
+        const endpointId = '11111111-1111-1111-1111-111111111111';
         const mockContext = createMockExecuteFunctions({ endpointId });
 
         mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -169,7 +169,7 @@ describe('Defense Control Operations', () => {
   describe('Local Administrative Accounts Operations', () => {
     describe('getLocalAdministrativeAccounts()', () => {
       it('should fetch local admin accounts for an endpoint', async () => {
-        const endpointId = 'ep-123';
+        const endpointId = '11111111-1111-1111-1111-111111111111';
         const mockAccounts = {
           endpointId,
           accounts: [
@@ -194,7 +194,7 @@ describe('Defense Control Operations', () => {
 
     describe('triggerLocalAdminAccountsUpdate()', () => {
       it('should trigger update on client', async () => {
-        const endpointId = 'ep-123';
+        const endpointId = '11111111-1111-1111-1111-111111111111';
         const mockContext = createMockExecuteFunctions({ endpointId }, {}, true);
         const result = await triggerLocalAdminAccountsUpdate.call(mockContext, 0);
 
@@ -210,7 +210,7 @@ describe('Defense Control Operations', () => {
 
     describe('patchLocalAdminUserCredentials()', () => {
       it('should update local admin credentials', async () => {
-        const endpointId = 'ep-123';
+        const endpointId = '11111111-1111-1111-1111-111111111111';
         const mockUpdated = {
           endpointId,
           accounts: [{ username: 'Administrator', expiryDate: '2025-12-31' }],
@@ -270,7 +270,7 @@ describe('Defense Control Operations', () => {
 
     describe('getMicrosoftDefenderThreat()', () => {
       it('should fetch a single threat by ID', async () => {
-        const threatId = 'threat-123';
+        const threatId = '40404040-4040-4040-4040-404040404040';
         const mockThreat = {
           id: threatId,
           name: 'Trojan.Generic',
@@ -293,7 +293,7 @@ describe('Defense Control Operations', () => {
 
     describe('getMicrosoftDefenderThreatsByEndpoint()', () => {
       it('should fetch threats for a specific endpoint', async () => {
-        const endpointId = 'ep-123';
+        const endpointId = '11111111-1111-1111-1111-111111111111';
         const mockThreats = {
           currentPage: 0,
           pageSize: 50,
@@ -322,7 +322,7 @@ describe('Defense Control Operations', () => {
 
     describe('getMicrosoftDefenderThreatsByLogicalGroup()', () => {
       it('should fetch threats for a logical group', async () => {
-        const logicalGroupId = 'lg-123';
+        const logicalGroupId = '22222222-2222-2222-2222-222222222222';
         const mockThreats = {
           currentPage: 0,
           pageSize: 50,
@@ -382,7 +382,7 @@ describe('Defense Control Operations', () => {
 
     describe('getMicrosoftDefenderWindowsEndpoint()', () => {
       it('should fetch a single Defender endpoint by ID', async () => {
-        const endpointId = 'ep-123';
+        const endpointId = '11111111-1111-1111-1111-111111111111';
         const mockEndpoint = {
           id: endpointId,
           name: 'WS-001',
@@ -408,9 +408,9 @@ describe('Defense Control Operations', () => {
 
   describe('Credential Configuration', () => {
     it('should use correct base URL from credentials', async () => {
-      const mockEndpoint = { id: 'ep-1', name: 'Test' };
+      const mockEndpoint = { id: '11111111-1111-1111-1111-111111111111', name: 'Test' };
       const mockContext = createMockExecuteFunctions(
-        { endpointId: 'ep-1' },
+        { endpointId: '11111111-1111-1111-1111-111111111111' },
         { baseUrl: 'https://custom-bms-server:443/bconnect' },
         mockEndpoint,
       );
@@ -425,9 +425,9 @@ describe('Defense Control Operations', () => {
     });
 
     it('should use SSL skip option from credentials', async () => {
-      const mockEndpoint = { id: 'ep-1', name: 'Test' };
+      const mockEndpoint = { id: '11111111-1111-1111-1111-111111111111', name: 'Test' };
       const mockContext = createMockExecuteFunctions(
-        { endpointId: 'ep-1' },
+        { endpointId: '11111111-1111-1111-1111-111111111111' },
         { ignoreSslIssues: true },
         mockEndpoint,
       );

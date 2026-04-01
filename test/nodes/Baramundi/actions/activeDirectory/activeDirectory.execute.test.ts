@@ -168,7 +168,7 @@ describe('Active Directory Operations', () => {
 
   describe('getADGroup()', () => {
     it('should fetch a single AD group by ID', async () => {
-      const adGroupId = 'group-123';
+      const adGroupId = '33333333-3333-3333-3333-333333333333';
       const mockADGroup = {
         id: adGroupId,
         name: 'IT-Department',
@@ -197,7 +197,7 @@ describe('Active Directory Operations', () => {
     });
 
     it('should handle 404 errors for non-existent AD groups', async () => {
-      const adGroupId = 'non-existent';
+      const adGroupId = '33333333-3333-3333-3333-333333333333';
       const mockContext = createMockExecuteFunctions({ adGroupId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -212,7 +212,7 @@ describe('Active Directory Operations', () => {
 
   describe('getADGroupsByOrgUnit()', () => {
     it('should fetch AD groups for a specific organizational unit', async () => {
-      const orgUnitId = 'ou-456';
+      const orgUnitId = '44444444-4444-4444-4444-444444444444';
       const mockADGroups = {
         currentPage: 0,
         pageSize: 50,
@@ -247,7 +247,7 @@ describe('Active Directory Operations', () => {
 
   describe('getADUsersByGroup()', () => {
     it('should fetch AD users for a specific group', async () => {
-      const adGroupId = 'group-789';
+      const adGroupId = '33333333-3333-3333-3333-333333333333';
       const mockADUsers = {
         currentPage: 0,
         pageSize: 50,
@@ -363,7 +363,7 @@ describe('Active Directory Operations', () => {
 
   describe('getADUser()', () => {
     it('should fetch a single AD user by ID', async () => {
-      const adUserId = 'user-123';
+      const adUserId = '55555555-5555-5555-5555-555555555555';
       const mockADUser = {
         id: adUserId,
         name: 'John Doe',
@@ -394,7 +394,7 @@ describe('Active Directory Operations', () => {
     });
 
     it('should handle 404 errors for non-existent AD users', async () => {
-      const adUserId = 'non-existent';
+      const adUserId = '55555555-5555-5555-5555-555555555555';
       const mockContext = createMockExecuteFunctions({ adUserId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -449,7 +449,7 @@ describe('Active Directory Operations', () => {
 
   describe('getADObject()', () => {
     it('should fetch a single AD object by ID', async () => {
-      const adObjectId = 'obj-123';
+      const adObjectId = '66666666-6666-6666-6666-666666666666';
       const mockADObject = {
         id: adObjectId,
         name: 'Server-DC01',
@@ -478,7 +478,7 @@ describe('Active Directory Operations', () => {
     });
 
     it('should handle 404 errors for non-existent AD objects', async () => {
-      const adObjectId = 'non-existent';
+      const adObjectId = '66666666-6666-6666-6666-666666666666';
       const mockContext = createMockExecuteFunctions({ adObjectId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -573,7 +573,7 @@ describe('Active Directory Operations', () => {
 
   describe('getOrgUnit()', () => {
     it('should fetch a single organizational unit by ID', async () => {
-      const orgUnitId = 'ou-123';
+      const orgUnitId = '44444444-4444-4444-4444-444444444444';
       const mockOrgUnit = {
         id: orgUnitId,
         name: 'IT-Department',
@@ -602,7 +602,7 @@ describe('Active Directory Operations', () => {
     });
 
     it('should handle 404 errors for non-existent OUs', async () => {
-      const orgUnitId = 'non-existent';
+      const orgUnitId = '44444444-4444-4444-4444-444444444444';
       const mockContext = createMockExecuteFunctions({ orgUnitId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -621,7 +621,7 @@ describe('Active Directory Operations', () => {
 
   describe('getADGroupsByADGroup()', () => {
     it('should fetch AD sub-groups in an AD group with pagination', async () => {
-      const adGroupId = 'group-parent-1';
+      const adGroupId = '33333333-3333-3333-3333-333333333333';
       const mockResponse = {
         currentPage: 0, pageSize: 50, totalPages: 1, totalItems: 2,
         hasPreviousPage: false, hasNextPage: false,
@@ -648,7 +648,7 @@ describe('Active Directory Operations', () => {
     });
 
     it('should fetch all AD sub-groups when returnAll is true', async () => {
-      const adGroupId = 'group-parent-1';
+      const adGroupId = '33333333-3333-3333-3333-333333333333';
       const mockPage1 = {
         currentPage: 0, pageSize: 2, totalPages: 2, totalItems: 3,
         hasPreviousPage: false, hasNextPage: true,
@@ -673,7 +673,7 @@ describe('Active Directory Operations', () => {
 
   describe('getADObjectsByADGroup()', () => {
     it('should fetch AD objects in an AD group with pagination', async () => {
-      const adGroupId = 'group-1';
+      const adGroupId = '33333333-3333-3333-3333-333333333333';
       const mockResponse = {
         currentPage: 0, pageSize: 50, totalPages: 1, totalItems: 2,
         hasPreviousPage: false, hasNextPage: false,
@@ -702,7 +702,7 @@ describe('Active Directory Operations', () => {
 
   describe('getADObjectMemberships()', () => {
     it('should fetch group memberships of an AD object', async () => {
-      const adObjectId = 'obj-123';
+      const adObjectId = '66666666-6666-6666-6666-666666666666';
       const mockResponse = {
         currentPage: 0, pageSize: 50, totalPages: 1, totalItems: 2,
         hasPreviousPage: false, hasNextPage: false,
@@ -731,7 +731,7 @@ describe('Active Directory Operations', () => {
 
   describe('getADObjectsByOrgUnit()', () => {
     it('should fetch AD objects in an organizational unit', async () => {
-      const orgUnitId = 'ou-123';
+      const orgUnitId = '44444444-4444-4444-4444-444444444444';
       const mockResponse = {
         currentPage: 0, pageSize: 50, totalPages: 1, totalItems: 2,
         hasPreviousPage: false, hasNextPage: false,
@@ -760,7 +760,7 @@ describe('Active Directory Operations', () => {
 
   describe('getADUsersByOrgUnit()', () => {
     it('should fetch AD users in an organizational unit', async () => {
-      const orgUnitId = 'ou-456';
+      const orgUnitId = '44444444-4444-4444-4444-444444444444';
       const mockResponse = {
         currentPage: 0, pageSize: 50, totalPages: 1, totalItems: 2,
         hasPreviousPage: false, hasNextPage: false,
@@ -789,7 +789,7 @@ describe('Active Directory Operations', () => {
 
   describe('getOrgUnitsByOrgUnit()', () => {
     it('should fetch sub-OUs in an organizational unit', async () => {
-      const orgUnitId = 'ou-789';
+      const orgUnitId = '44444444-4444-4444-4444-444444444444';
       const mockResponse = {
         currentPage: 0, pageSize: 50, totalPages: 1, totalItems: 2,
         hasPreviousPage: false, hasNextPage: false,
@@ -818,7 +818,7 @@ describe('Active Directory Operations', () => {
 
   describe('Credential Configuration', () => {
     it('should use correct base URL from credentials', async () => {
-      const adGroupId = 'group-123';
+      const adGroupId = '33333333-3333-3333-3333-333333333333';
       const mockADGroup = { id: adGroupId, name: 'Test Group' };
 
       const mockContext = createMockExecuteFunctions(
@@ -837,7 +837,7 @@ describe('Active Directory Operations', () => {
     });
 
     it('should use SSL skip option from credentials', async () => {
-      const adGroupId = 'group-123';
+      const adGroupId = '33333333-3333-3333-3333-333333333333';
       const mockADGroup = { id: adGroupId, name: 'Test Group' };
 
       const mockContext = createMockExecuteFunctions(

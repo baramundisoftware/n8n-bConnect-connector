@@ -84,7 +84,7 @@ describe('Asset Operations', () => {
     });
 
     it('should handle 404 errors for non-existent assets', async () => {
-      const assetId = 'non-existent-asset-id';
+      const assetId = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee';
       const mockContext = createMockExecuteFunctions({ assetId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -308,7 +308,7 @@ describe('Asset Operations', () => {
 
   describe('create()', () => {
     it('should create an asset with required fields only', async () => {
-      const assetTypeId = 'asset-type-123';
+      const assetTypeId = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
       const displayName = 'Test Laptop';
       const mockCreatedAsset = {
         id: '12345678-1234-1234-1234-123456789abc',
@@ -346,7 +346,7 @@ describe('Asset Operations', () => {
     });
 
     it('should create an asset with all additional fields', async () => {
-      const assetTypeId = 'asset-type-123';
+      const assetTypeId = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
       const displayName = 'Dell Latitude 7490';
       const additionalFields = {
         comment: 'Assigned to IT department',
@@ -396,7 +396,7 @@ describe('Asset Operations', () => {
 
     it('should handle errors when creating asset with invalid type', async () => {
       const mockContext = createMockExecuteFunctions({
-        assetTypeId: 'invalid-type-id',
+        assetTypeId: 'ffffffff-ffff-ffff-ffff-ffffffffffff',
         displayName: 'Test Asset',
         additionalFields: {},
       });
@@ -759,7 +759,7 @@ describe('Asset Operations', () => {
 
   describe('getAssetType()', () => {
     it('should fetch a single asset type by ID', async () => {
-      const assetTypeId = 'type-123';
+      const assetTypeId = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
       const mockAssetType = {
         id: assetTypeId,
         name: 'Laptop',
@@ -787,7 +787,7 @@ describe('Asset Operations', () => {
     });
 
     it('should handle 404 errors for non-existent asset types', async () => {
-      const assetTypeId = 'non-existent';
+      const assetTypeId = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
       const mockContext = createMockExecuteFunctions({ assetTypeId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
@@ -852,7 +852,7 @@ describe('Asset Operations', () => {
 
   describe('deleteAssetType()', () => {
     it('should delete an asset type', async () => {
-      const assetTypeId = 'type-123';
+      const assetTypeId = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
       const mockContext = createMockExecuteFunctions(
         { assetTypeId },
         {},
@@ -878,7 +878,7 @@ describe('Asset Operations', () => {
 
   describe('getAssetsByEndpoint()', () => {
     it('should fetch assets for a specific endpoint', async () => {
-      const endpointId = 'endpoint-456';
+      const endpointId = '11111111-1111-1111-1111-111111111111';
       const mockAssets = {
         currentPage: 0,
         pageSize: 50,
@@ -913,7 +913,7 @@ describe('Asset Operations', () => {
 
   describe('getAssetsByLogicalGroup()', () => {
     it('should fetch assets for a logical group', async () => {
-      const logicalGroupId = 'group-789';
+      const logicalGroupId = '22222222-2222-2222-2222-222222222222';
       const mockAssets = {
         currentPage: 0,
         pageSize: 50,
@@ -1050,7 +1050,7 @@ describe('Asset Operations', () => {
 
   describe('updateAssetStockFolder()', () => {
     it('should update a stock folder', async () => {
-      const folderId = 'folder-123';
+      const folderId = '77777777-7777-7777-7777-777777777777';
       const newName = 'Updated Warehouse';
       const mockResponse = { id: folderId, name: newName };
 
@@ -1074,7 +1074,7 @@ describe('Asset Operations', () => {
     });
 
     it('should throw error when no fields to update', async () => {
-      const folderId = 'folder-123';
+      const folderId = '77777777-7777-7777-7777-777777777777';
       const mockContext = createMockExecuteFunctions({
         folderId,
         updateFields: {},
@@ -1086,7 +1086,7 @@ describe('Asset Operations', () => {
 
   describe('deleteAssetStockFolder()', () => {
     it('should delete a stock folder', async () => {
-      const folderId = 'folder-123';
+      const folderId = '77777777-7777-7777-7777-777777777777';
       const mockContext = createMockExecuteFunctions(
         { folderId },
         {},
@@ -1144,7 +1144,7 @@ describe('Asset Phase 4 - AD Object and OrgUnit Operations', () => {
 
   describe('getAssetStockFolder()', () => {
     it('should fetch a single asset stock folder by ID', async () => {
-      const folderId = 'folder-123';
+      const folderId = '77777777-7777-7777-7777-777777777777';
       const mockFolder = { id: folderId, name: 'Stock Folder A' };
       const mockContext = createMockExecuteFunctions({ folderId }, {}, mockFolder);
 
@@ -1160,7 +1160,7 @@ describe('Asset Phase 4 - AD Object and OrgUnit Operations', () => {
 
   describe('getAssetStockSubFolders()', () => {
     it('should fetch sub-folders of an asset stock folder', async () => {
-      const folderId = 'folder-parent';
+      const folderId = '77777777-7777-7777-7777-777777777777';
       const mockContext = createMockExecuteFunctions(
         { folderId, returnAll: false, limit: 50 },
         {},
@@ -1195,7 +1195,7 @@ describe('Asset Phase 4 - AD Object and OrgUnit Operations', () => {
 
   describe('getAssetTypeFolder()', () => {
     it('should fetch a single asset type folder by ID', async () => {
-      const assetTypeFolderId = 'atf-123';
+      const assetTypeFolderId = '90909090-9090-9090-9090-909090909090';
       const mockFolder = { id: assetTypeFolderId, name: 'Type Folder X' };
       const mockContext = createMockExecuteFunctions({ assetTypeFolderId }, {}, mockFolder);
 
@@ -1228,7 +1228,7 @@ describe('Asset Phase 4 - AD Object and OrgUnit Operations', () => {
 
   describe('updateAssetTypeFolder()', () => {
     it('should update an asset type folder via PATCH', async () => {
-      const assetTypeFolderId = 'atf-456';
+      const assetTypeFolderId = '90909090-9090-9090-9090-909090909090';
       const mockFolder = { id: assetTypeFolderId, name: 'Updated Folder' };
       const mockContext = createMockExecuteFunctions(
         { assetTypeFolderId, updateFields: { name: 'Updated Folder' } },
@@ -1245,7 +1245,7 @@ describe('Asset Phase 4 - AD Object and OrgUnit Operations', () => {
     });
 
     it('should throw when no update fields provided', async () => {
-      const assetTypeFolderId = 'atf-456';
+      const assetTypeFolderId = '90909090-9090-9090-9090-909090909090';
       const mockContext = createMockExecuteFunctions(
         { assetTypeFolderId, updateFields: {} }, {}, {},
       );
@@ -1256,7 +1256,7 @@ describe('Asset Phase 4 - AD Object and OrgUnit Operations', () => {
 
   describe('deleteAssetTypeFolder()', () => {
     it('should delete an asset type folder', async () => {
-      const assetTypeFolderId = 'atf-789';
+      const assetTypeFolderId = '90909090-9090-9090-9090-909090909090';
       const mockContext = createMockExecuteFunctions({ assetTypeFolderId }, {}, {});
 
       const result = await deleteAssetTypeFolder.call(mockContext, 0);
@@ -1271,7 +1271,7 @@ describe('Asset Phase 4 - AD Object and OrgUnit Operations', () => {
 
   describe('getAssetTypeFolderSubFolders()', () => {
     it('should fetch sub-folders of an asset type folder', async () => {
-      const assetTypeFolderId = 'atf-parent';
+      const assetTypeFolderId = '90909090-9090-9090-9090-909090909090';
       const mockContext = createMockExecuteFunctions(
         { assetTypeFolderId, returnAll: false, limit: 50 },
         {},

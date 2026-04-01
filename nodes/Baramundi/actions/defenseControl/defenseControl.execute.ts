@@ -1,7 +1,7 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../transport/requestApi';
-import { validateRfc6902Patch } from '../../utils/validation';
+import { validateGuid, validateRfc6902Patch } from '../../utils/validation';
 
 // ============================================================================
 // BITLOCKER OPERATIONS
@@ -45,6 +45,10 @@ export async function getBitLockerWindowsEndpoint(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const _endpointIdValidation = validateGuid(endpointId);
+  if (!_endpointIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/defensecontrol/v2.0/BitLocker/WindowsEndpoints/${endpointId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -58,6 +62,10 @@ export async function getLocalAdministrativeAccounts(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const _endpointIdValidation = validateGuid(endpointId);
+  if (!_endpointIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/defensecontrol/v2.0/LocalAdministrativeAccounts/WindowsEndpoints/${endpointId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -67,6 +75,10 @@ export async function triggerLocalAdminAccountsUpdate(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const _endpointIdValidation = validateGuid(endpointId);
+  if (!_endpointIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
+  }
   await apiRequest.call(this, 'POST', `/defensecontrol/v2.0/LocalAdministrativeAccounts/WindowsEndpoints/${endpointId}/TriggerUpdateOnClient`);
   return this.helpers.returnJsonArray({ success: true, endpointId });
 }
@@ -76,6 +88,10 @@ export async function patchLocalAdminUserCredentials(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const _endpointIdValidation = validateGuid(endpointId);
+  if (!_endpointIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
   // Build JSON Patch document for PATCH request
@@ -141,6 +157,10 @@ export async function getMicrosoftDefenderThreat(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const threatId = this.getNodeParameter('threatId', index) as string;
+  const _threatIdValidation = validateGuid(threatId);
+  if (!_threatIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _threatIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/defensecontrol/v2.0/MicrosoftDefender/Threats/${threatId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -150,6 +170,10 @@ export async function getMicrosoftDefenderThreatsByEndpoint(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const _endpointIdValidation = validateGuid(endpointId);
+  if (!_endpointIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as {
@@ -196,6 +220,10 @@ export async function getMicrosoftDefenderThreatsByLogicalGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const logicalGroupId = this.getNodeParameter('logicalGroupId', index) as string;
+  const _logicalGroupIdValidation = validateGuid(logicalGroupId);
+  if (!_logicalGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _logicalGroupIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as {
@@ -279,6 +307,10 @@ export async function getMicrosoftDefenderWindowsEndpoint(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const _endpointIdValidation = validateGuid(endpointId);
+  if (!_endpointIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/defensecontrol/v2.0/MicrosoftDefender/WindowsEndpoints/${endpointId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -292,6 +324,10 @@ export async function getBitLockerSecrets(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const _endpointIdValidation = validateGuid(endpointId);
+  if (!_endpointIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/defensecontrol/v2.0/BitLocker/WindowsEndpoints/${endpointId}/Secrets`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -301,6 +337,10 @@ export async function patchBitLockerSecrets(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const _endpointIdValidation = validateGuid(endpointId);
+  if (!_endpointIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const patchOperations = this.getNodeParameter('patchOperations', index) as string;
 
   let body: IDataObject[];

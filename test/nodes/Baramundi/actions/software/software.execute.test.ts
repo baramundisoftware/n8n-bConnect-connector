@@ -22,26 +22,26 @@ describe('Software Operations', () => {
 
 	it('should fetch installed software by endpoint', async () => {
 		const mockSoftware = { currentPage: 0, pageSize: 50, data: [{ id: 'sw-1', name: 'Software 1' }] };
-		const mockContext = createMockExecuteFunctions({ endpointId: 'ep-123', returnAll: false, limit: 50 }, {}, mockSoftware);
+		const mockContext = createMockExecuteFunctions({ endpointId: '11111111-1111-1111-1111-111111111111', returnAll: false, limit: 50 }, {}, mockSoftware);
 		const result = await software.getInstalledSoftwareByEndpoint.call(mockContext, 0);
 		expect(result).toBeDefined();
-		expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/WindowsEndpoints/ep-123/InstalledWindowsSoftware') }));
+		expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/WindowsEndpoints/11111111-1111-1111-1111-111111111111/InstalledWindowsSoftware') }));
 	});
 
 	it('should fetch installed software by logical group', async () => {
 		const mockSoftware = { currentPage: 0, pageSize: 50, data: [{ id: 'sw-1', name: 'Software 1' }] };
-		const mockContext = createMockExecuteFunctions({ logicalGroupId: 'lg-123', returnAll: false, limit: 50 }, {}, mockSoftware);
+		const mockContext = createMockExecuteFunctions({ logicalGroupId: '22222222-2222-2222-2222-222222222222', returnAll: false, limit: 50 }, {}, mockSoftware);
 		const result = await software.getInstalledSoftwareByLogicalGroup.call(mockContext, 0);
 		expect(result).toBeDefined();
-		expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/LogicalGroups/lg-123/InstalledWindowsSoftware') }));
+		expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/LogicalGroups/22222222-2222-2222-2222-222222222222/InstalledWindowsSoftware') }));
 	});
 
 	it('should fetch installed software by universal dynamic group', async () => {
 		const mockSoftware = { currentPage: 0, pageSize: 50, data: [{ id: 'sw-1', name: 'Software 1' }] };
-		const mockContext = createMockExecuteFunctions({ universalDynamicGroupId: 'udg-123', returnAll: false, limit: 50 }, {}, mockSoftware);
+		const mockContext = createMockExecuteFunctions({ universalDynamicGroupId: '78787878-7878-7878-7878-787878787878', returnAll: false, limit: 50 }, {}, mockSoftware);
 		const result = await software.getInstalledSoftwareByUniversalDynamicGroup.call(mockContext, 0);
 		expect(result).toBeDefined();
-		expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/UniversalDynamicGroups/udg-123/InstalledWindowsSoftware') }));
+		expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/UniversalDynamicGroups/78787878-7878-7878-7878-787878787878/InstalledWindowsSoftware') }));
 	});
 });
 
@@ -204,29 +204,29 @@ describe('Software Phase 8E — Bundle Application / Folder Operations', () => {
   }
 
   it('addApplicationToBundle — POSTs to Bundles/{id}/BundleApplications', async () => {
-    const ctx = createCtx({ bundleId: 'b-1', applicationId: 'app-1', additionalFields: {} }, { id: 'ba-1' });
+    const ctx = createCtx({ bundleId: '12121212-1212-1212-1212-121212121212', applicationId: 'dddddddd-dddd-dddd-dddd-dddddddddddd', additionalFields: {} }, { id: '56565656-5656-5656-5656-565656565656' });
     const result = await software.addApplicationToBundle.call(ctx, 0);
     expect(result).toHaveLength(1);
-    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'POST', url: expect.stringContaining('/software/v2.0/Bundles/b-1/BundleApplications') }));
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'POST', url: expect.stringContaining('/software/v2.0/Bundles/12121212-1212-1212-1212-121212121212/BundleApplications') }));
   });
 
   it('replaceApplicationInBundle — PATCHes bundle application', async () => {
-    const ctx = createCtx({ bundleId: 'b-2', bundleApplicationId: 'ba-2', updateFields: { applicationId: 'app-new' } }, { id: 'ba-2' });
+    const ctx = createCtx({ bundleId: '12121212-1212-1212-1212-121212121212', bundleApplicationId: '56565656-5656-5656-5656-565656565656', updateFields: { applicationId: 'dddddddd-dddd-dddd-dddd-dddddddddddd' } }, { id: '56565656-5656-5656-5656-565656565656' });
     const result = await software.replaceApplicationInBundle.call(ctx, 0);
     expect(result).toHaveLength(1);
-    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'PATCH', url: expect.stringContaining('/software/v2.0/Bundles/b-2/BundleApplications/ba-2') }));
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'PATCH', url: expect.stringContaining('/software/v2.0/Bundles/12121212-1212-1212-1212-121212121212/BundleApplications/56565656-5656-5656-5656-565656565656') }));
   });
 
   it('replaceApplicationInBundle — throws when no update fields', async () => {
-    const ctx = createCtx({ bundleId: 'b-2', bundleApplicationId: 'ba-2', updateFields: {} }, {});
+    const ctx = createCtx({ bundleId: '12121212-1212-1212-1212-121212121212', bundleApplicationId: '56565656-5656-5656-5656-565656565656', updateFields: {} }, {});
     await expect(software.replaceApplicationInBundle.call(ctx, 0)).rejects.toThrow('No fields to update specified');
   });
 
   it('updateBundleFolder — PATCHes bundle folder', async () => {
-    const ctx = createCtx({ bundleFolderId: 'bf-1', updateFields: { name: 'Updated' } }, { id: 'bf-1' });
+    const ctx = createCtx({ bundleFolderId: '34343434-3434-3434-3434-343434343434', updateFields: { name: 'Updated' } }, { id: '34343434-3434-3434-3434-343434343434' });
     const result = await software.updateBundleFolder.call(ctx, 0);
     expect(result).toHaveLength(1);
-    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'PATCH', url: expect.stringContaining('/software/v2.0/Bundle/Folders/bf-1') }));
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'PATCH', url: expect.stringContaining('/software/v2.0/Bundle/Folders/34343434-3434-3434-3434-343434343434') }));
   });
 
   it('getBundleApplications — returns paginated results', async () => {
@@ -237,9 +237,9 @@ describe('Software Phase 8E — Bundle Application / Folder Operations', () => {
   });
 
   it('deleteBundleApplication — deletes bundle application', async () => {
-    const ctx = createCtx({ bundleApplicationId: 'ba-5' }, {});
+    const ctx = createCtx({ bundleApplicationId: '56565656-5656-5656-5656-565656565656' }, {});
     const result = await software.deleteBundleApplication.call(ctx, 0);
-    expect(result[0].json).toEqual({ success: true, deletedId: 'ba-5' });
-    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'DELETE', url: expect.stringContaining('/software/v2.0/BundleApplications/ba-5') }));
+    expect(result[0].json).toEqual({ success: true, deletedId: '56565656-5656-5656-5656-565656565656' });
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'DELETE', url: expect.stringContaining('/software/v2.0/BundleApplications/56565656-5656-5656-5656-565656565656') }));
   });
 });

@@ -1,5 +1,7 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../transport/requestApi';
+import { validateGuid } from '../../utils/validation';
 
 export async function getMany(this: IExecuteFunctions, index: number): Promise<INodeExecutionData[]> {
 	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
@@ -19,6 +21,10 @@ export async function getMany(this: IExecuteFunctions, index: number): Promise<I
 
 export async function get(this: IExecuteFunctions, index: number): Promise<INodeExecutionData[]> {
 	const id = this.getNodeParameter('groupId', index) as string;
+	const _idValidation = validateGuid(id);
+	if (!_idValidation.valid) {
+		throw new NodeOperationError(this.getNode(), _idValidation.errors.join(', '), { itemIndex: index });
+	}
 	const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/UniversalDynamicGroups/${id}`);
 	return this.helpers.returnJsonArray([response as IDataObject]);
 }
@@ -39,12 +45,20 @@ export async function getFolders(this: IExecuteFunctions, index: number): Promis
 
 export async function getFolder(this: IExecuteFunctions, index: number): Promise<INodeExecutionData[]> {
 	const id = this.getNodeParameter('folderId', index) as string;
+	const _idValidation = validateGuid(id);
+	if (!_idValidation.valid) {
+		throw new NodeOperationError(this.getNode(), _idValidation.errors.join(', '), { itemIndex: index });
+	}
 	const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/UniversalDynamicGroupsFolder/${id}`);
 	return this.helpers.returnJsonArray([response as IDataObject]);
 }
 
 export async function getSubFolders(this: IExecuteFunctions, index: number): Promise<INodeExecutionData[]> {
 	const folderId = this.getNodeParameter('folderId', index) as string;
+	const _folderIdValidation = validateGuid(folderId);
+	if (!_folderIdValidation.valid) {
+		throw new NodeOperationError(this.getNode(), _folderIdValidation.errors.join(', '), { itemIndex: index });
+	}
 	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
 	const qs: Record<string, string | number> = {};
 
@@ -60,6 +74,10 @@ export async function getSubFolders(this: IExecuteFunctions, index: number): Pro
 
 export async function getGroupsByFolder(this: IExecuteFunctions, index: number): Promise<INodeExecutionData[]> {
 	const folderId = this.getNodeParameter('folderId', index) as string;
+	const _folderIdValidation = validateGuid(folderId);
+	if (!_folderIdValidation.valid) {
+		throw new NodeOperationError(this.getNode(), _folderIdValidation.errors.join(', '), { itemIndex: index });
+	}
 	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
 	const qs: Record<string, string | number> = {};
 

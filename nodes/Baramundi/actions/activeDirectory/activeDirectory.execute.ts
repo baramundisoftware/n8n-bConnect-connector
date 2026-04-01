@@ -1,5 +1,7 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../transport/requestApi';
+import { validateGuid } from '../../utils/validation';
 
 // ============================================================================
 // AD GROUPS OPERATIONS
@@ -43,6 +45,10 @@ export async function getADGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const adGroupId = this.getNodeParameter('adGroupId', index) as string;
+  const _adGroupIdValidation = validateGuid(adGroupId);
+  if (!_adGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _adGroupIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/activedirectory/v2.0/ADGroups/${adGroupId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -52,6 +58,10 @@ export async function getADGroupsByOrgUnit(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const orgUnitId = this.getNodeParameter('orgUnitId', index) as string;
+  const _orgUnitIdValidation = validateGuid(orgUnitId);
+  if (!_orgUnitIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _orgUnitIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as {
@@ -98,6 +108,10 @@ export async function getADUsersByGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const adGroupId = this.getNodeParameter('adGroupId', index) as string;
+  const _adGroupIdValidation = validateGuid(adGroupId);
+  if (!_adGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _adGroupIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as {
@@ -181,6 +195,10 @@ export async function getADUser(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const adUserId = this.getNodeParameter('adUserId', index) as string;
+  const _adUserIdValidation = validateGuid(adUserId);
+  if (!_adUserIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _adUserIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/activedirectory/v2.0/ADUsers/${adUserId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -227,6 +245,10 @@ export async function getADObject(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const adObjectId = this.getNodeParameter('adObjectId', index) as string;
+  const _adObjectIdValidation = validateGuid(adObjectId);
+  if (!_adObjectIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _adObjectIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/activedirectory/v2.0/ADObjects/${adObjectId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -273,6 +295,10 @@ export async function getOrgUnit(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const orgUnitId = this.getNodeParameter('orgUnitId', index) as string;
+  const _orgUnitIdValidation = validateGuid(orgUnitId);
+  if (!_orgUnitIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _orgUnitIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/activedirectory/v2.0/OrgUnits/${orgUnitId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -286,6 +312,10 @@ export async function getADGroupsByADGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const adGroupId = this.getNodeParameter('adGroupId', index) as string;
+  const _adGroupIdValidation = validateGuid(adGroupId);
+  if (!_adGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _adGroupIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as {
@@ -318,6 +348,10 @@ export async function getADObjectsByADGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const adGroupId = this.getNodeParameter('adGroupId', index) as string;
+  const _adGroupIdValidation = validateGuid(adGroupId);
+  if (!_adGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _adGroupIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as {
@@ -350,6 +384,10 @@ export async function getADObjectMemberships(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const adObjectId = this.getNodeParameter('adObjectId', index) as string;
+  const _adObjectIdValidation = validateGuid(adObjectId);
+  if (!_adObjectIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _adObjectIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as {
@@ -382,6 +420,10 @@ export async function getADObjectsByOrgUnit(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const orgUnitId = this.getNodeParameter('orgUnitId', index) as string;
+  const _orgUnitIdValidation = validateGuid(orgUnitId);
+  if (!_orgUnitIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _orgUnitIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as {
@@ -414,6 +456,10 @@ export async function getADUsersByOrgUnit(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const orgUnitId = this.getNodeParameter('orgUnitId', index) as string;
+  const _orgUnitIdValidation = validateGuid(orgUnitId);
+  if (!_orgUnitIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _orgUnitIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as {
@@ -446,6 +492,10 @@ export async function getOrgUnitsByOrgUnit(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const orgUnitId = this.getNodeParameter('orgUnitId', index) as string;
+  const _orgUnitIdValidation = validateGuid(orgUnitId);
+  if (!_orgUnitIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _orgUnitIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as {

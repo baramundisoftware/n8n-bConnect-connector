@@ -185,7 +185,7 @@ describe('Server Management Operations', () => {
 
     describe('getMicroservice()', () => {
       it('should fetch a single microservice by ID', async () => {
-        const microserviceId = 'ms-123';
+        const microserviceId = '9a9a9a9a-9a9a-9a9a-9a9a-9a9a9a9a9a9a';
         const mockMicroservice = {
           id: microserviceId,
           name: 'Inventory Service',
@@ -285,7 +285,7 @@ describe('Server Management Operations', () => {
 
     describe('getSecurityGroup()', () => {
       it('should fetch a single security group by ID', async () => {
-        const groupId = 'sg-123';
+        const groupId = 'bcbcbcbc-bcbc-bcbc-bcbc-bcbcbcbcbcbc';
         const mockGroup = {
           id: groupId,
           name: 'Administrators',
@@ -334,7 +334,7 @@ describe('Server Management Operations', () => {
 
     describe('updateSecurityGroup()', () => {
       it('should update a security group', async () => {
-        const groupId = 'sg-123';
+        const groupId = 'bcbcbcbc-bcbc-bcbc-bcbc-bcbcbcbcbcbc';
         const mockUpdated = { id: groupId, name: 'Updated Name' };
 
         const mockContext = createMockExecuteFunctions(
@@ -356,7 +356,7 @@ describe('Server Management Operations', () => {
 
     describe('deleteSecurityGroup()', () => {
       it('should delete a security group', async () => {
-        const groupId = 'sg-123';
+        const groupId = 'bcbcbcbc-bcbc-bcbc-bcbc-bcbcbcbcbcbc';
         const mockContext = createMockExecuteFunctions({ securityGroupId: groupId }, {}, {});
         const result = await deleteSecurityGroup.call(mockContext, 0);
 
@@ -402,7 +402,7 @@ describe('Server Management Operations', () => {
 
     describe('getSecurityProfile()', () => {
       it('should fetch a single security profile by ID', async () => {
-        const profileId = 'sp-123';
+        const profileId = 'dededede-dede-dede-dede-dededededede';
         const mockProfile = {
           id: profileId,
           name: 'Full Access',
@@ -460,7 +460,7 @@ describe('Server Management Operations', () => {
 
     describe('updateSecurityProfile()', () => {
       it('should update a security profile', async () => {
-        const profileId = 'sp-123';
+        const profileId = 'dededede-dede-dede-dede-dededededede';
         const mockUpdated = { id: profileId, name: 'Updated Profile' };
 
         const mockContext = createMockExecuteFunctions(
@@ -482,7 +482,7 @@ describe('Server Management Operations', () => {
 
     describe('deleteSecurityProfile()', () => {
       it('should delete a security profile', async () => {
-        const profileId = 'sp-123';
+        const profileId = 'dededede-dede-dede-dede-dededededede';
         const mockContext = createMockExecuteFunctions({ securityProfileId: profileId }, {}, {});
         const result = await deleteSecurityProfile.call(mockContext, 0);
 
@@ -500,7 +500,7 @@ describe('Server Management Operations', () => {
   describe('Object Permissions Operations', () => {
     describe('getAccessRights()', () => {
       it('should fetch access rights for an object', async () => {
-        const objectId = 'obj-123';
+        const objectId = 'f0f0f0f0-f0f0-f0f0-f0f0-f0f0f0f0f0f0';
         const mockRights = {
           objectId,
           permissions: [
@@ -523,7 +523,7 @@ describe('Server Management Operations', () => {
 
     describe('updateObjectPermissions()', () => {
       it('should update object permissions', async () => {
-        const objectId = 'obj-123';
+        const objectId = 'f0f0f0f0-f0f0-f0f0-f0f0-f0f0f0f0f0f0';
         const mockUpdated = { objectId, updated: true };
 
         const mockContext = createMockExecuteFunctions(
@@ -587,7 +587,7 @@ describe('Server Management Operations', () => {
 
     describe('startMicroservice()', () => {
       it('should start a microservice', async () => {
-        const microserviceId = 'ms-123';
+        const microserviceId = '9a9a9a9a-9a9a-9a9a-9a9a-9a9a9a9a9a9a';
         const mockContext = createMockExecuteFunctions({ microserviceId }, {}, {});
         const result = await startMicroservice.call(mockContext, 0);
 
@@ -603,7 +603,7 @@ describe('Server Management Operations', () => {
 
     describe('stopMicroservice()', () => {
       it('should stop a microservice', async () => {
-        const microserviceId = 'ms-123';
+        const microserviceId = '9a9a9a9a-9a9a-9a9a-9a9a-9a9a9a9a9a9a';
         const mockContext = createMockExecuteFunctions({ microserviceId }, {}, {});
         const result = await stopMicroservice.call(mockContext, 0);
 
@@ -619,7 +619,7 @@ describe('Server Management Operations', () => {
 
     describe('restartMicroservice()', () => {
       it('should restart a microservice', async () => {
-        const microserviceId = 'ms-123';
+        const microserviceId = '9a9a9a9a-9a9a-9a9a-9a9a-9a9a9a9a9a9a';
         const mockContext = createMockExecuteFunctions({ microserviceId }, {}, {});
         const result = await restartMicroservice.call(mockContext, 0);
 

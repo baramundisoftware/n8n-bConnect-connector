@@ -1,5 +1,7 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../transport/requestApi';
+import { validateGuid } from '../../utils/validation';
 
 export async function get(
   this: IExecuteFunctions,
@@ -9,6 +11,10 @@ export async function get(
   const jobId = jobSelection === '__custom__'
     ? this.getNodeParameter('jobId', index) as string
     : jobSelection;
+  const _jobIdValidation = validateGuid(jobId);
+  if (!_jobIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _jobIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/jobs/v2.0/JobDefinitions/${jobId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -54,6 +60,10 @@ export async function execute(
   const jobId = jobSelection === '__custom__'
     ? this.getNodeParameter('jobId', index) as string
     : jobSelection;
+  const _jobIdValidation = validateGuid(jobId);
+  if (!_jobIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _jobIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const endpointIdsString = this.getNodeParameter('endpointIds', index) as string;
   const options = this.getNodeParameter('options', index, {}) as {
     comment?: string;
@@ -87,6 +97,10 @@ export async function getInstances(
   const jobId = jobSelection === '__custom__'
     ? this.getNodeParameter('jobId', index) as string
     : jobSelection;
+  const _jobIdValidation = validateGuid(jobId);
+  if (!_jobIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _jobIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
 
@@ -161,6 +175,10 @@ export async function getJobInstance(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const instanceId = this.getNodeParameter('instanceId', index) as string;
+  const _instanceIdValidation = validateGuid(instanceId);
+  if (!_instanceIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _instanceIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/jobs/v2.0/JobInstances/${instanceId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -173,6 +191,10 @@ export async function getEndpointJobInstances(
   const endpointId = endpointSelection === '__custom__'
     ? this.getNodeParameter('endpointId', index) as string
     : endpointSelection;
+  const _endpointIdValidation = validateGuid(endpointId);
+  if (!_endpointIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
 
@@ -201,6 +223,10 @@ export async function startJobInstance(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const instanceId = this.getNodeParameter('instanceId', index) as string;
+  const _instanceIdValidation = validateGuid(instanceId);
+  if (!_instanceIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _instanceIdValidation.errors.join(', '), { itemIndex: index });
+  }
   await apiRequest.call(this, 'POST', `/jobs/v2.0/JobInstances/${instanceId}/Start`);
   return this.helpers.returnJsonArray({ success: true, startedId: instanceId } as IDataObject);
 }
@@ -210,6 +236,10 @@ export async function stopJobInstance(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const instanceId = this.getNodeParameter('instanceId', index) as string;
+  const _instanceIdValidation = validateGuid(instanceId);
+  if (!_instanceIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _instanceIdValidation.errors.join(', '), { itemIndex: index });
+  }
   await apiRequest.call(this, 'POST', `/jobs/v2.0/JobInstances/${instanceId}/Stop`);
   return this.helpers.returnJsonArray({ success: true, stoppedId: instanceId });
 }
@@ -219,6 +249,10 @@ export async function resumeJobInstance(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const instanceId = this.getNodeParameter('instanceId', index) as string;
+  const _instanceIdValidation = validateGuid(instanceId);
+  if (!_instanceIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _instanceIdValidation.errors.join(', '), { itemIndex: index });
+  }
   await apiRequest.call(this, 'POST', `/jobs/v2.0/JobInstances/${instanceId}/Resume`);
   return this.helpers.returnJsonArray({ success: true, resumedId: instanceId });
 }
@@ -228,6 +262,10 @@ export async function deleteJobInstance(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const instanceId = this.getNodeParameter('instanceId', index) as string;
+  const _instanceIdValidation = validateGuid(instanceId);
+  if (!_instanceIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _instanceIdValidation.errors.join(', '), { itemIndex: index });
+  }
   await apiRequest.call(this, 'DELETE', `/jobs/v2.0/JobInstances/${instanceId}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: instanceId });
 }
@@ -274,6 +312,10 @@ export async function getFolder(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const folderId = this.getNodeParameter('folderId', index) as string;
+  const _folderIdValidation = validateGuid(folderId);
+  if (!_folderIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _folderIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/jobs/v2.0/Folders/${folderId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -299,6 +341,10 @@ export async function updateFolder(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const folderId = this.getNodeParameter('folderId', index) as string;
+  const _folderIdValidation = validateGuid(folderId);
+  if (!_folderIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _folderIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
   const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
@@ -328,6 +374,10 @@ export async function deleteFolder(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const folderId = this.getNodeParameter('folderId', index) as string;
+  const _folderIdValidation = validateGuid(folderId);
+  if (!_folderIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _folderIdValidation.errors.join(', '), { itemIndex: index });
+  }
   await apiRequest.call(this, 'DELETE', `/jobs/v2.0/Folders/${folderId}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: folderId });
 }
@@ -374,6 +424,10 @@ export async function getKioskRelease(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const releaseId = this.getNodeParameter('releaseId', index) as string;
+  const _releaseIdValidation = validateGuid(releaseId);
+  if (!_releaseIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _releaseIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/jobs/v2.0/KioskReleases/${releaseId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -386,8 +440,16 @@ export async function createKioskRelease(
   const jobDefinitionId = jobDefinitionSelection === '__custom__'
     ? this.getNodeParameter('jobDefinitionId', index) as string
     : jobDefinitionSelection;
+  const _jobDefinitionIdValidation = validateGuid(jobDefinitionId);
+  if (!_jobDefinitionIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _jobDefinitionIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const targetType = this.getNodeParameter('targetType', index) as string;
   const targetId = this.getNodeParameter('targetId', index) as string;
+  const _targetIdValidation = validateGuid(targetId);
+  if (!_targetIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _targetIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const additionalFields = this.getNodeParameter('additionalFields', index, {}) as IDataObject;
 
   const body: IDataObject = {
@@ -406,6 +468,10 @@ export async function withdrawKioskRelease(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const releaseId = this.getNodeParameter('releaseId', index) as string;
+  const _releaseIdValidation = validateGuid(releaseId);
+  if (!_releaseIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _releaseIdValidation.errors.join(', '), { itemIndex: index });
+  }
   await apiRequest.call(this, 'DELETE', `/jobs/v2.0/KioskReleases/${releaseId}`);
   return this.helpers.returnJsonArray({ success: true, withdrawnId: releaseId });
 }
@@ -440,6 +506,10 @@ export async function update(
   const jobId = jobSelection === '__custom__'
     ? this.getNodeParameter('jobId', index) as string
     : jobSelection;
+  const _jobIdValidation = validateGuid(jobId);
+  if (!_jobIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _jobIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
   const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
@@ -472,6 +542,10 @@ export async function deleteJob(
   const jobId = jobSelection === '__custom__'
     ? this.getNodeParameter('jobId', index) as string
     : jobSelection;
+  const _jobIdValidation = validateGuid(jobId);
+  if (!_jobIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _jobIdValidation.errors.join(', '), { itemIndex: index });
+  }
   await apiRequest.call(this, 'DELETE', `/jobs/v2.0/JobDefinitions/${jobId}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: jobId });
 }
@@ -485,6 +559,10 @@ export async function getSubFolders(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const folderId = this.getNodeParameter('folderId', index) as string;
+  const _folderIdValidation = validateGuid(folderId);
+  if (!_folderIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _folderIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const qs: Record<string, string | number> = {};
@@ -503,6 +581,10 @@ export async function getJobDefinitionsByFolder(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const folderId = this.getNodeParameter('folderId', index) as string;
+  const _folderIdValidation = validateGuid(folderId);
+  if (!_folderIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _folderIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const qs: Record<string, string | number> = {};
@@ -521,6 +603,10 @@ export async function getKioskReleasesByJobDefinition(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const jobId = this.getNodeParameter('jobId', index) as string;
+  const _jobIdValidation = validateGuid(jobId);
+  if (!_jobIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _jobIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const qs: Record<string, string | number> = {};
@@ -539,6 +625,10 @@ export async function getJobInstancesByLogicalGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const logicalGroupId = this.getNodeParameter('logicalGroupId', index) as string;
+  const _logicalGroupIdValidation = validateGuid(logicalGroupId);
+  if (!_logicalGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _logicalGroupIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const qs: Record<string, string | number> = {};
@@ -557,6 +647,10 @@ export async function getJobInstancesByStaticGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const staticGroupId = this.getNodeParameter('staticGroupId', index) as string;
+  const _staticGroupIdValidation = validateGuid(staticGroupId);
+  if (!_staticGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _staticGroupIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const qs: Record<string, string | number> = {};
@@ -575,6 +669,10 @@ export async function getJobInstancesByDynamicGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const dynamicGroupId = this.getNodeParameter('dynamicGroupId', index) as string;
+  const _dynamicGroupIdValidation = validateGuid(dynamicGroupId);
+  if (!_dynamicGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _dynamicGroupIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const qs: Record<string, string | number> = {};
@@ -593,6 +691,10 @@ export async function getJobInstancesByUDG(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const udgId = this.getNodeParameter('udgId', index) as string;
+  const _udgIdValidation = validateGuid(udgId);
+  if (!_udgIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _udgIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const qs: Record<string, string | number> = {};
@@ -611,7 +713,15 @@ export async function assignJobToLogicalGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const logicalGroupId = this.getNodeParameter('logicalGroupId', index) as string;
+  const _logicalGroupIdValidation = validateGuid(logicalGroupId);
+  if (!_logicalGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _logicalGroupIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const jobDefinitionId = this.getNodeParameter('jobDefinitionId', index) as string;
+  const _jobDefinitionIdValidation = validateGuid(jobDefinitionId);
+  if (!_jobDefinitionIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _jobDefinitionIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'POST', `/jobs/v2.0/LogicalGroups/${logicalGroupId}/AssignJobDefinition`, { jobDefinitionId });
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -621,7 +731,15 @@ export async function assignJobToStaticGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const staticGroupId = this.getNodeParameter('staticGroupId', index) as string;
+  const _staticGroupIdValidation = validateGuid(staticGroupId);
+  if (!_staticGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _staticGroupIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const jobDefinitionId = this.getNodeParameter('jobDefinitionId', index) as string;
+  const _jobDefinitionIdValidation = validateGuid(jobDefinitionId);
+  if (!_jobDefinitionIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _jobDefinitionIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'POST', `/jobs/v2.0/StaticGroups/${staticGroupId}/AssignJobDefinition`, { jobDefinitionId });
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -631,7 +749,15 @@ export async function assignJobToDynamicGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const dynamicGroupId = this.getNodeParameter('dynamicGroupId', index) as string;
+  const _dynamicGroupIdValidation = validateGuid(dynamicGroupId);
+  if (!_dynamicGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _dynamicGroupIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const jobDefinitionId = this.getNodeParameter('jobDefinitionId', index) as string;
+  const _jobDefinitionIdValidation = validateGuid(jobDefinitionId);
+  if (!_jobDefinitionIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _jobDefinitionIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'POST', `/jobs/v2.0/DynamicGroups/${dynamicGroupId}/AssignJobDefinition`, { jobDefinitionId });
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -641,7 +767,15 @@ export async function assignJobToUDG(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const udgId = this.getNodeParameter('udgId', index) as string;
+  const _udgIdValidation = validateGuid(udgId);
+  if (!_udgIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _udgIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const jobDefinitionId = this.getNodeParameter('jobDefinitionId', index) as string;
+  const _jobDefinitionIdValidation = validateGuid(jobDefinitionId);
+  if (!_jobDefinitionIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _jobDefinitionIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'POST', `/jobs/v2.0/UniversalDynamicGroups/${udgId}/AssignJobDefinition`, { jobDefinitionId });
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -651,6 +785,10 @@ export async function getKioskReleasesByEndpoint(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const _endpointIdValidation = validateGuid(endpointId);
+  if (!_endpointIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const qs: Record<string, string | number> = {};
@@ -669,6 +807,10 @@ export async function getKioskReleasesByLogicalGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const logicalGroupId = this.getNodeParameter('logicalGroupId', index) as string;
+  const _logicalGroupIdValidation = validateGuid(logicalGroupId);
+  if (!_logicalGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _logicalGroupIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const qs: Record<string, string | number> = {};
@@ -687,6 +829,10 @@ export async function getKioskReleasesByADObject(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const adObjectId = this.getNodeParameter('adObjectId', index) as string;
+  const _adObjectIdValidation = validateGuid(adObjectId);
+  if (!_adObjectIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _adObjectIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const qs: Record<string, string | number> = {};

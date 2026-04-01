@@ -43,8 +43,8 @@ function createMockExecuteFunctions(
   } as unknown as IExecuteFunctions;
 }
 
-const mockGroup = { id: 'udg-guid-1', name: 'All Windows Endpoints', type: 'UniversalDynamicGroup' };
-const mockFolder = { id: 'folder-guid-1', name: 'Production', parentId: null };
+const mockGroup = { id: '78787878-7878-7878-7878-787878787878', name: 'All Windows Endpoints', type: 'UniversalDynamicGroup' };
+const mockFolder = { id: '77777777-7777-7777-7777-777777777777', name: 'Production', parentId: null };
 const pageResponse = (data: any[]) => ({ data, currentPage: 0, pageSize: 50, totalCount: data.length });
 
 describe('Universal Dynamic Groups Operations', () => {
@@ -63,7 +63,7 @@ describe('Universal Dynamic Groups Operations', () => {
     it('should return all groups when returnAll is true', async () => {
       const mock = createMockExecuteFunctions(
         { returnAll: true, options: {} },
-        pageResponse([mockGroup, { ...mockGroup, id: 'udg-guid-2' }]),
+        pageResponse([mockGroup, { ...mockGroup, id: '78787878-7878-7878-7878-787878787878' }]),
       );
       const result = await getMany.call(mock, 0);
       expect(result).toHaveLength(2);
@@ -84,7 +84,7 @@ describe('Universal Dynamic Groups Operations', () => {
   describe('get()', () => {
     it('should return a single group by ID', async () => {
       const mock = createMockExecuteFunctions(
-        { groupId: 'udg-guid-1' },
+        { groupId: '78787878-7878-7878-7878-787878787878' },
         mockGroup,
       );
       const result = await get.call(mock, 0);
@@ -94,13 +94,13 @@ describe('Universal Dynamic Groups Operations', () => {
 
     it('should call the correct API path with group ID', async () => {
       const mock = createMockExecuteFunctions(
-        { groupId: 'udg-guid-1' },
+        { groupId: '78787878-7878-7878-7878-787878787878' },
         mockGroup,
       );
       const httpRequest = mock.helpers.httpRequest as ReturnType<typeof vi.fn>;
       await get.call(mock, 0);
       const callArgs = httpRequest.mock.calls[0][0];
-      expect(callArgs.url).toContain('/endpoints/v2.0/UniversalDynamicGroups/udg-guid-1');
+      expect(callArgs.url).toContain('/endpoints/v2.0/UniversalDynamicGroups/78787878-7878-7878-7878-787878787878');
     });
   });
 
@@ -119,7 +119,7 @@ describe('Universal Dynamic Groups Operations', () => {
   describe('getFolder()', () => {
     it('should return a single folder by ID', async () => {
       const mock = createMockExecuteFunctions(
-        { folderId: 'folder-guid-1' },
+        { folderId: '77777777-7777-7777-7777-777777777777' },
         mockFolder,
       );
       const result = await getFolder.call(mock, 0);
@@ -129,21 +129,21 @@ describe('Universal Dynamic Groups Operations', () => {
 
     it('should call the correct API path with folder ID', async () => {
       const mock = createMockExecuteFunctions(
-        { folderId: 'folder-guid-1' },
+        { folderId: '77777777-7777-7777-7777-777777777777' },
         mockFolder,
       );
       const httpRequest = mock.helpers.httpRequest as ReturnType<typeof vi.fn>;
       await getFolder.call(mock, 0);
       const callArgs = httpRequest.mock.calls[0][0];
-      expect(callArgs.url).toContain('/endpoints/v2.0/UniversalDynamicGroupsFolder/folder-guid-1');
+      expect(callArgs.url).toContain('/endpoints/v2.0/UniversalDynamicGroupsFolder/77777777-7777-7777-7777-777777777777');
     });
   });
 
   describe('getSubFolders()', () => {
     it('should return sub-folders for a given folder', async () => {
       const mock = createMockExecuteFunctions(
-        { folderId: 'folder-guid-1', returnAll: false, limit: 10 },
-        pageResponse([{ ...mockFolder, id: 'folder-guid-2', parentId: 'folder-guid-1' }]),
+        { folderId: '77777777-7777-7777-7777-777777777777', returnAll: false, limit: 10 },
+        pageResponse([{ ...mockFolder, id: '77777777-7777-7777-7777-777777777777', parentId: '77777777-7777-7777-7777-777777777777' }]),
       );
       const result = await getSubFolders.call(mock, 0);
       expect(result).toHaveLength(1);
@@ -151,20 +151,20 @@ describe('Universal Dynamic Groups Operations', () => {
 
     it('should call correct path with folder ID', async () => {
       const mock = createMockExecuteFunctions(
-        { folderId: 'folder-guid-1', returnAll: false, limit: 10 },
+        { folderId: '77777777-7777-7777-7777-777777777777', returnAll: false, limit: 10 },
         pageResponse([]),
       );
       const httpRequest = mock.helpers.httpRequest as ReturnType<typeof vi.fn>;
       await getSubFolders.call(mock, 0);
       const callArgs = httpRequest.mock.calls[0][0];
-      expect(callArgs.url).toContain('/endpoints/v2.0/UniversalDynamicGroupsFolder/folder-guid-1/Folders');
+      expect(callArgs.url).toContain('/endpoints/v2.0/UniversalDynamicGroupsFolder/77777777-7777-7777-7777-777777777777/Folders');
     });
   });
 
   describe('getGroupsByFolder()', () => {
     it('should return groups within a folder', async () => {
       const mock = createMockExecuteFunctions(
-        { folderId: 'folder-guid-1', returnAll: false, limit: 10 },
+        { folderId: '77777777-7777-7777-7777-777777777777', returnAll: false, limit: 10 },
         pageResponse([mockGroup]),
       );
       const result = await getGroupsByFolder.call(mock, 0);
@@ -173,13 +173,13 @@ describe('Universal Dynamic Groups Operations', () => {
 
     it('should call correct path with folder ID', async () => {
       const mock = createMockExecuteFunctions(
-        { folderId: 'folder-guid-1', returnAll: false, limit: 10 },
+        { folderId: '77777777-7777-7777-7777-777777777777', returnAll: false, limit: 10 },
         pageResponse([mockGroup]),
       );
       const httpRequest = mock.helpers.httpRequest as ReturnType<typeof vi.fn>;
       await getGroupsByFolder.call(mock, 0);
       const callArgs = httpRequest.mock.calls[0][0];
-      expect(callArgs.url).toContain('/endpoints/v2.0/Folders/folder-guid-1/UniversalDynamicGroups');
+      expect(callArgs.url).toContain('/endpoints/v2.0/Folders/77777777-7777-7777-7777-777777777777/UniversalDynamicGroups');
     });
   });
 });

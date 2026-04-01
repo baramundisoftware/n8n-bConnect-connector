@@ -1,5 +1,7 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../transport/requestApi';
+import { validateGuid } from '../../utils/validation';
 
 // ============================================================================
 // SERVER INFORMATION OPERATIONS
@@ -54,6 +56,10 @@ export async function getMicroservice(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const microserviceId = this.getNodeParameter('microserviceId', index) as string;
+  const _microserviceIdValidation = validateGuid(microserviceId);
+  if (!_microserviceIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _microserviceIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/servermanagement/v2.0/Microservices/${microserviceId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -120,6 +126,10 @@ export async function getSecurityGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const securityGroupId = this.getNodeParameter('securityGroupId', index) as string;
+  const _securityGroupIdValidation = validateGuid(securityGroupId);
+  if (!_securityGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _securityGroupIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/servermanagement/v2.0/SecurityGroups/${securityGroupId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -145,6 +155,10 @@ export async function updateSecurityGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const securityGroupId = this.getNodeParameter('securityGroupId', index) as string;
+  const _securityGroupIdValidation = validateGuid(securityGroupId);
+  if (!_securityGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _securityGroupIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
   // Build JSON Patch document for PATCH request
@@ -176,6 +190,10 @@ export async function deleteSecurityGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const securityGroupId = this.getNodeParameter('securityGroupId', index) as string;
+  const _securityGroupIdValidation = validateGuid(securityGroupId);
+  if (!_securityGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _securityGroupIdValidation.errors.join(', '), { itemIndex: index });
+  }
   await apiRequest.call(this, 'DELETE', `/servermanagement/v2.0/SecurityGroups/${securityGroupId}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: securityGroupId });
 }
@@ -222,6 +240,10 @@ export async function getSecurityProfile(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const securityProfileId = this.getNodeParameter('securityProfileId', index) as string;
+  const _securityProfileIdValidation = validateGuid(securityProfileId);
+  if (!_securityProfileIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _securityProfileIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/servermanagement/v2.0/SecurityProfiles/${securityProfileId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -247,6 +269,10 @@ export async function updateSecurityProfile(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const securityProfileId = this.getNodeParameter('securityProfileId', index) as string;
+  const _securityProfileIdValidation = validateGuid(securityProfileId);
+  if (!_securityProfileIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _securityProfileIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
   // Build JSON Patch document for PATCH request
@@ -278,6 +304,10 @@ export async function deleteSecurityProfile(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const securityProfileId = this.getNodeParameter('securityProfileId', index) as string;
+  const _securityProfileIdValidation = validateGuid(securityProfileId);
+  if (!_securityProfileIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _securityProfileIdValidation.errors.join(', '), { itemIndex: index });
+  }
   await apiRequest.call(this, 'DELETE', `/servermanagement/v2.0/SecurityProfiles/${securityProfileId}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: securityProfileId });
 }
@@ -291,6 +321,10 @@ export async function getAccessRights(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const objectId = this.getNodeParameter('objectId', index) as string;
+  const _objectIdValidation = validateGuid(objectId);
+  if (!_objectIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _objectIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/servermanagement/v2.0/Objects/${objectId}/Rights`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -300,6 +334,10 @@ export async function updateObjectPermissions(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const objectId = this.getNodeParameter('objectId', index) as string;
+  const _objectIdValidation = validateGuid(objectId);
+  if (!_objectIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _objectIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
   // Build JSON Patch document for PATCH request
@@ -353,6 +391,10 @@ export async function startMicroservice(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const microserviceId = this.getNodeParameter('microserviceId', index) as string;
+  const _microserviceIdValidation = validateGuid(microserviceId);
+  if (!_microserviceIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _microserviceIdValidation.errors.join(', '), { itemIndex: index });
+  }
   await apiRequest.call(this, 'POST', `/servermanagement/v2.0/Microservices/${microserviceId}/Start`);
   return this.helpers.returnJsonArray({ success: true, microserviceId, action: 'start' });
 }
@@ -362,6 +404,10 @@ export async function stopMicroservice(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const microserviceId = this.getNodeParameter('microserviceId', index) as string;
+  const _microserviceIdValidation = validateGuid(microserviceId);
+  if (!_microserviceIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _microserviceIdValidation.errors.join(', '), { itemIndex: index });
+  }
   await apiRequest.call(this, 'POST', `/servermanagement/v2.0/Microservices/${microserviceId}/Stop`);
   return this.helpers.returnJsonArray({ success: true, microserviceId, action: 'stop' });
 }
@@ -371,6 +417,10 @@ export async function restartMicroservice(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const microserviceId = this.getNodeParameter('microserviceId', index) as string;
+  const _microserviceIdValidation = validateGuid(microserviceId);
+  if (!_microserviceIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _microserviceIdValidation.errors.join(', '), { itemIndex: index });
+  }
   await apiRequest.call(this, 'POST', `/servermanagement/v2.0/Microservices/${microserviceId}/Restart`);
   return this.helpers.returnJsonArray({ success: true, microserviceId, action: 'restart' });
 }
@@ -428,6 +478,10 @@ export async function getDownloadJob(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const downloadJobId = this.getNodeParameter('downloadJobId', index) as string;
+  const _downloadJobIdValidation = validateGuid(downloadJobId);
+  if (!_downloadJobIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), _downloadJobIdValidation.errors.join(', '), { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/servermanagement/v2.0/DownloadJobs/${downloadJobId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }

@@ -44,7 +44,7 @@ describe('OS Folders Operations', () => {
 				totalPages: 1,
 				totalItems: 2,
 				data: [
-					{ id: 'folder-1', name: 'Windows 10', parentId: null },
+					{ id: '77777777-7777-7777-7777-777777777777', name: 'Windows 10', parentId: null },
 					{ id: 'folder-2', name: 'Windows 11', parentId: null },
 				],
 			};
@@ -66,13 +66,13 @@ describe('OS Folders Operations', () => {
 	describe('getFolder()', () => {
 		it('should fetch a single OS folder by ID', async () => {
 			const mockFolder = {
-				id: 'folder-123',
+				id: '77777777-7777-7777-7777-777777777777',
 				name: 'Windows Server 2022',
 				parentId: 'parent-1',
 			};
 
 			const mockContext = createMockExecuteFunctions(
-				{ folderId: 'folder-123' },
+				{ folderId: '77777777-7777-7777-7777-777777777777' },
 				{},
 				mockFolder,
 			);
@@ -84,7 +84,7 @@ describe('OS Folders Operations', () => {
 			expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
 				expect.objectContaining({
 					method: 'GET',
-					url: expect.stringContaining('/operatingsystems/v2.0/Folders/folder-123'),
+					url: expect.stringContaining('/operatingsystems/v2.0/Folders/77777777-7777-7777-7777-777777777777'),
 				}),
 			);
 		});
@@ -96,13 +96,13 @@ describe('OS Folders Operations', () => {
 				currentPage: 0,
 				pageSize: 50,
 				data: [
-					{ id: 'sub-1', name: 'Pro', parentId: 'folder-123' },
-					{ id: 'sub-2', name: 'Enterprise', parentId: 'folder-123' },
+					{ id: 'sub-1', name: 'Pro', parentId: '77777777-7777-7777-7777-777777777777' },
+					{ id: 'sub-2', name: 'Enterprise', parentId: '77777777-7777-7777-7777-777777777777' },
 				],
 			};
 
 			const mockContext = createMockExecuteFunctions(
-				{ folderId: 'folder-123', returnAll: false, limit: 50 },
+				{ folderId: '77777777-7777-7777-7777-777777777777', returnAll: false, limit: 50 },
 				{},
 				mockSubfolders,
 			);
@@ -112,7 +112,7 @@ describe('OS Folders Operations', () => {
 			expect(result).toHaveLength(2);
 			expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
 				expect.objectContaining({
-					url: expect.stringContaining('/Folders/folder-123/Folders'),
+					url: expect.stringContaining('/Folders/77777777-7777-7777-7777-777777777777/Folders'),
 				}),
 			);
 		});
@@ -151,13 +151,13 @@ describe('OS Folders Operations', () => {
 	describe('updateFolder()', () => {
 		it('should update an OS folder using PATCH', async () => {
 			const mockUpdated = {
-				id: 'folder-123',
+				id: '77777777-7777-7777-7777-777777777777',
 				name: 'Updated Name',
 			};
 
 			const mockContext = createMockExecuteFunctions(
 				{
-					folderId: 'folder-123',
+					folderId: '77777777-7777-7777-7777-777777777777',
 					updateFields: { name: 'Updated Name' },
 				},
 				{},
@@ -172,7 +172,7 @@ describe('OS Folders Operations', () => {
 
 		it('should throw error when no fields to update', async () => {
 			const mockContext = createMockExecuteFunctions({
-				folderId: 'folder-123',
+				folderId: '77777777-7777-7777-7777-777777777777',
 				updateFields: {},
 			});
 
@@ -185,7 +185,7 @@ describe('OS Folders Operations', () => {
 	describe('deleteFolder()', () => {
 		it('should delete an OS folder', async () => {
 			const mockContext = createMockExecuteFunctions(
-				{ folderId: 'folder-123' },
+				{ folderId: '77777777-7777-7777-7777-777777777777' },
 				{},
 				{},
 			);
@@ -194,7 +194,7 @@ describe('OS Folders Operations', () => {
 
 			expect(result).toHaveLength(1);
 			expect(result[0].json.success).toBe(true);
-			expect(result[0].json.deletedId).toBe('folder-123');
+			expect(result[0].json.deletedId).toBe('77777777-7777-7777-7777-777777777777');
 		});
 	});
 });
@@ -231,14 +231,14 @@ describe('OS Windows Endpoints Operations', () => {
 	describe('getWindowsEndpoint()', () => {
 		it('should fetch a single Windows endpoint OS info by ID', async () => {
 			const mockEndpoint = {
-				id: 'ep-123',
+				id: '11111111-1111-1111-1111-111111111111',
 				displayName: 'PC-001',
 				operatingSystemName: 'Windows 10 Pro',
 				osInstallFolderId: 'folder-1',
 			};
 
 			const mockContext = createMockExecuteFunctions(
-				{ endpointId: 'ep-123' },
+				{ endpointId: '11111111-1111-1111-1111-111111111111' },
 				{},
 				mockEndpoint,
 			);
@@ -253,13 +253,13 @@ describe('OS Windows Endpoints Operations', () => {
 	describe('updateWindowsEndpoint()', () => {
 		it('should update Windows endpoint OS config using PATCH', async () => {
 			const mockUpdated = {
-				id: 'ep-123',
+				id: '11111111-1111-1111-1111-111111111111',
 				osInstallFolderId: 'folder-new',
 			};
 
 			const mockContext = createMockExecuteFunctions(
 				{
-					endpointId: 'ep-123',
+					endpointId: '11111111-1111-1111-1111-111111111111',
 					updateFields: { osInstallFolderId: 'folder-new' },
 				},
 				{},
@@ -281,9 +281,9 @@ describe('OS Windows Endpoints Operations', () => {
 describe('Credential Configuration', () => {
 	it('should use correct baseURL from credentials', async () => {
 		const mockContext = createMockExecuteFunctions(
-			{ folderId: 'folder-1' },
+			{ folderId: '77777777-7777-7777-7777-777777777777' },
 			{ baseUrl: 'https://custom-server:444/bconnect' },
-			{ id: 'folder-1', name: 'Test' },
+			{ id: '77777777-7777-7777-7777-777777777777', name: 'Test' },
 		);
 
 		await operatingSystem.getFolder.call(mockContext, 0);
@@ -291,7 +291,7 @@ describe('Credential Configuration', () => {
 		expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
 			expect.objectContaining({
 				baseURL: 'https://custom-server:444/bconnect',
-				url: '/operatingsystems/v2.0/Folders/folder-1',
+				url: '/operatingsystems/v2.0/Folders/77777777-7777-7777-7777-777777777777',
 			}),
 		);
 	});

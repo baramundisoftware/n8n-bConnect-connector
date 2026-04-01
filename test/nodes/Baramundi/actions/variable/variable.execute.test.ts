@@ -94,14 +94,14 @@ describe('Variable Definitions Operations', () => {
 	describe('getVariableDefinition()', () => {
 		it('should fetch a single variable definition by ID', async () => {
 			const mockDefinition = {
-				id: 'var-def-123',
+				id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
 				name: 'ServerPath',
 				dataType: 'String',
 				defaultValue: 'C:\\Program Files',
 			};
 
 			const mockContext = createMockExecuteFunctions(
-				{ variableDefinitionId: 'var-def-123' },
+				{ variableDefinitionId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' },
 				{},
 				mockDefinition,
 			);
@@ -113,7 +113,7 @@ describe('Variable Definitions Operations', () => {
 			expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
 				expect.objectContaining({
 					method: 'GET',
-					url: expect.stringContaining('/variables/v2.0/VariableDefinitions/var-def-123'),
+					url: expect.stringContaining('/variables/v2.0/VariableDefinitions/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'),
 				}),
 			);
 		});
@@ -154,14 +154,14 @@ describe('Variable Definitions Operations', () => {
 	describe('updateVariableDefinition()', () => {
 		it('should update a variable definition using PATCH', async () => {
 			const mockUpdated = {
-				id: 'var-def-123',
+				id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
 				name: 'UpdatedVar',
 				dataType: 'String',
 			};
 
 			const mockContext = createMockExecuteFunctions(
 				{
-					variableDefinitionId: 'var-def-123',
+					variableDefinitionId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
 					updateFields: { name: 'UpdatedVar' },
 				},
 				{},
@@ -176,7 +176,7 @@ describe('Variable Definitions Operations', () => {
 
 		it('should throw error when no fields to update', async () => {
 			const mockContext = createMockExecuteFunctions({
-				variableDefinitionId: 'var-def-123',
+				variableDefinitionId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
 				updateFields: {},
 			});
 
@@ -189,7 +189,7 @@ describe('Variable Definitions Operations', () => {
 	describe('deleteVariableDefinition()', () => {
 		it('should delete a variable definition', async () => {
 			const mockContext = createMockExecuteFunctions(
-				{ variableDefinitionId: 'var-def-123' },
+				{ variableDefinitionId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' },
 				{},
 				{},
 			);
@@ -198,7 +198,7 @@ describe('Variable Definitions Operations', () => {
 
 			expect(result).toHaveLength(1);
 			expect(result[0].json.success).toBe(true);
-			expect(result[0].json.deletedId).toBe('var-def-123');
+			expect(result[0].json.deletedId).toBe('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb');
 		});
 	});
 });
@@ -235,13 +235,13 @@ describe('Variable Instances Operations', () => {
 	describe('getVariableInstance()', () => {
 		it('should fetch a single variable instance by ID', async () => {
 			const mockInstance = {
-				id: 'inst-123',
+				id: 'cccccccc-cccc-cccc-cccc-cccccccccccc',
 				variableDefinitionId: 'var-def-1',
 				value: 'CustomValue',
 			};
 
 			const mockContext = createMockExecuteFunctions(
-				{ variableInstanceId: 'inst-123' },
+				{ variableInstanceId: 'cccccccc-cccc-cccc-cccc-cccccccccccc' },
 				{},
 				mockInstance,
 			);
@@ -256,13 +256,13 @@ describe('Variable Instances Operations', () => {
 	describe('updateVariableInstance()', () => {
 		it('should update a variable instance value using PATCH', async () => {
 			const mockUpdated = {
-				id: 'inst-123',
+				id: 'cccccccc-cccc-cccc-cccc-cccccccccccc',
 				value: 'NewValue',
 			};
 
 			const mockContext = createMockExecuteFunctions(
 				{
-					variableInstanceId: 'inst-123',
+					variableInstanceId: 'cccccccc-cccc-cccc-cccc-cccccccccccc',
 					updateFields: { value: 'NewValue' },
 				},
 				{},
@@ -288,13 +288,13 @@ describe('Variable Instances By Entity Operations', () => {
 				currentPage: 0,
 				pageSize: 50,
 				data: [
-					{ id: 'inst-1', endpointId: 'ep-123', value: 'Value1' },
-					{ id: 'inst-2', endpointId: 'ep-123', value: 'Value2' },
+					{ id: 'inst-1', endpointId: '11111111-1111-1111-1111-111111111111', value: 'Value1' },
+					{ id: 'inst-2', endpointId: '11111111-1111-1111-1111-111111111111', value: 'Value2' },
 				],
 			};
 
 			const mockContext = createMockExecuteFunctions(
-				{ endpointId: 'ep-123', returnAll: false, limit: 50 },
+				{ endpointId: '11111111-1111-1111-1111-111111111111', returnAll: false, limit: 50 },
 				{},
 				mockInstances,
 			);
@@ -305,7 +305,7 @@ describe('Variable Instances By Entity Operations', () => {
 			expect(result).toHaveLength(2);
 			expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
 				expect.objectContaining({
-					url: expect.stringContaining('/Endpoints/ep-123/VariableInstances'),
+					url: expect.stringContaining('/Endpoints/11111111-1111-1111-1111-111111111111/VariableInstances'),
 				}),
 			);
 		});
@@ -320,7 +320,7 @@ describe('Variable Instances By Entity Operations', () => {
 			};
 
 			const mockContext = createMockExecuteFunctions(
-				{ logicalGroupId: 'lg-123', returnAll: false, limit: 50 },
+				{ logicalGroupId: '22222222-2222-2222-2222-222222222222', returnAll: false, limit: 50 },
 				{},
 				mockInstances,
 			);
@@ -330,7 +330,7 @@ describe('Variable Instances By Entity Operations', () => {
 			expect(result).toBeDefined();
 			expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
 				expect.objectContaining({
-					url: expect.stringContaining('/LogicalGroups/lg-123/VariableInstances'),
+					url: expect.stringContaining('/LogicalGroups/22222222-2222-2222-2222-222222222222/VariableInstances'),
 				}),
 			);
 		});
@@ -345,7 +345,7 @@ describe('Variable Instances By Entity Operations', () => {
 			};
 
 			const mockContext = createMockExecuteFunctions(
-				{ adObjectId: 'ad-123', returnAll: false, limit: 50 },
+				{ adObjectId: '66666666-6666-6666-6666-666666666666', returnAll: false, limit: 50 },
 				{},
 				mockInstances,
 			);
@@ -355,7 +355,7 @@ describe('Variable Instances By Entity Operations', () => {
 			expect(result).toBeDefined();
 			expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
 				expect.objectContaining({
-					url: expect.stringContaining('/ADObjects/ad-123/VariableInstances'),
+					url: expect.stringContaining('/ADObjects/66666666-6666-6666-6666-666666666666/VariableInstances'),
 				}),
 			);
 		});
@@ -369,9 +369,9 @@ describe('Variable Instances By Entity Operations', () => {
 describe('Credential Configuration', () => {
 	it('should use correct baseURL from credentials', async () => {
 		const mockContext = createMockExecuteFunctions(
-			{ variableDefinitionId: 'var-1' },
+			{ variableDefinitionId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' },
 			{ baseUrl: 'https://custom-server:444/bconnect' },
-			{ id: 'var-1', name: 'Test' },
+			{ id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', name: 'Test' },
 		);
 
 		await variable.getVariableDefinition.call(mockContext, 0);
@@ -379,16 +379,16 @@ describe('Credential Configuration', () => {
 		expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
 			expect.objectContaining({
 				baseURL: 'https://custom-server:444/bconnect',
-				url: '/variables/v2.0/VariableDefinitions/var-1',
+				url: '/variables/v2.0/VariableDefinitions/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
 			}),
 		);
 	});
 
 	it('should handle SSL configuration', async () => {
 		const mockContext = createMockExecuteFunctions(
-			{ variableDefinitionId: 'var-1' },
+			{ variableDefinitionId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' },
 			{ ignoreSslIssues: false },
-			{ id: 'var-1', name: 'Test' },
+			{ id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', name: 'Test' },
 		);
 
 		await variable.getVariableDefinition.call(mockContext, 0);
@@ -416,16 +416,16 @@ describe('Variable Phase 8F — Application/JobDefinition Instances', () => {
   }
 
   it('getVariableInstancesByApplication — returns instances for a Windows application', async () => {
-    const ctx = createCtx({ applicationId: 'app-1', returnAll: false, limit: 50 }, pageResp([{ id: 'vi-1', name: 'VAR1' }]));
+    const ctx = createCtx({ applicationId: 'dddddddd-dddd-dddd-dddd-dddddddddddd', returnAll: false, limit: 50 }, pageResp([{ id: 'vi-1', name: 'VAR1' }]));
     const result = await variable.getVariableInstancesByApplication.call(ctx, 0);
     expect(result).toHaveLength(1);
-    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/variables/v2.0/WindowsApplications/app-1/VariableInstances') }));
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/variables/v2.0/WindowsApplications/dddddddd-dddd-dddd-dddd-dddddddddddd/VariableInstances') }));
   });
 
   it('getVariableInstancesByJobDefinition — returns instances for a job definition', async () => {
-    const ctx = createCtx({ jobDefinitionId: 'jd-1', returnAll: false, limit: 50 }, pageResp([{ id: 'vi-2', name: 'VAR2' }, { id: 'vi-3', name: 'VAR3' }]));
+    const ctx = createCtx({ jobDefinitionId: '88888888-8888-8888-8888-888888888888', returnAll: false, limit: 50 }, pageResp([{ id: 'vi-2', name: 'VAR2' }, { id: 'vi-3', name: 'VAR3' }]));
     const result = await variable.getVariableInstancesByJobDefinition.call(ctx, 0);
     expect(result).toHaveLength(2);
-    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/variables/v2.0/WindowsJobDefinitions/jd-1/VariableInstances') }));
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/variables/v2.0/WindowsJobDefinitions/88888888-8888-8888-8888-888888888888/VariableInstances') }));
   });
 });
