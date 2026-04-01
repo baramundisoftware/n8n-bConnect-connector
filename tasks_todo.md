@@ -2,7 +2,7 @@
 
 ## Project Goal
 
-Create an n8n community node for baramundi Management Suite (bConnect API) to enable workflow automation for IT endpoint management with comprehensive support for both V2.0 and V1.1 APIs.
+Create an n8n community node for baramundi Management Suite (bConnect API) to enable workflow automation for IT endpoint management. The connector targets **bConnect V2.0 API only**, supporting bMS versions 25R2 and 26R1. V1.1 API is not supported (see REQ-SCOPE-1 in Requirements.md).
 
 ---
 
@@ -22,7 +22,7 @@ Create an n8n community node for baramundi Management Suite (bConnect API) to en
   - Updated execute logic in `endpoint.execute.ts` and `job.execute.ts`
   - Fixed and validated 140 unit tests (75 endpoint + 62 job + 3 compilation fixes)
   - Fixed and validated 7 system tests (4 endpoint + 3 job)
-  - Fixed TypeScript compilation errors in V1.1 modules (setupIntegrity, ssh, vpp)
+  - Note: V1.1 modules (setupIntegrity, ssh, vpp, etc.) subsequently removed per REQ-SCOPE-1
   - Built and deployed package to running n8n instance
 - **Test Results**: 633 tests passing (23 skipped), 86.35% coverage
 - **Impact**: Significantly improved UX - users can now select endpoints/jobs from searchable dropdowns instead of manually entering GUIDs
@@ -37,10 +37,9 @@ _(No other tasks currently in progress)_
 ### 🎯 V2.0 API Implementation Status - Core Complete, 91 Operations Remaining
 
 **Summary (2026-01-23):**
-- **Total Operations Implemented**: 137/228 V2.0 operations (60.1% spec coverage)
-- **n8n Operations Total**: 191 operations (137 V2.0 + 54 V1.1)
+- **Total Operations Implemented**: 137/228 V2.0 operations (60.1% spec coverage) — V2.0 only per REQ-SCOPE-1
 - **Status**: All essential CRUD operations complete, contextual queries pending
-- **Test Coverage**: 633 unit tests + 184 system tests (86.35% coverage)
+- **Test Coverage**: 547 unit tests passing (118 skipped) + system tests
 
 **📋 Complete Gap Analysis**: See [tasks_bConnect_Complete.md](./tasks_bConnect_Complete.md) for detailed roadmap to 100% V2.0 spec coverage
 
@@ -262,301 +261,34 @@ The following operations were previously reported as "missing" but verification 
   - [x] Get Windows endpoint by ID
   - [x] Get single update by endpoint and update ID
 
-### 🔧 Low Priority - V1.1 Specialized Features
-
-**V1.1 API Implementation Status:**
-- **Total V1.1 Controllers from Spec:** 19 controllers (50 operations total)
-- **Currently Implemented:** 19 controllers (50 operations) ✅ **100% COMPLETE**
-- **Remaining to Implement:** 0 controllers (0 operations)
-- **Blocked (Missing Spec Pages):** 0 controllers
-
-**Implemented V1.1 Controllers (19 - ALL COMPLETE):**
-1. ✅ InventoryDataRegistryScans (3 ops) - Pages 50
-2. ✅ HardwareProfiles (2 ops) - Pages 40
-3. ✅ BootEnvironment (2 ops) - Pages 41
-4. ✅ ComplianceViolations (3 ops) - Pages 73-74
-5. ✅ EndpointSecrets/BitLocker (5 ops) - Pages 65 ⚠️ Security Critical
-6. ✅ InventoryDataFileScans (3 ops) - Pages 51
-7. ✅ InventoryDataWMIScans (6 ops) - Pages 52
-8. ✅ InventoryDataCustomScans (6 ops) - Pages 53
-9. ✅ InventoryDataHardwareScans (3 ops) - Pages 54 - Cross-platform
-10. ✅ InventoryDataSnmpScans (1 op) - Pages 55 - Network devices
-11. ✅ InventoryOverviews (2 ops) - Pages 55 - Windows only
-12. ✅ SoftwareScanRules (1 op) - Pages 57 - Windows only
-13. ✅ SoftwareScanRuleCounts (1 op) - Pages 58 - Windows only
-14. ✅ EndpointInvSoftware (1 op) - Pages 59 - Windows only
-15. ✅ InventoryAppScans (2 ops) - Pages 56 - Mobile only
-16. ✅ Images (1 op) - Pages 60 - Job icons/images
-17. ✅ EndpointSSHInfo (1 op) - Page 74 (Section 7.46) - Linux/Unix only
-18. ✅ VPPUsers & VPPLicenseAssociations (7 ops) - Pages 68-69 (Sections 7.31-7.32) - iOS/Mac licensing
-19. ✅ PinnedBmaSetupFiles (1 op) - Section 7.44 - Setup file integrity verification ⚠️ Security Critical
-
----
-
-#### 11. Inventory Data Registry Scans V1.1 ✅ COMPLETE
-- [x] **Registry Scan Inventory** (3 operations)
-  - [x] Get all registry scan inventory data
-  - [x] Get registry scan data by endpoint ID
-  - [x] Delete registry scan data by endpoint ID
-  - Controller 5.17 from bConnect V1.1 spec (page 50)
-  - 7 unit tests, 5 system tests (all passing)
-  - Full TDD implementation with live API validation
-
-#### 12. Hardware Profiles V1.1 ✅ COMPLETE
-- [x] **Hardware Profile Management** (2 operations, read-only)
-  - [x] Get all hardware profiles
-  - [x] Get hardware profile by ID
-  - Controller 5.11 from bConnect V1.1 spec (page 40)
-  - 6 unit tests, 4 system tests (all passing)
-  - Full TDD implementation with live API validation
-
-#### 13. Boot Environment V1.1 ✅ COMPLETE
-- [x] **Boot Environment Management** (2 operations, read-only)
-  - [x] Get all boot environments
-  - [x] Get boot environment by ID
-  - Controller 5.12 from bConnect V1.1 spec (page 41)
-  - 6 unit tests, 4 system tests (all passing)
-  - Full TDD implementation with live API validation
-
-#### 14. Compliance Violations V1.1 ✅ COMPLETE
-- [x] **CVE & Compliance Management** (3 operations)
-  - [x] Get all compliance violations (CVE, MDM, Industrial)
-  - [x] Get violation by CVE ID
-  - [x] Get violations by endpoint ID (client-side filtering)
-  - Controller ComplianceViolations V1.1 (pages 73-74)
-  - 6 unit tests, 6 system tests (all passing)
-  - Full TDD implementation with live API validation
-
-#### 15. BitLocker Secrets V1.1 ✅ COMPLETE ⚠️ SECURITY CRITICAL
-- [x] **BitLocker Recovery & Secrets** (5 operations, all read-only)
-  - [x] Get all endpoint secrets (recovery keys, TPM passwords, PINs)
-  - [x] Get BitLocker recovery password for volume
-  - [x] Get TPM owner password for volume
-  - [x] Get BitLocker PIN for endpoint
-  - [x] Get all volume secrets
-  - Controller EndpointSecrets V1.1 (page 65)
-  - 11 unit tests, 8 system tests (all passing)
-  - Full TDD implementation with comprehensive security warnings
-- [x] **Security & Audit**
-  - [x] Security warnings in code comments and documentation
-  - [x] Security test scenario in system tests
-  - [x] Comprehensive security documentation in tasks.md
-
-#### 16. Apple VPP Management V1.1 ✅ COMPLETE
-- [x] **VPP Users** (4 operations)
-  - [x] Get all VPP users
-  - [x] Get VPP user by ID
-  - [x] Create VPP user
-  - [x] Delete VPP user
-- [x] **VPP License Associations** (3 operations)
-  - [x] Get all license associations
-  - [x] Assign license to user/device
-  - [x] Revoke license (delete association)
-  - Controller VPPUsers & VPPLicenseAssociations V1.1 (sections 7.31-7.32)
-  - 11 unit tests, 7 system tests (all passing)
-  - Full TDD implementation with live API validation
-  - Apple Volume Purchase Program for iOS/Mac app licensing
-
-#### 17. SSH Server Management V1.1 ✅ COMPLETE
-- [x] **SSH Server Information** (1 operation, read-only, Linux/Unix only)
-  - [x] Get SSH server info for endpoint
-  - Controller EndpointSSHInfo V1.1 (page 74, section 7.46)
-  - 5 unit tests, 4 system tests (all passing)
-  - Full TDD implementation with live API validation
-  - Returns: EndpointId, Port, SshVersion, DiscoveredOn, HostKeys array
-
-#### 18. Inventory Data File Scans V1.1 ✅ COMPLETE
-- [x] **File Scan Inventory** (3 operations)
-  - [x] Get all file scan inventory data
-  - [x] Get file scan data by endpoint ID
-  - [x] Delete file scan data by endpoint ID
-  - Controller 5.17 from bConnect V1.1 spec (page 51)
-  - 7 unit tests, 3 system tests (all passing)
-  - Full TDD implementation with live API validation
-
-#### 19. Inventory Data WMI Scans V1.1 ✅ COMPLETE
-- [x] **WMI Scan Inventory** (6 operations)
-  - [x] Get all WMI scan inventory data
-  - [x] Get WMI scans by template name
-  - [x] Get latest WMI scans by template name
-  - [x] Get WMI scans by endpoint ID
-  - [x] Get WMI scans by endpoint and template
-  - [x] Get WMI scans by endpoint, template, and scan time
-  - Controller 5.18 from bConnect V1.1 spec (page 52)
-  - 8 unit tests, 6 system tests (all passing)
-  - Full TDD implementation with live API validation
-
-#### 20. Inventory Data Custom Scans V1.1 ✅ COMPLETE
-- [x] **Custom Scan Inventory** (6 operations)
-  - [x] Get all custom scan inventory data
-  - [x] Get custom scans by template name
-  - [x] Get latest custom scans by template name
-  - [x] Get custom scans by endpoint ID
-  - [x] Get custom scans by endpoint and template
-  - [x] Get custom scans by endpoint, template, and scan time
-  - Controller 5.19 from bConnect V1.1 spec (page 53)
-  - 8 unit tests, 6 system tests (all passing)
-  - Full TDD implementation with live API validation
-
-#### 21. Inventory Data Hardware Scans V1.1 ✅ COMPLETE
-- [x] **Hardware Scan Inventory** (3 operations, cross-platform)
-  - [x] Get hardware scan by endpoint ID
-  - [x] Get hardware scan by endpoint ID and template name (Windows only)
-  - [x] Get hardware scan by endpoint, template, and scan time/Latest (Windows only)
-  - Controller 5.17 from bConnect V1.1 spec (page 54)
-  - Cross-platform support: Windows, iOS, Android, Mac
-  - Template parameters ignored for non-Windows endpoints
-  - Latest scan retrieval with `Scan=Latest` parameter
-  - 6 unit tests, 4 system tests (all passing)
-  - Full TDD implementation with live API validation
-
-#### 22. Inventory Data SNMP Scans V1.1 ✅ COMPLETE
-- [x] **SNMP Scan Inventory** (1 operation, read-only)
-  - [x] Get SNMP scan data by endpoint ID
-  - Controller 5.18 from bConnect V1.1 spec (page 55)
-  - Network device inventory (Cisco, HP, etc.)
-  - SNMP OID data retrieval
-  - Requires read rights on "Inventoried Files" node
-  - 3 unit tests, 2 system tests (all passing)
-  - Full TDD implementation with live API validation
-
-#### 23. Inventory Overviews V1.1 ✅ COMPLETE
-- [x] **Inventory Overview** (2 operations, read-only, Windows only)
-  - [x] Get all inventory overviews
-  - [x] Get inventory overview by endpoint ID
-  - Controller 5.19 from bConnect V1.1 spec (page 55)
-  - Overview of Custom, WMI, and Hardware scans
-  - Last scan timestamps for each type
-  - Quick scan status check
-  - 5 unit tests, 3 system tests (all passing)
-  - Full TDD implementation with live API validation
-
-#### 24. Inventory App Scans V1.1 ✅ COMPLETE
-- [x] **App Scan Inventory** (2 operations, read-only, Mobile only)
-  - [x] Get all app scan data
-  - [x] Get app scan data by endpoint ID
-  - Controller 5.20 from bConnect V1.1 spec (page 56)
-  - Mobile device app inventory (Android and iOS only)
-  - App version tracking, publisher info, install dates
-  - Not applicable to Windows endpoints
-  - 3 unit tests, 2 system tests (all passing)
-
-#### 25. Software Scan Rules V1.1 ✅ COMPLETE
-- [x] **Software Scan Rules** (1 operation, read-only, Windows only)
-  - [x] Get all software scan rules
-  - Controller 5.21 from bConnect V1.1 spec (page 57)
-  - Client software inventory rules
-  - Managed software tracking
-  - Software detection patterns
-  - Requires read rights on "Software scan rules" node
-  - 2 unit tests, 1 system test (all passing)
-
-#### 26. Software Scan Rule Counts V1.1 ✅ COMPLETE
-- [x] **Software Scan Rule Counts** (1 operation, read-only, Windows only)
-  - [x] Get all software scan rule counts
-  - Controller 5.22 from bConnect V1.1 spec (page 58)
-  - Software installation counts per rule
-  - Endpoint lists per software
-  - License management support
-  - Requires read rights on "Licenses" node
-  - 2 unit tests, 1 system test (all passing)
-
-#### 27. Endpoint Inventory Software V1.1 ✅ COMPLETE
-- [x] **Endpoint Inventory Software Links** (1 operation, read-only, Windows only)
-  - [x] Get all endpoint inventory software links
-  - Controller 5.23 from bConnect V1.1 spec (page 59)
-  - Links endpoints to inventoried software
-  - Software version tracking per endpoint
-  - Last seen timestamps and conflict detection
-  - Requires read rights on endpoint and "Software scan rules" node
-  - 2 unit tests, 1 system test (all passing)
-
-#### 28. Images V1.1 ✅ COMPLETE
-- [x] **Job Image Retrieval** (1 operation, read-only)
-  - [x] Get image by ID
-  - Controller 5.24 from bConnect V1.1 spec (page 60)
-  - Job-related image/icon retrieval
-  - Base64-encoded image data
-  - MIME type support (JPEG, PNG, etc.)
-  - 2 unit tests, 1 system test (all passing)
-
-#### 29. Setup File Integrity V1.1 ✅ COMPLETE
-- [x] **Integrity Verification** (1 operation, read-only) ⚠️ Security Critical
-  - [x] Get setup file integrity (SHA-256 hashes)
-  - Controller 7.44 from bConnect V1.1 spec (PinnedBmaSetupFilesInformation)
-  - Baramundi setup file integrity verification
-  - SHA-256 hash validation for security verification
-  - 3 unit tests, 3 system tests (all passing)
-  - Full TDD implementation with live API validation
-
 ### 🧪 Testing & Quality (TDD Methodology)
 
-- [x] **Unit Tests - 633 tests passing** ✅ COMPLETE (86.35% coverage overall)
-  - [x] Endpoint operations: 75 tests ✅ COMPLETE (includes loadOptions integration)
-  - [x] Jobs API operations: 62 tests ✅ COMPLETE (includes loadOptions integration)
-  - [x] Assets API operations: 36 tests ✅ COMPLETE
-  - [x] Server Management API: 23 tests ✅ COMPLETE
-  - [x] Active Directory API: 20 tests ✅ COMPLETE
-  - [x] Defense Control API: 15 tests ✅ COMPLETE
-  - [x] Variables API: 15 tests ✅ COMPLETE
-  - [x] Operating Systems API: 11 tests ✅ COMPLETE
-  - [x] BitLocker Secrets: 11 tests ✅ COMPLETE (V1.1 API)
-  - [x] VPP Management: 11 tests ✅ COMPLETE (V1.1 API)
-  - [x] Organizational Units: 9 tests ✅ COMPLETE (V1.1 API)
-  - [x] Inventory Data WMI Scans: 8 tests ✅ COMPLETE (V1.1 API)
-  - [x] Inventory Data Custom Scans: 8 tests ✅ COMPLETE (V1.1 API)
-  - [x] Inventory Data Registry Scans: 7 tests ✅ COMPLETE (V1.1 API)
-  - [x] Inventory Data File Scans: 7 tests ✅ COMPLETE (V1.1 API)
-  - [x] Compliance Violations: 6 tests ✅ COMPLETE (V1.1 API)
-  - [x] Hardware Profiles: 6 tests ✅ COMPLETE (V1.1 API)
-  - [x] Boot Environment: 6 tests ✅ COMPLETE (V1.1 API)
-  - [x] Inventory Data Hardware Scans: 6 tests ✅ COMPLETE (V1.1 API)
-  - [x] Inventory Overviews: 5 tests ✅ COMPLETE (V1.1 API)
-  - [x] SSH Server Management: 5 tests ✅ COMPLETE (V1.1 API)
-  - [x] Software API: 4 tests ✅ COMPLETE
-  - [x] Update Management API: 4 tests ✅ COMPLETE
-  - [x] Setup File Integrity: 3 tests ✅ COMPLETE (V1.1 API)
-  - [x] Inventory Data SNMP Scans: 3 tests ✅ COMPLETE (V1.1 API)
-  - [x] Inventory App Scans: 3 tests ✅ COMPLETE (V1.1 API)
-  - [x] Software Scan Rules: 2 tests ✅ COMPLETE (V1.1 API)
-  - [x] Software Scan Rule Counts: 2 tests ✅ COMPLETE (V1.1 API)
-  - [x] Endpoint Inventory Software: 2 tests ✅ COMPLETE (V1.1 API)
-  - [x] Images: 2 tests ✅ COMPLETE (V1.1 API)
-  - [x] Transport layer: 14 tests ✅ COMPLETE
+- [x] **Unit Tests - 547 passing, 118 skipped** ✅ (V2.0 only, per REQ-SCOPE-1)
+  - [x] Endpoint operations ✅ COMPLETE
+  - [x] Jobs API operations ✅ COMPLETE
+  - [x] Assets API operations ✅ COMPLETE
+  - [x] Server Management API ✅ COMPLETE
+  - [x] Active Directory API ✅ COMPLETE
+  - [x] Defense Control API ✅ COMPLETE
+  - [x] Variables API ✅ COMPLETE
+  - [x] Operating Systems API ✅ COMPLETE
+  - [x] Software API ✅ COMPLETE
+  - [x] Update Management API ✅ COMPLETE
+  - [x] Transport layer ✅ COMPLETE
   - [x] Coverage: 90-100% for all implemented modules ✅ Target exceeded
 
-- [x] **System Tests - 184 tests** ✅ COMPLETE (Live bConnect API validation)
-  - [x] Endpoints API: 13 tests (all passing, includes loadOptions parameter tests) ✅
-  - [x] Jobs API: 9 tests (all passing, includes loadOptions parameter tests) ✅
-  - [x] Assets API: 14 tests (all passing) ✅
-  - [x] Server Management API: 21 tests (all passing) ✅
-  - [x] Active Directory API: 10 tests (all passing) ✅
-  - [x] Defense Control API: 11 tests (all passing) ✅
-  - [x] Variables API: 11 tests (all passing) ✅
-  - [x] Operating Systems API: 10 tests (all passing) ✅
-  - [x] BitLocker Secrets: 8 tests (all passing) ✅ (V1.1 API)
-  - [x] VPP Management: 7 tests (all passing) ✅ (V1.1 API)
-  - [x] Software API: 7 tests (all passing) ✅
-  - [x] Compliance Violations: 6 tests (all passing) ✅ (V1.1 API)
-  - [x] Inventory Data Registry Scans: 5 tests (all passing) ✅ (V1.1 API)
-  - [x] Inventory Data WMI Scans: 6 tests (all passing) ✅ (V1.1 API)
-  - [x] Inventory Data Custom Scans: 6 tests (all passing) ✅ (V1.1 API)
-  - [x] Inventory Data Hardware Scans: 4 tests (all passing) ✅ (V1.1 API)
-  - [x] SSH Server Management: 4 tests (all passing) ✅ (V1.1 API)
-  - [x] Hardware Profiles: 4 tests (all passing) ✅ (V1.1 API)
-  - [x] Boot Environment: 4 tests (all passing) ✅ (V1.1 API)
-  - [x] Inventory Data File Scans: 3 tests (all passing) ✅ (V1.1 API)
-  - [x] Inventory Overviews: 3 tests (all passing) ✅ (V1.1 API)
-  - [x] Org Units API: 3 tests (all passing) ✅ (V1.1 API)
-  - [x] Setup File Integrity: 3 tests (all passing) ✅ (V1.1 API)
-  - [x] Update Management API: 2 tests (all passing) ✅
-  - [x] Inventory Data SNMP Scans: 2 tests (all passing) ✅ (V1.1 API)
-  - [x] Software Scan Rules: 1 test (all passing) ✅ (V1.1 API)
-  - [x] Software Scan Rule Counts: 1 test (all passing) ✅ (V1.1 API)
-  - [x] Endpoint Inventory Software: 1 test (all passing) ✅ (V1.1 API)
-  - [x] Inventory App Scans: 1 test (all passing) ✅ (V1.1 API)
-  - [x] **Pass Rate: 86.7%** (157 passing, 23 skipped, 1 failing)
-  - [x] **Execution Time: ~7.5s** (29 test files, real HTTP calls)
+- [x] **System Tests** ✅ (Live bConnect V2.0 API validation, per REQ-SCOPE-1)
+  - [x] Endpoints API ✅
+  - [x] Jobs API ✅
+  - [x] Assets API ✅
+  - [x] Server Management API ✅
+  - [x] Active Directory API ✅
+  - [x] Defense Control API ✅
+  - [x] Variables API ✅
+  - [x] Operating Systems API ✅
+  - [x] Software API ✅
+  - [x] Update Management API ✅
+  - [x] Compliance API ✅
   - [x] **TDD Methodology**: Tests written first, then validated against live API
   - [x] **Infrastructure**: test/system/setup.ts with environment-based configuration
   - [x] Test against live BMS server (https://bms-win22srv:444/bconnect)
@@ -573,8 +305,7 @@ The following operations were previously reported as "missing" but verification 
 - [ ] **Documentation**
   - [ ] Add screenshots to README
   - [ ] Create video tutorial
-  - [ ] Document all V2.0 resources
-  - [ ] Document all V1.1 resources
+  - [ ] Document all V2.0 resources (V1.1 removed per REQ-SCOPE-1)
   - [ ] Create workflow examples for each resource
 
 - [x] **UX Improvements - Phase 1: LoadOptions Implementation** ✅ COMPLETE
