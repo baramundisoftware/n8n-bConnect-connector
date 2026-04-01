@@ -35,3 +35,13 @@ jobs:
 
       - name: Security audit (runtime dependencies only)
         run: npm audit --omit=dev --audit-level=high
+
+      - name: File permission check (no 664 or executable .ts files)
+        run: |
+          bad=$(find nodes test -name "*.ts" ! -perm 644 2>/dev/null)
+          if [ -n "$bad" ]; then
+            echo "ERROR: The following .ts files have unexpected permissions:"
+            echo "$bad" | xargs ls -la
+            exit 1
+          fi
+          echo "All .ts file permissions OK (644)"

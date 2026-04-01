@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-04-01
+
+> **Semver rationale**: Patch bump. Security hardening only — no new operations, no breaking changes.
+
+### Security
+
+- **F-2026-01** (MEDIUM): Added `validateGuid()` + `NodeOperationError` guards to all `*Id` URL path parameters across 8 previously unprotected execute modules: `activeDirectory`, `defenseControl`, `operatingSystem`, `serverManagement`, `software`, `universalDynamicGroups`, `updateManagement`, `variable`. Prevents malformed or injected values from reaching the API.
+- **F-2026-02** (LOW): Added `validateGuid()` to 13 unvalidated `Id` parameters in `job.execute.ts` Phase 8D gap functions (`getJobDefinitionsByFolder`, `getKioskReleasesByJobDefinition`, `getJobInstancesByGroup` variants, `assignJobTo*` variants, `getKioskReleasesByEndpoint/LogicalGroup/ADObject`). Closes OData injection surface in `getInstances`.
+- **F-2026-03** (LOW): Fixed file permissions — `chmod 644` on all `.ts` files that had mode `664` (`Baramundi.node.ts`, `utils/types.ts`, all `*.fields.ts`). Added CI step to prevent regression.
+
 ## [0.4.0] - 2026-03-31
 
 > **Semver rationale**: Minor bump. Phase 8 adds ~43 new read/write operations across 6 resource modules (activeDirectory, asset, endpoint, job, software, variable). No breaking changes to existing operations.
