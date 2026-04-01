@@ -232,8 +232,7 @@ describe.skipIf(skipConfig.skip)('Endpoint API - System Tests', () => {
   describe('Static Groups Operations', () => {
     let createdGroupId: string;
 
-    it.skip('should create, read, update, and delete a static group', async () => {
-      // Note: Static Groups endpoint may not be available in all bConnect versions
+    it('should create, read, update, and delete a static group', async () => {
       // CREATE
       const createContext = createSystemTestContext({
         name: `SystemTest_StaticGroup_${Date.now()}`,
@@ -280,7 +279,7 @@ describe.skipIf(skipConfig.skip)('Endpoint API - System Tests', () => {
       createdEndpointIds = createdEndpointIds.filter(id => id !== createdGroupId);
     });
 
-    it.skip('should list all static groups', async () => {
+    it('should list all static groups', async () => {
       const context = createSystemTestContext({
         returnAll: false,
         limit: 10,
@@ -293,7 +292,7 @@ describe.skipIf(skipConfig.skip)('Endpoint API - System Tests', () => {
   });
 
   describe('Dynamic Groups Operations', () => {
-    it.skip('should get a specific dynamic group', async () => {
+    it('should get a specific dynamic group', async () => {
       // First get a dynamic group ID
       const listContext = createSystemTestContext({
         returnAll: false,
@@ -318,7 +317,7 @@ describe.skipIf(skipConfig.skip)('Endpoint API - System Tests', () => {
       expect(result[0].json.id).toBe(groupId);
     });
 
-    it.skip('should list all dynamic groups', async () => {
+    it('should list all dynamic groups', async () => {
       const context = createSystemTestContext({
         returnAll: false,
         limit: 10,

@@ -214,7 +214,7 @@ describe.skipIf(skipConfig.skip)('Server Management API - System Tests', () => {
     });
 
     // Skip CRUD operations - security groups are critical and require careful configuration
-    it.skip('should create, update, and delete a security group', async () => {
+    it('should create, update, and delete a security group', async () => {
       // CREATE
       const createContext = createSystemTestContext({
         name: `SystemTest_SecurityGroup_${Date.now()}`,
@@ -301,7 +301,7 @@ describe.skipIf(skipConfig.skip)('Server Management API - System Tests', () => {
 
   describe('Access Rights Operations', () => {
     // Skip - requires specific object ID (can use security group ID, etc.)
-    it.skip('should fetch access rights for an object', async () => {
+    it('should fetch access rights for an object', async () => {
       // Get a security group to test access rights on
       const listContext = createSystemTestContext({
         returnAll: false,

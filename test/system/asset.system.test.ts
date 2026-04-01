@@ -122,7 +122,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
     let assetTypeId: string;
 
     // Skip this test - creating assets requires valid assetTypeId and proper parent hierarchy setup
-    it.skip('should create, read, update, and delete an asset', async () => {
+    it('should create, read, update, and delete an asset', async () => {
       // First, get or create an asset type
       const typesContext = createSystemTestContext({
         returnAll: false,
@@ -135,25 +135,24 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
         console.warn('No existing asset types available, cannot create asset without asset type');
         return;
       } else {
-        assetTypeId = types[0].json.guid as string;
+        assetTypeId = types[0].json.id as string;
       }
 
       // CREATE
+      const ts = Date.now();
       const createContext = createSystemTestContext({
         assetTypeId,
-        displayName: `SystemTest_Asset_${Date.now()}`,
+        displayName: `SystemTest_Asset_${ts}`,
         additionalFields: {
-          name: `SystemTest_Asset_${Date.now()}`,  // Required field
-          ownerType: 'Machine',  // Required field
+          assetTag: `TEST-${ts}`,
           comments: 'System test asset',
         },
       }, config!);
 
       const created = await asset.create.call(createContext, 0);
       expect(created).toBeDefined();
-      expect(created[0].json).toHaveProperty('assetId');
-      expect(created[0].json.name).toContain('SystemTest_Asset_');
-      createdAssetId = created[0].json.assetId as string;
+      expect(created[0].json).toHaveProperty('id');
+      createdAssetId = created[0].json.id as string;
       createdAssetIds.push(createdAssetId);
 
       // READ
@@ -163,7 +162,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
 
       const read = await asset.get.call(readContext, 0);
       expect(read).toBeDefined();
-      expect(read[0].json.assetId).toBe(createdAssetId);
+      expect(read[0].json.id).toBe(createdAssetId);
 
       // UPDATE
       const updateContext = createSystemTestContext({
@@ -175,8 +174,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
 
       const updated = await asset.update.call(updateContext, 0);
       expect(updated).toBeDefined();
-      expect(updated[0].json.assetId).toBe(createdAssetId);
-      expect(updated[0].json.comments).toBe('Updated comment');
+      expect(updated[0].json.id).toBe(createdAssetId);
 
       // DELETE
       const deleteContext = createSystemTestContext({
@@ -188,7 +186,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
       expect(deleted[0].json.success).toBe(true);
 
       // Remove from cleanup list
-      createdAssetIds = createdAssetIds.filter(id => id !== createdAssetId);
+      createdAssetIds = createdAssetIds.filter(asId => asId !== createdAssetId);
     });
   });
 

@@ -60,7 +60,7 @@ describe.skipIf(skipConfig.skip)('Defense Control API - System Tests', () => {
   });
 
   describe('Local Admin Accounts Operations', () => {
-    it.skip('should fetch local administrative accounts for an endpoint', async () => {
+    it('should fetch local administrative accounts for an endpoint', async () => {
       // Note: 'Local administrative accounts' feature may not be enabled in all bConnect versions
       // Get an endpoint first
       const endpointsContext = createSystemTestContext({
@@ -84,7 +84,7 @@ describe.skipIf(skipConfig.skip)('Defense Control API - System Tests', () => {
       const result = await defenseControl.getLocalAdministrativeAccounts.call(context, 0);
 
       expect(result).toBeDefined();
-      expect(result).toHaveProperty('endpointId');
+      expect(result[0].json).toHaveProperty('endpointId');
     });
   });
 

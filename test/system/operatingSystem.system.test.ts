@@ -107,8 +107,7 @@ describe.skipIf(skipConfig.skip)('Operating Systems API - System Tests', () => {
   });
 
   describe('Folder Operations - CRUD', () => {
-    // Skip write operations - require valid parent folder configuration
-    it.skip('should create, update, and delete an OS folder', async () => {
+    it('should create, update, and delete an OS folder', async () => {
       // Get an existing folder to use as parent
       const listContext = createSystemTestContext({
         returnAll: false,
@@ -218,8 +217,7 @@ describe.skipIf(skipConfig.skip)('Operating Systems API - System Tests', () => {
       expect(result.length).toBeLessThanOrEqual(5);
     });
 
-    // Skip update operation - modifying OS data requires careful consideration
-    it.skip('should update a Windows endpoint', async () => {
+    it('should update a Windows endpoint', async () => {
       const listContext = createSystemTestContext({
         returnAll: false,
         limit: 1,
@@ -232,7 +230,7 @@ describe.skipIf(skipConfig.skip)('Operating Systems API - System Tests', () => {
         return;
       }
 
-      const endpointId = endpoints[0].json.endpointId as string;
+      const endpointId = endpoints[0].json.id as string;
 
       const updateContext = createSystemTestContext({
         endpointId,
@@ -244,7 +242,7 @@ describe.skipIf(skipConfig.skip)('Operating Systems API - System Tests', () => {
       const result = await os.updateWindowsEndpoint.call(updateContext, 0);
 
       expect(result).toBeDefined();
-      expect(result[0].json.endpointId).toBe(endpointId);
+      expect(result[0].json.id).toBe(endpointId);
     });
   });
 

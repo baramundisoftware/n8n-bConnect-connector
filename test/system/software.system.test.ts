@@ -148,18 +148,17 @@ describe.skipIf(skipConfig.skip)('Software API - System Tests', () => {
   });
 
   describe('getInstalledSoftwareByUniversalDynamicGroup()', () => {
-    it.skip('should fetch software for a specific universal dynamic group', async () => {
-      // Note: Dynamic Groups endpoint may not be available in all bConnect versions
-      // First, get a dynamic group ID
+    it('should fetch software for a specific universal dynamic group', async () => {
+      // Get a UDG ID from the mock
       const groupsContext = createSystemTestContext({
         returnAll: false,
         limit: 1,
       }, config!);
 
-      const groups = await (await import('../../nodes/Baramundi/actions/endpoint/endpoint.execute')).getDynamicGroups.call(groupsContext, 0);
+      const groups = await (await import('../../nodes/Baramundi/actions/universalDynamicGroups/universalDynamicGroups.execute')).getMany.call(groupsContext, 0);
 
       if (groups.length === 0) {
-        console.warn('No dynamic groups available for testing');
+        console.warn('No universal dynamic groups available for testing');
         return;
       }
 
