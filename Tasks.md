@@ -373,6 +373,27 @@
 
 ---
 
+## Phase 10 — Network Endpoint Create (Coverage Gap)
+
+**Goal**: Add `CreateNetworkEndpoint` to the `create` operation. Network is the only platform type missing from the endpoint type dropdown. It requires `displayName` + `primaryIP` (required per OpenAPI spec).
+
+**Prerequisite**: Phase 9 complete.
+
+### Backlog
+
+| ID | Task | Role | Priority | Depends on |
+|----|------|------|----------|------------|
+| P10.1 | Add `network` to `endpointType` dropdown in `endpoint.fields.ts`; add `primaryIP` required field for network type; add `network` to `endpointMap` in `endpoint.execute.ts` | Backend Developer | HIGH | Phase 9 done |
+| P10.2 | Write unit tests for `create` with network type | Test Engineer | HIGH | P10.1 |
+| P10.3 | Build + lint + full test run — 0 errors | QA Engineer | HIGH | P10.2 |
+| P10.4 | Bump version, update CHANGELOG, update analysis files | DevOps Engineer | MEDIUM | P10.3 |
+
+### Done
+
+*(empty)*
+
+---
+
 ## Notes
 
 - **System tests** (`test/system/`) require a live bMS server. They are skipped in CI unless `BMS_URL` env var is set. Do not block phases on system test results.

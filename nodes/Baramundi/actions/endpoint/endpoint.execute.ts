@@ -180,11 +180,12 @@ export async function create(
 
   // Determine API endpoint based on type
   const endpointMap: Record<string, string> = {
-    windows: '/endpoints/v2.0/WindowsEndpoints',
-    linux: '/endpoints/v2.0/LinuxEndpoints',
-    mac: '/endpoints/v2.0/MacEndpoints',
     android: '/endpoints/v2.0/AndroidEndpoints',
     ios: '/endpoints/v2.0/IosEndpoints',
+    linux: '/endpoints/v2.0/LinuxEndpoints',
+    mac: '/endpoints/v2.0/MacEndpoints',
+    network: '/endpoints/v2.0/NetworkEndpoints',
+    windows: '/endpoints/v2.0/WindowsEndpoints',
   };
 
   const apiEndpoint = endpointMap[endpointType];
@@ -202,6 +203,20 @@ export async function create(
   if (endpointType === 'windows' || endpointType === 'linux') {
     const hostName = this.getNodeParameter('hostName', index) as string;
     body.hostName = hostName;
+  }
+
+  // Add primaryIP for Network (required)
+  if (endpointType === 'network') {
+    const primaryIP = this.getNodeParameter('primaryIP', index) as string;
+    const ipValidation = validateIpv4Address(primaryIP);
+    if (!ipValidation.valid) {
+      throw new NodeOperationError(
+        this.getNode(),
+        `Invalid primary IP address:\n${ipValidation.errors.join('\n')}`,
+        { itemIndex: index },
+      );
+    }
+    body.primaryIP = primaryIP;
   }
 
   const response = await apiRequest.call(this, 'POST', apiEndpoint, body);

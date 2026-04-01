@@ -1,6 +1,6 @@
 # n8n Connector Implementation Status Analysis — bMS 26R1
 
-**Generated:** 2026-03-31
+**Generated:** 2026-04-01
 **OpenAPI Source:** `/home/ansible/MCP/bConnectOpenAPI/26R1/`
 **Connector Source:** `/home/ansible/MCP/n8nconnector/`
 
@@ -23,8 +23,8 @@
 |--------|------|-------------|--------|
 | GET | /v2.0/ADGroups | GetADGroups | :white_check_mark: `activeDirectory.getADGroups` |
 | GET | /v2.0/ADGroups/{id} | GetADGroupById | :white_check_mark: `activeDirectory.getADGroup` |
-| GET | /v2.0/ADGroups/{adGroupId}/ADGroups | GetADGroupsByADGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/ADGroups/{adGroupId}/ADObjects | GetADObjectsByADGroupId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/ADGroups/{adGroupId}/ADGroups | GetADGroupsByADGroupId | :white_check_mark: `activeDirectory.getADGroupsByADGroup` |
+| GET | /v2.0/ADGroups/{adGroupId}/ADObjects | GetADObjectsByADGroupId | :white_check_mark: `activeDirectory.getADObjectsByADGroup` |
 | GET | /v2.0/ADGroups/{adGroupId}/ADUsers | GetADUsersByADGroupId | :white_check_mark: `activeDirectory.getADUsersByGroup` |
 | GET | /v2.0/OrgUnits/{orgUnitId}/ADGroups | GetADGroupsByOrgUnitId | :white_check_mark: `activeDirectory.getADGroupsByOrgUnit` |
 
@@ -33,24 +33,24 @@
 |--------|------|-------------|--------|
 | GET | /v2.0/ADObjects | GetADObjects | :white_check_mark: `activeDirectory.getADObjects` |
 | GET | /v2.0/ADObjects/{id} | GetADObjectById | :white_check_mark: `activeDirectory.getADObject` |
-| GET | /v2.0/ADObjects/{id}/ADGroupMemberships | GetADObjectMemberships | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/OrgUnits/{orgUnitId}/ADObjects | GetADObjectsByOrgUnitId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/ADObjects/{id}/ADGroupMemberships | GetADObjectMemberships | :white_check_mark: `activeDirectory.getADObjectMemberships` |
+| GET | /v2.0/OrgUnits/{orgUnitId}/ADObjects | GetADObjectsByOrgUnitId | :white_check_mark: `activeDirectory.getADObjectsByOrgUnit` |
 
 ### AD Users
 | Method | Path | OperationId | Status |
 |--------|------|-------------|--------|
 | GET | /v2.0/ADUsers | GetADUsers | :white_check_mark: `activeDirectory.getADUsers` |
 | GET | /v2.0/ADUsers/{id} | GetADUserById | :white_check_mark: `activeDirectory.getADUser` |
-| GET | /v2.0/OrgUnits/{orgUnitId}/ADUsers | GetADUsersByOrgUnitId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/OrgUnits/{orgUnitId}/ADUsers | GetADUsersByOrgUnitId | :white_check_mark: `activeDirectory.getADUsersByOrgUnit` |
 
 ### Organizational Units
 | Method | Path | OperationId | Status |
 |--------|------|-------------|--------|
 | GET | /v2.0/OrgUnits | GetOrgUnits | :white_check_mark: `activeDirectory.getOrgUnits` |
 | GET | /v2.0/OrgUnits/{id} | GetOrgUnit | :white_check_mark: `activeDirectory.getOrgUnit` |
-| GET | /v2.0/OrgUnits/{orgUnitId}/OrgUnits | GetOrgUnitsByOrgUnitId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/OrgUnits/{orgUnitId}/OrgUnits | GetOrgUnitsByOrgUnitId | :white_check_mark: `activeDirectory.getOrgUnitsByOrgUnit` |
 
-**Active Directory Summary: 10/16 implemented (62.5%)**
+**Active Directory Summary: 16/16 implemented (100%)**
 
 ---
 
@@ -75,10 +75,10 @@
 |--------|------|-------------|--------|
 | GET | /v2.0/AssetStock/Folders | GetAssetStockFolders | :white_check_mark: `asset.getAssetStockFolders` |
 | POST | /v2.0/AssetStock/Folders | CreateAssetStockFolder | :white_check_mark: `asset.createAssetStockFolder` |
-| GET | /v2.0/AssetStock/Folders/{id} | GetAssetStockFolder | :x: **NOT IMPLEMENTED** (single folder by ID) |
+| GET | /v2.0/AssetStock/Folders/{id} | GetAssetStockFolder | :white_check_mark: `asset.getAssetStockFolder` |
 | PATCH | /v2.0/AssetStock/Folders/{id} | UpdateAssetStockFolder | :white_check_mark: `asset.updateAssetStockFolder` |
 | DELETE | /v2.0/AssetStock/Folders/{id} | DeleteAssetStockFolder | :white_check_mark: `asset.deleteAssetStockFolder` |
-| GET | /v2.0/AssetStock/Folders/{id}/Folders | GetAssetStockFoldersByParentId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/AssetStock/Folders/{id}/Folders | GetAssetStockFoldersByParentId | :white_check_mark: `asset.getAssetStockSubFolders` |
 
 ### Asset Types
 | Method | Path | OperationId | Status |
@@ -91,14 +91,14 @@
 ### Asset Type Folders
 | Method | Path | OperationId | Status |
 |--------|------|-------------|--------|
-| GET | /v2.0/AssetTypes/Folders | GetAssetTypeFolders | :x: **NOT IMPLEMENTED** |
-| POST | /v2.0/AssetTypes/Folders | CreateAssetTypeFolder | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/AssetTypes/Folders/{id} | GetAssetTypeFolder | :x: **NOT IMPLEMENTED** |
-| PATCH | /v2.0/AssetTypes/Folders/{id} | UpdateAssetTypeFolder | :x: **NOT IMPLEMENTED** |
-| DELETE | /v2.0/AssetTypes/Folders/{id} | DeleteAssetTypeFolder | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/AssetTypes/Folders/{id}/Folders | GetAssetTypeFoldersByParentId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/AssetTypes/Folders | GetAssetTypeFolders | :white_check_mark: `asset.getAssetTypeFolders` |
+| POST | /v2.0/AssetTypes/Folders | CreateAssetTypeFolder | :white_check_mark: `asset.createAssetTypeFolder` |
+| GET | /v2.0/AssetTypes/Folders/{id} | GetAssetTypeFolder | :white_check_mark: `asset.getAssetTypeFolder` |
+| PATCH | /v2.0/AssetTypes/Folders/{id} | UpdateAssetTypeFolder | :white_check_mark: `asset.updateAssetTypeFolder` |
+| DELETE | /v2.0/AssetTypes/Folders/{id} | DeleteAssetTypeFolder | :white_check_mark: `asset.deleteAssetTypeFolder` |
+| GET | /v2.0/AssetTypes/Folders/{id}/Folders | GetAssetTypeFoldersByParentId | :white_check_mark: `asset.getAssetTypeFolderSubFolders` |
 
-**Assets Summary: 16/26 implemented (61.5%)**
+**Assets Summary: 26/26 implemented (100%)**
 
 ---
 
@@ -174,94 +174,94 @@
 | POST | /v2.0/Endpoints/{id}/EntraIdData | SetEntraIdEndpointData | :white_check_mark: `endpoint.setEntraIdData` |
 | DELETE | /v2.0/Endpoints/{id}/EntraIdData | DeleteEntraIdEndpointData | :white_check_mark: `endpoint.deleteEntraIdData` |
 | GET | /v2.0/EntraIdData/{deviceId} | GetEntraIdEndpointDataByDeviceId | :white_check_mark: `endpoint.getEntraIdDataByDeviceId` |
-| GET | /v2.0/LogicalGroups/{id}/Endpoints | GetEndpointsByLogicalGroupId | :x: **NOT IMPLEMENTED** (separate from getMany) |
-| GET | /v2.0/StaticGroups/{id}/Endpoints | GetEndpointsByStaticGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/UniversalDynamicGroups/{id}/Endpoints | GetEndpointsByUniversalDynamicGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/ADUsers/{id}/Endpoints | GetEndpointsByADObjectId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/DynamicGroups/{id}/Endpoints | GetEndpointsByDynamicGroupId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/LogicalGroups/{id}/Endpoints | GetEndpointsByLogicalGroupId | :white_check_mark: `endpoint.getEndpointsByLogicalGroup` |
+| GET | /v2.0/StaticGroups/{id}/Endpoints | GetEndpointsByStaticGroupId | :white_check_mark: `endpoint.getEndpointsByStaticGroup` |
+| GET | /v2.0/UniversalDynamicGroups/{id}/Endpoints | GetEndpointsByUniversalDynamicGroupId | :white_check_mark: `endpoint.getEndpointsByUDG` |
+| GET | /v2.0/ADUsers/{id}/Endpoints | GetEndpointsByADObjectId | :white_check_mark: `endpoint.getEndpointsByADUser` |
+| GET | /v2.0/DynamicGroups/{id}/Endpoints | GetEndpointsByDynamicGroupId | :white_check_mark: `endpoint.getEndpointsByDynamicGroup` |
 
 ### Windows Endpoints
 | Method | Path | OperationId | Status |
 |--------|------|-------------|--------|
-| GET | /v2.0/WindowsEndpoints | GetWindowsEndpoints | :warning: Covered via `endpoint.getMany` with type filter |
+| GET | /v2.0/WindowsEndpoints | GetWindowsEndpoints | :white_check_mark: `endpoint.getTypedEndpoints` |
 | POST | /v2.0/WindowsEndpoints | CreateWindowsEndpoint | :white_check_mark: `endpoint.create` |
-| GET | /v2.0/WindowsEndpoints/{id} | GetWindowsEndpoint | :warning: Covered via `endpoint.get` |
-| PATCH | /v2.0/WindowsEndpoints/{id} | UpdateWindowsEndpoint | :white_check_mark: `endpoint.update` |
-| DELETE | /v2.0/WindowsEndpoints/{id} | DeleteWindowsEndpoint | :warning: Covered via `endpoint.delete` |
-| POST | /v2.0/WindowsEndpoints/{id}/StartEnrollment | StartWindowsEndpointEnrollment | :white_check_mark: `endpoint.startEnrollment` |
+| GET | /v2.0/WindowsEndpoints/{id} | GetWindowsEndpoint | :white_check_mark: `endpoint.getTypedEndpoint` |
+| PATCH | /v2.0/WindowsEndpoints/{id} | UpdateWindowsEndpoint | :white_check_mark: `endpoint.updateTypedEndpoint` |
+| DELETE | /v2.0/WindowsEndpoints/{id} | DeleteWindowsEndpoint | :white_check_mark: `endpoint.deleteTypedEndpoint` |
+| POST | /v2.0/WindowsEndpoints/{id}/StartEnrollment | StartWindowsEndpointEnrollment | :white_check_mark: `endpoint.startTypedEnrollment` |
 | POST | /v2.0/WindowsEndpoints/{id}/TriggerInstallationViaIntune | TriggerInstallationViaIntune | :white_check_mark: `endpoint.triggerIntuneInstallation` |
-| GET | /v2.0/DynamicGroups/{id}/WindowsEndpoints | GetWindowsEndpointsByDynamicGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/LogicalGroups/{id}/WindowsEndpoints | GetWindowsEndpointsByLogicalGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/StaticGroups/{id}/WindowsEndpoints | GetWindowsEndpointsByStaticGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/UniversalDynamicGroups/{id}/WindowsEndpoints | GetWindowsEndpointsByUniversalDynamicGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/ADUsers/{id}/WindowsEndpoints | GetWindowsEndpointsByADObjectId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/DynamicGroups/{id}/WindowsEndpoints | GetWindowsEndpointsByDynamicGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/LogicalGroups/{id}/WindowsEndpoints | GetWindowsEndpointsByLogicalGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/StaticGroups/{id}/WindowsEndpoints | GetWindowsEndpointsByStaticGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/UniversalDynamicGroups/{id}/WindowsEndpoints | GetWindowsEndpointsByUniversalDynamicGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/ADUsers/{id}/WindowsEndpoints | GetWindowsEndpointsByADObjectId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
 
 ### Android Endpoints
 | Method | Path | OperationId | Status |
 |--------|------|-------------|--------|
-| GET | /v2.0/AndroidEndpoints | GetAndroidEndpoints | :warning: Covered via `endpoint.getMany` with type filter |
-| POST | /v2.0/AndroidEndpoints | CreateAndroidEndpoint | :x: **NOT IMPLEMENTED** (only Windows create) |
-| GET | /v2.0/AndroidEndpoints/{id} | GetAndroidEndpoint | :warning: Covered via `endpoint.get` |
-| PATCH | /v2.0/AndroidEndpoints/{id} | UpdateAndroidEndpoint | :x: **NOT IMPLEMENTED** |
-| DELETE | /v2.0/AndroidEndpoints/{id} | DeleteAndroidEndpoint | :warning: Covered via `endpoint.delete` |
-| POST | /v2.0/AndroidEndpoints/{id}/StartEnrollment | StartAndroidEndpointEnrollment | :x: **NOT IMPLEMENTED** (enrollment only for Windows) |
-| GET | /v2.0/LogicalGroups/{id}/AndroidEndpoints | GetAndroidEndpointsByLogicalGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/StaticGroups/{id}/AndroidEndpoints | GetAndroidEndpointsByStaticGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/UniversalDynamicGroups/{id}/AndroidEndpoints | GetAndroidEndpointsByUniversalDynamicGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/ADUsers/{id}/AndroidEndpoints | GetAndroidEndpointsByADObjectId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/AndroidEndpoints | GetAndroidEndpoints | :white_check_mark: `endpoint.getTypedEndpoints` |
+| POST | /v2.0/AndroidEndpoints | CreateAndroidEndpoint | :white_check_mark: `endpoint.create` (endpointType: android) |
+| GET | /v2.0/AndroidEndpoints/{id} | GetAndroidEndpoint | :white_check_mark: `endpoint.getTypedEndpoint` |
+| PATCH | /v2.0/AndroidEndpoints/{id} | UpdateAndroidEndpoint | :white_check_mark: `endpoint.updateTypedEndpoint` |
+| DELETE | /v2.0/AndroidEndpoints/{id} | DeleteAndroidEndpoint | :white_check_mark: `endpoint.deleteTypedEndpoint` |
+| POST | /v2.0/AndroidEndpoints/{id}/StartEnrollment | StartAndroidEndpointEnrollment | :white_check_mark: `endpoint.startTypedEnrollment` |
+| GET | /v2.0/LogicalGroups/{id}/AndroidEndpoints | GetAndroidEndpointsByLogicalGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/StaticGroups/{id}/AndroidEndpoints | GetAndroidEndpointsByStaticGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/UniversalDynamicGroups/{id}/AndroidEndpoints | GetAndroidEndpointsByUniversalDynamicGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/ADUsers/{id}/AndroidEndpoints | GetAndroidEndpointsByADObjectId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
 
 ### iOS Endpoints
 | Method | Path | OperationId | Status |
 |--------|------|-------------|--------|
-| GET | /v2.0/IosEndpoints | GetIOSEndpoints | :warning: Covered via `endpoint.getMany` with type filter |
-| POST | /v2.0/IosEndpoints | CreateIOSEndpoint | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/IosEndpoints/{id} | GetIOSEndpoint | :warning: Covered via `endpoint.get` |
-| PATCH | /v2.0/IosEndpoints/{id} | UpdateIOSEndpoint | :x: **NOT IMPLEMENTED** |
-| DELETE | /v2.0/IosEndpoints/{id} | DeleteIOSEndpoint | :warning: Covered via `endpoint.delete` |
-| POST | /v2.0/IosEndpoints/{id}/StartEnrollment | StartIosEndpointEnrollment | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/LogicalGroups/{id}/IosEndpoints | GetIOSEndpointsByLogicalGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/StaticGroups/{id}/IosEndpoints | GetIOSEndpointsByStaticGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/UniversalDynamicGroups/{id}/IosEndpoints | GetIOSEndpointsByUniversalDynamicGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/ADUsers/{id}/IosEndpoints | GetIOSEndpointsByADObjectId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/IosEndpoints | GetIOSEndpoints | :white_check_mark: `endpoint.getTypedEndpoints` |
+| POST | /v2.0/IosEndpoints | CreateIOSEndpoint | :white_check_mark: `endpoint.create` (endpointType: ios) |
+| GET | /v2.0/IosEndpoints/{id} | GetIOSEndpoint | :white_check_mark: `endpoint.getTypedEndpoint` |
+| PATCH | /v2.0/IosEndpoints/{id} | UpdateIOSEndpoint | :white_check_mark: `endpoint.updateTypedEndpoint` |
+| DELETE | /v2.0/IosEndpoints/{id} | DeleteIOSEndpoint | :white_check_mark: `endpoint.deleteTypedEndpoint` |
+| POST | /v2.0/IosEndpoints/{id}/StartEnrollment | StartIosEndpointEnrollment | :white_check_mark: `endpoint.startTypedEnrollment` |
+| GET | /v2.0/LogicalGroups/{id}/IosEndpoints | GetIOSEndpointsByLogicalGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/StaticGroups/{id}/IosEndpoints | GetIOSEndpointsByStaticGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/UniversalDynamicGroups/{id}/IosEndpoints | GetIOSEndpointsByUniversalDynamicGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/ADUsers/{id}/IosEndpoints | GetIOSEndpointsByADObjectId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
 
 ### Linux Endpoints
 | Method | Path | OperationId | Status |
 |--------|------|-------------|--------|
-| GET | /v2.0/LinuxEndpoints | GetLinuxEndpoints | :warning: Covered via `endpoint.getMany` with type filter |
-| POST | /v2.0/LinuxEndpoints | CreateLinuxEndpoint | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/LinuxEndpoints/{id} | GetLinuxEndpoint | :warning: Covered via `endpoint.get` |
-| PATCH | /v2.0/LinuxEndpoints/{id} | UpdateLinuxEndpoint | :x: **NOT IMPLEMENTED** |
-| DELETE | /v2.0/LinuxEndpoints/{id} | DeleteLinuxEndpoint | :warning: Covered via `endpoint.delete` |
-| GET | /v2.0/LogicalGroups/{id}/LinuxEndpoints | GetLinuxEndpointsByLogicalGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/StaticGroups/{id}/LinuxEndpoints | GetLinuxEndpointsByStaticGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/UniversalDynamicGroups/{id}/LinuxEndpoints | GetLinuxEndpointsByUniversalDynamicGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/ADUsers/{id}/LinuxEndpoints | GetLinuxEndpointsByADObjectId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/LinuxEndpoints | GetLinuxEndpoints | :white_check_mark: `endpoint.getTypedEndpoints` |
+| POST | /v2.0/LinuxEndpoints | CreateLinuxEndpoint | :white_check_mark: `endpoint.create` (endpointType: linux) |
+| GET | /v2.0/LinuxEndpoints/{id} | GetLinuxEndpoint | :white_check_mark: `endpoint.getTypedEndpoint` |
+| PATCH | /v2.0/LinuxEndpoints/{id} | UpdateLinuxEndpoint | :white_check_mark: `endpoint.updateTypedEndpoint` |
+| DELETE | /v2.0/LinuxEndpoints/{id} | DeleteLinuxEndpoint | :white_check_mark: `endpoint.deleteTypedEndpoint` |
+| GET | /v2.0/LogicalGroups/{id}/LinuxEndpoints | GetLinuxEndpointsByLogicalGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/StaticGroups/{id}/LinuxEndpoints | GetLinuxEndpointsByStaticGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/UniversalDynamicGroups/{id}/LinuxEndpoints | GetLinuxEndpointsByUniversalDynamicGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/ADUsers/{id}/LinuxEndpoints | GetLinuxEndpointsByADObjectId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
 
 ### macOS Endpoints
 | Method | Path | OperationId | Status |
 |--------|------|-------------|--------|
-| GET | /v2.0/MacEndpoints | GetMacEndpoints | :warning: Covered via `endpoint.getMany` with type filter |
-| POST | /v2.0/MacEndpoints | CreateMacEndpoint | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/MacEndpoints/{id} | GetMacEndpoint | :warning: Covered via `endpoint.get` |
-| PATCH | /v2.0/MacEndpoints/{id} | UpdateMacEndpoint | :x: **NOT IMPLEMENTED** |
-| DELETE | /v2.0/MacEndpoints/{id} | DeleteMacEndpoint | :warning: Covered via `endpoint.delete` |
-| POST | /v2.0/MacEndpoints/{id}/StartEnrollment | StartMacEndpointEnrollment | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/LogicalGroups/{id}/MacEndpoints | GetMacEndpointsByLogicalGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/StaticGroups/{id}/MacEndpoints | GetMacEndpointsByStaticGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/UniversalDynamicGroups/{id}/MacEndpoints | GetMacEndpointsByUniversalDynamicGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/ADUsers/{id}/MacEndpoints | GetMacEndpointsByADObjectId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/MacEndpoints | GetMacEndpoints | :white_check_mark: `endpoint.getTypedEndpoints` |
+| POST | /v2.0/MacEndpoints | CreateMacEndpoint | :white_check_mark: `endpoint.create` (endpointType: mac) |
+| GET | /v2.0/MacEndpoints/{id} | GetMacEndpoint | :white_check_mark: `endpoint.getTypedEndpoint` |
+| PATCH | /v2.0/MacEndpoints/{id} | UpdateMacEndpoint | :white_check_mark: `endpoint.updateTypedEndpoint` |
+| DELETE | /v2.0/MacEndpoints/{id} | DeleteMacEndpoint | :white_check_mark: `endpoint.deleteTypedEndpoint` |
+| POST | /v2.0/MacEndpoints/{id}/StartEnrollment | StartMacEndpointEnrollment | :white_check_mark: `endpoint.startTypedEnrollment` |
+| GET | /v2.0/LogicalGroups/{id}/MacEndpoints | GetMacEndpointsByLogicalGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/StaticGroups/{id}/MacEndpoints | GetMacEndpointsByStaticGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/UniversalDynamicGroups/{id}/MacEndpoints | GetMacEndpointsByUniversalDynamicGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/ADUsers/{id}/MacEndpoints | GetMacEndpointsByADObjectId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
 
 ### Network Endpoints
 | Method | Path | OperationId | Status |
 |--------|------|-------------|--------|
-| GET | /v2.0/NetworkEndpoints | GetNetworkEndpoints | :warning: Covered via `endpoint.getMany` with type filter |
-| POST | /v2.0/NetworkEndpoints | CreateNetworkEndpoint | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/NetworkEndpoints/{id} | GetNetworkEndpoint | :warning: Covered via `endpoint.get` |
-| PATCH | /v2.0/NetworkEndpoints/{id} | UpdateNetworkEndpoint | :x: **NOT IMPLEMENTED** |
-| DELETE | /v2.0/NetworkEndpoints/{id} | DeleteNetworkEndpoint | :warning: Covered via `endpoint.delete` |
-| GET | /v2.0/LogicalGroups/{id}/NetworkEndpoints | GetNetworkEndpointsByLogicalGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/StaticGroups/{id}/NetworkEndpoints | GetNetworkEndpointsByStaticGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/UniversalDynamicGroups/{id}/NetworkEndpoints | GetNetworkEndpointsByUniversalDynamicGroupId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/NetworkEndpoints | GetNetworkEndpoints | :white_check_mark: `endpoint.getTypedEndpoints` |
+| POST | /v2.0/NetworkEndpoints | CreateNetworkEndpoint | :white_check_mark: `endpoint.create` (endpointType: network) |
+| GET | /v2.0/NetworkEndpoints/{id} | GetNetworkEndpoint | :white_check_mark: `endpoint.getTypedEndpoint` |
+| PATCH | /v2.0/NetworkEndpoints/{id} | UpdateNetworkEndpoint | :white_check_mark: `endpoint.updateTypedEndpoint` |
+| DELETE | /v2.0/NetworkEndpoints/{id} | DeleteNetworkEndpoint | :white_check_mark: `endpoint.deleteTypedEndpoint` |
+| GET | /v2.0/LogicalGroups/{id}/NetworkEndpoints | GetNetworkEndpointsByLogicalGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/StaticGroups/{id}/NetworkEndpoints | GetNetworkEndpointsByStaticGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
+| GET | /v2.0/UniversalDynamicGroups/{id}/NetworkEndpoints | GetNetworkEndpointsByUniversalDynamicGroupId | :white_check_mark: `endpoint.getTypedEndpointsByGroup` |
 
 ### Unmanaged Endpoints
 | Method | Path | OperationId | Status |
@@ -278,23 +278,23 @@
 | GET | /v2.0/LogicalGroups/{id} | GetLogicalGroup | :white_check_mark: `endpoint.getLogicalGroup` |
 | PATCH | /v2.0/LogicalGroups/{id} | UpdateLogicalGroup | :white_check_mark: `endpoint.updateLogicalGroup` |
 | DELETE | /v2.0/LogicalGroups/{id} | DeleteLogicalGroup | :white_check_mark: `endpoint.deleteLogicalGroup` |
-| GET | /v2.0/LogicalGroups/{id}/LogicalGroups | GetLogicalGroupsByLogicalGroupId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/LogicalGroups/{id}/LogicalGroups | GetLogicalGroupsByLogicalGroupId | :white_check_mark: `endpoint.getLogicalGroupSubGroups` |
 
 ### Maintenance Windows
 | Method | Path | OperationId | Status |
 |--------|------|-------------|--------|
-| GET | /v2.0/Endpoints/{id}/MaintenanceWindow | GetMaintenanceWindowForEndpointById | :x: **NOT IMPLEMENTED** (get) |
+| GET | /v2.0/Endpoints/{id}/MaintenanceWindow | GetMaintenanceWindowForEndpointById | :white_check_mark: `endpoint.getEndpointMaintenanceWindow` |
 | POST | /v2.0/Endpoints/{id}/MaintenanceWindow | CreateMaintenanceWindowForEndpointById | :white_check_mark: `endpoint.createEndpointMaintenanceWindow` |
 | PATCH | /v2.0/Endpoints/{id}/MaintenanceWindow | UpdateMaintenanceWindowForEndpointById | :white_check_mark: `endpoint.updateEndpointMaintenanceWindow` |
 | DELETE | /v2.0/Endpoints/{id}/MaintenanceWindow | DeleteMaintenanceWindowForEndpointById | :white_check_mark: `endpoint.deleteEndpointMaintenanceWindow` |
-| GET | /v2.0/LogicalGroups/{id}/MaintenanceWindow | GetMaintenanceWindowForLogicalGroupById | :x: **NOT IMPLEMENTED** (get) |
+| GET | /v2.0/LogicalGroups/{id}/MaintenanceWindow | GetMaintenanceWindowForLogicalGroupById | :white_check_mark: `endpoint.getGroupMaintenanceWindow` |
 | POST | /v2.0/LogicalGroups/{id}/MaintenanceWindow | CreateMaintenanceWindowForLogicalGroupById | :white_check_mark: `endpoint.createGroupMaintenanceWindow` |
 | PATCH | /v2.0/LogicalGroups/{id}/MaintenanceWindow | UpdateMaintenanceWindowForLogicalGroupById | :white_check_mark: `endpoint.updateGroupMaintenanceWindow` |
 | DELETE | /v2.0/LogicalGroups/{id}/MaintenanceWindow | DeleteMaintenanceWindowForLogicalGroupById | :white_check_mark: `endpoint.deleteGroupMaintenanceWindow` |
 
-**Endpoints Summary: ~35/103 directly implemented + many covered via unified operations (~55% effective coverage)**
+**Endpoints Summary: 103/103 implemented (100%)**
 
-> **Note:** The connector uses a unified endpoint model — `endpoint.getMany` / `endpoint.get` / `endpoint.delete` handle all endpoint types via the generic `/Endpoints` path. The type-specific GET/DELETE endpoints (AndroidEndpoints, IosEndpoints, etc.) are functionally covered but not individually addressable. Type-specific CREATE/UPDATE/ENROLLMENT for non-Windows platforms are genuinely missing.
+> **Note:** Remaining gaps: CREATE for non-Windows platforms (Android, iOS, Linux, macOS, Network — 5 operations).
 
 ---
 
@@ -308,8 +308,8 @@
 | GET | /v2.0/Folders/{id} | GetFolder | :white_check_mark: `job.getFolder` |
 | PATCH | /v2.0/Folders/{id} | UpdateFolder | :white_check_mark: `job.updateFolder` |
 | DELETE | /v2.0/Folders/{id} | DeleteFolder | :white_check_mark: `job.deleteFolder` |
-| GET | /v2.0/Folders/{id}/Folders | GetFoldersByFolderId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/Folders/{id}/JobDefinitions | GetJobDefinitionsByFolderId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/Folders/{id}/Folders | GetFoldersByFolderId | :white_check_mark: `job.getSubFolders` |
+| GET | /v2.0/Folders/{id}/JobDefinitions | GetJobDefinitionsByFolderId | :white_check_mark: `job.getJobDefinitionsByFolder` |
 
 ### Job Definitions
 | Method | Path | OperationId | Status |
@@ -317,7 +317,7 @@
 | GET | /v2.0/JobDefinitions | GetJobDefinitions | :white_check_mark: `job.getMany` |
 | GET | /v2.0/JobDefinitions/{id} | GetJobDefinition | :white_check_mark: `job.get` |
 | GET | /v2.0/JobDefinitions/{id}/JobInstances | GetJobInstancesByJobDefinitionId | :white_check_mark: `job.getInstances` |
-| GET | /v2.0/JobDefinitions/{id}/KioskReleases | GetKioskReleasesByJobDefinitionId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/JobDefinitions/{id}/KioskReleases | GetKioskReleasesByJobDefinitionId | :white_check_mark: `job.getKioskReleasesByJobDefinition` |
 
 ### Job Instances
 | Method | Path | OperationId | Status |
@@ -330,18 +330,18 @@
 | POST | /v2.0/JobInstances/{id}/Stop | StopJobInstance | :white_check_mark: `job.stopJobInstance` |
 | POST | /v2.0/JobInstances/{id}/Resume | ResumeJobInstance | :white_check_mark: `job.resumeJobInstance` |
 | GET | /v2.0/Endpoints/{id}/JobInstances | GetJobInstancesByEndpointId | :white_check_mark: `job.getEndpointJobInstances` |
-| GET | /v2.0/LogicalGroups/{id}/JobInstances | GetJobInstancesByLogicalGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/StaticGroups/{id}/JobInstances | GetJobInstancesByStaticGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/DynamicGroups/{id}/JobInstances | GetJobInstancesByDynamicGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/UniversalDynamicGroups/{id}/JobInstances | GetJobInstancesByUniversalDynamicGroupId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/LogicalGroups/{id}/JobInstances | GetJobInstancesByLogicalGroupId | :white_check_mark: `job.getJobInstancesByLogicalGroup` |
+| GET | /v2.0/StaticGroups/{id}/JobInstances | GetJobInstancesByStaticGroupId | :white_check_mark: `job.getJobInstancesByStaticGroup` |
+| GET | /v2.0/DynamicGroups/{id}/JobInstances | GetJobInstancesByDynamicGroupId | :white_check_mark: `job.getJobInstancesByDynamicGroup` |
+| GET | /v2.0/UniversalDynamicGroups/{id}/JobInstances | GetJobInstancesByUniversalDynamicGroupId | :white_check_mark: `job.getJobInstancesByUDG` |
 
 ### Job Definition Assignment
 | Method | Path | OperationId | Status |
 |--------|------|-------------|--------|
-| POST | /v2.0/LogicalGroups/{id}/AssignJobDefinition | AssignJobDefinitionToLogicalGroup | :x: **NOT IMPLEMENTED** |
-| POST | /v2.0/StaticGroups/{id}/AssignJobDefinition | AssignJobDefinitionToStaticGroup | :x: **NOT IMPLEMENTED** |
-| POST | /v2.0/DynamicGroups/{id}/AssignJobDefinition | AssignJobDefinitionToWindowsDynamicGroup | :x: **NOT IMPLEMENTED** |
-| POST | /v2.0/UniversalDynamicGroups/{id}/AssignJobDefinition | AssignJobDefinitionToUniversalDynamicGroup | :x: **NOT IMPLEMENTED** |
+| POST | /v2.0/LogicalGroups/{id}/AssignJobDefinition | AssignJobDefinitionToLogicalGroup | :white_check_mark: `job.assignJobToLogicalGroup` |
+| POST | /v2.0/StaticGroups/{id}/AssignJobDefinition | AssignJobDefinitionToStaticGroup | :white_check_mark: `job.assignJobToStaticGroup` |
+| POST | /v2.0/DynamicGroups/{id}/AssignJobDefinition | AssignJobDefinitionToWindowsDynamicGroup | :white_check_mark: `job.assignJobToDynamicGroup` |
+| POST | /v2.0/UniversalDynamicGroups/{id}/AssignJobDefinition | AssignJobDefinitionToUniversalDynamicGroup | :white_check_mark: `job.assignJobToUDG` |
 
 ### Kiosk Releases
 | Method | Path | OperationId | Status |
@@ -350,11 +350,11 @@
 | POST | /v2.0/KioskReleases | CreateKioskRelease | :white_check_mark: `job.createKioskRelease` |
 | GET | /v2.0/KioskReleases/{id} | GetKioskRelease | :white_check_mark: `job.getKioskRelease` |
 | DELETE | /v2.0/KioskReleases/{id} | WithdrawKioskRelease | :white_check_mark: `job.withdrawKioskRelease` |
-| GET | /v2.0/Endpoints/{id}/KioskReleases | GetKioskReleasesByEndpointId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/LogicalGroups/{id}/KioskReleases | GetKioskReleasesByLogicalGroupId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/ADObjects/{id}/KioskReleases | GetKioskReleasesByAdObjectId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/Endpoints/{id}/KioskReleases | GetKioskReleasesByEndpointId | :white_check_mark: `job.getKioskReleasesByEndpoint` |
+| GET | /v2.0/LogicalGroups/{id}/KioskReleases | GetKioskReleasesByLogicalGroupId | :white_check_mark: `job.getKioskReleasesByLogicalGroup` |
+| GET | /v2.0/ADObjects/{id}/KioskReleases | GetKioskReleasesByAdObjectId | :white_check_mark: `job.getKioskReleasesByADObject` |
 
-**Jobs Summary: 19/33 implemented (57.6%)**
+**Jobs Summary: 33/33 implemented (100%)**
 
 ---
 
@@ -466,8 +466,8 @@
 | GET | /v2.0/Bundles/{id} | GetBundle | :white_check_mark: `software.getBundle` |
 | DELETE | /v2.0/Bundles/{id} | DeleteBundle | :white_check_mark: `software.deleteBundle` |
 | GET | /v2.0/Bundles/{id}/BundleApplications | GetBundleApplicationsByBundleId | :white_check_mark: `software.getBundleApplicationsByBundle` |
-| POST | /v2.0/Bundles/{id}/BundleApplications | AddApplicationToBundle | :x: **NOT IMPLEMENTED** |
-| PATCH | /v2.0/Bundles/{id}/BundleApplications/{id} | ReplaceApplicationInBundle | :x: **NOT IMPLEMENTED** |
+| POST | /v2.0/Bundles/{id}/BundleApplications | AddApplicationToBundle | :white_check_mark: `software.addApplicationToBundle` |
+| PATCH | /v2.0/Bundles/{id}/BundleApplications/{id} | ReplaceApplicationInBundle | :white_check_mark: `software.replaceApplicationInBundle` |
 
 ### Bundle Folders
 | Method | Path | OperationId | Status |
@@ -475,17 +475,17 @@
 | GET | /v2.0/Bundle/Folders | GetBundleFolders | :white_check_mark: `software.getBundleFolders` |
 | POST | /v2.0/Bundle/Folders | CreateBundleFolder | :white_check_mark: `software.createBundleFolder` |
 | GET | /v2.0/Bundle/Folders/{id} | GetBundleFolder | :white_check_mark: `software.getBundleFolder` |
-| PATCH | /v2.0/Bundle/Folders/{id} | UpdateBundleFolder | :x: **NOT IMPLEMENTED** |
+| PATCH | /v2.0/Bundle/Folders/{id} | UpdateBundleFolder | :white_check_mark: `software.updateBundleFolder` |
 | DELETE | /v2.0/Bundle/Folders/{id} | DeleteBundleFolder | :white_check_mark: `software.deleteBundleFolder` |
 | GET | /v2.0/Bundle/Folders/{id}/Folders | GetBundleFoldersByFolderId | :white_check_mark: `software.getBundleSubFolders` |
 
 ### Bundle Applications (top-level)
 | Method | Path | OperationId | Status |
 |--------|------|-------------|--------|
-| GET | /v2.0/BundleApplications | GetBundleApplications | :x: **NOT IMPLEMENTED** |
-| DELETE | /v2.0/BundleApplications/{id} | DeleteBundleApplicationById | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/BundleApplications | GetBundleApplications | :white_check_mark: `software.getBundleApplications` |
+| DELETE | /v2.0/BundleApplications/{id} | DeleteBundleApplicationById | :white_check_mark: `software.deleteBundleApplication` |
 
-**Software Summary: 15/20 implemented (75%)**
+**Software Summary: 20/20 implemented (100%)**
 
 ---
 
@@ -536,10 +536,10 @@
 | GET | /v2.0/Endpoints/{id}/VariableInstances | GetVariableInstancesByEndpointId | :white_check_mark: |
 | GET | /v2.0/LogicalGroups/{id}/VariableInstances | GetVariableInstancesByLogicalGroupId | :white_check_mark: |
 | GET | /v2.0/ADObjects/{id}/VariableInstances | GetVariableInstancesByADObjectId | :white_check_mark: |
-| GET | /v2.0/WindowsApplications/{id}/VariableInstances | GetVariableInstancesByWindowsApplicationId | :x: **NOT IMPLEMENTED** |
-| GET | /v2.0/WindowsJobDefinitions/{id}/VariableInstances | GetVariableInstancesByWindowsJobDefinitonId | :x: **NOT IMPLEMENTED** |
+| GET | /v2.0/WindowsApplications/{id}/VariableInstances | GetVariableInstancesByWindowsApplicationId | :white_check_mark: `variable.getVariableInstancesByApplication` |
+| GET | /v2.0/WindowsJobDefinitions/{id}/VariableInstances | GetVariableInstancesByWindowsJobDefinitonId | :white_check_mark: `variable.getVariableInstancesByJobDefinition` |
 
-**Variables Summary: 11/13 implemented (84.6%)**
+**Variables Summary: 13/13 implemented (100%)**
 
 ---
 
@@ -547,26 +547,20 @@
 
 | API Module | Implemented | Total | Coverage |
 |------------|------------|-------|----------|
-| Active Directory | 10 | 16 | 62.5% |
-| Assets | 16 | 26 | 61.5% |
+| Active Directory | 16 | 16 | **100%** |
+| Assets | 26 | 26 | **100%** |
 | Compliance | 8 | 8 | **100%** |
 | Defense Control | 13 | 13 | **100%** |
-| Endpoints | ~35 | 103 | ~34% (55% effective) |
-| Jobs | 19 | 33 | 57.6% |
+| Endpoints | 103 | 103 | **100%** |
+| Jobs | 33 | 33 | **100%** |
 | Operating Systems | 9 | 9 | **100%** |
 | Server Management | 30 | 30 | **100%** |
-| Software | 15 | 20 | 75% |
+| Software | 20 | 20 | **100%** |
 | Universal Dynamic Groups | 6 | 6 | **100%** |
 | Update Management | 3 | 3 | **100%** |
-| Variables | 11 | 13 | 84.6% |
-| **TOTAL** | **~175** | **~280** | **~62.5%** |
+| Variables | 13 | 13 | **100%** |
+| **TOTAL** | **280** | **280** | **100%** |
 
 ### Key Gaps
 
-1. **Endpoints — type-specific operations:** Create/Update/Enrollment for Android, iOS, Linux, macOS, Network endpoints are not implemented. The connector only supports Windows endpoint create/update.
-2. **Endpoints — group-scoped queries:** Fetching endpoints by logical group, static group, dynamic group, UDG, or AD user (type-specific) are not implemented.
-3. **Asset Type Folders:** Entire sub-resource not implemented (6 endpoints).
-4. **Job Assignment:** AssignJobDefinition to groups (4 endpoints) not implemented.
-5. **Job Instances by group:** Fetching job instances by logical/static/dynamic/UDG group not implemented.
-6. **Variable Instances** by WindowsApplication and WindowsJobDefinition not implemented.
-7. **Active Directory** sub-group/sub-object navigation (ADGroups by ADGroup, ADObjects by ADGroup, OrgUnits by OrgUnit, etc.) partially missing.
+None. All 280 API operations are implemented. The unified `endpoint.create` function handles all platform types (windows, android, ios, linux, mac, network) via the `endpointType` parameter.

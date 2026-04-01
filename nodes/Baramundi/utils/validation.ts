@@ -306,20 +306,22 @@ export function validateRfc6902Patch(operations: unknown): ValidationResult {
 
 /**
  * Validate a string used in an OData query (SearchQuery or OrderBy).
- * Rejects characters that could enable OData filter injection: ' " ; ( )
+ * Rejects characters not valid in OData: " and ;
+ * Single quotes and parentheses are allowed — they are required for OData filter
+ * expressions (e.g. state eq 'Running', contains(name, 'foo')).
  * @param value - The string to validate
  * @param fieldName - Human-readable field name for the error message
  * @returns ValidationResult
  */
 export function validateODataString(value: string, fieldName: string): ValidationResult {
-	const forbidden = /['";\(\)]/;
+	const forbidden = /[";\x00-\x1f]/;
 	if (!value || typeof value !== 'string') {
 		return { valid: false, errors: [`${fieldName} is required`] };
 	}
 	if (forbidden.test(value)) {
 		return {
 			valid: false,
-			errors: [`${fieldName} contains characters not allowed in OData queries: ' " ; ( )`],
+			errors: [`${fieldName} contains characters not allowed in OData queries: " ;`],
 		};
 	}
 	return { valid: true, errors: [] };

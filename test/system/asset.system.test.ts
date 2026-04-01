@@ -70,8 +70,8 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
       expect(Array.isArray(result)).toBe(true);
 
       if (result.length > 0) {
-        expect(result[0].json).toHaveProperty('assetId');
-        expect(result[0].json).toHaveProperty('name');
+        expect(result[0].json).toHaveProperty('id');
+        expect(result[0].json).toHaveProperty('assetTag');
       }
     });
 
@@ -89,7 +89,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
         return;
       }
 
-      const assetId = assets[0].json.assetId as string;
+      const assetId = assets[0].json.id as string;
 
       const context = createSystemTestContext({
         assetId,
@@ -98,7 +98,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
       const result = await asset.get.call(context, 0);
 
       expect(result).toBeDefined();
-      expect(result[0].json.assetId).toBe(assetId);
+      expect(result[0].json.id).toBe(assetId);
     });
 
     it('should support search and orderBy options', async () => {
@@ -205,7 +205,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
       expect(Array.isArray(result)).toBe(true);
 
       if (result.length > 0) {
-        expect(result[0].json).toHaveProperty('guid');
+        expect(result[0].json).toHaveProperty('id');
         expect(result[0].json).toHaveProperty('name');
       }
     });
@@ -223,7 +223,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
         return;
       }
 
-      const typeId = types[0].json.guid as string;
+      const typeId = types[0].json.id as string;
 
       const context = createSystemTestContext({
         assetTypeId: typeId,
@@ -232,7 +232,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
       const result = await asset.getAssetType.call(context, 0);
 
       expect(result).toBeDefined();
-      expect(result[0].json.guid).toBe(typeId);
+      expect(result[0].json.id).toBe(typeId);
     });
 
     // Skip this test - creating asset types requires valid parent hierarchy configuration

@@ -38,8 +38,8 @@ describe.skipIf(skipConfig.skip)('Software API - System Tests', () => {
       // Verify structure of first item
       if (result.length > 0) {
         console.log('Sample software item:', JSON.stringify(result[0].json, null, 2));
-        expect(result[0].json).toHaveProperty('name');
-        expect(result[0].json).toHaveProperty('vendor');
+        expect(result[0].json).toHaveProperty('displayName');
+        expect(result[0].json).toHaveProperty('publisher');
       }
     });
 
@@ -105,8 +105,8 @@ describe.skipIf(skipConfig.skip)('Software API - System Tests', () => {
       expect(Array.isArray(result)).toBe(true);
 
       if (result.length > 0) {
-        expect(result[0].json).toHaveProperty('name');
-        expect(result[0].json).toHaveProperty('vendor');
+        expect(result[0].json).toHaveProperty('displayName');
+        expect(result[0].json).toHaveProperty('publisher');
       }
     });
   });
@@ -141,8 +141,8 @@ describe.skipIf(skipConfig.skip)('Software API - System Tests', () => {
       expect(Array.isArray(result)).toBe(true);
 
       if (result.length > 0) {
-        expect(result[0].json).toHaveProperty('name');
-        expect(result[0].json).toHaveProperty('vendor');
+        expect(result[0].json).toHaveProperty('displayName');
+        expect(result[0].json).toHaveProperty('publisher');
       }
     });
   });
@@ -178,8 +178,8 @@ describe.skipIf(skipConfig.skip)('Software API - System Tests', () => {
       expect(Array.isArray(result)).toBe(true);
 
       if (result.length > 0) {
-        expect(result[0].json).toHaveProperty('name');
-        expect(result[0].json).toHaveProperty('vendor');
+        expect(result[0].json).toHaveProperty('displayName');
+        expect(result[0].json).toHaveProperty('publisher');
       }
     });
   });

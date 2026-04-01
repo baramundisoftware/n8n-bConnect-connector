@@ -48,7 +48,8 @@ export async function getMicroservices(
   _index: number,
 ): Promise<INodeExecutionData[]> {
   const response = await apiRequest.call(this, 'GET', '/servermanagement/v2.0/Microservices');
-  return this.helpers.returnJsonArray(response as IDataObject);
+  const data = ((response as IDataObject).data ?? response) as IDataObject[];
+  return this.helpers.returnJsonArray(data);
 }
 
 export async function getMicroservice(

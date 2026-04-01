@@ -355,7 +355,7 @@ describe.skipIf(skipConfig.skip)('Jobs API - System Tests', () => {
         returnAll: false,
         limit: 10,
         options: {
-          searchQuery: "Status eq 'NonExistentStatus12345'",
+          searchQuery: "state eq 'NonExistentStatus12345'",
         },
       }, config!);
 

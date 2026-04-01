@@ -114,7 +114,7 @@ describe.skipIf(skipConfig.skip)('Defense Control API - System Tests', () => {
         return;
       }
 
-      const threatId = threats[0].json.threatId as string;
+      const threatId = threats[0].json.id as string;
 
       const context = createSystemTestContext({
         threatId,
@@ -123,7 +123,7 @@ describe.skipIf(skipConfig.skip)('Defense Control API - System Tests', () => {
       const result = await defenseControl.getMicrosoftDefenderThreat.call(context, 0);
 
       expect(result).toBeDefined();
-      expect(result[0].json).toHaveProperty('threatId');
+      expect(result[0].json).toHaveProperty('id');
     });
 
     it('should fetch Microsoft Defender threats by endpoint', async () => {

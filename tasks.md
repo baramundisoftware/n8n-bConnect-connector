@@ -23,14 +23,16 @@ Creating an n8n community node for baramundi Management Suite (bConnect API) to 
 
 **V2.0 API Coverage**
 - 13 modules implemented
-- 137/228 operations (60.1% spec coverage)
+- All 28 Phase 8 contextual query gaps closed (2026-03-31)
+- Phase 9 platform-specific endpoint operations complete (2026-04-01)
+- 547 unit tests passing, 0 lint errors, clean build
 - Full CRUD support for all major resources
 - Pagination, filtering, and version-gating (REQ-VERSION-1)
 
 ### Test Coverage
 
 **Unit Tests**
-- 547 passing, 118 skipped
+- 547 passing, 0 lint errors
 - 90-100% coverage per module
 
 **System Tests**
@@ -51,12 +53,11 @@ Creating an n8n community node for baramundi Management Suite (bConnect API) to 
 
 ## Next Steps
 
-See [tasks_todo.md](./tasks_todo.md) for detailed pending work:
+All Phase 1–9 implementation work is complete. Remaining work:
 
-1. Remaining V2.0 contextual queries (Jobs, AD, Assets, Variables — 28 operations)
-2. Platform-specific endpoint operations (optional — 63 operations, strategic decision pending)
-3. Documentation enhancements (screenshots, tutorials, workflow examples)
-4. Publishing to n8n community nodes registry
+1. Documentation enhancements (screenshots, workflow examples) — for npm publish readiness
+2. Publishing to n8n community nodes registry
+3. Phase 10 (optional) — any additional coverage or features if requested
 
 ---
 

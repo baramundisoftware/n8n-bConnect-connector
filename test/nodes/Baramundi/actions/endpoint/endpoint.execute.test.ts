@@ -792,6 +792,111 @@ describe('Endpoint Operations - Unit Tests', () => {
       );
     });
 
+    it('should create a Network endpoint with required primaryIP', async () => {
+      // Arrange
+      const displayName = 'switch-core-01';
+      const primaryIP = '192.168.1.1';
+      const mockCreatedEndpoint = {
+        id: '77777777-7777-7777-7777-777777777777',
+        displayName,
+        primaryIP,
+      };
+
+      const mockContext = createMockExecuteFunctions(
+        {
+          endpointType: 'network',
+          displayName,
+          primaryIP,
+          additionalFields: {},
+        },
+        {},
+        mockCreatedEndpoint
+      );
+
+      // Act
+      const result = await create.call(mockContext, 0);
+
+      // Assert
+      expect(result).toBeDefined();
+      expect(result).toHaveLength(1);
+      expect(result[0].json.displayName).toBe(displayName);
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'POST',
+          url: '/endpoints/v2.0/NetworkEndpoints',
+          body: {
+            displayName,
+            primaryIP,
+          },
+        })
+      );
+    });
+
+    it('should create a Network endpoint with optional fields', async () => {
+      // Arrange
+      const displayName = 'router-edge-01';
+      const primaryIP = '10.0.0.1';
+      const mockCreatedEndpoint = {
+        id: '88888888-8888-8888-8888-888888888888',
+        displayName,
+        primaryIP,
+        hostName: 'ROUTER-EDGE-01',
+        webInterfaceUrl: 'https://192.168.1.1/admin',
+      };
+
+      const mockContext = createMockExecuteFunctions(
+        {
+          endpointType: 'network',
+          displayName,
+          primaryIP,
+          additionalFields: {
+            hostName: 'ROUTER-EDGE-01',
+            webInterfaceUrl: 'https://192.168.1.1/admin',
+            comment: 'Edge router',
+          },
+        },
+        {},
+        mockCreatedEndpoint
+      );
+
+      // Act
+      const result = await create.call(mockContext, 0);
+
+      // Assert
+      expect(result).toBeDefined();
+      expect(result).toHaveLength(1);
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'POST',
+          url: '/endpoints/v2.0/NetworkEndpoints',
+          body: {
+            displayName,
+            primaryIP,
+            hostName: 'ROUTER-EDGE-01',
+            webInterfaceUrl: 'https://192.168.1.1/admin',
+            comment: 'Edge router',
+          },
+        })
+      );
+    });
+
+    it('should reject invalid primaryIP for Network endpoint', async () => {
+      // Arrange
+      const mockContext = createMockExecuteFunctions(
+        {
+          endpointType: 'network',
+          displayName: 'switch-01',
+          primaryIP: 'not-an-ip',
+          additionalFields: {},
+        },
+        {},
+        {}
+      );
+
+      // Act & Assert
+      await expect(create.call(mockContext, 0)).rejects.toThrow();
+    });
+
     it('should handle unknown endpoint type', async () => {
       // Arrange
       const mockContext = createMockExecuteFunctions(

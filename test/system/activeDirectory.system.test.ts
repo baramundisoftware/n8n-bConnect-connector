@@ -47,16 +47,16 @@ describe.skipIf(skipConfig.skip)('Active Directory API - System Tests', () => {
         return;
       }
 
-      const groupId = groups[0].json.id as string;
+      const adGroupId = groups[0].json.id as string;
 
       const context = createSystemTestContext({
-        groupId,
+        adGroupId,
       }, config!);
 
       const result = await activeDirectory.getADGroup.call(context, 0);
 
       expect(result).toBeDefined();
-      expect(result[0].json.id).toBe(groupId);
+      expect(result[0].json.id).toBe(adGroupId);
     });
 
     it('should fetch AD groups by org unit', async () => {
@@ -100,10 +100,10 @@ describe.skipIf(skipConfig.skip)('Active Directory API - System Tests', () => {
         return;
       }
 
-      const groupId = groups[0].json.id as string;
+      const adGroupId = groups[0].json.id as string;
 
       const context = createSystemTestContext({
-        groupId,
+        adGroupId,
         returnAll: false,
         limit: 10,
       }, config!);
@@ -141,16 +141,16 @@ describe.skipIf(skipConfig.skip)('Active Directory API - System Tests', () => {
         return;
       }
 
-      const userId = users[0].json.id as string;
+      const adUserId = users[0].json.id as string;
 
       const context = createSystemTestContext({
-        userId,
+        adUserId,
       }, config!);
 
       const result = await activeDirectory.getADUser.call(context, 0);
 
       expect(result).toBeDefined();
-      expect(result[0].json.id).toBe(userId);
+      expect(result[0].json.id).toBe(adUserId);
     });
   });
 
@@ -180,16 +180,16 @@ describe.skipIf(skipConfig.skip)('Active Directory API - System Tests', () => {
         return;
       }
 
-      const objectId = objects[0].json.id as string;
+      const adObjectId = objects[0].json.id as string;
 
       const context = createSystemTestContext({
-        objectId,
+        adObjectId,
       }, config!);
 
       const result = await activeDirectory.getADObject.call(context, 0);
 
       expect(result).toBeDefined();
-      expect(result[0].json.id).toBe(objectId);
+      expect(result[0].json.id).toBe(adObjectId);
     });
   });
 

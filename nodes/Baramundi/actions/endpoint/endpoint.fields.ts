@@ -299,6 +299,11 @@ export const endpointFields: INodeProperties[] = [
         description: 'macOS endpoint',
       },
       {
+        name: 'Network',
+        value: 'network',
+        description: 'Network endpoint (requires primary IP address)',
+      },
+      {
         name: 'Windows',
         value: 'windows',
         description: 'Windows desktop/server endpoint',
@@ -468,6 +473,76 @@ export const endpointFields: INodeProperties[] = [
         type: 'string',
         default: '',
         description: 'Serial number of the device',
+      },
+    ],
+  },
+
+  // ----------------------------------
+  //         endpoint:create (network)
+  // ----------------------------------
+  {
+    displayName: 'Primary IP Address',
+    name: 'primaryIP',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['create'],
+        endpointType: ['network'],
+      },
+    },
+    description: 'Primary IP address of the network endpoint (required)',
+  },
+  {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['create'],
+        endpointType: ['network'],
+      },
+    },
+    options: [
+      {
+        displayName: 'Comment',
+        name: 'comment',
+        type: 'string',
+        default: '',
+        description: 'Text field for creating comments on the endpoint',
+      },
+      {
+        displayName: 'Host Name',
+        name: 'hostName',
+        type: 'string',
+        default: '',
+        description: 'Host name of the network endpoint',
+      },
+      {
+        displayName: 'Logical Group ID',
+        name: 'logicalGroupId',
+        type: 'string',
+        default: '',
+        description: 'ID of Logical Group (GUID)',
+      },
+      {
+        displayName: 'Primary MAC Address',
+        name: 'primaryMAC',
+        type: 'string',
+        default: '',
+        description: 'Primary MAC address of the endpoint',
+      },
+      {
+        displayName: 'Web Interface URL',
+        name: 'webInterfaceUrl',
+        type: 'string',
+        default: '',
+        description: 'URL of the web interface of the network device',
       },
     ],
   },
