@@ -21,7 +21,7 @@ Before installing, ensure you have:
 
 - **n8n**: Version 1.0.0 or higher
 - **Node.js**: Version 18.0.0 or higher
-- **baramundi Management Suite**: With bConnect API enabled (V2.0 or V1.1)
+- **baramundi Management Suite**: With bConnect API enabled (V2.0, bMS 25R2 or 26R1)
 - **Network Access**: Connection to baramundi Management Server on port 444
 
 ---

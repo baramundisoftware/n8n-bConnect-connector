@@ -632,15 +632,15 @@ it('should fetch data from live API', async () => {
 
 The bConnect MCP server has a different operation granularity strategy:
 
-**MCP Server**: 117 tools (94 V2.0 + 23 V1.1)
+**MCP Server**: 94 V2.0 tools
 - Consolidates related operations into single tools with parameters
 - Example: Single `listEndpoints` tool with `platform` parameter
 
-**n8n Connector**: 191 operations (137 V2.0 + 54 V1.1)
+**n8n Connector**: 137 V2.0 operations (V1.1 removed — REQ-SCOPE-1)
 - More granular operations for specific use cases
 - Example: Separate `getWindowsEndpoints`, `getLogicalGroups`, etc.
 
-**Impact**: Direct operation count comparison is misleading. The n8n connector provides MORE specific operations than MCP but fewer than the OpenAPI spec due to intelligent consolidation.
+**Impact**: Direct operation count comparison is misleading. The n8n connector provides MORE specific V2.0 operations than MCP but fewer than the OpenAPI spec due to intelligent consolidation.
 
 ---
 

@@ -381,9 +381,6 @@ A: Each phase includes testing. Resource locators need API mocking, error handli
 **Q: Will this break existing workflows?**
 A: No. ResourceLocators are backward-compatible - they accept both old string values and new resourceLocator objects. Validation only adds checks, doesn't change functionality.
 
-**Q: What about V1.1 endpoints?**
-A: Same improvements apply. The resource locator pattern works for both V2.0 and V1.1 resources.
-
 ---
 
 ## Resources

@@ -170,7 +170,7 @@ npm list n8n-nodes-baramundi
 |-------------------------------|-----------------|----------------|
 | n8n                           | 1.0.0           | 1.71.0+        |
 | Node.js                       | 18.0.0          | 20.x LTS       |
-| baramundi bConnect API        | V1.1 or V2.0    | 2024           |
+| baramundi bConnect API        | V2.0 (25R2/26R1) | 2024          |
 
 ---
 

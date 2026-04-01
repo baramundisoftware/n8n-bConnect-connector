@@ -15,9 +15,9 @@ The n8n connector implements **137 out of 228** V2.0 operations (**60.1% coverag
 |--------|-------|
 | **V2.0 Operations Implemented** | 137/228 (60.1%) |
 | **Missing V2.0 Operations** | 91/228 (39.9%) |
-| **Total n8n Operations** | 191 (137 V2.0 + 54 V1.1) |
-| **Unit Tests** | 633 tests (86.35% coverage) |
-| **System Tests** | 184 tests (live API validation) |
+| **Total n8n Operations** | 137 V2.0 (V1.1 removed — REQ-SCOPE-1) |
+| **Unit Tests** | 547 passing, 118 skipped |
+| **System Tests** | Live API validation (all V2.0 modules) |
 
 ---
 
@@ -129,13 +129,14 @@ See **[tasks_bConnect_Complete.md](./tasks_bConnect_Complete.md)** for detailed 
 
 ## Comparison: n8n vs bConnect MCP
 
-| Tool | Total Operations | V2.0 | V1.1 | Strategy |
-|------|-----------------|------|------|----------|
-| **n8n Connector** | 191 | 137 | 54 | Granular + Consolidated |
-| **bConnect MCP** | 117 | 94 | 23 | Tool-based with parameters |
-| **OpenAPI Spec** | 228 | 228 | - | Platform-specific |
+| Tool | V2.0 Operations | Strategy |
+|------|----------------|----------|
+| **n8n Connector** | 137 | Granular + Consolidated (V2.0 only) |
+| **bConnect MCP** | 94 | Tool-based with parameters |
+| **OpenAPI Spec (25R2)** | 228 | Platform-specific |
+| **OpenAPI Spec (26R1)** | 264 | +36 ops vs 25R2 |
 
-**Key Difference**: The n8n connector provides MORE operations than MCP but fewer than the spec due to intelligent platform consolidation.
+**Key Difference**: The n8n connector provides MORE V2.0 operations than MCP but fewer than the full spec due to intelligent platform consolidation. V1.1 is not supported (REQ-SCOPE-1).
 
 ---
 

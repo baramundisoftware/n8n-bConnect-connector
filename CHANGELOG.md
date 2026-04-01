@@ -370,8 +370,7 @@ None - this is the initial release.
 |-------------------------------|--------------|-------------|
 | n8n                           | ≥1.0.0       | ✅ Supported |
 | Node.js                       | ≥18.0.0      | ✅ Supported |
-| baramundi bConnect API V2.0   | Latest       | ✅ Primary   |
-| baramundi bConnect API V1.1   | Latest       | ✅ Fallback  |
+| baramundi bConnect API V2.0   | 25R2 / 26R1  | ✅ Supported |
 | TypeScript                    | ^5.4.0       | ✅ Dev Only  |
 
 ## Support
