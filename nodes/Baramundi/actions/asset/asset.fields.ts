@@ -86,6 +86,7 @@ export const assetFields: INodeProperties[] = [
       },
     },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',
@@ -346,6 +347,7 @@ export const assetFields: INodeProperties[] = [
       },
     },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',
@@ -575,6 +577,7 @@ export const assetFields: INodeProperties[] = [
       },
     },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',
@@ -655,6 +658,7 @@ export const assetFields: INodeProperties[] = [
     default: false,
     displayOptions: { show: { resource: ['asset'], operation: ['getAssetStockSubFolders'] } },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',
@@ -688,6 +692,7 @@ export const assetFields: INodeProperties[] = [
     default: false,
     displayOptions: { show: { resource: ['asset'], operation: ['getAssetTypeFolders'] } },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',
@@ -804,6 +809,7 @@ export const assetFields: INodeProperties[] = [
     default: false,
     displayOptions: { show: { resource: ['asset'], operation: ['getAssetTypeFolderSubFolders'] } },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',

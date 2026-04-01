@@ -228,6 +228,7 @@ export const jobFields: INodeProperties[] = [
       },
     },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',
@@ -420,6 +421,7 @@ export const jobFields: INodeProperties[] = [
       },
     },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',
@@ -454,6 +456,7 @@ export const jobFields: INodeProperties[] = [
       },
     },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',
@@ -575,6 +578,7 @@ export const jobFields: INodeProperties[] = [
       },
     },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',
@@ -681,6 +685,7 @@ export const jobFields: INodeProperties[] = [
       },
     },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',
@@ -882,6 +887,7 @@ export const jobFields: INodeProperties[] = [
       },
     },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',
@@ -1381,6 +1387,7 @@ export const jobFields: INodeProperties[] = [
     default: false,
     displayOptions: { show: { resource: ['job'], operation: ['getSubFolders', 'getJobDefinitionsByFolder', 'getKioskReleasesByJobDefinition', 'getJobInstancesByLogicalGroup', 'getJobInstancesByStaticGroup', 'getJobInstancesByDynamicGroup', 'getJobInstancesByUDG', 'getKioskReleasesByEndpoint', 'getKioskReleasesByLogicalGroup', 'getKioskReleasesByADObject'] } },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',

@@ -121,6 +121,7 @@ export const defenseControlFields: INodeProperties[] = [
       },
     },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',

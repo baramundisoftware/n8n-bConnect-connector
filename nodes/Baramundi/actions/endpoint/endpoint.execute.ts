@@ -9,6 +9,7 @@ import {
 	validateIpv4Address,
 	validateMaintenanceWindow,
 	validateRfc6902Patch,
+	validateODataString,
 } from '../../utils/validation';
 
 export async function get(
@@ -49,6 +50,10 @@ export async function getMany(
   const qs: Record<string, string | number> = {};
 
   if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) {
+      throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.OrderBy = options.orderBy;
   }
 
@@ -393,6 +398,10 @@ export async function getLogicalGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const groupId = this.getNodeParameter('groupId', index) as string;
+  const groupIdValidation = validateGuid(groupId);
+  if (!groupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/LogicalGroups/${groupId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -411,10 +420,18 @@ export async function getLogicalGroups(
   const qs: Record<string, string | number> = {};
 
   if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) {
+      throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.SearchQuery = options.searchQuery;
   }
 
   if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) {
+      throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.OrderBy = options.orderBy;
   }
 
@@ -451,6 +468,10 @@ export async function updateLogicalGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const groupId = this.getNodeParameter('groupId', index) as string;
+  const groupIdValidation = validateGuid(groupId);
+  if (!groupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
   const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
@@ -480,6 +501,10 @@ export async function deleteLogicalGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const groupId = this.getNodeParameter('groupId', index) as string;
+  const groupIdValidation = validateGuid(groupId);
+  if (!groupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/LogicalGroups/${groupId}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: groupId });
 }
@@ -493,6 +518,10 @@ export async function getStaticGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const groupId = this.getNodeParameter('groupId', index) as string;
+  const groupIdValidation = validateGuid(groupId);
+  if (!groupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/StaticGroups/${groupId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -511,10 +540,18 @@ export async function getStaticGroups(
   const qs: Record<string, string | number> = {};
 
   if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) {
+      throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.SearchQuery = options.searchQuery;
   }
 
   if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) {
+      throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.OrderBy = options.orderBy;
   }
 
@@ -551,6 +588,10 @@ export async function updateStaticGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const groupId = this.getNodeParameter('groupId', index) as string;
+  const groupIdValidation = validateGuid(groupId);
+  if (!groupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
   const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
@@ -580,6 +621,10 @@ export async function deleteStaticGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const groupId = this.getNodeParameter('groupId', index) as string;
+  const groupIdValidation = validateGuid(groupId);
+  if (!groupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/StaticGroups/${groupId}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: groupId });
 }
@@ -593,6 +638,10 @@ export async function getDynamicGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const groupId = this.getNodeParameter('groupId', index) as string;
+  const groupIdValidation = validateGuid(groupId);
+  if (!groupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/DynamicGroups/${groupId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -611,10 +660,18 @@ export async function getDynamicGroups(
   const qs: Record<string, string | number> = {};
 
   if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) {
+      throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.SearchQuery = options.searchQuery;
   }
 
   if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) {
+      throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.OrderBy = options.orderBy;
   }
 
@@ -687,6 +744,10 @@ export async function updateEndpointMaintenanceWindow(
     ? this.getNodeParameter('endpointId', index) as string
     : endpointSelection;
   const windowId = this.getNodeParameter('windowId', index) as string;
+  const windowIdValidation = validateGuid(windowId);
+  if (!windowIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid window ID:\n${windowIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
   const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
@@ -730,6 +791,10 @@ export async function deleteEndpointMaintenanceWindow(
     ? this.getNodeParameter('endpointId', index) as string
     : endpointSelection;
   const windowId = this.getNodeParameter('windowId', index) as string;
+  const windowIdValidation = validateGuid(windowId);
+  if (!windowIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid window ID:\n${windowIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
 
   await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindows/${windowId}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: windowId });
@@ -740,6 +805,10 @@ export async function createGroupMaintenanceWindow(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const groupId = this.getNodeParameter('groupId', index) as string;
+  const groupIdValidation = validateGuid(groupId);
+  if (!groupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const groupType = this.getNodeParameter('groupType', index) as string;
   const startTime = this.getNodeParameter('startTime', index) as string;
   const endTime = this.getNodeParameter('endTime', index) as string;
@@ -767,8 +836,16 @@ export async function updateGroupMaintenanceWindow(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const groupId = this.getNodeParameter('groupId', index) as string;
+  const groupIdValidation = validateGuid(groupId);
+  if (!groupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const groupType = this.getNodeParameter('groupType', index) as string;
   const windowId = this.getNodeParameter('windowId', index) as string;
+  const windowIdValidation = validateGuid(windowId);
+  if (!windowIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid window ID:\n${windowIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
   const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
@@ -814,8 +891,16 @@ export async function deleteGroupMaintenanceWindow(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const groupId = this.getNodeParameter('groupId', index) as string;
+  const groupIdValidation = validateGuid(groupId);
+  if (!groupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const groupType = this.getNodeParameter('groupType', index) as string;
   const windowId = this.getNodeParameter('windowId', index) as string;
+  const windowIdValidation = validateGuid(windowId);
+  if (!windowIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid window ID:\n${windowIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
 
   const groupTypeMap: Record<string, string> = {
     logical: 'LogicalGroups',
@@ -851,6 +936,10 @@ export async function putEndpointMaintenanceWindow(
       { itemIndex: index },
     );
   }
+  const windowIdValidation = validateGuid(windowId);
+  if (!windowIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid window ID:\n${windowIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
 
   let body: IDataObject;
   try {
@@ -868,8 +957,16 @@ export async function putGroupMaintenanceWindow(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const groupId = this.getNodeParameter('groupId', index) as string;
+  const groupIdValidation = validateGuid(groupId);
+  if (!groupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const groupType = this.getNodeParameter('groupType', index) as string;
   const windowId = this.getNodeParameter('windowId', index) as string;
+  const windowIdValidation = validateGuid(windowId);
+  if (!windowIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid window ID:\n${windowIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const maintenanceWindowJson = this.getNodeParameter('maintenanceWindowJson', index) as string;
 
   const groupTypeMap: Record<string, string> = {
@@ -913,6 +1010,10 @@ export async function setEntraIdData(
   }
 
   const entraIdDeviceId = this.getNodeParameter('entraIdDeviceId', index) as string;
+  const entraIdDeviceIdValidation = validateGuid(entraIdDeviceId);
+  if (!entraIdDeviceIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid entra ID device ID:\n${entraIdDeviceIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const additionalFields = this.getNodeParameter('additionalFields', index, {}) as {
     entraIdTenantId?: string;
     entraIdUserId?: string;
@@ -1036,6 +1137,10 @@ export async function getEndpointMaintenanceWindow(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const endpointIdValidation = validateGuid(endpointId);
+  if (!endpointIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid endpoint ID:\n${endpointIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -1045,6 +1150,10 @@ export async function getGroupMaintenanceWindow(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const logicalGroupId = this.getNodeParameter('logicalGroupId', index) as string;
+  const logicalGroupIdValidation = validateGuid(logicalGroupId);
+  if (!logicalGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid logical group ID:\n${logicalGroupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/LogicalGroups/${logicalGroupId}/MaintenanceWindow`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -1054,13 +1163,25 @@ export async function getLogicalGroupSubGroups(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const logicalGroupId = this.getNodeParameter('logicalGroupId', index) as string;
+  const logicalGroupIdValidation = validateGuid(logicalGroupId);
+  if (!logicalGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid logical group ID:\n${logicalGroupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   if (returnAll) {
     const response = await apiRequestAllItems.call(this, 'GET', `/endpoints/v2.0/LogicalGroups/${logicalGroupId}/LogicalGroups`, {}, qs);
@@ -1078,13 +1199,25 @@ export async function getEndpointsByLogicalGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const logicalGroupId = this.getNodeParameter('logicalGroupId', index) as string;
+  const logicalGroupIdValidation = validateGuid(logicalGroupId);
+  if (!logicalGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid logical group ID:\n${logicalGroupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   if (returnAll) {
     const response = await apiRequestAllItems.call(this, 'GET', `/endpoints/v2.0/LogicalGroups/${logicalGroupId}/Endpoints`, {}, qs);
@@ -1102,13 +1235,25 @@ export async function getEndpointsByStaticGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const staticGroupId = this.getNodeParameter('staticGroupId', index) as string;
+  const staticGroupIdValidation = validateGuid(staticGroupId);
+  if (!staticGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid static group ID:\n${staticGroupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   if (returnAll) {
     const response = await apiRequestAllItems.call(this, 'GET', `/endpoints/v2.0/StaticGroups/${staticGroupId}/Endpoints`, {}, qs);
@@ -1126,13 +1271,25 @@ export async function getEndpointsByDynamicGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const dynamicGroupId = this.getNodeParameter('dynamicGroupId', index) as string;
+  const dynamicGroupIdValidation = validateGuid(dynamicGroupId);
+  if (!dynamicGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid dynamic group ID:\n${dynamicGroupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   if (returnAll) {
     const response = await apiRequestAllItems.call(this, 'GET', `/endpoints/v2.0/DynamicGroups/${dynamicGroupId}/Endpoints`, {}, qs);
@@ -1150,13 +1307,25 @@ export async function getEndpointsByUDG(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const udgId = this.getNodeParameter('udgId', index) as string;
+  const udgIdValidation = validateGuid(udgId);
+  if (!udgIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid UDG ID:\n${udgIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   if (returnAll) {
     const response = await apiRequestAllItems.call(this, 'GET', `/endpoints/v2.0/UniversalDynamicGroups/${udgId}/Endpoints`, {}, qs);
@@ -1174,13 +1343,25 @@ export async function getEndpointsByADUser(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const adUserId = this.getNodeParameter('adUserId', index) as string;
+  const adUserIdValidation = validateGuid(adUserId);
+  if (!adUserIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid AD user ID:\n${adUserIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   if (returnAll) {
     const response = await apiRequestAllItems.call(this, 'GET', `/endpoints/v2.0/ADUsers/${adUserId}/Endpoints`, {}, qs);
@@ -1229,8 +1410,16 @@ export async function getTypedEndpoints(
   if (!typePath) throw new NodeOperationError(this.getNode(), `Unknown platform type: ${platformType}`, { itemIndex: index });
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   if (returnAll) {
     const response = await apiRequestAllItems.call(this, 'GET', `/endpoints/v2.0/${typePath}`, {}, qs);
@@ -1349,6 +1538,10 @@ export async function getTypedEndpointsByGroup(
   const platformType = this.getNodeParameter('platformType', index) as string;
   const groupType = this.getNodeParameter('groupType', index) as string;
   const groupId = this.getNodeParameter('typedGroupId', index) as string;
+  const groupIdValidation = validateGuid(groupId);
+  if (!groupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
@@ -1360,8 +1553,16 @@ export async function getTypedEndpointsByGroup(
   if (!groupTypePath) throw new NodeOperationError(this.getNode(), `Unknown group type: ${groupType}`, { itemIndex: index });
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   const url = `/endpoints/v2.0/${groupTypePath}/${groupId}/${typePath}`;
 
@@ -1389,8 +1590,16 @@ export async function getIndustrialEndpoints(
   const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   if (returnAll) {
     const response = await apiRequestAllItems.call(this, 'GET', '/endpoints/v2.0/IndustrialEndpoints', {}, qs);
@@ -1481,6 +1690,10 @@ export async function getIndustrialEndpointsByGroup(
 ): Promise<INodeExecutionData[]> {
   const groupType = this.getNodeParameter('industrialGroupType', index) as string;
   const groupId = this.getNodeParameter('industrialGroupId', index) as string;
+  const groupIdValidation = validateGuid(groupId);
+  if (!groupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
@@ -1495,8 +1708,16 @@ export async function getIndustrialEndpointsByGroup(
   if (!groupTypePath) throw new NodeOperationError(this.getNode(), `Unknown group type: ${groupType}`, { itemIndex: index });
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   const url = `/endpoints/v2.0/${groupTypePath}/${groupId}/IndustrialEndpoints`;
 

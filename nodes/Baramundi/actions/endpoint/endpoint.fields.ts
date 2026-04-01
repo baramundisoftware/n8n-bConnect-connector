@@ -163,6 +163,7 @@ export const endpointFields: INodeProperties[] = [
       },
     },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',
@@ -241,6 +242,7 @@ export const endpointFields: INodeProperties[] = [
       },
     },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',
@@ -726,6 +728,7 @@ export const endpointFields: INodeProperties[] = [
       },
     },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',
@@ -1335,6 +1338,7 @@ export const endpointFields: INodeProperties[] = [
       },
     },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',
@@ -1397,6 +1401,7 @@ export const endpointFields: INodeProperties[] = [
     default: false,
     displayOptions: { show: { resource: ['endpoint'], operation: ['getLogicalGroupSubGroups', 'getEndpointsByLogicalGroup', 'getEndpointsByStaticGroup', 'getEndpointsByDynamicGroup', 'getEndpointsByADUser', 'getEndpointsByUDG'] } },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',
@@ -1493,6 +1498,7 @@ export const endpointFields: INodeProperties[] = [
     default: false,
     displayOptions: { show: { resource: ['endpoint'], operation: ['getTypedEndpoints', 'getTypedEndpointsByGroup'] } },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',
@@ -1623,6 +1629,7 @@ export const endpointFields: INodeProperties[] = [
     default: false,
     displayOptions: { show: { resource: ['endpoint'], operation: ['getIndustrialEndpoints', 'getIndustrialEndpointsByGroup'] } },
     description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
   },
   {
     displayName: 'Limit',

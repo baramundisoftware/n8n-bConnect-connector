@@ -1,7 +1,7 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../transport/requestApi';
-import { validateGuid } from '../../utils/validation';
+import { validateGuid, validateODataString } from '../../utils/validation';
 
 export async function getWindowsEndpoints(
 	this: IExecuteFunctions,
@@ -12,8 +12,16 @@ export async function getWindowsEndpoints(
 	const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
 
 	const qs: Record<string, string | number> = {};
-	if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-	if (options.orderBy) qs.OrderBy = options.orderBy;
+	if (options.searchQuery) {
+		const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+		if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+		qs.SearchQuery = options.searchQuery;
+	}
+	if (options.orderBy) {
+		const obValidation = validateODataString(options.orderBy, 'Order By');
+		if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+		qs.OrderBy = options.orderBy;
+	}
 
 	if (returnAll) {
 		const response = await apiRequestAllItems.call(this, 'GET', '/updatemanagement/v2.0/WindowsEndpoints', {}, qs);

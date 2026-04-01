@@ -1,13 +1,17 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../transport/requestApi';
-import { validateGuid } from '../../utils/validation';
+import { validateGuid, validateODataString } from '../../utils/validation';
 
 export async function getRules(this: IExecuteFunctions, index: number): Promise<INodeExecutionData[]> {
 	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
 	const qs: Record<string, string | number> = {};
 	const options = this.getNodeParameter('options', index, {}) as IDataObject;
-	if (options.orderBy) qs.OrderBy = options.orderBy as string;
+	if (options.orderBy) {
+		const obValidation = validateODataString(options.orderBy as string, 'Order By');
+		if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+		qs.OrderBy = options.orderBy as string;
+	}
 
 	if (returnAll) {
 		const data = await apiRequestAllItems.call(this, 'GET', '/compliance/v2.0/Rules', {}, qs);
@@ -31,7 +35,11 @@ export async function getVulnerabilities(this: IExecuteFunctions, index: number)
 	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
 	const qs: Record<string, string | number> = {};
 	const options = this.getNodeParameter('options', index, {}) as IDataObject;
-	if (options.orderBy) qs.OrderBy = options.orderBy as string;
+	if (options.orderBy) {
+		const obValidation = validateODataString(options.orderBy as string, 'Order By');
+		if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+		qs.OrderBy = options.orderBy as string;
+	}
 
 	if (returnAll) {
 		const data = await apiRequestAllItems.call(this, 'GET', '/compliance/v2.0/Vulnerabilities', {}, qs);
@@ -55,7 +63,11 @@ export async function getDetectedVulnerabilities(this: IExecuteFunctions, index:
 	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
 	const qs: Record<string, string | number> = {};
 	const options = this.getNodeParameter('options', index, {}) as IDataObject;
-	if (options.orderBy) qs.OrderBy = options.orderBy as string;
+	if (options.orderBy) {
+		const obValidation = validateODataString(options.orderBy as string, 'Order By');
+		if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+		qs.OrderBy = options.orderBy as string;
+	}
 
 	if (returnAll) {
 		const data = await apiRequestAllItems.call(this, 'GET', '/compliance/v2.0/DetectedVulnerabilities', {}, qs);
@@ -88,7 +100,11 @@ export async function getDetectedRuleViolations(this: IExecuteFunctions, index: 
 	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
 	const qs: Record<string, string | number> = {};
 	const options = this.getNodeParameter('options', index, {}) as IDataObject;
-	if (options.orderBy) qs.OrderBy = options.orderBy as string;
+	if (options.orderBy) {
+		const obValidation = validateODataString(options.orderBy as string, 'Order By');
+		if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+		qs.OrderBy = options.orderBy as string;
+	}
 
 	if (returnAll) {
 		const data = await apiRequestAllItems.call(this, 'GET', '/compliance/v2.0/DetectedRuleViolations', {}, qs);

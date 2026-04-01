@@ -1,7 +1,7 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../transport/requestApi';
-import { validateGuid } from '../../utils/validation';
+import { validateGuid, validateODataString } from '../../utils/validation';
 
 // ============================================================================
 // VARIABLE DEFINITIONS OPERATIONS
@@ -21,10 +21,18 @@ export async function getVariableDefinitions(
 	const qs: Record<string, string | number> = {};
 
 	if (options.searchQuery) {
+		const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+		if (!sqValidation.valid) {
+			throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+		}
 		qs.SearchQuery = options.searchQuery;
 	}
 
 	if (options.orderBy) {
+		const obValidation = validateODataString(options.orderBy, 'Order By');
+		if (!obValidation.valid) {
+			throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+		}
 		qs.OrderBy = options.orderBy;
 	}
 
@@ -174,10 +182,18 @@ export async function getVariableInstances(
 	const qs: Record<string, string | number> = {};
 
 	if (options.searchQuery) {
+		const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+		if (!sqValidation.valid) {
+			throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+		}
 		qs.SearchQuery = options.searchQuery;
 	}
 
 	if (options.orderBy) {
+		const obValidation = validateODataString(options.orderBy, 'Order By');
+		if (!obValidation.valid) {
+			throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+		}
 		qs.OrderBy = options.orderBy;
 	}
 
@@ -289,10 +305,18 @@ export async function getVariableInstancesByEndpoint(
 	const qs: Record<string, string | number> = {};
 
 	if (options.searchQuery) {
+		const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+		if (!sqValidation.valid) {
+			throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+		}
 		qs.SearchQuery = options.searchQuery;
 	}
 
 	if (options.orderBy) {
+		const obValidation = validateODataString(options.orderBy, 'Order By');
+		if (!obValidation.valid) {
+			throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+		}
 		qs.OrderBy = options.orderBy;
 	}
 
@@ -339,10 +363,18 @@ export async function getVariableInstancesByLogicalGroup(
 	const qs: Record<string, string | number> = {};
 
 	if (options.searchQuery) {
+		const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+		if (!sqValidation.valid) {
+			throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+		}
 		qs.SearchQuery = options.searchQuery;
 	}
 
 	if (options.orderBy) {
+		const obValidation = validateODataString(options.orderBy, 'Order By');
+		if (!obValidation.valid) {
+			throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+		}
 		qs.OrderBy = options.orderBy;
 	}
 
@@ -389,10 +421,18 @@ export async function getVariableInstancesByADObject(
 	const qs: Record<string, string | number> = {};
 
 	if (options.searchQuery) {
+		const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+		if (!sqValidation.valid) {
+			throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+		}
 		qs.SearchQuery = options.searchQuery;
 	}
 
 	if (options.orderBy) {
+		const obValidation = validateODataString(options.orderBy, 'Order By');
+		if (!obValidation.valid) {
+			throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+		}
 		qs.OrderBy = options.orderBy;
 	}
 

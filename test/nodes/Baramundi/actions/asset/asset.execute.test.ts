@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import { NodeOperationError } from 'n8n-workflow';
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { get, getMany, create, update, deleteAsset, getAssetTypes, getAssetType, getAssetsByEndpoint, getAssetsByLogicalGroup, createAssetType, deleteAssetType, getAssetStockAssets, getAssetStockFolders, createAssetStockFolder, updateAssetStockFolder, deleteAssetStockFolder, getAssetsByADObject, getAssetsByOrgUnit, getAssetStockFolder, getAssetStockSubFolders, getAssetTypeFolders, getAssetTypeFolder, createAssetTypeFolder, updateAssetTypeFolder, deleteAssetTypeFolder, getAssetTypeFolderSubFolders } from '../../../../../nodes/Baramundi/actions/asset/asset.execute';
 
@@ -94,6 +95,21 @@ describe('Asset Operations', () => {
       });
 
       await expect(get.call(mockContext, 0)).rejects.toThrow('Not Found');
+    });
+
+    it('should throw NodeOperationError for invalid GUID format', async () => {
+      const mockContext = createMockExecuteFunctions({ assetId: 'not-a-guid' });
+      await expect(get.call(mockContext, 0)).rejects.toThrow(NodeOperationError);
+    });
+
+    it('should throw NodeOperationError for empty assetId', async () => {
+      const mockContext = createMockExecuteFunctions({ assetId: '' });
+      await expect(get.call(mockContext, 0)).rejects.toThrow(NodeOperationError);
+    });
+
+    it('should throw NodeOperationError for SQL-injection-style assetId', async () => {
+      const mockContext = createMockExecuteFunctions({ assetId: "' OR '1'='1" });
+      await expect(get.call(mockContext, 0)).rejects.toThrow(NodeOperationError);
     });
   });
 
@@ -409,6 +425,15 @@ describe('Asset Operations', () => {
 
       await expect(create.call(mockContext, 0)).rejects.toThrow('400');
     });
+
+    it('should throw NodeOperationError for invalid assetTypeId GUID', async () => {
+      const mockContext = createMockExecuteFunctions({
+        assetTypeId: 'not-a-guid',
+        displayName: 'Test Asset',
+        additionalFields: {},
+      });
+      await expect(create.call(mockContext, 0)).rejects.toThrow(NodeOperationError);
+    });
   });
 
   describe('update()', () => {
@@ -598,6 +623,14 @@ describe('Asset Operations', () => {
       expect(patchRequest.body[0]).toHaveProperty('path', '/displayName');
       expect(patchRequest.body[0]).toHaveProperty('value', 'test-name');
     });
+
+    it('should throw NodeOperationError for invalid assetId GUID', async () => {
+      const mockContext = createMockExecuteFunctions({
+        assetId: 'invalid-guid-format',
+        updateFields: { displayName: 'New Name' },
+      });
+      await expect(update.call(mockContext, 0)).rejects.toThrow(NodeOperationError);
+    });
   });
 
   describe('deleteAsset()', () => {
@@ -634,6 +667,11 @@ describe('Asset Operations', () => {
       });
 
       await expect(deleteAsset.call(mockContext, 0)).rejects.toThrow('404');
+    });
+
+    it('should throw NodeOperationError for invalid assetId GUID', async () => {
+      const mockContext = createMockExecuteFunctions({ assetId: 'not-a-valid-guid' });
+      await expect(deleteAsset.call(mockContext, 0)).rejects.toThrow(NodeOperationError);
     });
   });
 

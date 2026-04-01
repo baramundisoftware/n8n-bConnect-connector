@@ -668,3 +668,320 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 - [x] `Retry-After` header honoured on 429 responses
 - [x] Client error codes (4xx except 429) are not retried
 - [x] 6 new unit tests covering retry behaviour; all passing
+
+---
+
+## REQ-RELEASE-1 — v0.4.2 Security Patch Release
+
+**Status**: OPEN
+
+**Description**: The IT Audit (2026-04-01) identified and fixed 8 findings in a single session. These changes must be packaged as a versioned release with a proper CHANGELOG entry before any further development work.
+
+**Scope of changes in this release**:
+- V-1/V-2 (CRITICAL): `validateGuid()` added to all 18+ `*Id` parameters in `asset.execute.ts`
+- V-3 (CRITICAL): `validateGuid()` added to `getEndpointMaintenanceWindow()` and `getGroupMaintenanceWindow()`; ESLint rule caught and fixed 26 additional unvalidated `*Id` params in `endpoint.execute.ts`
+- V-4 (HIGH): `validateODataString()` added to `validation.ts`; applied to all 12 execute files (100+ call sites)
+- A-1 (MEDIUM): Hardcoded fallback credentials removed from `test/system/setup.ts`
+- ESLint rule `local/require-guid-validation` added to `eslint.config.mjs` — prevents future regression
+- `SECURITY.md` created with vulnerability reporting policy and dev-dependency risk acceptance
+- Negative GUID test cases added to `asset.execute.test.ts`
+- `hint` property added to all `returnAll` parameters in all 12 fields files
+
+**Quality**:
+- [ ] `CHANGELOG.md` updated with v0.4.2 entry
+- [ ] `package.json` version bumped to `0.4.2`
+- [ ] All 547+ unit tests passing
+- [ ] Zero ESLint errors
+- [ ] Git tag `v0.4.2` created
+- [ ] Distribution package rebuilt
+
+---
+
+## REQ-API-AD-1 — Active Directory Contextual Navigation
+
+**Status**: OPEN
+
+**Description**: The Active Directory module is missing 6 contextual read operations present in the 26R1 spec. These allow navigating the AD hierarchy (sub-groups within groups, objects within groups, OU children).
+
+**Missing operations** (all GET, 26R1+):
+
+| Operation | Path |
+|---|---|
+| Get AD groups by AD group | `GET /v2.0/ADGroups/{adGroupId}/ADGroups` |
+| Get AD objects by AD group | `GET /v2.0/ADGroups/{adGroupId}/ADObjects` |
+| Get AD object memberships | `GET /v2.0/ADObjects/{id}/ADGroupMemberships` |
+| Get AD objects by org unit | `GET /v2.0/OrgUnits/{orgUnitId}/ADObjects` |
+| Get AD users by org unit | `GET /v2.0/OrgUnits/{orgUnitId}/ADUsers` |
+| Get org units by org unit | `GET /v2.0/OrgUnits/{orgUnitId}/OrgUnits` |
+
+**Module**: `nodes/Baramundi/actions/activeDirectory/`
+
+**Quality**:
+- [ ] All 6 operations implemented in `activeDirectory.execute.ts`
+- [ ] All 6 operations exposed in `activeDirectory.fields.ts` with correct `displayOptions`
+- [ ] `validateGuid()` called on all ID parameters
+- [ ] Pagination + OData validation applied where applicable
+- [ ] Minimum 2 unit tests per operation
+- [ ] Active Directory module coverage ≥ 90%
+
+---
+
+## REQ-API-ENDPOINT-1 — Platform-Specific Endpoint CRUD
+
+**Status**: OPEN
+
+**Description**: The connector currently only supports Windows endpoint Create and Update. The spec defines Create/Update/Enrollment for Android, iOS, Linux, macOS, and Network endpoints. Each platform has a distinct request body schema.
+
+**Missing operations**:
+
+| Platform | Create | Update (PATCH) | Start Enrollment |
+|---|---|---|---|
+| Android | `POST /v2.0/AndroidEndpoints` | `PATCH /v2.0/AndroidEndpoints/{id}` | `POST /v2.0/AndroidEndpoints/{id}/StartEnrollment` |
+| iOS | `POST /v2.0/IosEndpoints` | `PATCH /v2.0/IosEndpoints/{id}` | `POST /v2.0/IosEndpoints/{id}/StartEnrollment` |
+| Linux | `POST /v2.0/LinuxEndpoints` | `PATCH /v2.0/LinuxEndpoints/{id}` | — |
+| macOS | `POST /v2.0/MacEndpoints` | `PATCH /v2.0/MacEndpoints/{id}` | `POST /v2.0/MacEndpoints/{id}/StartEnrollment` |
+| Network | `POST /v2.0/NetworkEndpoints` | `PATCH /v2.0/NetworkEndpoints/{id}` | — |
+
+**Design note**: Each platform's Create has different required fields (e.g., Android requires MDM enrolment type; iOS requires Apple Push Notification certificate). Use the `platformType` dropdown pattern already in place for `getMany`, extending it to create/update operations.
+
+**Module**: `nodes/Baramundi/actions/endpoint/`
+
+**Quality**:
+- [ ] Create operation implemented for each of the 5 platforms
+- [ ] Update (PATCH) operation implemented for each of the 5 platforms
+- [ ] StartEnrollment implemented for Android, iOS, macOS
+- [ ] `validateGuid()` on all ID parameters
+- [ ] Platform-specific required fields documented in `displayName` / `description`
+- [ ] Minimum 2 unit tests per platform per operation
+
+---
+
+## REQ-API-ENDPOINT-2 — Group-Scoped Endpoint Queries
+
+**Status**: OPEN
+
+**Description**: Multiple "get endpoints in group" operations exist in the spec but are not implemented. These are needed for group-targeted automation workflows (e.g., "patch all endpoints in logical group X").
+
+**Missing operations** (all GET with pagination):
+
+| Operation | Path |
+|---|---|
+| Endpoints by logical group | `GET /v2.0/LogicalGroups/{id}/Endpoints` |
+| Endpoints by static group | `GET /v2.0/StaticGroups/{id}/Endpoints` |
+| Endpoints by UDG | `GET /v2.0/UniversalDynamicGroups/{id}/Endpoints` |
+| Endpoints by AD user | `GET /v2.0/ADUsers/{id}/Endpoints` |
+| Endpoints by dynamic group | `GET /v2.0/DynamicGroups/{id}/Endpoints` |
+| Windows endpoints by logical group | `GET /v2.0/LogicalGroups/{id}/WindowsEndpoints` |
+| Windows endpoints by static group | `GET /v2.0/StaticGroups/{id}/WindowsEndpoints` |
+| Windows endpoints by dynamic group | `GET /v2.0/DynamicGroups/{id}/WindowsEndpoints` |
+| Windows endpoints by UDG | `GET /v2.0/UniversalDynamicGroups/{id}/WindowsEndpoints` |
+| Windows endpoints by AD user | `GET /v2.0/ADUsers/{id}/WindowsEndpoints` |
+
+(Android, iOS, Linux, macOS, Network equivalents exist — implement as a second pass after REQ-API-ENDPOINT-1 is done)
+
+**Quality**:
+- [ ] All 10 operations above implemented
+- [ ] `validateGuid()` on all group/user ID parameters
+- [ ] Pagination (`returnAll` + `limit`) + OData validation applied
+- [ ] Minimum 2 unit tests per operation
+
+---
+
+## REQ-API-JOB-1 — Job Folder Navigation and Kiosk Context Queries
+
+**Status**: OPEN
+
+**Description**: Three read operations in the Jobs module are missing: sub-folder listing, job definitions by folder, and kiosk releases by job definition.
+
+**Missing operations**:
+
+| Operation | Path |
+|---|---|
+| Get sub-folders of a job folder | `GET /v2.0/Folders/{id}/Folders` |
+| Get job definitions in a folder | `GET /v2.0/Folders/{id}/JobDefinitions` |
+| Get kiosk releases by job definition | `GET /v2.0/JobDefinitions/{id}/KioskReleases` |
+| Get kiosk releases by endpoint | `GET /v2.0/Endpoints/{id}/KioskReleases` |
+| Get kiosk releases by logical group | `GET /v2.0/LogicalGroups/{id}/KioskReleases` |
+| Get kiosk releases by AD object | `GET /v2.0/ADObjects/{id}/KioskReleases` |
+
+**Module**: `nodes/Baramundi/actions/job/`
+
+**Quality**:
+- [ ] All 6 operations implemented
+- [ ] `validateGuid()` on all ID parameters
+- [ ] Minimum 2 unit tests per operation
+- [ ] Jobs module spec coverage ≥ 85%
+
+---
+
+## REQ-API-JOB-2 — Job Instances by Group and Job Assignment
+
+**Status**: OPEN
+
+**Description**: Workflows often need to query job execution history per group, and assign jobs to groups. Neither is currently supported.
+
+**Missing operations**:
+
+| Operation | Path |
+|---|---|
+| Job instances by logical group | `GET /v2.0/LogicalGroups/{id}/JobInstances` |
+| Job instances by static group | `GET /v2.0/StaticGroups/{id}/JobInstances` |
+| Job instances by dynamic group | `GET /v2.0/DynamicGroups/{id}/JobInstances` |
+| Job instances by UDG | `GET /v2.0/UniversalDynamicGroups/{id}/JobInstances` |
+| Assign job to logical group | `POST /v2.0/LogicalGroups/{id}/AssignJobDefinition` |
+| Assign job to static group | `POST /v2.0/StaticGroups/{id}/AssignJobDefinition` |
+| Assign job to dynamic group | `POST /v2.0/DynamicGroups/{id}/AssignJobDefinition` |
+| Assign job to UDG | `POST /v2.0/UniversalDynamicGroups/{id}/AssignJobDefinition` |
+
+**Quality**:
+- [ ] All 8 operations implemented
+- [ ] `validateGuid()` on all ID parameters; `validateGuid()` on job definition ID in assign operations
+- [ ] AssignJobDefinition uses the existing `jobSelection` hybrid-dropdown pattern for job ID input
+- [ ] Minimum 2 unit tests per operation
+
+---
+
+## REQ-API-SOFTWARE-1 — Bundle Application Management
+
+**Status**: OPEN
+
+**Description**: Software bundles are manageable but their constituent applications cannot be added, replaced, or deleted. Top-level `BundleApplications` endpoints are also missing.
+
+**Missing operations**:
+
+| Operation | Path |
+|---|---|
+| Add application to bundle | `POST /v2.0/Bundles/{id}/BundleApplications` |
+| Replace application in bundle | `PATCH /v2.0/Bundles/{bundleId}/BundleApplications/{appId}` |
+| Get all bundle applications | `GET /v2.0/BundleApplications` |
+| Delete bundle application | `DELETE /v2.0/BundleApplications/{id}` |
+| Update bundle folder | `PATCH /v2.0/Bundle/Folders/{id}` |
+
+**Module**: `nodes/Baramundi/actions/software/`
+
+**Quality**:
+- [ ] All 5 operations implemented
+- [ ] `validateGuid()` on all ID parameters
+- [ ] Minimum 2 unit tests per operation
+- [ ] Software module coverage reaches 100%
+
+---
+
+## REQ-API-VAR-1 — Variable Instances by Application and Job Definition
+
+**Status**: OPEN
+
+**Description**: Two contextual variable instance queries are missing: by Windows application and by Windows job definition. These support automation that reads variables scoped to a specific managed application or job.
+
+**Missing operations**:
+
+| Operation | Path |
+|---|---|
+| Variable instances by Windows application | `GET /v2.0/WindowsApplications/{id}/VariableInstances` |
+| Variable instances by Windows job definition | `GET /v2.0/WindowsJobDefinitions/{id}/VariableInstances` |
+
+**Module**: `nodes/Baramundi/actions/variable/`
+
+**Quality**:
+- [ ] Both operations implemented
+- [ ] `validateGuid()` on ID parameters
+- [ ] Minimum 2 unit tests each
+- [ ] Variables module reaches 100% spec coverage
+
+---
+
+## REQ-UX-1 — resourceLocator for Endpoint and Job Selection
+
+**Status**: OPEN
+
+**Description**: The current `loadOptions` dropdown for endpoint and job selection works but is limited — it shows top 100 items with no search. Upgrading to n8n's `resourceLocator` component provides full server-side search, multiple selection modes (by ID / from list), and a better form experience.
+
+**Scope**:
+- Endpoint selection: replace hybrid dropdown in `endpoint.fields.ts` with `resourceLocator` using `By ID` and `From List` modes
+- Job selection: same upgrade in `job.fields.ts`
+- Required new methods in `Baramundi.node.ts`: `listSearch.searchEndpoints`, `listSearch.searchJobDefinitions`
+- Both search methods must support the `filter` parameter (user search string) and `paginationToken`
+
+**Quality**:
+- [ ] `resourceLocator` component used for endpointId in all 6 endpoint operations
+- [ ] `resourceLocator` component used for jobId in all 6 job operations
+- [ ] `listSearch.searchEndpoints` returns name + GUID, supports filter
+- [ ] `listSearch.searchJobDefinitions` returns name + type + GUID, supports filter
+- [ ] `extractResourceLocatorValue()` (already in `validation.ts`) used in all execute functions that receive the locator
+- [ ] All existing unit tests pass; new tests cover locator value extraction
+
+---
+
+## REQ-UX-2 — Contextual Error Messages
+
+**Status**: OPEN
+
+**Description**: API errors currently surface as raw HTTP status codes and baramundi error objects. Users receive no actionable guidance. Common error patterns should be translated to human-readable messages with troubleshooting hints.
+
+**HTTP status translations** (to be implemented in `requestApi.ts`):
+
+| Status | Plain-language message |
+|---|---|
+| 400 | Bad request — check parameter values (field names, data types) |
+| 401 | Authentication failed — verify username/password in credentials |
+| 403 | Access denied — the account lacks permission for this operation |
+| 404 | Resource not found — verify the ID exists and belongs to the correct bMS version |
+| 409 | Conflict — a resource with this name or ID already exists |
+| 422 | Unprocessable — the request body is structurally valid but failed business-rule validation |
+| 500 | Server error — bConnect returned an internal error; check bMS server logs |
+| 503 | Service unavailable — bConnect is starting up or overloaded; the node will retry automatically |
+
+**Quality**:
+- [ ] `requestApi.ts` wraps all non-2xx responses with translated message + original error detail
+- [ ] Error message includes operation context (resource type, operation, ID if present)
+- [ ] `NodeOperationError` used throughout (never plain `Error`)
+- [ ] Minimum 8 new unit tests covering each HTTP status translation
+- [ ] No raw `error.message` from axios propagated to the user without translation
+
+---
+
+## REQ-PUBLISH-1 — Distribution Package
+
+**Status**: OPEN
+
+**Description**: The connector must be distributable to baramundi customers via file transfer (npm package file), independent of the n8n community registry.
+
+**Requirements**:
+- `npm pack` produces a `.tgz` file installable via `npm install <file.tgz>` on a customer's n8n instance
+- Package metadata in `package.json` is complete: `name`, `version`, `description`, `author`, `license`, `keywords`, `n8n.nodes`, `n8n.credentials`
+- `INSTALLATION.md` covers: download, `npm install`, n8n restart, credential setup
+- Package does not include `node_modules/`, `test/`, `*.test.ts`, system test files, or dev configs (`.eslintrc`, `vitest.config.ts`)
+- `dist/` contains only compiled output; source TypeScript is not needed at runtime
+
+**Quality**:
+- [ ] `npm pack` completes without errors or warnings
+- [ ] Resulting `.tgz` installs cleanly on a fresh n8n instance
+- [ ] `package.json` fields: `name`, `version`, `description`, `author`, `license`, `keywords`, `n8n` block all correct
+- [ ] `files` array in `package.json` excludes test assets and dev configs
+- [ ] `INSTALLATION.md` is current and complete
+- [ ] Distribution `.tgz` artifact is placed in a known location for handoff
+
+---
+
+## REQ-PUBLISH-2 — n8n Community Node Registry Submission
+
+**Status**: BLOCKED — awaiting baramundi management approval
+
+**Description**: Submit the package to the n8n community nodes registry (npm) so it can be installed directly from the n8n UI via the node manager.
+
+**Pre-conditions**:
+- [ ] baramundi management approves public release
+- [ ] REQ-PUBLISH-1 complete (package metadata and build quality confirmed)
+- [ ] README includes required n8n community node badges and n8n installation instructions
+- [ ] Package name `n8n-nodes-baramundi` is available on npm (verify with `npm view n8n-nodes-baramundi`)
+- [ ] npm account with publish rights is configured
+
+**Steps** (when unblocked):
+1. `npm publish --access public`
+2. Submit to n8n community integration list (GitHub PR to n8n-io/n8n repository)
+3. Monitor for community feedback and address within 30 days
+
+**Quality**:
+- [ ] Package published to npm registry
+- [ ] Installable from n8n UI node manager
+- [ ] n8n compatibility test: install + use on n8n v1.x LTS

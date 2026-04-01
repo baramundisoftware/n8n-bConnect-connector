@@ -685,7 +685,7 @@ describe('Job Operations', () => {
         {
           returnAll: false,
           limit: 50,
-          options: { searchQuery: "Status eq 'Running'" },
+          options: { searchQuery: 'Status eq Running' },
         },
         {},
         mockInstances
@@ -696,7 +696,7 @@ describe('Job Operations', () => {
       expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
           qs: expect.objectContaining({
-            SearchQuery: "Status eq 'Running'",
+            SearchQuery: 'Status eq Running',
           }),
         })
       );
@@ -793,7 +793,7 @@ describe('Job Operations', () => {
           returnAll: false,
           limit: 50,
           options: {
-            searchQuery: "Status eq 'Running'",
+            searchQuery: 'Status eq Running',
             orderBy: 'StartTime desc',
           },
         },
@@ -806,7 +806,7 @@ describe('Job Operations', () => {
       expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
           qs: expect.objectContaining({
-            SearchQuery: "Status eq 'Running'",
+            SearchQuery: 'Status eq Running',
             OrderBy: 'StartTime desc',
           }),
         })

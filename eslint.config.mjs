@@ -1,11 +1,23 @@
 import tseslint from 'typescript-eslint';
 import n8nNodesBase from 'eslint-plugin-n8n-nodes-base';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const requireGuidValidation = require('./eslint-rules/require-guid-validation.js');
 
 export default tseslint.config(
   {
     ignores: ['dist/**', 'node_modules/**'],
   },
   ...tseslint.configs.recommended,
+  {
+    files: ['nodes/**/*.ts'],
+    plugins: {
+      local: { rules: { 'require-guid-validation': requireGuidValidation } },
+    },
+    rules: {
+      'local/require-guid-validation': 'error',
+    },
+  },
   {
     files: ['**/*.ts'],
     plugins: {

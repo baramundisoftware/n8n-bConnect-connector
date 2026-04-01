@@ -19,9 +19,9 @@ export interface SystemTestConfig {
  * Returns null if credentials are not configured
  */
 export function getSystemTestConfig(): SystemTestConfig | null {
-  const baseUrl = process.env.BCONNECT_BASE_URL || 'https://bms-win22srv:444/bconnect';
-  const username = process.env.BCONNECT_USERNAME || 'Administrator';
-  const password = process.env.BCONNECT_PASSWORD || 'baramundi-2008';
+  const baseUrl = process.env.BCONNECT_BASE_URL || '';
+  const username = process.env.BCONNECT_USERNAME || '';
+  const password = process.env.BCONNECT_PASSWORD || '';
   const ignoreSslIssues = process.env.BCONNECT_IGNORE_SSL !== 'false';
 
   // Check if we have valid credentials

@@ -3165,7 +3165,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
 
   describe('getTypedEndpointsByGroup()', () => {
     it('should fetch iOS endpoints in a logical group', async () => {
-      const groupId = 'grp-111';
+      const groupId = '11111111-1111-1111-1111-111111111111';
       const ctx = createMockExecuteFunctions(
         { platformType: 'ios', groupType: 'logical', typedGroupId: groupId, returnAll: false, limit: 50 },
         {},
@@ -3179,7 +3179,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
     });
 
     it('should fetch Android endpoints by AD user', async () => {
-      const groupId = 'user-aaa';
+      const groupId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
       const ctx = createMockExecuteFunctions(
         { platformType: 'android', groupType: 'adUser', typedGroupId: groupId, returnAll: false, limit: 50 },
         {},
@@ -3274,7 +3274,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
 
   describe('getIndustrialEndpointsByGroup()', () => {
     it('should fetch industrial endpoints in a static group', async () => {
-      const groupId = 'grp-static-001';
+      const groupId = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
       const ctx = createMockExecuteFunctions(
         { industrialGroupType: 'static', industrialGroupId: groupId, returnAll: false, limit: 50 },
         {},

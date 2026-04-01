@@ -1,7 +1,7 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../transport/requestApi';
-import { validateGuid } from '../../utils/validation';
+import { validateGuid, validateODataString } from '../../utils/validation';
 
 // ============================================================================
 // AD GROUPS OPERATIONS
@@ -21,10 +21,18 @@ export async function getADGroups(
   const qs: Record<string, string | number> = {};
 
   if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) {
+      throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.SearchQuery = options.searchQuery;
   }
 
   if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) {
+      throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.OrderBy = options.orderBy;
   }
 
@@ -72,10 +80,18 @@ export async function getADGroupsByOrgUnit(
   const qs: Record<string, string | number> = {};
 
   if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) {
+      throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.SearchQuery = options.searchQuery;
   }
 
   if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) {
+      throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.OrderBy = options.orderBy;
   }
 
@@ -122,10 +138,18 @@ export async function getADUsersByGroup(
   const qs: Record<string, string | number> = {};
 
   if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) {
+      throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.SearchQuery = options.searchQuery;
   }
 
   if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) {
+      throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.OrderBy = options.orderBy;
   }
 
@@ -171,10 +195,18 @@ export async function getADUsers(
   const qs: Record<string, string | number> = {};
 
   if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) {
+      throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.SearchQuery = options.searchQuery;
   }
 
   if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) {
+      throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.OrderBy = options.orderBy;
   }
 
@@ -221,10 +253,18 @@ export async function getADObjects(
   const qs: Record<string, string | number> = {};
 
   if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) {
+      throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.SearchQuery = options.searchQuery;
   }
 
   if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) {
+      throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.OrderBy = options.orderBy;
   }
 
@@ -271,10 +311,18 @@ export async function getOrgUnits(
   const qs: Record<string, string | number> = {};
 
   if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) {
+      throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.SearchQuery = options.searchQuery;
   }
 
   if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) {
+      throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.OrderBy = options.orderBy;
   }
 
@@ -324,8 +372,16 @@ export async function getADGroupsByADGroup(
   };
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   if (returnAll) {
     const response = await apiRequestAllItems.call(
@@ -360,8 +416,16 @@ export async function getADObjectsByADGroup(
   };
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   if (returnAll) {
     const response = await apiRequestAllItems.call(
@@ -396,8 +460,16 @@ export async function getADObjectMemberships(
   };
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   if (returnAll) {
     const response = await apiRequestAllItems.call(
@@ -432,8 +504,16 @@ export async function getADObjectsByOrgUnit(
   };
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   if (returnAll) {
     const response = await apiRequestAllItems.call(
@@ -468,8 +548,16 @@ export async function getADUsersByOrgUnit(
   };
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   if (returnAll) {
     const response = await apiRequestAllItems.call(
@@ -504,8 +592,16 @@ export async function getOrgUnitsByOrgUnit(
   };
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   if (returnAll) {
     const response = await apiRequestAllItems.call(

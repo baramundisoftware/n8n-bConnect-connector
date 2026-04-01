@@ -1,11 +1,17 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../transport/requestApi';
+import { validateGuid, validateODataString } from '../../utils/validation';
 
 export async function get(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
   const assetId = this.getNodeParameter('assetId', index) as string;
+  const assetIdValidation = validateGuid(assetId);
+  if (!assetIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid asset ID:\n${assetIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/assets/v2.0/Assets/${assetId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -25,14 +31,26 @@ export async function getMany(
   const qs: Record<string, string | number> = {};
 
   if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) {
+      throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.SearchQuery = options.searchQuery;
   }
 
   if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) {
+      throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.OrderBy = options.orderBy;
   }
 
   if (options.assetTypeId) {
+    const atIdValidation = validateGuid(options.assetTypeId);
+    if (!atIdValidation.valid) {
+      throw new NodeOperationError(this.getNode(), `Invalid asset type ID:\n${atIdValidation.errors.join('\n')}`, { itemIndex: index });
+    }
     qs.AssetTypeId = options.assetTypeId;
   }
 
@@ -53,6 +71,10 @@ export async function create(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const assetTypeId = this.getNodeParameter('assetTypeId', index) as string;
+  const assetTypeIdValidation = validateGuid(assetTypeId);
+  if (!assetTypeIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid asset type ID:\n${assetTypeIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const displayName = this.getNodeParameter('displayName', index) as string;
   const additionalFields = this.getNodeParameter('additionalFields', index, {}) as IDataObject;
 
@@ -71,6 +93,10 @@ export async function update(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const assetId = this.getNodeParameter('assetId', index) as string;
+  const assetIdValidation = validateGuid(assetId);
+  if (!assetIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid asset ID:\n${assetIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
   // Build JSON Patch document for PATCH request
@@ -102,6 +128,10 @@ export async function deleteAsset(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const assetId = this.getNodeParameter('assetId', index) as string;
+  const assetIdValidation = validateGuid(assetId);
+  if (!assetIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid asset ID:\n${assetIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   await apiRequest.call(this, 'DELETE', `/assets/v2.0/Assets/${assetId}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: assetId });
 }
@@ -124,10 +154,18 @@ export async function getAssetTypes(
   const qs: Record<string, string | number> = {};
 
   if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) {
+      throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.SearchQuery = options.searchQuery;
   }
 
   if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) {
+      throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.OrderBy = options.orderBy;
   }
 
@@ -148,6 +186,10 @@ export async function getAssetType(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const assetTypeId = this.getNodeParameter('assetTypeId', index) as string;
+  const assetTypeIdValidation = validateGuid(assetTypeId);
+  if (!assetTypeIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid asset type ID:\n${assetTypeIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/assets/v2.0/AssetTypes/${assetTypeId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -173,6 +215,10 @@ export async function deleteAssetType(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const assetTypeId = this.getNodeParameter('assetTypeId', index) as string;
+  const assetTypeIdValidation = validateGuid(assetTypeId);
+  if (!assetTypeIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid asset type ID:\n${assetTypeIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   await apiRequest.call(this, 'DELETE', `/assets/v2.0/AssetTypes/${assetTypeId}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: assetTypeId });
 }
@@ -186,6 +232,10 @@ export async function getAssetsByEndpoint(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const endpointIdValidation = validateGuid(endpointId);
+  if (!endpointIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid endpoint ID:\n${endpointIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as {
@@ -196,10 +246,18 @@ export async function getAssetsByEndpoint(
   const qs: Record<string, string | number> = {};
 
   if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) {
+      throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.SearchQuery = options.searchQuery;
   }
 
   if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) {
+      throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.OrderBy = options.orderBy;
   }
 
@@ -232,6 +290,10 @@ export async function getAssetsByLogicalGroup(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const logicalGroupId = this.getNodeParameter('logicalGroupId', index) as string;
+  const logicalGroupIdValidation = validateGuid(logicalGroupId);
+  if (!logicalGroupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid logical group ID:\n${logicalGroupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as {
@@ -242,10 +304,18 @@ export async function getAssetsByLogicalGroup(
   const qs: Record<string, string | number> = {};
 
   if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) {
+      throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.SearchQuery = options.searchQuery;
   }
 
   if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) {
+      throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.OrderBy = options.orderBy;
   }
 
@@ -291,10 +361,18 @@ export async function getAssetStockAssets(
   const qs: Record<string, string | number> = {};
 
   if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) {
+      throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.SearchQuery = options.searchQuery;
   }
 
   if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) {
+      throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.OrderBy = options.orderBy;
   }
 
@@ -324,10 +402,18 @@ export async function getAssetStockFolders(
   const qs: Record<string, string | number> = {};
 
   if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) {
+      throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.SearchQuery = options.searchQuery;
   }
 
   if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) {
+      throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    }
     qs.OrderBy = options.orderBy;
   }
 
@@ -364,6 +450,10 @@ export async function updateAssetStockFolder(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const folderId = this.getNodeParameter('folderId', index) as string;
+  const folderIdValidation = validateGuid(folderId);
+  if (!folderIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid folder ID:\n${folderIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
   // Build JSON Patch document for PATCH request
@@ -395,6 +485,10 @@ export async function deleteAssetStockFolder(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const folderId = this.getNodeParameter('folderId', index) as string;
+  const folderIdValidation = validateGuid(folderId);
+  if (!folderIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid folder ID:\n${folderIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   await apiRequest.call(this, 'DELETE', `/assets/v2.0/AssetStock/Folders/${folderId}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: folderId });
 }
@@ -408,6 +502,10 @@ export async function getAssetsByADObject(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const adObjectId = this.getNodeParameter('adObjectId', index) as string;
+  const adObjectIdValidation = validateGuid(adObjectId);
+  if (!adObjectIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid AD object ID:\n${adObjectIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
 
@@ -429,6 +527,10 @@ export async function getAssetsByOrgUnit(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const orgUnitId = this.getNodeParameter('orgUnitId', index) as string;
+  const orgUnitIdValidation = validateGuid(orgUnitId);
+  if (!orgUnitIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid org unit ID:\n${orgUnitIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
 
@@ -454,6 +556,10 @@ export async function getAssetStockFolder(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const folderId = this.getNodeParameter('folderId', index) as string;
+  const folderIdValidation = validateGuid(folderId);
+  if (!folderIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid folder ID:\n${folderIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/assets/v2.0/AssetStock/Folders/${folderId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -463,13 +569,25 @@ export async function getAssetStockSubFolders(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const folderId = this.getNodeParameter('folderId', index) as string;
+  const folderIdValidation = validateGuid(folderId);
+  if (!folderIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid folder ID:\n${folderIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   if (returnAll) {
     const response = await apiRequestAllItems.call(this, 'GET', `/assets/v2.0/AssetStock/Folders/${folderId}/Folders`, {}, qs);
@@ -495,8 +613,16 @@ export async function getAssetTypeFolders(
   const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   if (returnAll) {
     const response = await apiRequestAllItems.call(this, 'GET', '/assets/v2.0/AssetTypes/Folders', {}, qs);
@@ -514,6 +640,10 @@ export async function getAssetTypeFolder(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const assetTypeFolderId = this.getNodeParameter('assetTypeFolderId', index) as string;
+  const atfIdValidation = validateGuid(assetTypeFolderId);
+  if (!atfIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid asset type folder ID:\n${atfIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const response = await apiRequest.call(this, 'GET', `/assets/v2.0/AssetTypes/Folders/${assetTypeFolderId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
@@ -535,6 +665,10 @@ export async function updateAssetTypeFolder(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const assetTypeFolderId = this.getNodeParameter('assetTypeFolderId', index) as string;
+  const atfIdValidation = validateGuid(assetTypeFolderId);
+  if (!atfIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid asset type folder ID:\n${atfIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
   const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
@@ -558,6 +692,10 @@ export async function deleteAssetTypeFolder(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const assetTypeFolderId = this.getNodeParameter('assetTypeFolderId', index) as string;
+  const atfIdValidation = validateGuid(assetTypeFolderId);
+  if (!atfIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid asset type folder ID:\n${atfIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   await apiRequest.call(this, 'DELETE', `/assets/v2.0/AssetTypes/Folders/${assetTypeFolderId}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: assetTypeFolderId });
 }
@@ -567,13 +705,25 @@ export async function getAssetTypeFolderSubFolders(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const assetTypeFolderId = this.getNodeParameter('assetTypeFolderId', index) as string;
+  const atfIdValidation = validateGuid(assetTypeFolderId);
+  if (!atfIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid asset type folder ID:\n${atfIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as { searchQuery?: string; orderBy?: string };
 
   const qs: Record<string, string | number> = {};
-  if (options.searchQuery) qs.SearchQuery = options.searchQuery;
-  if (options.orderBy) qs.OrderBy = options.orderBy;
+  if (options.searchQuery) {
+    const sqValidation = validateODataString(options.searchQuery, 'Search Query');
+    if (!sqValidation.valid) throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+    qs.SearchQuery = options.searchQuery;
+  }
+  if (options.orderBy) {
+    const obValidation = validateODataString(options.orderBy, 'Order By');
+    if (!obValidation.valid) throw new NodeOperationError(this.getNode(), obValidation.errors.join('\n'), { itemIndex: index });
+    qs.OrderBy = options.orderBy;
+  }
 
   if (returnAll) {
     const response = await apiRequestAllItems.call(this, 'GET', `/assets/v2.0/AssetTypes/Folders/${assetTypeFolderId}/Folders`, {}, qs);

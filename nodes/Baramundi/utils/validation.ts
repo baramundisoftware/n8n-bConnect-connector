@@ -305,6 +305,27 @@ export function validateRfc6902Patch(operations: unknown): ValidationResult {
 }
 
 /**
+ * Validate a string used in an OData query (SearchQuery or OrderBy).
+ * Rejects characters that could enable OData filter injection: ' " ; ( )
+ * @param value - The string to validate
+ * @param fieldName - Human-readable field name for the error message
+ * @returns ValidationResult
+ */
+export function validateODataString(value: string, fieldName: string): ValidationResult {
+	const forbidden = /['";\(\)]/;
+	if (!value || typeof value !== 'string') {
+		return { valid: false, errors: [`${fieldName} is required`] };
+	}
+	if (forbidden.test(value)) {
+		return {
+			valid: false,
+			errors: [`${fieldName} contains characters not allowed in OData queries: ' " ; ( )`],
+		};
+	}
+	return { valid: true, errors: [] };
+}
+
+/**
  * Extract value from resourceLocator or string parameter
  * Handles both legacy string format and new resourceLocator object format
  * @param value - Either a string GUID or resourceLocator object
