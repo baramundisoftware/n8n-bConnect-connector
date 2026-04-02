@@ -1,51 +1,8 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-// Common operation options available in both 25R2 and 26R1
-const COMMON_ENDPOINT_OPTIONS = [
-  { name: 'Create', value: 'create', description: 'Create a new Windows endpoint', action: 'Create a Windows endpoint' },
-  { name: 'Delete', value: 'delete', description: 'Delete an endpoint', action: 'Delete an endpoint' },
-  { name: 'Get', value: 'get', description: 'Get an endpoint by ID', action: 'Get an endpoint' },
-  { name: 'Get Many', value: 'getMany', description: 'Get many endpoints', action: 'Get many endpoints' },
-  { name: 'Search', value: 'search', description: 'Search endpoints by name or other criteria', action: 'Search endpoints' },
-  { name: 'Start Enrollment', value: 'startEnrollment', description: 'Start enrollment process for an endpoint', action: 'Start enrollment for endpoint' },
-  { name: 'Trigger Intune Installation', value: 'triggerIntuneInstallation', description: 'Trigger installation of baramundi Management Agent via Intune', action: 'Trigger Intune installation' },
-  { name: 'Update', value: 'update', description: 'Update an endpoint', action: 'Update an endpoint' },
-  // Logical Group Operations
-  { name: 'Get Logical Group', value: 'getLogicalGroup', description: 'Get a logical group by ID', action: 'Get a logical group' },
-  { name: 'Get Logical Groups', value: 'getLogicalGroups', description: 'Get many logical groups', action: 'Get many logical groups' },
-  { name: 'Create Logical Group', value: 'createLogicalGroup', description: 'Create a new logical group', action: 'Create a logical group' },
-  { name: 'Update Logical Group', value: 'updateLogicalGroup', description: 'Update a logical group', action: 'Update a logical group' },
-  { name: 'Delete Logical Group', value: 'deleteLogicalGroup', description: 'Delete a logical group', action: 'Delete a logical group' },
-  // Static Group Operations
-  { name: 'Get Static Group', value: 'getStaticGroup', description: 'Get a static group by ID', action: 'Get a static group' },
-  { name: 'Get Static Groups', value: 'getStaticGroups', description: 'Get many static groups', action: 'Get many static groups' },
-  { name: 'Create Static Group', value: 'createStaticGroup', description: 'Create a new static group', action: 'Create a static group' },
-  { name: 'Update Static Group', value: 'updateStaticGroup', description: 'Update a static group', action: 'Update a static group' },
-  { name: 'Delete Static Group', value: 'deleteStaticGroup', description: 'Delete a static group', action: 'Delete a static group' },
-  // Dynamic Group Operations (Read-only)
-  { name: 'Get Dynamic Group', value: 'getDynamicGroup', description: 'Get a dynamic group by ID', action: 'Get a dynamic group' },
-  { name: 'Get Dynamic Groups', value: 'getDynamicGroups', description: 'Get many dynamic groups', action: 'Get many dynamic groups' },
-  // Maintenance Window — common create/delete/get
-  { name: 'Create Endpoint Maintenance Window', value: 'createEndpointMaintenanceWindow', description: 'Create a maintenance window for an endpoint', action: 'Create endpoint maintenance window' },
-  { name: 'Delete Endpoint Maintenance Window', value: 'deleteEndpointMaintenanceWindow', description: 'Delete a maintenance window for an endpoint', action: 'Delete endpoint maintenance window' },
-  { name: 'Get Endpoint Maintenance Window', value: 'getEndpointMaintenanceWindow', description: 'Get the maintenance window for an endpoint', action: 'Get endpoint maintenance window' },
-  { name: 'Create Group Maintenance Window', value: 'createGroupMaintenanceWindow', description: 'Create a maintenance window for a group', action: 'Create group maintenance window' },
-  { name: 'Delete Group Maintenance Window', value: 'deleteGroupMaintenanceWindow', description: 'Delete a maintenance window for a group', action: 'Delete group maintenance window' },
-  { name: 'Get Group Maintenance Window', value: 'getGroupMaintenanceWindow', description: 'Get the maintenance window for a logical group', action: 'Get group maintenance window' },
-  // Sub-group / Endpoints by group queries
-  { name: 'Get Logical Group Sub-Groups', value: 'getLogicalGroupSubGroups', description: 'Get sub-groups of a logical group', action: 'Get logical group sub-groups' },
-  { name: 'Get Endpoints by Logical Group', value: 'getEndpointsByLogicalGroup', description: 'Get endpoints in a logical group', action: 'Get endpoints by logical group' },
-  { name: 'Get Endpoints by Static Group', value: 'getEndpointsByStaticGroup', description: 'Get endpoints in a static group', action: 'Get endpoints by static group' },
-  { name: 'Get Endpoints by Dynamic Group', value: 'getEndpointsByDynamicGroup', description: 'Get endpoints in a dynamic group', action: 'Get endpoints by dynamic group' },
-  { name: 'Get Endpoints by AD User', value: 'getEndpointsByADUser', description: 'Get endpoints assigned to an AD user', action: 'Get endpoints by AD user' },
-  // Type-specific operations (Phase 9)
-  { name: 'Get Many (By Platform Type)', value: 'getTypedEndpoints', description: 'Get many endpoints filtered by platform type (Windows/Android/iOS/Linux/Mac/Network)', action: 'Get many typed endpoints' },
-  { name: 'Get (By Platform Type)', value: 'getTypedEndpoint', description: 'Get a single endpoint by ID and platform type', action: 'Get typed endpoint' },
-  { name: 'Update (By Platform Type)', value: 'updateTypedEndpoint', description: 'Update an endpoint using its type-specific API path', action: 'Update typed endpoint' },
-  { name: 'Delete (By Platform Type)', value: 'deleteTypedEndpoint', description: 'Delete an endpoint using its type-specific API path', action: 'Delete typed endpoint' },
-  { name: 'Start Enrollment (By Platform Type)', value: 'startTypedEnrollment', description: 'Start enrollment for Windows, Android, iOS, or Mac endpoint', action: 'Start typed enrollment' },
-  { name: 'Get Typed Endpoints By Group', value: 'getTypedEndpointsByGroup', description: 'Get endpoints of a specific platform type in a group', action: 'Get typed endpoints by group' },
-];
+// ============================================================
+// Core Endpoint Operations
+// ============================================================
 
 /** Operations shown when bmsVersion = 25R2 */
 export const endpointOperations25R2: INodeProperties[] = [
@@ -56,19 +13,16 @@ export const endpointOperations25R2: INodeProperties[] = [
     noDataExpression: true,
     displayOptions: { show: { resource: ['endpoint'], bmsVersion: ['25R2'] } },
     options: [
-      ...COMMON_ENDPOINT_OPTIONS,
-      // Maintenance Window — PUT (25R2 only, replaced by PATCH in 26R1)
-      { name: 'Replace Endpoint Maintenance Window (PUT)', value: 'putEndpointMaintenanceWindow', description: 'Replace a maintenance window for an endpoint with a full body (bMS 25R2)', action: 'Replace endpoint maintenance window' },
-      { name: 'Replace Group Maintenance Window (PUT)', value: 'putGroupMaintenanceWindow', description: 'Replace a maintenance window for a group with a full body (bMS 25R2)', action: 'Replace group maintenance window' },
-      // Industrial endpoints (25R2 only — removed in 26R1)
-      { name: 'Get Industrial Endpoints', value: 'getIndustrialEndpoints', description: 'Get all industrial endpoints (bMS 25R2 only)', action: 'Get industrial endpoints' },
-      { name: 'Get Industrial Endpoint', value: 'getIndustrialEndpoint', description: 'Get an industrial endpoint by ID (bMS 25R2 only)', action: 'Get industrial endpoint' },
-      { name: 'Create Industrial Endpoint', value: 'createIndustrialEndpoint', description: 'Create a new industrial endpoint (bMS 25R2 only)', action: 'Create industrial endpoint' },
-      { name: 'Update Industrial Endpoint', value: 'updateIndustrialEndpoint', description: 'Update an industrial endpoint (bMS 25R2 only)', action: 'Update industrial endpoint' },
-      { name: 'Delete Industrial Endpoint', value: 'deleteIndustrialEndpoint', description: 'Delete an industrial endpoint (bMS 25R2 only)', action: 'Delete industrial endpoint' },
-      { name: 'Get Industrial Endpoints By Group', value: 'getIndustrialEndpointsByGroup', description: 'Get industrial endpoints in a logical group, static group, or UDG (bMS 25R2 only)', action: 'Get industrial endpoints by group' },
+      { name: 'Create', value: 'create', description: 'Create a new Windows endpoint', action: 'Create a Windows endpoint' },
+      { name: 'Delete', value: 'delete', description: 'Delete an endpoint', action: 'Delete an endpoint' },
+      { name: 'Get', value: 'get', description: 'Get an endpoint by ID', action: 'Get an endpoint' },
+      { name: 'Get Endpoints by AD User', value: 'getEndpointsByADUser', description: 'Get endpoints assigned to an AD user', action: 'Get endpoints by AD user' },
+      { name: 'Get Many', value: 'getMany', description: 'Get many endpoints', action: 'Get many endpoints' },
+      { name: 'Search', value: 'search', description: 'Search endpoints by name or other criteria', action: 'Search endpoints' },
+      { name: 'Start Enrollment', value: 'startEnrollment', description: 'Start enrollment process for an endpoint', action: 'Start enrollment for endpoint' },
+      { name: 'Trigger Intune Installation', value: 'triggerIntuneInstallation', description: 'Trigger installation of baramundi Management Agent via Intune', action: 'Trigger Intune installation' },
+      { name: 'Update', value: 'update', description: 'Update an endpoint', action: 'Update an endpoint' },
     ],
-    // eslint-disable-next-line n8n-nodes-base/node-param-default-wrong-for-options -- 'getMany' is in COMMON_ENDPOINT_OPTIONS spread; ESLint cannot resolve spread
     default: 'getMany',
   },
 ];
@@ -82,27 +36,195 @@ export const endpointOperations26R1: INodeProperties[] = [
     noDataExpression: true,
     displayOptions: { show: { resource: ['endpoint'], bmsVersion: ['26R1'] } },
     options: [
-      ...COMMON_ENDPOINT_OPTIONS,
-      // Maintenance Window — PATCH (26R1+)
-      { name: 'Update Endpoint Maintenance Window (PATCH)', value: 'updateEndpointMaintenanceWindow', description: 'Update a maintenance window for an endpoint using JSON Patch (bMS 26R1+)', action: 'Update endpoint maintenance window' },
-      { name: 'Update Group Maintenance Window (PATCH)', value: 'updateGroupMaintenanceWindow', description: 'Update a maintenance window for a group using JSON Patch (bMS 26R1+)', action: 'Update group maintenance window' },
-      // EntraId Operations (26R1+)
-      { name: 'Set Entra ID Data', value: 'setEntraIdData', description: 'Create or update Entra ID data for an endpoint (bMS 26R1+)', action: 'Set Entra ID data for endpoint' },
+      { name: 'Create', value: 'create', description: 'Create a new Windows endpoint', action: 'Create a Windows endpoint' },
+      { name: 'Delete', value: 'delete', description: 'Delete an endpoint', action: 'Delete an endpoint' },
       { name: 'Delete Entra ID Data', value: 'deleteEntraIdData', description: 'Delete Entra ID data for an endpoint (bMS 26R1+)', action: 'Delete Entra ID data for endpoint' },
-      { name: 'Get Entra ID Data By Device ID', value: 'getEntraIdDataByDeviceId', description: 'Get Entra ID endpoint data by Entra ID device ID (bMS 26R1+)', action: 'Get Entra ID data by device ID' },
-      // UnmanagedEndpoints Operations (26R1+)
-      { name: 'Get Unmanaged Endpoints', value: 'getUnmanagedEndpoints', description: 'Get all unmanaged endpoints (bMS 26R1+)', action: 'Get unmanaged endpoints' },
-      { name: 'Get Unmanaged Endpoint', value: 'getUnmanagedEndpoint', description: 'Get an unmanaged endpoint by ID (bMS 26R1+)', action: 'Get unmanaged endpoint' },
       { name: 'Delete Unmanaged Endpoint', value: 'deleteUnmanagedEndpoint', description: 'Delete an unmanaged endpoint by ID (bMS 26R1+)', action: 'Delete unmanaged endpoint' },
+      { name: 'Get', value: 'get', description: 'Get an endpoint by ID', action: 'Get an endpoint' },
+      { name: 'Get Endpoints by AD User', value: 'getEndpointsByADUser', description: 'Get endpoints assigned to an AD user', action: 'Get endpoints by AD user' },
       { name: 'Get Endpoints by UDG', value: 'getEndpointsByUDG', description: 'Get endpoints in a Universal Dynamic Group (bMS 26R1+)', action: 'Get endpoints by UDG' },
+      { name: 'Get Entra ID Data By Device ID', value: 'getEntraIdDataByDeviceId', description: 'Get Entra ID endpoint data by Entra ID device ID (bMS 26R1+)', action: 'Get Entra ID data by device ID' },
+      { name: 'Get Many', value: 'getMany', description: 'Get many endpoints', action: 'Get many endpoints' },
+      { name: 'Get Unmanaged Endpoint', value: 'getUnmanagedEndpoint', description: 'Get an unmanaged endpoint by ID (bMS 26R1+)', action: 'Get unmanaged endpoint' },
+      { name: 'Get Unmanaged Endpoints', value: 'getUnmanagedEndpoints', description: 'Get all unmanaged endpoints (bMS 26R1+)', action: 'Get unmanaged endpoints' },
+      { name: 'Search', value: 'search', description: 'Search endpoints by name or other criteria', action: 'Search endpoints' },
+      { name: 'Set Entra ID Data', value: 'setEntraIdData', description: 'Create or update Entra ID data for an endpoint (bMS 26R1+)', action: 'Set Entra ID data for endpoint' },
+      { name: 'Start Enrollment', value: 'startEnrollment', description: 'Start enrollment process for an endpoint', action: 'Start enrollment for endpoint' },
+      { name: 'Trigger Intune Installation', value: 'triggerIntuneInstallation', description: 'Trigger installation of baramundi Management Agent via Intune', action: 'Trigger Intune installation' },
+      { name: 'Update', value: 'update', description: 'Update an endpoint', action: 'Update an endpoint' },
     ],
-    // eslint-disable-next-line n8n-nodes-base/node-param-default-wrong-for-options -- 'getMany' is in COMMON_ENDPOINT_OPTIONS spread; ESLint cannot resolve spread
     default: 'getMany',
   },
 ];
 
 /** @deprecated Use endpointOperations25R2 and endpointOperations26R1 instead */
 export const endpointOperations: INodeProperties[] = [...endpointOperations25R2, ...endpointOperations26R1];
+
+// ============================================================
+// Logical Group Operations
+// ============================================================
+
+export const logicalGroupOperations: INodeProperties[] = [
+  {
+    displayName: 'Operation',
+    name: 'operation',
+    type: 'options',
+    noDataExpression: true,
+    displayOptions: { show: { resource: ['logicalGroup'] } },
+    options: [
+      { name: 'Create', value: 'createLogicalGroup', description: 'Create a new logical group', action: 'Create a logical group' },
+      { name: 'Delete', value: 'deleteLogicalGroup', description: 'Delete a logical group', action: 'Delete a logical group' },
+      { name: 'Get', value: 'getLogicalGroup', description: 'Get a logical group by ID', action: 'Get a logical group' },
+      { name: 'Get Endpoints by Logical Group', value: 'getEndpointsByLogicalGroup', description: 'Get endpoints in a logical group', action: 'Get endpoints by logical group' },
+      { name: 'Get Many', value: 'getLogicalGroups', description: 'Get many logical groups', action: 'Get many logical groups' },
+      { name: 'Get Sub-Groups', value: 'getLogicalGroupSubGroups', description: 'Get sub-groups of a logical group', action: 'Get logical group sub-groups' },
+      { name: 'Update', value: 'updateLogicalGroup', description: 'Update a logical group', action: 'Update a logical group' },
+    ],
+    default: 'getLogicalGroups',
+  },
+];
+
+// ============================================================
+// Static Group Operations
+// ============================================================
+
+export const staticGroupOperations: INodeProperties[] = [
+  {
+    displayName: 'Operation',
+    name: 'operation',
+    type: 'options',
+    noDataExpression: true,
+    displayOptions: { show: { resource: ['staticGroup'] } },
+    options: [
+      { name: 'Create', value: 'createStaticGroup', description: 'Create a new static group', action: 'Create a static group' },
+      { name: 'Delete', value: 'deleteStaticGroup', description: 'Delete a static group', action: 'Delete a static group' },
+      { name: 'Get', value: 'getStaticGroup', description: 'Get a static group by ID', action: 'Get a static group' },
+      { name: 'Get Endpoints by Static Group', value: 'getEndpointsByStaticGroup', description: 'Get endpoints in a static group', action: 'Get endpoints by static group' },
+      { name: 'Get Many', value: 'getStaticGroups', description: 'Get many static groups', action: 'Get many static groups' },
+      { name: 'Update', value: 'updateStaticGroup', description: 'Update a static group', action: 'Update a static group' },
+    ],
+    default: 'getStaticGroups',
+  },
+];
+
+// ============================================================
+// Dynamic Group Operations
+// ============================================================
+
+export const dynamicGroupOperations: INodeProperties[] = [
+  {
+    displayName: 'Operation',
+    name: 'operation',
+    type: 'options',
+    noDataExpression: true,
+    displayOptions: { show: { resource: ['dynamicGroup'] } },
+    options: [
+      { name: 'Get', value: 'getDynamicGroup', description: 'Get a dynamic group by ID', action: 'Get a dynamic group' },
+      { name: 'Get Endpoints by Dynamic Group', value: 'getEndpointsByDynamicGroup', description: 'Get endpoints in a dynamic group', action: 'Get endpoints by dynamic group' },
+      { name: 'Get Many', value: 'getDynamicGroups', description: 'Get many dynamic groups', action: 'Get many dynamic groups' },
+    ],
+    default: 'getDynamicGroups',
+  },
+];
+
+// ============================================================
+// Maintenance Window Operations
+// ============================================================
+
+export const maintenanceWindowOperations25R2: INodeProperties[] = [
+  {
+    displayName: 'Operation',
+    name: 'operation',
+    type: 'options',
+    noDataExpression: true,
+    displayOptions: { show: { resource: ['maintenanceWindow'], bmsVersion: ['25R2'] } },
+    options: [
+      { name: 'Create Endpoint Maintenance Window', value: 'createEndpointMaintenanceWindow', description: 'Create a maintenance window for an endpoint', action: 'Create endpoint maintenance window' },
+      { name: 'Create Group Maintenance Window', value: 'createGroupMaintenanceWindow', description: 'Create a maintenance window for a group', action: 'Create group maintenance window' },
+      { name: 'Delete Endpoint Maintenance Window', value: 'deleteEndpointMaintenanceWindow', description: 'Delete a maintenance window for an endpoint', action: 'Delete endpoint maintenance window' },
+      { name: 'Delete Group Maintenance Window', value: 'deleteGroupMaintenanceWindow', description: 'Delete a maintenance window for a group', action: 'Delete group maintenance window' },
+      { name: 'Get Endpoint Maintenance Window', value: 'getEndpointMaintenanceWindow', description: 'Get the maintenance window for an endpoint', action: 'Get endpoint maintenance window' },
+      { name: 'Get Group Maintenance Window', value: 'getGroupMaintenanceWindow', description: 'Get the maintenance window for a logical group', action: 'Get group maintenance window' },
+      { name: 'Replace Endpoint Maintenance Window (PUT)', value: 'putEndpointMaintenanceWindow', description: 'Replace a maintenance window for an endpoint with a full body (bMS 25R2)', action: 'Replace endpoint maintenance window' },
+      { name: 'Replace Group Maintenance Window (PUT)', value: 'putGroupMaintenanceWindow', description: 'Replace a maintenance window for a group with a full body (bMS 25R2)', action: 'Replace group maintenance window' },
+    ],
+    default: 'getEndpointMaintenanceWindow',
+  },
+];
+
+export const maintenanceWindowOperations26R1: INodeProperties[] = [
+  {
+    displayName: 'Operation',
+    name: 'operation',
+    type: 'options',
+    noDataExpression: true,
+    displayOptions: { show: { resource: ['maintenanceWindow'], bmsVersion: ['26R1'] } },
+    options: [
+      { name: 'Create Endpoint Maintenance Window', value: 'createEndpointMaintenanceWindow', description: 'Create a maintenance window for an endpoint', action: 'Create endpoint maintenance window' },
+      { name: 'Create Group Maintenance Window', value: 'createGroupMaintenanceWindow', description: 'Create a maintenance window for a group', action: 'Create group maintenance window' },
+      { name: 'Delete Endpoint Maintenance Window', value: 'deleteEndpointMaintenanceWindow', description: 'Delete a maintenance window for an endpoint', action: 'Delete endpoint maintenance window' },
+      { name: 'Delete Group Maintenance Window', value: 'deleteGroupMaintenanceWindow', description: 'Delete a maintenance window for a group', action: 'Delete group maintenance window' },
+      { name: 'Get Endpoint Maintenance Window', value: 'getEndpointMaintenanceWindow', description: 'Get the maintenance window for an endpoint', action: 'Get endpoint maintenance window' },
+      { name: 'Get Group Maintenance Window', value: 'getGroupMaintenanceWindow', description: 'Get the maintenance window for a logical group', action: 'Get group maintenance window' },
+      { name: 'Update Endpoint Maintenance Window (PATCH)', value: 'updateEndpointMaintenanceWindow', description: 'Update a maintenance window for an endpoint using JSON Patch (bMS 26R1+)', action: 'Update endpoint maintenance window' },
+      { name: 'Update Group Maintenance Window (PATCH)', value: 'updateGroupMaintenanceWindow', description: 'Update a maintenance window for a group using JSON Patch (bMS 26R1+)', action: 'Update group maintenance window' },
+    ],
+    default: 'getEndpointMaintenanceWindow',
+  },
+];
+
+// ============================================================
+// Typed Endpoint Operations
+// ============================================================
+
+export const typedEndpointOperations25R2: INodeProperties[] = [
+  {
+    displayName: 'Operation',
+    name: 'operation',
+    type: 'options',
+    noDataExpression: true,
+    displayOptions: { show: { resource: ['typedEndpoint'], bmsVersion: ['25R2'] } },
+    options: [
+      { name: 'Create Industrial Endpoint', value: 'createIndustrialEndpoint', description: 'Create a new industrial endpoint (bMS 25R2 only)', action: 'Create industrial endpoint' },
+      { name: 'Delete', value: 'deleteTypedEndpoint', description: 'Delete an endpoint using its type-specific API path', action: 'Delete typed endpoint' },
+      { name: 'Delete Industrial Endpoint', value: 'deleteIndustrialEndpoint', description: 'Delete an industrial endpoint (bMS 25R2 only)', action: 'Delete industrial endpoint' },
+      { name: 'Get', value: 'getTypedEndpoint', description: 'Get a single endpoint by ID and platform type', action: 'Get typed endpoint' },
+      { name: 'Get Industrial Endpoint', value: 'getIndustrialEndpoint', description: 'Get an industrial endpoint by ID (bMS 25R2 only)', action: 'Get industrial endpoint' },
+      { name: 'Get Industrial Endpoints', value: 'getIndustrialEndpoints', description: 'Get all industrial endpoints (bMS 25R2 only)', action: 'Get industrial endpoints' },
+      { name: 'Get Industrial Endpoints By Group', value: 'getIndustrialEndpointsByGroup', description: 'Get industrial endpoints in a logical group, static group, or UDG (bMS 25R2 only)', action: 'Get industrial endpoints by group' },
+      { name: 'Get Many', value: 'getTypedEndpoints', description: 'Get many endpoints filtered by platform type (Windows/Android/iOS/Linux/Mac/Network)', action: 'Get many typed endpoints' },
+      { name: 'Get Typed Endpoints By Group', value: 'getTypedEndpointsByGroup', description: 'Get endpoints of a specific platform type in a group', action: 'Get typed endpoints by group' },
+      { name: 'Start Enrollment', value: 'startTypedEnrollment', description: 'Start enrollment for Windows, Android, iOS, or Mac endpoint', action: 'Start typed enrollment' },
+      { name: 'Update', value: 'updateTypedEndpoint', description: 'Update an endpoint using its type-specific API path', action: 'Update typed endpoint' },
+      { name: 'Update Industrial Endpoint', value: 'updateIndustrialEndpoint', description: 'Update an industrial endpoint (bMS 25R2 only)', action: 'Update industrial endpoint' },
+    ],
+     
+    default: 'getTypedEndpoints',
+  },
+];
+
+export const typedEndpointOperations26R1: INodeProperties[] = [
+  {
+    displayName: 'Operation',
+    name: 'operation',
+    type: 'options',
+    noDataExpression: true,
+    displayOptions: { show: { resource: ['typedEndpoint'], bmsVersion: ['26R1'] } },
+    options: [
+      { name: 'Delete', value: 'deleteTypedEndpoint', description: 'Delete an endpoint using its type-specific API path', action: 'Delete typed endpoint' },
+      { name: 'Get', value: 'getTypedEndpoint', description: 'Get a single endpoint by ID and platform type', action: 'Get typed endpoint' },
+      { name: 'Get Many', value: 'getTypedEndpoints', description: 'Get many endpoints filtered by platform type (Windows/Android/iOS/Linux/Mac/Network)', action: 'Get many typed endpoints' },
+      { name: 'Get Typed Endpoints By Group', value: 'getTypedEndpointsByGroup', description: 'Get endpoints of a specific platform type in a group', action: 'Get typed endpoints by group' },
+      { name: 'Start Enrollment', value: 'startTypedEnrollment', description: 'Start enrollment for Windows, Android, iOS, or Mac endpoint', action: 'Start typed enrollment' },
+      { name: 'Update', value: 'updateTypedEndpoint', description: 'Update an endpoint using its type-specific API path', action: 'Update typed endpoint' },
+    ],
+    default: 'getTypedEndpoints',
+  },
+];
+
+// ============================================================
+// Core Endpoint Fields
+// ============================================================
 
 export const endpointFields: INodeProperties[] = [
   // ----------------------------------
@@ -771,525 +893,7 @@ export const endpointFields: INodeProperties[] = [
   },
 
   // ----------------------------------
-  //         endpoint: Group ID field (all group operations)
-  // ----------------------------------
-  {
-    displayName: 'Group ID',
-    name: 'groupId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['getLogicalGroup', 'updateLogicalGroup', 'deleteLogicalGroup', 'getStaticGroup', 'updateStaticGroup', 'deleteStaticGroup', 'getDynamicGroup'],
-      },
-    },
-    description: 'The GUID of the group',
-  },
-
-  // ----------------------------------
-  //         endpoint:getLogicalGroups, getStaticGroups, getDynamicGroups
-  // ----------------------------------
-  {
-    displayName: 'Return All',
-    name: 'returnAll',
-    type: 'boolean',
-    default: false,
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['getLogicalGroups', 'getStaticGroups', 'getDynamicGroups'],
-      },
-    },
-    description: 'Whether to return all results or only up to a given limit',
-    hint: 'Results are capped at 5,000 items regardless of this setting',
-  },
-  {
-    displayName: 'Limit',
-    name: 'limit',
-    type: 'number',
-    typeOptions: {
-      minValue: 1,
-    },
-    default: 50,
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['getLogicalGroups', 'getStaticGroups', 'getDynamicGroups'],
-        returnAll: [false],
-      },
-    },
-    description: 'Max number of results to return',
-  },
-  {
-    displayName: 'Options',
-    name: 'options',
-    type: 'collection',
-    placeholder: 'Add Option',
-    default: {},
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['getLogicalGroups', 'getStaticGroups', 'getDynamicGroups'],
-      },
-    },
-    options: [
-      {
-        displayName: 'Search Query',
-        name: 'searchQuery',
-        type: 'string',
-        default: '',
-        description: 'Search query to filter groups',
-      },
-      {
-        displayName: 'Order By',
-        name: 'orderBy',
-        type: 'string',
-        default: '',
-        placeholder: 'Name asc',
-        description: 'Sort order (e.g., "Name asc", "Name desc")',
-      },
-    ],
-  },
-
-  // ----------------------------------
-  //         endpoint:createLogicalGroup, createStaticGroup
-  // ----------------------------------
-  {
-    displayName: 'Name',
-    name: 'name',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['createLogicalGroup', 'createStaticGroup'],
-      },
-    },
-    description: 'Name of the group',
-  },
-  {
-    displayName: 'Additional Fields',
-    name: 'additionalFields',
-    type: 'collection',
-    placeholder: 'Add Field',
-    default: {},
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['createLogicalGroup', 'createStaticGroup'],
-      },
-    },
-    options: [
-      {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'Description of the group',
-      },
-      {
-        displayName: 'Comment',
-        name: 'comment',
-        type: 'string',
-        default: '',
-        description: 'Comment for the group',
-      },
-    ],
-  },
-
-  // ----------------------------------
-  //         endpoint:updateLogicalGroup, updateStaticGroup
-  // ----------------------------------
-  {
-    displayName: 'Update Fields',
-    name: 'updateFields',
-    type: 'collection',
-    placeholder: 'Add Field',
-    default: {},
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['updateLogicalGroup', 'updateStaticGroup'],
-      },
-    },
-    options: [
-      {
-        displayName: 'Name',
-        name: 'name',
-        type: 'string',
-        default: '',
-        description: 'Name of the group',
-      },
-      {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'Description of the group',
-      },
-      {
-        displayName: 'Comment',
-        name: 'comment',
-        type: 'string',
-        default: '',
-        description: 'Comment for the group',
-      },
-    ],
-  },
-
-  // ----------------------------------
-  //         endpoint:createEndpointMaintenanceWindow, updateEndpointMaintenanceWindow, deleteEndpointMaintenanceWindow
-  // ----------------------------------
-  {
-    displayName: 'Endpoint Name or ID',
-    name: 'endpointSelection',
-    type: 'options',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['createEndpointMaintenanceWindow', 'updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow', 'putEndpointMaintenanceWindow'],
-      },
-    },
-    typeOptions: {
-      loadOptionsMethod: 'getEndpoints',
-    },
-    options: [
-      {
-        name: 'Enter Custom GUID...',
-        value: '__custom__',
-      },
-    ],
-    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-  },
-  {
-    displayName: 'Endpoint ID',
-    name: 'endpointId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['createEndpointMaintenanceWindow', 'updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow', 'putEndpointMaintenanceWindow'],
-        endpointSelection: ['__custom__'],
-      },
-    },
-    placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
-    description: 'Enter the endpoint GUID manually',
-  },
-  {
-    displayName: 'Window ID',
-    name: 'windowId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow', 'putEndpointMaintenanceWindow'],
-      },
-    },
-    description: 'The GUID of the maintenance window',
-  },
-  {
-    displayName: 'Maintenance Window (JSON)',
-    name: 'maintenanceWindowJson',
-    type: 'json',
-    required: true,
-    default: '{"maintenanceWindowDefinitionType":"daily","intervals":[]}',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['putEndpointMaintenanceWindow'],
-        bmsVersion: ['25R2'],
-      },
-    },
-    description: 'Full MaintenanceWindow JSON body for PUT replacement (bMS 25R2). See API docs for schema.',
-  },
-  {
-    displayName: 'Start Time',
-    name: 'startTime',
-    type: 'string',
-    required: true,
-    default: '',
-    placeholder: '2026-01-20T08:00:00Z',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['createEndpointMaintenanceWindow'],
-      },
-    },
-    description: 'Start time of the maintenance window (ISO 8601 format)',
-  },
-  {
-    displayName: 'End Time',
-    name: 'endTime',
-    type: 'string',
-    required: true,
-    default: '',
-    placeholder: '2026-01-20T18:00:00Z',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['createEndpointMaintenanceWindow'],
-      },
-    },
-    description: 'End time of the maintenance window (ISO 8601 format)',
-  },
-  {
-    displayName: 'Additional Fields',
-    name: 'additionalFields',
-    type: 'collection',
-    placeholder: 'Add Field',
-    default: {},
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['createEndpointMaintenanceWindow'],
-      },
-    },
-    options: [
-      {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'Description of the maintenance window',
-      },
-      {
-        displayName: 'Comment',
-        name: 'comment',
-        type: 'string',
-        default: '',
-        description: 'Comment for the maintenance window',
-      },
-    ],
-  },
-  {
-    displayName: 'Update Fields',
-    name: 'updateFields',
-    type: 'collection',
-    placeholder: 'Add Field',
-    default: {},
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['updateEndpointMaintenanceWindow'],
-        bmsVersion: ['26R1'],
-      },
-    },
-    options: [
-      {
-        displayName: 'Start Time',
-        name: 'startTime',
-        type: 'string',
-        default: '',
-        placeholder: '2026-01-20T08:00:00Z',
-        description: 'Start time of the maintenance window (ISO 8601 format)',
-      },
-      {
-        displayName: 'End Time',
-        name: 'endTime',
-        type: 'string',
-        default: '',
-        placeholder: '2026-01-20T18:00:00Z',
-        description: 'End time of the maintenance window (ISO 8601 format)',
-      },
-      {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'Description of the maintenance window',
-      },
-      {
-        displayName: 'Comment',
-        name: 'comment',
-        type: 'string',
-        default: '',
-        description: 'Comment for the maintenance window',
-      },
-    ],
-  },
-
-  // ----------------------------------
-  //         endpoint:createGroupMaintenanceWindow, updateGroupMaintenanceWindow, deleteGroupMaintenanceWindow
-  // ----------------------------------
-  {
-    displayName: 'Group ID',
-    name: 'groupId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['createGroupMaintenanceWindow', 'updateGroupMaintenanceWindow', 'deleteGroupMaintenanceWindow', 'putGroupMaintenanceWindow'],
-      },
-    },
-    description: 'The GUID of the group',
-  },
-  {
-    displayName: 'Group Type',
-    name: 'groupType',
-    type: 'options',
-    required: true,
-    default: 'logical',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['createGroupMaintenanceWindow', 'updateGroupMaintenanceWindow', 'deleteGroupMaintenanceWindow', 'putGroupMaintenanceWindow'],
-      },
-    },
-    options: [
-      { name: 'Logical', value: 'logical' },
-      { name: 'Static', value: 'static' },
-      { name: 'Dynamic', value: 'dynamic' },
-    ],
-    description: 'Type of the group',
-  },
-  {
-    displayName: 'Window ID',
-    name: 'windowId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['updateGroupMaintenanceWindow', 'deleteGroupMaintenanceWindow', 'putGroupMaintenanceWindow'],
-      },
-    },
-    description: 'The GUID of the maintenance window',
-  },
-  {
-    displayName: 'Maintenance Window (JSON)',
-    name: 'maintenanceWindowJson',
-    type: 'json',
-    required: true,
-    default: '{"maintenanceWindowDefinitionType":"daily","intervals":[]}',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['putGroupMaintenanceWindow'],
-        bmsVersion: ['25R2'],
-      },
-    },
-    description: 'Full MaintenanceWindow JSON body for PUT replacement (bMS 25R2). See API docs for schema.',
-  },
-  {
-    displayName: 'Start Time',
-    name: 'startTime',
-    type: 'string',
-    required: true,
-    default: '',
-    placeholder: '2026-01-20T08:00:00Z',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['createGroupMaintenanceWindow'],
-      },
-    },
-    description: 'Start time of the maintenance window (ISO 8601 format)',
-  },
-  {
-    displayName: 'End Time',
-    name: 'endTime',
-    type: 'string',
-    required: true,
-    default: '',
-    placeholder: '2026-01-20T18:00:00Z',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['createGroupMaintenanceWindow'],
-      },
-    },
-    description: 'End time of the maintenance window (ISO 8601 format)',
-  },
-  {
-    displayName: 'Additional Fields',
-    name: 'additionalFields',
-    type: 'collection',
-    placeholder: 'Add Field',
-    default: {},
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['createGroupMaintenanceWindow'],
-      },
-    },
-    options: [
-      {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'Description of the maintenance window',
-      },
-      {
-        displayName: 'Comment',
-        name: 'comment',
-        type: 'string',
-        default: '',
-        description: 'Comment for the maintenance window',
-      },
-    ],
-  },
-  {
-    displayName: 'Update Fields',
-    name: 'updateFields',
-    type: 'collection',
-    placeholder: 'Add Field',
-    default: {},
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['updateGroupMaintenanceWindow'],
-        bmsVersion: ['26R1'],
-      },
-    },
-    options: [
-      {
-        displayName: 'Start Time',
-        name: 'startTime',
-        type: 'string',
-        default: '',
-        placeholder: '2026-01-20T08:00:00Z',
-        description: 'Start time of the maintenance window (ISO 8601 format)',
-      },
-      {
-        displayName: 'End Time',
-        name: 'endTime',
-        type: 'string',
-        default: '',
-        placeholder: '2026-01-20T18:00:00Z',
-        description: 'End time of the maintenance window (ISO 8601 format)',
-      },
-      {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'Description of the maintenance window',
-      },
-      {
-        displayName: 'Comment',
-        name: 'comment',
-        type: 'string',
-        default: '',
-        description: 'Comment for the maintenance window',
-      },
-    ],
-  },
-
-  // ----------------------------------
-  //         EntraId operations (26R1+)
+  //         endpoint: EntraId operations (26R1+)
   // ----------------------------------
   {
     displayName: 'Endpoint Name or ID',
@@ -1398,7 +1002,7 @@ export const endpointFields: INodeProperties[] = [
   },
 
   // ----------------------------------
-  //         UnmanagedEndpoints operations (26R1+)
+  //         endpoint: UnmanagedEndpoints operations (26R1+)
   // ----------------------------------
   {
     displayName: 'Return All',
@@ -1449,74 +1053,8 @@ export const endpointFields: INodeProperties[] = [
   },
 
   // ----------------------------------
-  //  Phase 8C — new field params
+  //         endpoint: getEndpointsByADUser
   // ----------------------------------
-  {
-    displayName: 'Endpoint ID',
-    name: 'endpointId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointMaintenanceWindow'] } },
-    description: 'The GUID of the endpoint',
-  },
-  {
-    displayName: 'Logical Group ID',
-    name: 'logicalGroupId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getGroupMaintenanceWindow', 'getLogicalGroupSubGroups', 'getEndpointsByLogicalGroup'] } },
-    description: 'The GUID of the logical group',
-  },
-  {
-    displayName: 'Return All',
-    name: 'returnAll',
-    type: 'boolean',
-    default: false,
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getLogicalGroupSubGroups', 'getEndpointsByLogicalGroup', 'getEndpointsByStaticGroup', 'getEndpointsByDynamicGroup', 'getEndpointsByADUser', 'getEndpointsByUDG'] } },
-    description: 'Whether to return all results or only up to a given limit',
-    hint: 'Results are capped at 5,000 items regardless of this setting',
-  },
-  {
-    displayName: 'Limit',
-    name: 'limit',
-    type: 'number',
-    typeOptions: { minValue: 1 },
-    default: 50,
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getLogicalGroupSubGroups', 'getEndpointsByLogicalGroup', 'getEndpointsByStaticGroup', 'getEndpointsByDynamicGroup', 'getEndpointsByADUser', 'getEndpointsByUDG'], returnAll: [false] } },
-    description: 'Max number of results to return',
-  },
-  {
-    displayName: 'Options',
-    name: 'options',
-    type: 'collection',
-    placeholder: 'Add Option',
-    default: {},
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getLogicalGroupSubGroups', 'getEndpointsByLogicalGroup', 'getEndpointsByStaticGroup', 'getEndpointsByDynamicGroup', 'getEndpointsByADUser', 'getEndpointsByUDG'] } },
-    options: [
-      { displayName: 'Search Query', name: 'searchQuery', type: 'string', default: '', description: 'Filter results by name' },
-      { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order' },
-    ],
-  },
-  {
-    displayName: 'Static Group ID',
-    name: 'staticGroupId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByStaticGroup'] } },
-    description: 'The GUID of the static group',
-  },
-  {
-    displayName: 'Dynamic Group ID',
-    name: 'dynamicGroupId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByDynamicGroup'] } },
-    description: 'The GUID of the dynamic group',
-  },
   {
     displayName: 'AD User ID',
     name: 'adUserId',
@@ -1527,6 +1065,40 @@ export const endpointFields: INodeProperties[] = [
     description: 'The GUID of the AD user',
   },
   {
+    displayName: 'Return All',
+    name: 'returnAll',
+    type: 'boolean',
+    default: false,
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByADUser'] } },
+    description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
+  },
+  {
+    displayName: 'Limit',
+    name: 'limit',
+    type: 'number',
+    typeOptions: { minValue: 1 },
+    default: 50,
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByADUser'], returnAll: [false] } },
+    description: 'Max number of results to return',
+  },
+  {
+    displayName: 'Options',
+    name: 'options',
+    type: 'collection',
+    placeholder: 'Add Option',
+    default: {},
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByADUser'] } },
+    options: [
+      { displayName: 'Search Query', name: 'searchQuery', type: 'string', default: '', description: 'Filter results by name' },
+      { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order' },
+    ],
+  },
+
+  // ----------------------------------
+  //         endpoint: getEndpointsByUDG (26R1+)
+  // ----------------------------------
+  {
     displayName: 'Universal Dynamic Group ID',
     name: 'udgId',
     type: 'string',
@@ -1535,7 +1107,967 @@ export const endpointFields: INodeProperties[] = [
     displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByUDG'], bmsVersion: ['26R1'] } },
     description: 'The GUID of the Universal Dynamic Group (bMS 26R1+)',
   },
+  {
+    displayName: 'Return All',
+    name: 'returnAll',
+    type: 'boolean',
+    default: false,
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByUDG'] } },
+    description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
+  },
+  {
+    displayName: 'Limit',
+    name: 'limit',
+    type: 'number',
+    typeOptions: { minValue: 1 },
+    default: 50,
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByUDG'], returnAll: [false] } },
+    description: 'Max number of results to return',
+  },
+  {
+    displayName: 'Options',
+    name: 'options',
+    type: 'collection',
+    placeholder: 'Add Option',
+    default: {},
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByUDG'] } },
+    options: [
+      { displayName: 'Search Query', name: 'searchQuery', type: 'string', default: '', description: 'Filter results by name' },
+      { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order' },
+    ],
+  },
+];
 
+// ============================================================
+// Logical Group Fields
+// ============================================================
+
+export const logicalGroupFields: INodeProperties[] = [
+  // ----------------------------------
+  //         logicalGroup: Group ID (get, update, delete)
+  // ----------------------------------
+  {
+    displayName: 'Group ID',
+    name: 'groupId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['logicalGroup'],
+        operation: ['getLogicalGroup', 'updateLogicalGroup', 'deleteLogicalGroup'],
+      },
+    },
+    description: 'The GUID of the group',
+  },
+
+  // ----------------------------------
+  //         logicalGroup:getLogicalGroups
+  // ----------------------------------
+  {
+    displayName: 'Return All',
+    name: 'returnAll',
+    type: 'boolean',
+    default: false,
+    displayOptions: {
+      show: {
+        resource: ['logicalGroup'],
+        operation: ['getLogicalGroups'],
+      },
+    },
+    description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
+  },
+  {
+    displayName: 'Limit',
+    name: 'limit',
+    type: 'number',
+    typeOptions: {
+      minValue: 1,
+    },
+    default: 50,
+    displayOptions: {
+      show: {
+        resource: ['logicalGroup'],
+        operation: ['getLogicalGroups'],
+        returnAll: [false],
+      },
+    },
+    description: 'Max number of results to return',
+  },
+  {
+    displayName: 'Options',
+    name: 'options',
+    type: 'collection',
+    placeholder: 'Add Option',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['logicalGroup'],
+        operation: ['getLogicalGroups'],
+      },
+    },
+    options: [
+      {
+        displayName: 'Search Query',
+        name: 'searchQuery',
+        type: 'string',
+        default: '',
+        description: 'Search query to filter groups',
+      },
+      {
+        displayName: 'Order By',
+        name: 'orderBy',
+        type: 'string',
+        default: '',
+        placeholder: 'Name asc',
+        description: 'Sort order (e.g., "Name asc", "Name desc")',
+      },
+    ],
+  },
+
+  // ----------------------------------
+  //         logicalGroup:createLogicalGroup
+  // ----------------------------------
+  {
+    displayName: 'Name',
+    name: 'name',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['logicalGroup'],
+        operation: ['createLogicalGroup'],
+      },
+    },
+    description: 'Name of the group',
+  },
+  {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['logicalGroup'],
+        operation: ['createLogicalGroup'],
+      },
+    },
+    options: [
+      {
+        displayName: 'Description',
+        name: 'description',
+        type: 'string',
+        default: '',
+        description: 'Description of the group',
+      },
+      {
+        displayName: 'Comment',
+        name: 'comment',
+        type: 'string',
+        default: '',
+        description: 'Comment for the group',
+      },
+    ],
+  },
+
+  // ----------------------------------
+  //         logicalGroup:updateLogicalGroup
+  // ----------------------------------
+  {
+    displayName: 'Update Fields',
+    name: 'updateFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['logicalGroup'],
+        operation: ['updateLogicalGroup'],
+      },
+    },
+    options: [
+      {
+        displayName: 'Name',
+        name: 'name',
+        type: 'string',
+        default: '',
+        description: 'Name of the group',
+      },
+      {
+        displayName: 'Description',
+        name: 'description',
+        type: 'string',
+        default: '',
+        description: 'Description of the group',
+      },
+      {
+        displayName: 'Comment',
+        name: 'comment',
+        type: 'string',
+        default: '',
+        description: 'Comment for the group',
+      },
+    ],
+  },
+
+  // ----------------------------------
+  //         logicalGroup: getLogicalGroupSubGroups, getEndpointsByLogicalGroup
+  // ----------------------------------
+  {
+    displayName: 'Logical Group ID',
+    name: 'logicalGroupId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: { show: { resource: ['logicalGroup'], operation: ['getLogicalGroupSubGroups', 'getEndpointsByLogicalGroup'] } },
+    description: 'The GUID of the logical group',
+  },
+  {
+    displayName: 'Return All',
+    name: 'returnAll',
+    type: 'boolean',
+    default: false,
+    displayOptions: { show: { resource: ['logicalGroup'], operation: ['getLogicalGroupSubGroups', 'getEndpointsByLogicalGroup'] } },
+    description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
+  },
+  {
+    displayName: 'Limit',
+    name: 'limit',
+    type: 'number',
+    typeOptions: { minValue: 1 },
+    default: 50,
+    displayOptions: { show: { resource: ['logicalGroup'], operation: ['getLogicalGroupSubGroups', 'getEndpointsByLogicalGroup'], returnAll: [false] } },
+    description: 'Max number of results to return',
+  },
+  {
+    displayName: 'Options',
+    name: 'options',
+    type: 'collection',
+    placeholder: 'Add Option',
+    default: {},
+    displayOptions: { show: { resource: ['logicalGroup'], operation: ['getLogicalGroupSubGroups', 'getEndpointsByLogicalGroup'] } },
+    options: [
+      { displayName: 'Search Query', name: 'searchQuery', type: 'string', default: '', description: 'Filter results by name' },
+      { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order' },
+    ],
+  },
+];
+
+// ============================================================
+// Static Group Fields
+// ============================================================
+
+export const staticGroupFields: INodeProperties[] = [
+  // ----------------------------------
+  //         staticGroup: Group ID (get, update, delete)
+  // ----------------------------------
+  {
+    displayName: 'Group ID',
+    name: 'groupId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['staticGroup'],
+        operation: ['getStaticGroup', 'updateStaticGroup', 'deleteStaticGroup'],
+      },
+    },
+    description: 'The GUID of the group',
+  },
+
+  // ----------------------------------
+  //         staticGroup:getStaticGroups
+  // ----------------------------------
+  {
+    displayName: 'Return All',
+    name: 'returnAll',
+    type: 'boolean',
+    default: false,
+    displayOptions: {
+      show: {
+        resource: ['staticGroup'],
+        operation: ['getStaticGroups'],
+      },
+    },
+    description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
+  },
+  {
+    displayName: 'Limit',
+    name: 'limit',
+    type: 'number',
+    typeOptions: {
+      minValue: 1,
+    },
+    default: 50,
+    displayOptions: {
+      show: {
+        resource: ['staticGroup'],
+        operation: ['getStaticGroups'],
+        returnAll: [false],
+      },
+    },
+    description: 'Max number of results to return',
+  },
+  {
+    displayName: 'Options',
+    name: 'options',
+    type: 'collection',
+    placeholder: 'Add Option',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['staticGroup'],
+        operation: ['getStaticGroups'],
+      },
+    },
+    options: [
+      {
+        displayName: 'Search Query',
+        name: 'searchQuery',
+        type: 'string',
+        default: '',
+        description: 'Search query to filter groups',
+      },
+      {
+        displayName: 'Order By',
+        name: 'orderBy',
+        type: 'string',
+        default: '',
+        placeholder: 'Name asc',
+        description: 'Sort order (e.g., "Name asc", "Name desc")',
+      },
+    ],
+  },
+
+  // ----------------------------------
+  //         staticGroup:createStaticGroup
+  // ----------------------------------
+  {
+    displayName: 'Name',
+    name: 'name',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['staticGroup'],
+        operation: ['createStaticGroup'],
+      },
+    },
+    description: 'Name of the group',
+  },
+  {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['staticGroup'],
+        operation: ['createStaticGroup'],
+      },
+    },
+    options: [
+      {
+        displayName: 'Description',
+        name: 'description',
+        type: 'string',
+        default: '',
+        description: 'Description of the group',
+      },
+      {
+        displayName: 'Comment',
+        name: 'comment',
+        type: 'string',
+        default: '',
+        description: 'Comment for the group',
+      },
+    ],
+  },
+
+  // ----------------------------------
+  //         staticGroup:updateStaticGroup
+  // ----------------------------------
+  {
+    displayName: 'Update Fields',
+    name: 'updateFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['staticGroup'],
+        operation: ['updateStaticGroup'],
+      },
+    },
+    options: [
+      {
+        displayName: 'Name',
+        name: 'name',
+        type: 'string',
+        default: '',
+        description: 'Name of the group',
+      },
+      {
+        displayName: 'Description',
+        name: 'description',
+        type: 'string',
+        default: '',
+        description: 'Description of the group',
+      },
+      {
+        displayName: 'Comment',
+        name: 'comment',
+        type: 'string',
+        default: '',
+        description: 'Comment for the group',
+      },
+    ],
+  },
+
+  // ----------------------------------
+  //         staticGroup: getEndpointsByStaticGroup
+  // ----------------------------------
+  {
+    displayName: 'Static Group ID',
+    name: 'staticGroupId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: { show: { resource: ['staticGroup'], operation: ['getEndpointsByStaticGroup'] } },
+    description: 'The GUID of the static group',
+  },
+  {
+    displayName: 'Return All',
+    name: 'returnAll',
+    type: 'boolean',
+    default: false,
+    displayOptions: { show: { resource: ['staticGroup'], operation: ['getEndpointsByStaticGroup'] } },
+    description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
+  },
+  {
+    displayName: 'Limit',
+    name: 'limit',
+    type: 'number',
+    typeOptions: { minValue: 1 },
+    default: 50,
+    displayOptions: { show: { resource: ['staticGroup'], operation: ['getEndpointsByStaticGroup'], returnAll: [false] } },
+    description: 'Max number of results to return',
+  },
+  {
+    displayName: 'Options',
+    name: 'options',
+    type: 'collection',
+    placeholder: 'Add Option',
+    default: {},
+    displayOptions: { show: { resource: ['staticGroup'], operation: ['getEndpointsByStaticGroup'] } },
+    options: [
+      { displayName: 'Search Query', name: 'searchQuery', type: 'string', default: '', description: 'Filter results by name' },
+      { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order' },
+    ],
+  },
+];
+
+// ============================================================
+// Dynamic Group Fields
+// ============================================================
+
+export const dynamicGroupFields: INodeProperties[] = [
+  // ----------------------------------
+  //         dynamicGroup: Group ID (get)
+  // ----------------------------------
+  {
+    displayName: 'Group ID',
+    name: 'groupId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['dynamicGroup'],
+        operation: ['getDynamicGroup'],
+      },
+    },
+    description: 'The GUID of the group',
+  },
+
+  // ----------------------------------
+  //         dynamicGroup:getDynamicGroups
+  // ----------------------------------
+  {
+    displayName: 'Return All',
+    name: 'returnAll',
+    type: 'boolean',
+    default: false,
+    displayOptions: {
+      show: {
+        resource: ['dynamicGroup'],
+        operation: ['getDynamicGroups'],
+      },
+    },
+    description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
+  },
+  {
+    displayName: 'Limit',
+    name: 'limit',
+    type: 'number',
+    typeOptions: {
+      minValue: 1,
+    },
+    default: 50,
+    displayOptions: {
+      show: {
+        resource: ['dynamicGroup'],
+        operation: ['getDynamicGroups'],
+        returnAll: [false],
+      },
+    },
+    description: 'Max number of results to return',
+  },
+  {
+    displayName: 'Options',
+    name: 'options',
+    type: 'collection',
+    placeholder: 'Add Option',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['dynamicGroup'],
+        operation: ['getDynamicGroups'],
+      },
+    },
+    options: [
+      {
+        displayName: 'Search Query',
+        name: 'searchQuery',
+        type: 'string',
+        default: '',
+        description: 'Search query to filter groups',
+      },
+      {
+        displayName: 'Order By',
+        name: 'orderBy',
+        type: 'string',
+        default: '',
+        placeholder: 'Name asc',
+        description: 'Sort order (e.g., "Name asc", "Name desc")',
+      },
+    ],
+  },
+
+  // ----------------------------------
+  //         dynamicGroup: getEndpointsByDynamicGroup
+  // ----------------------------------
+  {
+    displayName: 'Dynamic Group ID',
+    name: 'dynamicGroupId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: { show: { resource: ['dynamicGroup'], operation: ['getEndpointsByDynamicGroup'] } },
+    description: 'The GUID of the dynamic group',
+  },
+  {
+    displayName: 'Return All',
+    name: 'returnAll',
+    type: 'boolean',
+    default: false,
+    displayOptions: { show: { resource: ['dynamicGroup'], operation: ['getEndpointsByDynamicGroup'] } },
+    description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
+  },
+  {
+    displayName: 'Limit',
+    name: 'limit',
+    type: 'number',
+    typeOptions: { minValue: 1 },
+    default: 50,
+    displayOptions: { show: { resource: ['dynamicGroup'], operation: ['getEndpointsByDynamicGroup'], returnAll: [false] } },
+    description: 'Max number of results to return',
+  },
+  {
+    displayName: 'Options',
+    name: 'options',
+    type: 'collection',
+    placeholder: 'Add Option',
+    default: {},
+    displayOptions: { show: { resource: ['dynamicGroup'], operation: ['getEndpointsByDynamicGroup'] } },
+    options: [
+      { displayName: 'Search Query', name: 'searchQuery', type: 'string', default: '', description: 'Filter results by name' },
+      { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order' },
+    ],
+  },
+];
+
+// ============================================================
+// Maintenance Window Fields
+// ============================================================
+
+export const maintenanceWindowFields: INodeProperties[] = [
+  // ----------------------------------
+  //         maintenanceWindow: endpoint selection
+  // ----------------------------------
+  {
+    displayName: 'Endpoint Name or ID',
+    name: 'endpointSelection',
+    type: 'options',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['maintenanceWindow'],
+        operation: ['createEndpointMaintenanceWindow', 'updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow', 'putEndpointMaintenanceWindow', 'getEndpointMaintenanceWindow'],
+      },
+    },
+    typeOptions: {
+      loadOptionsMethod: 'getEndpoints',
+    },
+    options: [
+      {
+        name: 'Enter Custom GUID...',
+        value: '__custom__',
+      },
+    ],
+    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+  },
+  {
+    displayName: 'Endpoint ID',
+    name: 'endpointId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['maintenanceWindow'],
+        operation: ['createEndpointMaintenanceWindow', 'updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow', 'putEndpointMaintenanceWindow', 'getEndpointMaintenanceWindow'],
+        endpointSelection: ['__custom__'],
+      },
+    },
+    placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
+    description: 'Enter the endpoint GUID manually',
+  },
+  {
+    displayName: 'Window ID',
+    name: 'windowId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['maintenanceWindow'],
+        operation: ['updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow', 'putEndpointMaintenanceWindow'],
+      },
+    },
+    description: 'The GUID of the maintenance window',
+  },
+  {
+    displayName: 'Maintenance Window (JSON)',
+    name: 'maintenanceWindowJson',
+    type: 'json',
+    required: true,
+    default: '{"maintenanceWindowDefinitionType":"daily","intervals":[]}',
+    displayOptions: {
+      show: {
+        resource: ['maintenanceWindow'],
+        operation: ['putEndpointMaintenanceWindow'],
+        bmsVersion: ['25R2'],
+      },
+    },
+    description: 'Full MaintenanceWindow JSON body for PUT replacement (bMS 25R2). See API docs for schema.',
+  },
+  {
+    displayName: 'Start Time',
+    name: 'startTime',
+    type: 'string',
+    required: true,
+    default: '',
+    placeholder: '2026-01-20T08:00:00Z',
+    displayOptions: {
+      show: {
+        resource: ['maintenanceWindow'],
+        operation: ['createEndpointMaintenanceWindow'],
+      },
+    },
+    description: 'Start time of the maintenance window (ISO 8601 format)',
+  },
+  {
+    displayName: 'End Time',
+    name: 'endTime',
+    type: 'string',
+    required: true,
+    default: '',
+    placeholder: '2026-01-20T18:00:00Z',
+    displayOptions: {
+      show: {
+        resource: ['maintenanceWindow'],
+        operation: ['createEndpointMaintenanceWindow'],
+      },
+    },
+    description: 'End time of the maintenance window (ISO 8601 format)',
+  },
+  {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['maintenanceWindow'],
+        operation: ['createEndpointMaintenanceWindow'],
+      },
+    },
+    options: [
+      {
+        displayName: 'Description',
+        name: 'description',
+        type: 'string',
+        default: '',
+        description: 'Description of the maintenance window',
+      },
+      {
+        displayName: 'Comment',
+        name: 'comment',
+        type: 'string',
+        default: '',
+        description: 'Comment for the maintenance window',
+      },
+    ],
+  },
+  {
+    displayName: 'Update Fields',
+    name: 'updateFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['maintenanceWindow'],
+        operation: ['updateEndpointMaintenanceWindow'],
+        bmsVersion: ['26R1'],
+      },
+    },
+    options: [
+      {
+        displayName: 'Start Time',
+        name: 'startTime',
+        type: 'string',
+        default: '',
+        placeholder: '2026-01-20T08:00:00Z',
+        description: 'Start time of the maintenance window (ISO 8601 format)',
+      },
+      {
+        displayName: 'End Time',
+        name: 'endTime',
+        type: 'string',
+        default: '',
+        placeholder: '2026-01-20T18:00:00Z',
+        description: 'End time of the maintenance window (ISO 8601 format)',
+      },
+      {
+        displayName: 'Description',
+        name: 'description',
+        type: 'string',
+        default: '',
+        description: 'Description of the maintenance window',
+      },
+      {
+        displayName: 'Comment',
+        name: 'comment',
+        type: 'string',
+        default: '',
+        description: 'Comment for the maintenance window',
+      },
+    ],
+  },
+
+  // ----------------------------------
+  //         maintenanceWindow: group maintenance windows
+  // ----------------------------------
+  {
+    displayName: 'Group ID',
+    name: 'groupId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['maintenanceWindow'],
+        operation: ['createGroupMaintenanceWindow', 'updateGroupMaintenanceWindow', 'deleteGroupMaintenanceWindow', 'putGroupMaintenanceWindow', 'getGroupMaintenanceWindow'],
+      },
+    },
+    description: 'The GUID of the group',
+  },
+  {
+    displayName: 'Group Type',
+    name: 'groupType',
+    type: 'options',
+    required: true,
+    default: 'logical',
+    displayOptions: {
+      show: {
+        resource: ['maintenanceWindow'],
+        operation: ['createGroupMaintenanceWindow', 'updateGroupMaintenanceWindow', 'deleteGroupMaintenanceWindow', 'putGroupMaintenanceWindow', 'getGroupMaintenanceWindow'],
+      },
+    },
+    options: [
+      { name: 'Logical', value: 'logical' },
+      { name: 'Static', value: 'static' },
+      { name: 'Dynamic', value: 'dynamic' },
+    ],
+    description: 'Type of the group',
+  },
+  {
+    displayName: 'Window ID',
+    name: 'windowId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['maintenanceWindow'],
+        operation: ['updateGroupMaintenanceWindow', 'deleteGroupMaintenanceWindow', 'putGroupMaintenanceWindow'],
+      },
+    },
+    description: 'The GUID of the maintenance window',
+  },
+  {
+    displayName: 'Maintenance Window (JSON)',
+    name: 'maintenanceWindowJson',
+    type: 'json',
+    required: true,
+    default: '{"maintenanceWindowDefinitionType":"daily","intervals":[]}',
+    displayOptions: {
+      show: {
+        resource: ['maintenanceWindow'],
+        operation: ['putGroupMaintenanceWindow'],
+        bmsVersion: ['25R2'],
+      },
+    },
+    description: 'Full MaintenanceWindow JSON body for PUT replacement (bMS 25R2). See API docs for schema.',
+  },
+  {
+    displayName: 'Start Time',
+    name: 'startTime',
+    type: 'string',
+    required: true,
+    default: '',
+    placeholder: '2026-01-20T08:00:00Z',
+    displayOptions: {
+      show: {
+        resource: ['maintenanceWindow'],
+        operation: ['createGroupMaintenanceWindow'],
+      },
+    },
+    description: 'Start time of the maintenance window (ISO 8601 format)',
+  },
+  {
+    displayName: 'End Time',
+    name: 'endTime',
+    type: 'string',
+    required: true,
+    default: '',
+    placeholder: '2026-01-20T18:00:00Z',
+    displayOptions: {
+      show: {
+        resource: ['maintenanceWindow'],
+        operation: ['createGroupMaintenanceWindow'],
+      },
+    },
+    description: 'End time of the maintenance window (ISO 8601 format)',
+  },
+  {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['maintenanceWindow'],
+        operation: ['createGroupMaintenanceWindow'],
+      },
+    },
+    options: [
+      {
+        displayName: 'Description',
+        name: 'description',
+        type: 'string',
+        default: '',
+        description: 'Description of the maintenance window',
+      },
+      {
+        displayName: 'Comment',
+        name: 'comment',
+        type: 'string',
+        default: '',
+        description: 'Comment for the maintenance window',
+      },
+    ],
+  },
+  {
+    displayName: 'Update Fields',
+    name: 'updateFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['maintenanceWindow'],
+        operation: ['updateGroupMaintenanceWindow'],
+        bmsVersion: ['26R1'],
+      },
+    },
+    options: [
+      {
+        displayName: 'Start Time',
+        name: 'startTime',
+        type: 'string',
+        default: '',
+        placeholder: '2026-01-20T08:00:00Z',
+        description: 'Start time of the maintenance window (ISO 8601 format)',
+      },
+      {
+        displayName: 'End Time',
+        name: 'endTime',
+        type: 'string',
+        default: '',
+        placeholder: '2026-01-20T18:00:00Z',
+        description: 'End time of the maintenance window (ISO 8601 format)',
+      },
+      {
+        displayName: 'Description',
+        name: 'description',
+        type: 'string',
+        default: '',
+        description: 'Description of the maintenance window',
+      },
+      {
+        displayName: 'Comment',
+        name: 'comment',
+        type: 'string',
+        default: '',
+        description: 'Comment for the maintenance window',
+      },
+    ],
+  },
+];
+
+// ============================================================
+// Typed Endpoint Fields
+// ============================================================
+
+export const typedEndpointFields: INodeProperties[] = [
   // ----------------------------------
   //  Phase 9: Type-specific operations
   // ----------------------------------
@@ -1545,7 +2077,7 @@ export const endpointFields: INodeProperties[] = [
     type: 'options',
     required: true,
     default: 'windows',
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getTypedEndpoints', 'getTypedEndpoint', 'updateTypedEndpoint', 'deleteTypedEndpoint', 'startTypedEnrollment', 'getTypedEndpointsByGroup'] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getTypedEndpoints', 'getTypedEndpoint', 'updateTypedEndpoint', 'deleteTypedEndpoint', 'startTypedEnrollment', 'getTypedEndpointsByGroup'] } },
     options: [
       { name: 'Android', value: 'android' },
       { name: 'iOS', value: 'ios' },
@@ -1562,7 +2094,7 @@ export const endpointFields: INodeProperties[] = [
     type: 'string',
     required: true,
     default: '',
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getTypedEndpoint', 'updateTypedEndpoint', 'deleteTypedEndpoint', 'startTypedEnrollment'] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getTypedEndpoint', 'updateTypedEndpoint', 'deleteTypedEndpoint', 'startTypedEnrollment'] } },
     placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
     description: 'The GUID of the endpoint',
   },
@@ -1571,7 +2103,7 @@ export const endpointFields: INodeProperties[] = [
     name: 'returnAll',
     type: 'boolean',
     default: false,
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getTypedEndpoints', 'getTypedEndpointsByGroup'] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getTypedEndpoints', 'getTypedEndpointsByGroup'] } },
     description: 'Whether to return all results or only up to a given limit',
     hint: 'Results are capped at 5,000 items regardless of this setting',
   },
@@ -1581,7 +2113,7 @@ export const endpointFields: INodeProperties[] = [
     type: 'number',
     typeOptions: { minValue: 1 },
     default: 50,
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getTypedEndpoints', 'getTypedEndpointsByGroup'], returnAll: [false] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getTypedEndpoints', 'getTypedEndpointsByGroup'], returnAll: [false] } },
     description: 'Max number of results to return',
   },
   {
@@ -1590,7 +2122,7 @@ export const endpointFields: INodeProperties[] = [
     type: 'collection',
     placeholder: 'Add Option',
     default: {},
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getTypedEndpoints', 'getTypedEndpointsByGroup'] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getTypedEndpoints', 'getTypedEndpointsByGroup'] } },
     options: [
       { displayName: 'Search Query', name: 'searchQuery', type: 'string', default: '', description: 'Filter results by name' },
       { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order' },
@@ -1602,7 +2134,7 @@ export const endpointFields: INodeProperties[] = [
     type: 'collection',
     placeholder: 'Add Field',
     default: {},
-    displayOptions: { show: { resource: ['endpoint'], operation: ['updateTypedEndpoint'] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['updateTypedEndpoint'] } },
     options: [
       { displayName: 'Display Name', name: 'displayName', type: 'string', default: '' },
       { displayName: 'Primary IP', name: 'primaryIP', type: 'string', default: '' },
@@ -1616,7 +2148,7 @@ export const endpointFields: INodeProperties[] = [
     type: 'collection',
     placeholder: 'Add Option',
     default: {},
-    displayOptions: { show: { resource: ['endpoint'], operation: ['startTypedEnrollment'] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['startTypedEnrollment'] } },
     options: [
       { displayName: 'Email Recipient', name: 'emailRecipient', type: 'string', default: '', description: 'Email address to send enrollment instructions to' },
       { displayName: 'Email Language ID', name: 'emailLanguageId', type: 'string', default: '', description: 'Language ID for the enrollment email' },
@@ -1628,7 +2160,7 @@ export const endpointFields: INodeProperties[] = [
     type: 'options',
     required: true,
     default: 'logical',
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getTypedEndpointsByGroup'] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getTypedEndpointsByGroup'] } },
     options: [
       { name: 'AD User', value: 'adUser', description: 'Get typed endpoints assigned to an AD user' },
       { name: 'Dynamic Group', value: 'dynamic', description: 'Windows endpoints only — /DynamicGroups/{id}/{Type}Endpoints' },
@@ -1644,7 +2176,7 @@ export const endpointFields: INodeProperties[] = [
     type: 'string',
     required: true,
     default: '',
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getTypedEndpointsByGroup'] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getTypedEndpointsByGroup'] } },
     placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
     description: 'The GUID of the group',
   },
@@ -1658,7 +2190,7 @@ export const endpointFields: INodeProperties[] = [
     type: 'string',
     required: true,
     default: '',
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getIndustrialEndpoint', 'updateIndustrialEndpoint', 'deleteIndustrialEndpoint'] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getIndustrialEndpoint', 'updateIndustrialEndpoint', 'deleteIndustrialEndpoint'] } },
     placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
     description: 'The GUID of the industrial endpoint',
   },
@@ -1668,7 +2200,7 @@ export const endpointFields: INodeProperties[] = [
     type: 'string',
     required: true,
     default: '',
-    displayOptions: { show: { resource: ['endpoint'], operation: ['createIndustrialEndpoint'] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['createIndustrialEndpoint'] } },
     description: 'Display name for the new industrial endpoint',
   },
   {
@@ -1677,7 +2209,7 @@ export const endpointFields: INodeProperties[] = [
     type: 'collection',
     placeholder: 'Add Field',
     default: {},
-    displayOptions: { show: { resource: ['endpoint'], operation: ['createIndustrialEndpoint'] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['createIndustrialEndpoint'] } },
     options: [
       { displayName: 'Primary IP', name: 'primaryIP', type: 'string', default: '' },
       { displayName: 'Primary MAC', name: 'primaryMAC', type: 'string', default: '' },
@@ -1690,7 +2222,7 @@ export const endpointFields: INodeProperties[] = [
     type: 'collection',
     placeholder: 'Add Field',
     default: {},
-    displayOptions: { show: { resource: ['endpoint'], operation: ['updateIndustrialEndpoint'] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['updateIndustrialEndpoint'] } },
     options: [
       { displayName: 'Display Name', name: 'displayName', type: 'string', default: '' },
       { displayName: 'Primary IP', name: 'primaryIP', type: 'string', default: '' },
@@ -1702,7 +2234,7 @@ export const endpointFields: INodeProperties[] = [
     name: 'returnAll',
     type: 'boolean',
     default: false,
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getIndustrialEndpoints', 'getIndustrialEndpointsByGroup'] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getIndustrialEndpoints', 'getIndustrialEndpointsByGroup'] } },
     description: 'Whether to return all results or only up to a given limit',
     hint: 'Results are capped at 5,000 items regardless of this setting',
   },
@@ -1712,7 +2244,7 @@ export const endpointFields: INodeProperties[] = [
     type: 'number',
     typeOptions: { minValue: 1 },
     default: 50,
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getIndustrialEndpoints', 'getIndustrialEndpointsByGroup'], returnAll: [false] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getIndustrialEndpoints', 'getIndustrialEndpointsByGroup'], returnAll: [false] } },
     description: 'Max number of results to return',
   },
   {
@@ -1721,7 +2253,7 @@ export const endpointFields: INodeProperties[] = [
     type: 'collection',
     placeholder: 'Add Option',
     default: {},
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getIndustrialEndpoints', 'getIndustrialEndpointsByGroup'] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getIndustrialEndpoints', 'getIndustrialEndpointsByGroup'] } },
     options: [
       { displayName: 'Search Query', name: 'searchQuery', type: 'string', default: '', description: 'Filter results by name' },
       { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order' },
@@ -1733,7 +2265,7 @@ export const endpointFields: INodeProperties[] = [
     type: 'options',
     required: true,
     default: 'logical',
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getIndustrialEndpointsByGroup'] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getIndustrialEndpointsByGroup'] } },
     options: [
       { name: 'Logical Group', value: 'logical' },
       { name: 'Static Group', value: 'static' },
@@ -1747,7 +2279,7 @@ export const endpointFields: INodeProperties[] = [
     type: 'string',
     required: true,
     default: '',
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getIndustrialEndpointsByGroup'] } },
+    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getIndustrialEndpointsByGroup'] } },
     placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
     description: 'The GUID of the group',
   },

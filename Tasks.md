@@ -559,6 +559,58 @@ Trigger: Schedule (weekly, before patch Tuesday).
 
 ---
 
+## Phase 12 — Split Resources for Action Picker UX (REQ-UX-2)
+
+**Goal**: Break the 12 monolithic resources (~208 total actions) into ~25 focused resources so the n8n action picker groups actions into scannable categories of 5–12 items each. Currently "Endpoint" alone has 54 actions mixing endpoints, groups, maintenance windows, and Entra ID — users cannot find what they need.
+
+**Mechanism**: n8n's action picker groups actions by `resource` value. There is no `actionCategory` or sub-grouping field. The only way to create visual sections in the picker is to use more granular resource values.
+
+**Prerequisite**: None (purely structural refactor — no logic changes).
+
+**Constraints**:
+- No functional changes — all 208 operations must work identically after refactor.
+- Version gating (`bmsVersion`) must be preserved on all operations.
+- The `router.ts` dispatch must be updated to match new resource values.
+- Unit tests must be updated for new `resource` display conditions.
+- The `subtitle` expression `={{$parameter["operation"] + ": " + $parameter["resource"]}}` still works — verify it reads well with new resource names.
+
+### Backlog
+
+| ID | Task | Priority | Details |
+|----|------|----------|---------|
+| P12.1 | **Split `endpoint` resource (54 actions → 6 resources)** | HIGH | Split into: **Endpoint** (get, getMany, search, create, update, delete, startEnrollment, triggerIntuneInstallation = 8 ops), **Logical Group** (get, getMany, create, update, delete, getSubGroups, getEndpoints = 7 ops), **Static Group** (get, getMany, create, update, delete, getEndpoints = 6 ops), **Dynamic Group** (get, getMany, getEndpoints = 3 ops), **Maintenance Window** (create/get/delete/update/replace for endpoint + group = 10 ops), **Typed Endpoint** (getMany, get, update, delete, startEnrollment, getByGroup = 6 ops). Move Entra ID ops (set/get/delete = 3 ops) and unmanaged endpoint ops (get/getMany/delete = 3 ops) into Endpoint or their own resource. Also move "Get Endpoints by AD User" and "Get Endpoints by UDG" into Endpoint. |
+| P12.2 | **Split `job` resource (37 actions → 3 resources)** | HIGH | Split into: **Job Definition** (get, getMany, create, update, delete, getByFolder, execute = 7 ops), **Job Instance** (get, getAll, getMany, getByEndpoint, getByLogicalGroup, getByStaticGroup, getByDynamicGroup, getByUDG, assignToLogicalGroup, assignToStaticGroup, assignToDynamicGroup, assignToUDG, start, stop, resume, delete = 16 ops), **Kiosk Release** (get, getMany, create, withdraw, getByEndpoint, getByADObject, getByJobDef, getByLogicalGroup = 8 ops). Job Folder ops (get, getMany, create, update, delete, getSubFolders = 6 ops) → either keep in Job Definition or split into **Job Folder**. |
+| P12.3 | **Split `serverManagement` resource (30 actions → 3–4 resources)** | HIGH | Split into: **Server Management** (getManagementServer, restart, cancelRestart, getGateway, getVPNAppliance, getDIPStatus, getDIPsMSWCleanup, simulateMSWCleanup, getDownloadJob, getDownloadJobs, getCloudConnectors, getPXERelays = 12 ops), **Microservice** (get, getMany, start, stop, restart = 5 ops), **Security** (getSecurityGroup/s, createSecurityGroup, updateSecurityGroup, deleteSecurityGroup, getSecurityProfile/s, createSecurityProfile, updateSecurityProfile, deleteSecurityProfile, getAccessRights, updateObjectPermissions = 11 ops), **API Key** (getApiKeys = 1 op — consider merging into Server Management). |
+| P12.4 | **Split `asset` resource (26 actions → 3 resources)** | MEDIUM | Split into: **Asset** (get, getMany, create, update, delete, getByEndpoint, getByADObject, getByLogicalGroup, getByOrgUnit = 9 ops), **Asset Type** (get, getMany, create, delete = 4 ops), **Asset Folder** (getStockFolder/s, createStockFolder, updateStockFolder, deleteStockFolder, getSubFolders, getStockAssets, getTypeFolder/s, createTypeFolder, updateTypeFolder, deleteTypeFolder, getTypeFolderSubFolders = 13 ops — or split Stock Folder and Type Folder). |
+| P12.5 | **Split `software` resource (19 actions → 2 resources)** | MEDIUM | Split into: **Software** (getInstalledSoftware, getSoftwareByEndpoint, getSoftwareByLogicalGroup, getSoftwareByUDG = 4 ops), **Software Bundle** (get, getMany, create, delete, getApplications, getApplicationsByBundle, addApplication, replaceApplication, deleteApplication, getFolder/s, createFolder, updateFolder, deleteFolder, getSubFolders = 14 ops). |
+| P12.6 | **Split `activeDirectory` resource (16 actions → 3 resources)** | MEDIUM | Split into: **AD User** (get, getMany, getByGroup, getByOrgUnit = 4 ops), **AD Group** (get, getMany, getByADGroup, getByOrgUnit = 4 ops), **AD Object** (get, getMany, getByADGroup, getByOrgUnit, getGroupMemberships = 5 ops). Keep **Organizational Unit** (get, getMany, getByOrgUnit = 3 ops) as separate resource or merge into AD Object. |
+| P12.7 | **Keep small resources as-is** | LOW | These are already well-sized: **Defense Control** (13 ops — could split BitLocker/Defender/LocalAdmin but not urgent), **Variable** (13 ops), **Operating System** (9 ops), **Compliance** (8 ops), **Universal Dynamic Group** (6 ops), **Update Management** (3 ops). |
+| P12.8 | **Create new resource entries in `Baramundi.node.ts`** | HIGH | Update the `resource` property `options` array from 12 entries to ~25 entries. Each needs `name`, `value`, and `description`. Order alphabetically or by domain (Endpoints & Groups → Jobs → Software → Security → etc.). |
+| P12.9 | **Update `router.ts` dispatch** | HIGH | The router dispatches by `resource` + `operation`. Add new resource cases for all split resources. The execute functions themselves don't change — just the routing map. |
+| P12.10 | **Move field definitions to new resource scopes** | HIGH | For each split, update `displayOptions.show.resource` on all operation definitions and field definitions to reference the new resource value instead of the old one. This is the bulk of the mechanical work. |
+| P12.11 | **Update unit tests** | HIGH | Update all test mocks that set `resource` parameter values. Run full test suite — all existing tests must pass with the new resource values. |
+| P12.12 | **Build + lint + full test run** | HIGH | TypeScript 0 errors, ESLint 0 errors, all tests passing. Bump minor version, update CHANGELOG. |
+| P12.13 | **Manual smoke test in n8n** | HIGH | Verify in the n8n action picker that: (1) resources appear as separate groups, (2) each group has a reasonable number of actions, (3) the subtitle displays correctly, (4) executing a workflow with the refactored node still works. |
+
+### Implementation Notes
+
+- **File structure**: Each new resource can either get its own directory under `actions/` (e.g., `actions/logicalGroup/`) or stay in the parent directory with the fields split into separate exports. Recommend new directories only for resources extracted from `endpoint` and `job` — the rest can use separate exports in the existing files.
+- **Execution functions**: The `.execute.ts` files do NOT need to move or change. Only the field definitions (`.fields.ts`), the resource list in `Baramundi.node.ts`, and the router need updating.
+- **Order of work**: P12.1 → P12.8 → P12.9 → P12.10 → P12.11 → P12.12 → P12.13. Start with Endpoint (biggest win), then Job, then the rest. Each split can be done and tested independently.
+- **Backwards compatibility**: Existing saved workflows store `resource` + `operation` values. Splitting resources changes the `resource` value, which **breaks existing workflows**. Document this as a breaking change in CHANGELOG. Consider bumping major version (0.x → 1.0 or 0.4 → 0.5).
+
+### Done
+
+| ID | Task | Completed |
+|----|------|-----------|
+| P12.1 | Split `endpoint` resource into 6 resources (Endpoint, Logical Group, Static Group, Dynamic Group, Maintenance Window, Typed Endpoint) | 2026-04-02 |
+| P12.8 | Added 5 new resource entries to `Baramundi.node.ts` (Dynamic Group, Logical Group, Maintenance Window, Static Group, Typed Endpoint) | 2026-04-02 |
+| P12.9 | Updated `router.ts` with 5 new case blocks routing to existing `endpoint.*` functions | 2026-04-02 |
+| P12.10 | Updated all `displayOptions.show.resource` in `endpoint.fields.ts` to new resource values | 2026-04-02 |
+| P12.11 | All 550 unit tests pass with new resource split (endpoint.execute.test.ts: 118 tests green) | 2026-04-02 |
+
+---
+
 ## Notes
 
 - **System tests** (`test/system/`) require a live bMS server. They are skipped in CI unless `BMS_URL` env var is set. Do not block phases on system test results.

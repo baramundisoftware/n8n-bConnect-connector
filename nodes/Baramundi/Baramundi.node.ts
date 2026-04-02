@@ -12,7 +12,23 @@ import { assetFields, assetOperations25R2, assetOperations26R1 } from './actions
 import { complianceFields, complianceOperations } from './actions/compliance/compliance.fields';
 import { universalDynamicGroupsFields, universalDynamicGroupsOperations } from './actions/universalDynamicGroups/universalDynamicGroups.fields';
 import { defenseControlFields, defenseControlOperations } from './actions/defenseControl/defenseControl.fields';
-import { endpointFields, endpointOperations25R2, endpointOperations26R1 } from './actions/endpoint/endpoint.fields';
+import {
+  dynamicGroupFields,
+  dynamicGroupOperations,
+  endpointFields,
+  endpointOperations25R2,
+  endpointOperations26R1,
+  logicalGroupFields,
+  logicalGroupOperations,
+  maintenanceWindowFields,
+  maintenanceWindowOperations25R2,
+  maintenanceWindowOperations26R1,
+  staticGroupFields,
+  staticGroupOperations,
+  typedEndpointFields,
+  typedEndpointOperations25R2,
+  typedEndpointOperations26R1,
+} from './actions/endpoint/endpoint.fields';
 import { jobFields, jobOperations } from './actions/job/job.fields';
 import { operatingSystemFields, operatingSystemOperations } from './actions/operatingSystem/operatingSystem.fields';
 import { serverManagementFields, serverManagementOperations } from './actions/serverManagement/serverManagement.fields';
@@ -96,6 +112,11 @@ export class Baramundi implements INodeType {
             description: 'Manage BitLocker, local admin accounts, and Microsoft Defender',
           },
           {
+            name: 'Dynamic Group',
+            value: 'dynamicGroup',
+            description: 'Query dynamic endpoint groups',
+          },
+          {
             name: 'Endpoint',
             value: 'endpoint',
             description: 'Manage endpoints (devices) in baramundi',
@@ -104,6 +125,16 @@ export class Baramundi implements INodeType {
             name: 'Job',
             value: 'job',
             description: 'Manage jobs and job execution',
+          },
+          {
+            name: 'Logical Group',
+            value: 'logicalGroup',
+            description: 'Manage logical endpoint groups',
+          },
+          {
+            name: 'Maintenance Window',
+            value: 'maintenanceWindow',
+            description: 'Manage endpoint and group maintenance windows',
           },
           {
             name: 'Operating System',
@@ -119,6 +150,16 @@ export class Baramundi implements INodeType {
             name: 'Software',
             value: 'software',
             description: 'Query installed Windows software inventory',
+          },
+          {
+            name: 'Static Group',
+            value: 'staticGroup',
+            description: 'Manage static endpoint groups',
+          },
+          {
+            name: 'Typed Endpoint',
+            value: 'typedEndpoint',
+            description: 'Manage endpoints by platform type (Windows, Android, iOS, Linux, Mac, Network)',
           },
           {
             name: 'Universal Dynamic Group',
@@ -145,8 +186,15 @@ export class Baramundi implements INodeType {
       ...assetOperations25R2,
       ...assetOperations26R1,
       ...defenseControlOperations,
+      ...dynamicGroupOperations,
       ...endpointOperations25R2,
       ...endpointOperations26R1,
+      ...logicalGroupOperations,
+      ...maintenanceWindowOperations25R2,
+      ...maintenanceWindowOperations26R1,
+      ...staticGroupOperations,
+      ...typedEndpointOperations25R2,
+      ...typedEndpointOperations26R1,
       ...jobOperations,
       ...operatingSystemOperations,
       ...serverManagementOperations,
@@ -160,7 +208,12 @@ export class Baramundi implements INodeType {
       ...activeDirectoryFields,
       ...assetFields,
       ...defenseControlFields,
+      ...dynamicGroupFields,
       ...endpointFields,
+      ...logicalGroupFields,
+      ...maintenanceWindowFields,
+      ...staticGroupFields,
+      ...typedEndpointFields,
       ...jobFields,
       ...operatingSystemFields,
       ...serverManagementFields,
