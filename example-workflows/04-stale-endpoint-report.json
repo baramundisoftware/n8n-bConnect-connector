@@ -2,6 +2,14 @@
   "name": "Baramundi — Stale Endpoint Report",
   "nodes": [
     {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Test Workflow",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
       "parameters": {
         "rule": {
           "interval": [
@@ -16,7 +24,7 @@
       "name": "Monthly (1st Monday 08:00)",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [200, 300],
+      "position": [200, 460],
       "notes": "Fires on the first Monday of each month at 08:00."
     },
     {
@@ -90,6 +98,9 @@
     }
   ],
   "connections": {
+    "Test Workflow": {
+      "main": [[{ "node": "Get All Endpoints", "type": "main", "index": 0 }]]
+    },
     "Monthly (1st Monday 08:00)": {
       "main": [[{ "node": "Get All Endpoints", "type": "main", "index": 0 }]]
     },

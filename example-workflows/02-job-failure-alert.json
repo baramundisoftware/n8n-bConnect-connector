@@ -2,6 +2,14 @@
   "name": "Baramundi — Job Failure Alert",
   "nodes": [
     {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Test Workflow",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
       "parameters": {
         "rule": {
           "interval": [
@@ -16,7 +24,7 @@
       "name": "Every 6 Hours",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [200, 300]
+      "position": [200, 460]
     },
     {
       "parameters": {
@@ -110,6 +118,9 @@
     }
   ],
   "connections": {
+    "Test Workflow": {
+      "main": [[{ "node": "Get All Job Instances", "type": "main", "index": 0 }]]
+    },
     "Every 6 Hours": {
       "main": [[{ "node": "Get All Job Instances", "type": "main", "index": 0 }]]
     },

@@ -2,6 +2,14 @@
   "name": "Baramundi — Patch Tuesday Cycle",
   "nodes": [
     {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Test Workflow",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
       "parameters": {
         "rule": {
           "interval": [
@@ -16,13 +24,13 @@
       "name": "Patch Tuesday 22:00",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [200, 300],
+      "position": [200, 460],
       "notes": "Fires on the 2nd Tuesday of each month at 22:00. Adjust the cron expression for your patch window."
     },
     {
       "parameters": {
         "resource": "logicalGroup",
-        "operation": "getMany",
+        "operation": "getLogicalGroups",
         "returnAll": true
       },
       "id": "get-groups",
@@ -40,7 +48,7 @@
     {
       "parameters": {
         "resource": "maintenanceWindow",
-        "operation": "putGroupMaintenanceWindow",
+        "operation": "createGroupMaintenanceWindow",
         "groupId": "={{ $json.id }}",
         "startTime": "={{ $now.toISO() }}",
         "endTime": "={{ $now.plus({ hours: 6 }).toISO() }}"
@@ -145,6 +153,9 @@
     }
   ],
   "connections": {
+    "Test Workflow": {
+      "main": [[{ "node": "Get Logical Groups", "type": "main", "index": 0 }]]
+    },
     "Patch Tuesday 22:00": {
       "main": [[{ "node": "Get Logical Groups", "type": "main", "index": 0 }]]
     },
@@ -158,9 +169,9 @@
       "main": [[{ "node": "Wait 4 Hours", "type": "main", "index": 0 }]]
     },
     "Wait 4 Hours": {
-      "main": [[{ "node": "Get Job Results", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "Get Job Results (by Job Def)", "type": "main", "index": 0 }]]
     },
-    "Get Job Results": {
+    "Get Job Results (by Job Def)": {
       "main": [[{ "node": "Build HTML Report", "type": "main", "index": 0 }]]
     },
     "Build HTML Report": {

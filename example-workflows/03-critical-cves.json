@@ -2,6 +2,14 @@
   "name": "Baramundi — Critical CVE Report (26R1)",
   "nodes": [
     {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Test Workflow",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
       "parameters": {
         "rule": {
           "interval": [
@@ -16,7 +24,7 @@
       "name": "Daily 06:00",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [200, 300]
+      "position": [200, 460]
     },
     {
       "parameters": {
@@ -131,6 +139,9 @@
     }
   ],
   "connections": {
+    "Test Workflow": {
+      "main": [[{ "node": "Get All Detected Vulnerabilities", "type": "main", "index": 0 }]]
+    },
     "Daily 06:00": {
       "main": [[{ "node": "Get All Detected Vulnerabilities", "type": "main", "index": 0 }]]
     },
