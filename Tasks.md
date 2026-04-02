@@ -1,7 +1,7 @@
 # n8n-nodes-baramundi — Task Board
 
 **Requirements**: [Requirements.md](./Requirements.md)
-**Node**: `nodes/Baramundi/Baramundi.node.ts`
+**Node**: `nodes/Baramundi/Baramundi.node.ts` (until Phase 13 → 6 nodes in `nodes/Baramundi*/`)
 **OpenAPI specs**: `/home/ansible/MCP/bConnectOpenAPI/{version}/`
 
 ---
@@ -615,6 +615,46 @@ Trigger: Schedule (weekly, before patch Tuesday).
 | P12.6 | Split `activeDirectory` into 4 resources (AD User, AD Group, AD Object, Org Unit) | 2026-04-02 |
 | P12.7 | Keep small resources as-is (Defense Control, Variable, OS, Compliance, UDG, Update Mgmt) | N/A — no changes needed |
 | P12.12 | Build 0 errors, lint 0 errors, 550 tests passing. Bumped version 0.4.1 → 0.5.0, updated CHANGELOG | 2026-04-02 |
+
+---
+
+## Phase 13 — Split into 6 Domain Nodes (REQ-SPLIT-1)
+
+**Goal**: Split the monolithic `Baramundi` node (28 resources, ~222 sidebar actions) into 6 focused domain nodes. Remove old monolithic node entirely (pre-1.0, no backward compat needed).
+
+**Prerequisite**: Phase 12 complete.
+
+
+### Backlog
+
+| ID | Task | Priority | Notes |
+|----|------|----------|-------|
+| ~~P13.1~~ | ~~**Create shared infrastructure**~~ | ~~HIGH~~ | ~~Moved to Done~~ |
+| P13.2 | **Create BaramundiEndpoint node** | HIGH | `baramundiEndpoint` — 6 resources (endpoint, logicalGroup, staticGroup, dynamicGroup, maintenanceWindow, typedEndpoint), ~92 ops. Move `actions/endpoint/`. Create mini-router. LoadOptions: getEndpoints, getLogicalGroups, getStaticGroups, getDynamicGroups. Version-specific ops: endpoint, maintenanceWindow, typedEndpoint have 25R2/26R1 variants. |
+| P13.3 | **Create BaramundiAsset node** | HIGH | `baramundiAsset` — 3 resources (asset, assetType, assetFolder), ~43 ops. Move `actions/asset/`. Version-specific ops: asset has 25R2/26R1 variants. No LoadOptions. |
+| P13.4 | **Create BaramundiJob node** | HIGH | `baramundiJob` — 4 resources (jobDefinition, jobFolder, jobInstance, kioskRelease), ~37 ops. Move `actions/job/`. LoadOptions: getJobDefinitions. Skip dead `job` resource cases from router. |
+| P13.5 | **Create BaramundiSoftware node** | HIGH | `baramundiSoftware` — 5 resources (software, softwareBundle, updateManagement, variable, universalDynamicGroups), ~56 ops. Move `actions/software/`, `universalDynamicGroups/`, `updateManagement/`, `variable/`. Version-specific: software has 25R2/26R1 variants. `universalDynamicGroups` is 26R1+ only. |
+| P13.6 | **Create BaramundiAdmin node** | HIGH | `baramundiAdmin` — 7 resources (adUser, adGroup, adObject, orgUnit, serverManagement, microservice, operatingSystem), ~60 ops. Move `actions/activeDirectory/`, `operatingSystem/`. Copy `actions/serverManagement/` (shared with Security node). LoadOptions: getOrgUnits. Skip dead `activeDirectory` resource cases. |
+| P13.7 | **Create BaramundiSecurity node** | HIGH | `baramundiSecurity` — 3 resources (bmsecurity, compliance, defenseControl), ~33 ops. Move `actions/compliance/`, `actions/defenseControl/`. Copy `serverManagement/` module for bmsecurity handlers. `compliance` is 26R1+ only. |
+| P13.8 | **Update package.json and remove old node** | HIGH | Register 6 nodes in `n8n.nodes[]`, remove `Baramundi.node.js`. Delete `nodes/Baramundi/` entirely. `npm run build` + `npm test`. |
+| P13.9 | **Update tests** | HIGH | Move/update test files to match new node dirs. Update all import paths to new locations and shared utils. `npm test` — all pass. |
+| P13.10 | **Documentation and version bump** | HIGH | Update CHANGELOG.md, SDLC-PIPELINE.md. Bump version to 0.6.0. |
+
+### Implementation Notes
+
+- **Shared code**: All in `nodes/shared/` — single source of truth. Import via relative paths (e.g., `../../../../shared/transport/requestApi` from execute files).
+- **Same icon**: All 6 nodes use `baramundi.svg` (copy into each node dir).
+- **Single credential**: All nodes reference `bconnectApi`.
+- **bmsVersion**: Each node declares its own version dropdown (25R2, 26R1; default 26R1).
+- **bmsecurity sharing**: `bmsecurity` handlers live in `serverManagement.execute.ts`. Copy full module into both Admin and Security nodes; each router calls only its own operations.
+- **Dead code**: Router has unreachable cases for old `activeDirectory` (16 ops) and `job` (37 ops) resource values — do NOT carry these into new mini-routers.
+- **Order of work**: P13.1 first (shared infra), then P13.2–P13.7 (nodes, can be done in any order), then P13.8–P13.10.
+
+### Done
+
+| ID | Task | Completed |
+|----|------|-----------|
+| P13.1 | Create shared infrastructure — moved transport, utils, errorMessages, types, validation to `nodes/shared/`. Extracted 7 loadOptions into `nodes/shared/loadOptions.ts` with DRY helper. `tsc --noEmit` 0 errors, 550 tests pass. | 2026-04-02 |
 
 ---
 
