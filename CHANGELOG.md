@@ -7,6 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-04-02
+
+> **Semver rationale**: Minor bump. Phase 12 splits 6 monolithic resources into ~25 focused resources for n8n action picker UX (REQ-UX-2). **BREAKING CHANGE** — existing saved workflows referencing `resource: 'endpoint'`, `resource: 'job'`, `resource: 'activeDirectory'`, `resource: 'asset'`, `resource: 'software'`, or `resource: 'serverManagement'` for sub-resource operations will need to be updated to the new resource values. See migration notes below.
+
+### Breaking Changes (Phase 12 — Action Picker UX Refactor)
+
+Resource `endpoint` (54 ops) split into:
+- `endpoint` — core CRUD + Entra ID + unmanaged endpoints + AD/UDG queries (16 ops)
+- `logicalGroup` — logical group CRUD + getEndpoints (7 ops)
+- `staticGroup` — static group CRUD + getEndpoints (6 ops)
+- `dynamicGroup` — dynamic group queries + getEndpoints (3 ops)
+- `maintenanceWindow` — endpoint and group maintenance windows (10 ops)
+- `typedEndpoint` — platform-typed + industrial endpoints (12 ops)
+
+Resource `job` (37 ops) split into:
+- `jobDefinition` — job definition CRUD + execute + getByFolder (7 ops)
+- `jobFolder` — folder CRUD + getSubFolders (6 ops)
+- `jobInstance` — instance management, monitoring, group assignment (16 ops)
+- `kioskRelease` — kiosk release lifecycle (8 ops)
+
+Resource `serverManagement` (30 ops) split into:
+- `serverManagement` — core server infra ops (13 ops)
+- `microservice` — microservice start/stop/restart (5 ops)
+- `bmsecurity` — security groups, profiles, access rights (12 ops)
+
+Resource `asset` (26 ops) split into:
+- `asset` — asset CRUD + getBy* queries (9 ops)
+- `assetType` — asset type definitions (4 ops)
+- `assetFolder` — stock and type folder management (13 ops)
+
+Resource `software` (19 ops) split into:
+- `software` — installed software queries (4 ops)
+- `softwareBundle` — bundle + folder + application management (15 ops)
+
+Resource `activeDirectory` (16 ops) split into:
+- `adUser` — AD user queries (4 ops)
+- `adGroup` — AD group queries (4 ops)
+- `adObject` — AD object queries + memberships (5 ops)
+- `orgUnit` — organizational unit queries (3 ops)
+
+### Migration Guide
+Existing workflows using sub-resource operations under the old resource names must update the `resource` parameter to the new value. All operation values are unchanged — only the `resource` value changes. Old resource cases are retained in the router as backward-compat fallbacks for core operations.
+
 ## [0.4.1] - 2026-04-01
 
 > **Semver rationale**: Patch bump. Security hardening only — no new operations, no breaking changes.
