@@ -25,6 +25,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Automated API path validation test (`test/unit/apiPaths.test.ts`) — validates all connector paths against OpenAPI spec files on every test run. Prevents future path drift.
+- E2E test suite (210 tests) running against bConnectMock — covers all 6 nodes and all resource operations
+- Version-mismatch guards (SEC-08) — runtime enforcement prevents 25R2-only operations from executing against 26R1 servers
+- Threat model document (`docs/THREAT-MODEL-2026-04-02.md`)
+- Artifact signing, SCA, and SBOM tooling (REQ-SEC-SIGN, REQ-SEC-SCA)
+
+### Changed
+
+- Coverage configuration excludes declarative files (fields, node entry points, routers) — coverage target 80% now reflects actual logic
+- Test suite: 811 tests passing, 80% statement coverage (was 555 tests / 44%)
+- Updated `docker-compose.test.yml` to use inline Dockerfile build for proper node installation
+- Enhanced example workflows with additional credential and node configuration fields
 
 ## [0.8.1] - 2026-04-02
 
