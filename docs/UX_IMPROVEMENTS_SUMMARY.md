@@ -11,8 +11,8 @@
 |------|--------|---------|
 | Parameter Validation | ✅ Complete | `validation.ts`, 206 call sites |
 | Dropdown Selection (loadOptions) | ✅ Complete | Endpoints + Job Definitions |
-| Resource Locator (advanced search) | ❌ Not implemented | Blocked — see below |
-| Enhanced Error Messages | ❌ Not implemented | Planned, not started |
+| Enhanced Error Messages | ✅ Complete | `errorMessages.ts` + `requestApi.ts` |
+| Resource Locator (advanced search) | ⏳ Deferred | No blockers — Phase 11 in Tasks.md |
 
 ---
 
@@ -65,17 +65,26 @@ The full `resourceLocator` component (type-ahead search, By URL mode) has not be
 
 ---
 
-## ❌ Not Implemented: Enhanced Error Messages
+## ✅ Done: Enhanced Error Messages
 
-Planned improvement to `nodes/Baramundi/transport/requestApi.ts` — contextual error messages with HTTP status translation and troubleshooting hints.
+Fully implemented across two files:
 
-**Current state:** Generic `NodeApiError` with raw API error message.
+**`nodes/Baramundi/utils/errorMessages.ts`**
+- `getEnhancedErrorInfo()` — per-status messages + troubleshooting hints for 400/401/403/404/409/422/429/500/503
+- `getOperationErrorMessage()` — operation-specific context (`endpoint:get`, `job:create`, etc.)
+- `getNetworkErrorInfo()` — `ECONNREFUSED` / `ENOTFOUND` / `ETIMEDOUT` with actionable hints
+- `getSslErrorInfo()` — SSL/TLS/certificate errors with remediation steps
+- `formatTroubleshootingHints()` — numbered hint formatting
+- `extractStatusCode()` — parses status from multiple error object shapes
+- `isNetworkError()` / `isSslError()` — error type detection
 
-**Planned state:** Contextual messages per status code (400/401/403/404/409/422/500) with operation + resource context and actionable troubleshooting steps.
-
-**Reference implementation:** See `UX_IMPROVEMENTS_IMPLEMENTATION_SUMMARY.md` §"In Progress" section for the planned `requestApi.ts` changes.
-
-**Effort estimate:** 1–2 days. No blockers — can be implemented with current n8n version.
+**`nodes/Baramundi/transport/requestApi.ts`**
+- Network errors handled first (before HTTP status check)
+- SSL errors handled second
+- HTTP status errors — calls `getEnhancedErrorInfo()` with status + operation context
+- URL sanitisation — strips GUIDs from error output before surfacing to user
+- Retry logic with exponential backoff for 429 and 503
+- Fallback handler for unknown errors
 
 ---
 
