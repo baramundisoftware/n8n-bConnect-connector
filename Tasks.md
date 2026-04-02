@@ -710,6 +710,27 @@ Both must be deleted and replaced.
 
 ---
 
+## Audit Remediation — v0.8.2 Findings (2026-04-02)
+
+**Source**: `docs/AUDIT-2026-04-02.md`
+**Goal**: Resolve blocking and recommended findings before v1.0.0 release.
+
+### Backlog
+
+| ID | Task | Priority | Severity | Acceptance Criteria |
+|----|------|----------|----------|---------------------|
+| AR-01 | **Fix 30 bare `throw new Error()`** → `throw new NodeOperationError(this.getNode(), ...)` across all execute files. Affects: `serverManagement.execute.ts` (×2), `defenseControl.execute.ts` (×3), `variable.execute.ts` (×2), `software.execute.ts` (multiple), `updateManagement.execute.ts`. | P0 — blocking v1.0.0 | MEDIUM | `grep -rn "throw new Error(" nodes/` returns 0 results; all tests pass |
+| AR-02 | **Pin GitHub Actions SHAs** in `.github/workflows/ci.yml` — replace floating tags (`actions/checkout@v4`, `actions/setup-node@v4`) with immutable commit SHAs. Use Dependabot or Renovate comment to track updates. | P0 — blocking v1.0.0 | MEDIUM | All action refs use full 40-char SHA; CI still passes |
+| AR-03 | **Add npm audit exception list to CI** — document handlebars, lodash, minimatch as accepted transitive build-time-only findings. Add `npm audit --audit-level=critical` with advisory ignore list (or `.nsprc` / `overrides`) so CI does not fail on known no-fix transitives. | P0 — blocking v1.0.0 | MEDIUM | CI passes `npm audit` step; exception rationale documented inline |
+| AR-04 | **Extract duplicate `serverManagement.execute.ts`** — move to `nodes/shared/actions/serverManagement/serverManagement.execute.ts`; import in both `BaramundiAdmin` and `BaramundiSecurity`. Delete the two duplicate copies. | P1 — recommended | HIGH | Single source file; `find nodes/ -name "serverManagement.execute.ts"` returns 1 result; all tests pass |
+| AR-05 | **Improve branch coverage to ≥ 75%** — add error-path tests for `requestApi.ts` (network failure, 4xx/5xx responses, pagination truncation sentinel, retry logic). Current: 59.23%. | P1 — recommended | MEDIUM | `npm run test:coverage` reports branch ≥ 75%; no existing tests broken |
+
+### Done
+
+*(empty)*
+
+---
+
 ## Maintenance — Vitest 1.x → 4.x Upgrade (optional)
 
 **Goal**: Upgrade vitest from 1.6.x to 4.x to resolve moderate esbuild vulnerability (GHSA-67mh-4wv8-2f99) in transitive dep chain vitest → vite → esbuild ≤0.24.2.
