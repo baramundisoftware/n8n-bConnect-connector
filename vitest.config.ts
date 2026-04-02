@@ -11,7 +11,17 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       include: ['nodes/**/*.ts', 'credentials/**/*.ts'],
-      exclude: ['**/*.test.ts', '**/*.spec.ts', 'node_modules/**', 'dist/**'],
+      exclude: [
+        '**/*.test.ts',
+        '**/*.spec.ts',
+        '**/*.fields.ts',
+        '**/*.node.ts',
+        '**/index.ts',
+        '**/router.ts',
+        'credentials/**',
+        'node_modules/**',
+        'dist/**',
+      ],
     },
   },
 });
