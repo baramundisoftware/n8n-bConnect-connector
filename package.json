@@ -71,6 +71,7 @@
   },
   "files": [
     "dist",
+    "!dist/coverage",
     "LICENSE.md",
     "README.md",
     "CHANGELOG.md"
