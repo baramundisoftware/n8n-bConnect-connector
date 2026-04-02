@@ -15,7 +15,24 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
       let responseData: INodeExecutionData[] = [];
 
       switch (resource) {
-        case 'endpoint':
+        case 'endpoint': {
+          const bmsVersionEndpoint = this.getNodeParameter('bmsVersion', 0, '26R1') as string;
+          const industrialOps = new Set([
+            'getIndustrialEndpoints',
+            'getIndustrialEndpoint',
+            'createIndustrialEndpoint',
+            'updateIndustrialEndpoint',
+            'deleteIndustrialEndpoint',
+            'getIndustrialEndpointsByGroup',
+          ]);
+          if (bmsVersionEndpoint === '26R1' && industrialOps.has(operation)) {
+            throw new NodeOperationError(
+              this.getNode(),
+              `Operation "${operation}" is only available in bMS 25R2. ` +
+                'Industrial Endpoints are not supported in bMS 26R1.',
+              { itemIndex: i },
+            );
+          }
           switch (operation) {
             case 'create':
               responseData = await endpoint.create.call(this, i);
@@ -102,6 +119,7 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
               );
           }
           break;
+        }
 
         case 'logicalGroup':
           switch (operation) {
@@ -181,7 +199,8 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
           }
           break;
 
-        case 'maintenanceWindow':
+        case 'maintenanceWindow': {
+          const bmsVersion = this.getNodeParameter('bmsVersion', 0, '26R1') as string;
           switch (operation) {
             case 'createEndpointMaintenanceWindow':
               responseData = await endpoint.createEndpointMaintenanceWindow.call(this, i);
@@ -196,6 +215,15 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
               responseData = await endpoint.getEndpointMaintenanceWindow.call(this, i);
               break;
             case 'putEndpointMaintenanceWindow':
+              if (bmsVersion === '26R1') {
+                throw new NodeOperationError(
+                  this.getNode(),
+                  'Operation "Replace Endpoint Maintenance Window" (PUT) is only available in bMS 25R2. ' +
+                    'In bMS 26R1, use "Update Endpoint Maintenance Window" (PATCH) instead. ' +
+                    'Note: the request body format differs between PUT and PATCH.',
+                  { itemIndex: i },
+                );
+              }
               responseData = await endpoint.putEndpointMaintenanceWindow.call(this, i);
               break;
             case 'createGroupMaintenanceWindow':
@@ -211,6 +239,15 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
               responseData = await endpoint.getGroupMaintenanceWindow.call(this, i);
               break;
             case 'putGroupMaintenanceWindow':
+              if (bmsVersion === '26R1') {
+                throw new NodeOperationError(
+                  this.getNode(),
+                  'Operation "Replace Group Maintenance Window" (PUT) is only available in bMS 25R2. ' +
+                    'In bMS 26R1, use "Update Group Maintenance Window" (PATCH) instead. ' +
+                    'Note: the request body format differs between PUT and PATCH.',
+                  { itemIndex: i },
+                );
+              }
               responseData = await endpoint.putGroupMaintenanceWindow.call(this, i);
               break;
             default:
@@ -220,6 +257,7 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
               );
           }
           break;
+        }
 
         default:
           throw new NodeOperationError(this.getNode(), `Unknown resource "${resource}"`);

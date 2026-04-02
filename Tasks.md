@@ -659,9 +659,6 @@ Both must be deleted and replaced.
 
 *(empty)*
 
-| SEC-08.1 | Add version-mismatch guards in BaramundiEndpoint router: throw `NodeOperationError` when 25R2-only ops (`replaceEndpointMaintenanceWindow`, `replaceGroupMaintenanceWindow`, Industrial Endpoints) are executed with `bmsVersion: '26R1'`. Error must name the 26R1 replacement and note body format change. | **HIGH** | F-2026-08: Silent workflow breakage on bmsVersion migration |
-| SEC-08.2 | Unit tests for each version-mismatch guard (maintenance window PUT under 26R1, industrial endpoints under 26R1) | HIGH | F-2026-08 |
-
 ### Accepted (no action required)
 
 | ID | Finding | Severity | Rationale |
@@ -677,6 +674,8 @@ Both must be deleted and replaced.
 | SEC-04.2 | Added unit test `should reject invalid OData in searchQuery (SEC-04.1)` — 555 tests passing | 2026-04-02 |
 | SEC-04.3 | Grep-verified: 2 remaining `SearchQuery:` sites — both validated (endpoint.execute.ts:124 validated above, job.execute.ts:117 GUID-validated) | 2026-04-02 |
 | SEC-06.1 | Added safety comment on `job.execute.ts:117` noting GUID validation dependency | 2026-04-02 |
+| SEC-08.1 | Added version-mismatch guards in `router.ts`: `putEndpointMaintenanceWindow` + `putGroupMaintenanceWindow` throw `NodeOperationError` on 26R1; all 6 industrial endpoint ops throw on 26R1. Error messages name the 25R2 constraint and 26R1 alternatives. | 2026-04-02 |
+| SEC-08.2 | Created `test/nodes/Baramundi/actions/endpoint/router.versionGuard.test.ts` — 24 tests: 2 MW PUT ops × (throw on 26R1, message contains '25R2', no-throw on 25R2) + 6 industrial ops × same matrix. 603 tests total passing. | 2026-04-02 |
 
 ---
 
