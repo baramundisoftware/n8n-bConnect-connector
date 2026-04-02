@@ -678,15 +678,15 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 
 | ID | Finding | Severity | Status |
 |---|---|---|---|
-| REQ-AUDIT-F2026-04 | OData injection in `endpoint.search()` — missing `validateODataString()` | HIGH | OPEN |
+| REQ-AUDIT-F2026-04 | OData injection in `endpoint.search()` — missing `validateODataString()` | HIGH | ✅ DONE — SEC-04.1 (2026-04-02) |
 | REQ-AUDIT-F2026-05 | `additionalFields` passed to API without field-level validation | LOW | ACCEPTED — server-side validation sufficient |
 | REQ-AUDIT-F2026-06 | Template literal OData interpolation in `job.getInstances()` (GUID-validated, not exploitable) | INFO | NOTED |
 | REQ-AUDIT-F2026-07 | lodash HIGH in n8n-workflow peer dependency (`_.template` not used) | ACCEPTED | ACCEPTED — upstream dependency |
-| REQ-AUDIT-F2026-08 | Silent workflow breakage when switching `bmsVersion` 25R2 → 26R1 | MEDIUM | OPEN — version-mismatch guards needed in router |
+| REQ-AUDIT-F2026-08 | Silent workflow breakage when switching `bmsVersion` 25R2 → 26R1 | MEDIUM | ✅ DONE — SEC-08.1/SEC-08.2 (2026-04-02) |
 
 ### REQ-AUDIT-F2026-04 — OData Injection in endpoint.search() (HIGH)
 
-**Status**: OPEN
+**Status**: COMPLETED ✅ SEC-04.1 (2026-04-02)
 
 **Description**: `endpoint.execute.ts:search()` passes `searchQuery` directly to the bConnect API without calling `validateODataString()`. All other 50+ search/filter sites in the codebase validate correctly.
 
@@ -719,7 +719,7 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 
 ### REQ-AUDIT-F2026-08 — Silent Workflow Breakage on bmsVersion Migration (MEDIUM)
 
-**Status**: OPEN
+**Status**: COMPLETED ✅ SEC-08.1/SEC-08.2 (2026-04-02)
 
 **Description**: When a customer upgrades their bMS server from 25R2 to 26R1 and changes the `bmsVersion` dropdown, workflows using 25R2-only operations break silently:
 
@@ -752,7 +752,7 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 
 ## REQ-RELEASE-1 — v0.4.2 Security Patch Release
 
-**Status**: OPEN
+**Status**: SUPERSEDED — security hardening delivered across Phases 6–7; current version 0.8.3
 
 **Description**: The IT Audit (2026-04-01) identified and fixed 8 findings in a single session. These changes must be packaged as a versioned release with a proper CHANGELOG entry before any further development work.
 
@@ -778,7 +778,7 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 
 ## REQ-API-AD-1 — Active Directory Contextual Navigation
 
-**Status**: OPEN
+**Status**: COMPLETED ✅ Phase 8 (2026-03-30)
 
 **Description**: The Active Directory module is missing 6 contextual read operations present in the 26R1 spec. These allow navigating the AD hierarchy (sub-groups within groups, objects within groups, OU children).
 
@@ -807,7 +807,7 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 
 ## REQ-API-ENDPOINT-1 — Platform-Specific Endpoint CRUD
 
-**Status**: OPEN
+**Status**: COMPLETED ✅ Phase 9 + Phase 14 (2026-04-02)
 
 **Description**: The connector currently only supports Windows endpoint Create and Update. The spec defines Create/Update/Enrollment for Android, iOS, Linux, macOS, and Network endpoints. Each platform has a distinct request body schema.
 
@@ -837,7 +837,7 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 
 ## REQ-API-ENDPOINT-2 — Group-Scoped Endpoint Queries
 
-**Status**: OPEN
+**Status**: COMPLETED ✅ Phase 8C + Phase 14 (2026-04-02) — generic group queries done; typed group variants deferred post-v1.0.0
 
 **Description**: Multiple "get endpoints in group" operations exist in the spec but are not implemented. These are needed for group-targeted automation workflows (e.g., "patch all endpoints in logical group X").
 
@@ -868,7 +868,7 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 
 ## REQ-API-JOB-1 — Job Folder Navigation and Kiosk Context Queries
 
-**Status**: OPEN
+**Status**: COMPLETED ✅ Phase 8D (2026-03-30)
 
 **Description**: Three read operations in the Jobs module are missing: sub-folder listing, job definitions by folder, and kiosk releases by job definition.
 
@@ -895,7 +895,7 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 
 ## REQ-API-JOB-2 — Job Instances by Group and Job Assignment
 
-**Status**: OPEN
+**Status**: COMPLETED ✅ Phase 8D (2026-03-30)
 
 **Description**: Workflows often need to query job execution history per group, and assign jobs to groups. Neither is currently supported.
 
@@ -922,7 +922,7 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 
 ## REQ-API-SOFTWARE-1 — Bundle Application Management
 
-**Status**: OPEN
+**Status**: COMPLETED ✅ Phase 8E (2026-03-30)
 
 **Description**: Software bundles are manageable but their constituent applications cannot be added, replaced, or deleted. Top-level `BundleApplications` endpoints are also missing.
 
@@ -948,7 +948,7 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 
 ## REQ-API-VAR-1 — Variable Instances by Application and Job Definition
 
-**Status**: OPEN
+**Status**: COMPLETED ✅ Phase 8F (2026-03-30)
 
 **Description**: Two contextual variable instance queries are missing: by Windows application and by Windows job definition. These support automation that reads variables scoped to a specific managed application or job.
 
@@ -971,7 +971,7 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 
 ## REQ-UX-1 — resourceLocator for Endpoint and Job Selection
 
-**Status**: OPEN
+**Status**: COMPLETED ✅ Phase 15 (2026-04-02)
 
 **Description**: The current `loadOptions` dropdown for endpoint and job selection works but is limited — it shows top 100 items with no search. Upgrading to n8n's `resourceLocator` component provides full server-side search, multiple selection modes (by ID / from list), and a better form experience.
 
@@ -993,7 +993,7 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 
 ## REQ-UX-2 — Contextual Error Messages
 
-**Status**: OPEN
+**Status**: COMPLETED ✅ Phase 7 + AR-01 (2026-04-02) — errorMessages.ts + NodeOperationError standardisation
 
 **Description**: API errors currently surface as raw HTTP status codes and baramundi error objects. Users receive no actionable guidance. Common error patterns should be translated to human-readable messages with troubleshooting hints.
 
@@ -1047,7 +1047,7 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 
 ## REQ-SPLIT-1 — Split into 6 Domain Nodes
 
-**Status**: OPEN
+**Status**: COMPLETED ✅ Phase 13 (2026-04-02)
 
 **Description**: Split the monolithic `Baramundi` node (28 resources, ~222 sidebar actions) into 6 focused domain nodes. Each node covers a distinct management domain, reducing sidebar clutter and the in-editor resource dropdown from 28 entries to 3–7 per node.
 
@@ -1335,7 +1335,7 @@ The `bmsecurity` operations are implemented in `serverManagement.execute.ts`. Co
 
 ## REQ-ENDPOINT-UX-1 — Merge Typed Endpoint into Endpoint Resource
 
-**Status**: OPEN
+**Status**: COMPLETED ✅ Phase 14 (2026-04-02)
 
 **Description**: Remove the `typedEndpoint` resource from the Baramundi Endpoint node. Merge all typed endpoint operations into the `endpoint` resource by adding an `endpointType` / `platformType` dropdown (with an "All Platforms" option) to operations that can work cross-platform or platform-specific.
 
