@@ -6,7 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
-import { get, getMany, search, deleteEndpoint, create, update, startEnrollment, triggerIntuneInstallation, getLogicalGroup, getLogicalGroups, createLogicalGroup, updateLogicalGroup, deleteLogicalGroup, getStaticGroup, getStaticGroups, createStaticGroup, updateStaticGroup, deleteStaticGroup, getDynamicGroup, getDynamicGroups, setEntraIdData, deleteEntraIdData, getEntraIdDataByDeviceId, getUnmanagedEndpoints, getUnmanagedEndpoint, deleteUnmanagedEndpoint, putEndpointMaintenanceWindow, putGroupMaintenanceWindow, updateEndpointMaintenanceWindow, updateGroupMaintenanceWindow, getEndpointMaintenanceWindow, getGroupMaintenanceWindow, getLogicalGroupSubGroups, getEndpointsByLogicalGroup, getEndpointsByStaticGroup, getEndpointsByDynamicGroup, getEndpointsByUDG, getEndpointsByADUser, getTypedEndpoints, getTypedEndpoint, updateTypedEndpoint, deleteTypedEndpoint, startTypedEnrollment, getTypedEndpointsByGroup, getIndustrialEndpoints, getIndustrialEndpoint, createIndustrialEndpoint, updateIndustrialEndpoint, deleteIndustrialEndpoint, getIndustrialEndpointsByGroup } from '../../../../../nodes/BaramundiEndpoint/actions/endpoint/endpoint.execute';
+import { get, getMany, search, deleteEndpoint, create, update, startEnrollment, triggerIntuneInstallation, getLogicalGroup, getLogicalGroups, createLogicalGroup, updateLogicalGroup, deleteLogicalGroup, getStaticGroup, getStaticGroups, createStaticGroup, updateStaticGroup, deleteStaticGroup, getDynamicGroup, getDynamicGroups, setEntraIdData, deleteEntraIdData, getEntraIdDataByDeviceId, getUnmanagedEndpoints, getUnmanagedEndpoint, deleteUnmanagedEndpoint, putEndpointMaintenanceWindow, putGroupMaintenanceWindow, updateEndpointMaintenanceWindow, updateGroupMaintenanceWindow, getEndpointMaintenanceWindow, getGroupMaintenanceWindow, getLogicalGroupSubGroups, getEndpointsByLogicalGroup, getEndpointsByStaticGroup, getEndpointsByDynamicGroup, getEndpointsByUDG, getEndpointsByADUser, getEndpointsByGroup, getIndustrialEndpoints, getIndustrialEndpoint, createIndustrialEndpoint, updateIndustrialEndpoint, deleteIndustrialEndpoint, getIndustrialEndpointsByGroup } from '../../../../../nodes/BaramundiEndpoint/actions/endpoint/endpoint.execute';
 
 /**
  * Create a mock IExecuteFunctions instance for testing
@@ -3163,78 +3163,117 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
   });
 
   // ============================================================================
-  // Phase 9 — Type-specific endpoint operations
+  // Phase 14 — endpointType merged into get/getMany/update/delete/startEnrollment
   // ============================================================================
 
-  describe('getTypedEndpoints()', () => {
-    it('should fetch Android endpoints from type-specific path', async () => {
+  describe('getMany() with endpointType', () => {
+    it('should fetch Android endpoints when endpointType=android', async () => {
       const ctx = createMockExecuteFunctions(
-        { platformType: 'android', returnAll: false, limit: 50 },
+        { endpointType: 'android', returnAll: false, limit: 50 },
         {},
         pageResponse([{ id: 'and-1', displayName: 'Phone-01' }]),
       );
-      const result = await getTypedEndpoints.call(ctx, 0);
+      const result = await getMany.call(ctx, 0);
       expect(result).toHaveLength(1);
       expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({ url: '/endpoints/v2.0/AndroidEndpoints' }),
       );
     });
 
-    it('should fetch Network endpoints from type-specific path', async () => {
+    it('should fetch Network endpoints when endpointType=network', async () => {
       const ctx = createMockExecuteFunctions(
-        { platformType: 'network', returnAll: false, limit: 50 },
+        { endpointType: 'network', returnAll: false, limit: 50 },
         {},
         pageResponse([{ id: 'net-1', displayName: 'Switch-01' }]),
       );
-      const result = await getTypedEndpoints.call(ctx, 0);
+      const result = await getMany.call(ctx, 0);
       expect(result).toHaveLength(1);
       expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({ url: '/endpoints/v2.0/NetworkEndpoints' }),
       );
     });
+
+    it('should use generic /Endpoints path when endpointType=all', async () => {
+      const ctx = createMockExecuteFunctions(
+        { endpointType: 'all', returnAll: false, limit: 50 },
+        {},
+        pageResponse([{ id: 'ep-1' }]),
+      );
+      await getMany.call(ctx, 0);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: '/endpoints/v2.0/Endpoints' }),
+      );
+    });
   });
 
-  describe('getTypedEndpoint()', () => {
-    it('should fetch a single iOS endpoint by ID', async () => {
+  describe('get() with endpointType', () => {
+    it('should fetch a single iOS endpoint by ID when endpointType=ios', async () => {
       const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
       const ctx = createMockExecuteFunctions(
-        { platformType: 'ios', typedEndpointId: endpointId },
+        { endpointSelection: endpointId, endpointType: 'ios' },
         {},
         { id: endpointId, displayName: 'iPhone-01' },
       );
-      const result = await getTypedEndpoint.call(ctx, 0);
+      const result = await get.call(ctx, 0);
       expect(result).toHaveLength(1);
       expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({ url: `/endpoints/v2.0/IosEndpoints/${endpointId}` }),
       );
     });
+
+    it('should use generic path when endpointType=all', async () => {
+      const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
+      const ctx = createMockExecuteFunctions(
+        { endpointSelection: endpointId, endpointType: 'all' },
+        {},
+        { id: endpointId },
+      );
+      await get.call(ctx, 0);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: `/endpoints/v2.0/Endpoints/${endpointId}` }),
+      );
+    });
   });
 
-  describe('updateTypedEndpoint()', () => {
+  describe('update() with endpointType', () => {
     it('should PATCH a Linux endpoint at type-specific path', async () => {
       const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
       const ctx = createMockExecuteFunctions(
-        { platformType: 'linux', typedEndpointId: endpointId, updateFields: { displayName: 'linux-01' } },
+        { endpointSelection: endpointId, endpointType: 'linux', updateFields: { displayName: 'linux-01' } },
         {},
         { id: endpointId, displayName: 'linux-01' },
       );
-      const result = await updateTypedEndpoint.call(ctx, 0);
+      const result = await update.call(ctx, 0);
       expect(result).toHaveLength(1);
       expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({ method: 'PATCH', url: `/endpoints/v2.0/LinuxEndpoints/${endpointId}` }),
       );
     });
+
+    it('should PATCH a Mac endpoint at type-specific path', async () => {
+      const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
+      const ctx = createMockExecuteFunctions(
+        { endpointSelection: endpointId, endpointType: 'mac', updateFields: { displayName: 'mac-01' } },
+        {},
+        { id: endpointId, displayName: 'mac-01' },
+      );
+      const result = await update.call(ctx, 0);
+      expect(result).toHaveLength(1);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ method: 'PATCH', url: `/endpoints/v2.0/MacEndpoints/${endpointId}` }),
+      );
+    });
   });
 
-  describe('deleteTypedEndpoint()', () => {
+  describe('deleteEndpoint() with endpointType', () => {
     it('should DELETE a Mac endpoint at type-specific path', async () => {
       const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
       const ctx = createMockExecuteFunctions(
-        { platformType: 'mac', typedEndpointId: endpointId },
+        { endpointSelection: endpointId, endpointType: 'mac' },
         {},
         {},
       );
-      const result = await deleteTypedEndpoint.call(ctx, 0);
+      const result = await deleteEndpoint.call(ctx, 0);
       expect(result[0].json).toMatchObject({ success: true, deletedId: endpointId });
       expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({ method: 'DELETE', url: `/endpoints/v2.0/MacEndpoints/${endpointId}` }),
@@ -3242,15 +3281,15 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
     });
   });
 
-  describe('startTypedEnrollment()', () => {
-    it('should POST enrollment for an Android endpoint', async () => {
+  describe('startEnrollment() with explicit endpointType', () => {
+    it('should POST enrollment for an Android endpoint using explicit type', async () => {
       const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
       const ctx = createMockExecuteFunctions(
-        { platformType: 'android', typedEndpointId: endpointId, enrollmentOptions: {} },
+        { endpointSelection: endpointId, endpointType: 'android', enrollmentOptions: {} },
         {},
         {},
       );
-      const result = await startTypedEnrollment.call(ctx, 0);
+      const result = await startEnrollment.call(ctx, 0);
       expect(result[0].json).toMatchObject({ success: true, endpointId });
       expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({ url: `/endpoints/v2.0/AndroidEndpoints/${endpointId}/StartEnrollment` }),
@@ -3260,45 +3299,58 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
     it('should throw for Network endpoints which do not support enrollment', async () => {
       const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
       const ctx = createMockExecuteFunctions(
-        { platformType: 'network', typedEndpointId: endpointId, enrollmentOptions: {} },
+        { endpointSelection: endpointId, endpointType: 'network', enrollmentOptions: {} },
         {},
         {},
       );
-      await expect(startTypedEnrollment.call(ctx, 0)).rejects.toThrow('Enrollment not supported');
+      await expect(startEnrollment.call(ctx, 0)).rejects.toThrow('Enrollment not supported');
     });
   });
 
-  describe('getTypedEndpointsByGroup()', () => {
-    it('should fetch iOS endpoints in a logical group', async () => {
+  describe('getEndpointsByGroup()', () => {
+    it('should fetch iOS endpoints in a logical group when endpointType=ios', async () => {
       const groupId = '11111111-1111-1111-1111-111111111111';
       const ctx = createMockExecuteFunctions(
-        { platformType: 'ios', groupType: 'logical', typedGroupId: groupId, returnAll: false, limit: 50 },
+        { endpointType: 'ios', groupType: 'logical', typedGroupId: groupId, returnAll: false, limit: 50 },
         {},
         pageResponse([{ id: 'ios-1', displayName: 'iPhone-01' }]),
       );
-      const result = await getTypedEndpointsByGroup.call(ctx, 0);
+      const result = await getEndpointsByGroup.call(ctx, 0);
       expect(result).toHaveLength(1);
       expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({ url: `/endpoints/v2.0/LogicalGroups/${groupId}/IosEndpoints` }),
       );
     });
 
-    it('should fetch Android endpoints by AD user', async () => {
+    it('should fetch Android endpoints by AD user when endpointType=android', async () => {
       const groupId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
       const ctx = createMockExecuteFunctions(
-        { platformType: 'android', groupType: 'adUser', typedGroupId: groupId, returnAll: false, limit: 50 },
+        { endpointType: 'android', groupType: 'adUser', typedGroupId: groupId, returnAll: false, limit: 50 },
         {},
         pageResponse([{ id: 'and-2', displayName: 'Phone-02' }]),
       );
-      const result = await getTypedEndpointsByGroup.call(ctx, 0);
+      const result = await getEndpointsByGroup.call(ctx, 0);
       expect(result).toHaveLength(1);
       expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({ url: `/endpoints/v2.0/ADUsers/${groupId}/AndroidEndpoints` }),
       );
     });
+
+    it('should use generic /Endpoints path when endpointType=all', async () => {
+      const groupId = '11111111-1111-1111-1111-111111111111';
+      const ctx = createMockExecuteFunctions(
+        { endpointType: 'all', groupType: 'logical', typedGroupId: groupId, returnAll: false, limit: 50 },
+        {},
+        pageResponse([{ id: 'ep-1' }]),
+      );
+      await getEndpointsByGroup.call(ctx, 0);
+      expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ url: `/endpoints/v2.0/LogicalGroups/${groupId}/Endpoints` }),
+      );
+    });
   });
 
-  // Industrial endpoint operations (25R2 only)
+  // Industrial endpoint operations (25R2 only — now in endpoint resource)
   describe('getIndustrialEndpoints()', () => {
     it('should fetch industrial endpoints', async () => {
       const ctx = createMockExecuteFunctions(

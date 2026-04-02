@@ -13,15 +13,22 @@ export const endpointOperations25R2: INodeProperties[] = [
     noDataExpression: true,
     displayOptions: { show: { resource: ['endpoint'], bmsVersion: ['25R2'] } },
     options: [
-      { name: 'Create', value: 'create', description: 'Create a new Windows endpoint', action: 'Create a Windows endpoint' },
+      { name: 'Create', value: 'create', description: 'Create a new endpoint', action: 'Create an endpoint' },
+      { name: 'Create Industrial Endpoint', value: 'createIndustrialEndpoint', description: 'Create a new industrial endpoint (bMS 25R2 only)', action: 'Create industrial endpoint' },
       { name: 'Delete', value: 'delete', description: 'Delete an endpoint', action: 'Delete an endpoint' },
+      { name: 'Delete Industrial Endpoint', value: 'deleteIndustrialEndpoint', description: 'Delete an industrial endpoint (bMS 25R2 only)', action: 'Delete industrial endpoint' },
       { name: 'Get', value: 'get', description: 'Get an endpoint by ID', action: 'Get an endpoint' },
+      { name: 'Get By Group', value: 'getEndpointsByGroup', description: 'Get endpoints in a group, optionally filtered by platform type', action: 'Get endpoints by group' },
       { name: 'Get Endpoints by AD User', value: 'getEndpointsByADUser', description: 'Get endpoints assigned to an AD user', action: 'Get endpoints by AD user' },
-      { name: 'Get Many', value: 'getMany', description: 'Get many endpoints', action: 'Get many endpoints' },
+      { name: 'Get Industrial Endpoint', value: 'getIndustrialEndpoint', description: 'Get an industrial endpoint by ID (bMS 25R2 only)', action: 'Get industrial endpoint' },
+      { name: 'Get Industrial Endpoints', value: 'getIndustrialEndpoints', description: 'Get all industrial endpoints (bMS 25R2 only)', action: 'Get industrial endpoints' },
+      { name: 'Get Industrial Endpoints By Group', value: 'getIndustrialEndpointsByGroup', description: 'Get industrial endpoints in a group (bMS 25R2 only)', action: 'Get industrial endpoints by group' },
+      { name: 'Get Many', value: 'getMany', description: 'Get many endpoints, optionally filtered by platform type', action: 'Get many endpoints' },
       { name: 'Search', value: 'search', description: 'Search endpoints by name or other criteria', action: 'Search endpoints' },
       { name: 'Start Enrollment', value: 'startEnrollment', description: 'Start enrollment process for an endpoint', action: 'Start enrollment for endpoint' },
       { name: 'Trigger Intune Installation', value: 'triggerIntuneInstallation', description: 'Trigger installation of baramundi Management Agent via Intune', action: 'Trigger Intune installation' },
       { name: 'Update', value: 'update', description: 'Update an endpoint', action: 'Update an endpoint' },
+      { name: 'Update Industrial Endpoint', value: 'updateIndustrialEndpoint', description: 'Update an industrial endpoint (bMS 25R2 only)', action: 'Update industrial endpoint' },
     ],
     default: 'getMany',
   },
@@ -36,15 +43,16 @@ export const endpointOperations26R1: INodeProperties[] = [
     noDataExpression: true,
     displayOptions: { show: { resource: ['endpoint'], bmsVersion: ['26R1'] } },
     options: [
-      { name: 'Create', value: 'create', description: 'Create a new Windows endpoint', action: 'Create a Windows endpoint' },
+      { name: 'Create', value: 'create', description: 'Create a new endpoint', action: 'Create an endpoint' },
       { name: 'Delete', value: 'delete', description: 'Delete an endpoint', action: 'Delete an endpoint' },
       { name: 'Delete Entra ID Data', value: 'deleteEntraIdData', description: 'Delete Entra ID data for an endpoint (bMS 26R1+)', action: 'Delete Entra ID data for endpoint' },
       { name: 'Delete Unmanaged Endpoint', value: 'deleteUnmanagedEndpoint', description: 'Delete an unmanaged endpoint by ID (bMS 26R1+)', action: 'Delete unmanaged endpoint' },
       { name: 'Get', value: 'get', description: 'Get an endpoint by ID', action: 'Get an endpoint' },
+      { name: 'Get By Group', value: 'getEndpointsByGroup', description: 'Get endpoints in a group, optionally filtered by platform type', action: 'Get endpoints by group' },
       { name: 'Get Endpoints by AD User', value: 'getEndpointsByADUser', description: 'Get endpoints assigned to an AD user', action: 'Get endpoints by AD user' },
       { name: 'Get Endpoints by UDG', value: 'getEndpointsByUDG', description: 'Get endpoints in a Universal Dynamic Group (bMS 26R1+)', action: 'Get endpoints by UDG' },
       { name: 'Get Entra ID Data By Device ID', value: 'getEntraIdDataByDeviceId', description: 'Get Entra ID endpoint data by Entra ID device ID (bMS 26R1+)', action: 'Get Entra ID data by device ID' },
-      { name: 'Get Many', value: 'getMany', description: 'Get many endpoints', action: 'Get many endpoints' },
+      { name: 'Get Many', value: 'getMany', description: 'Get many endpoints, optionally filtered by platform type', action: 'Get many endpoints' },
       { name: 'Get Unmanaged Endpoint', value: 'getUnmanagedEndpoint', description: 'Get an unmanaged endpoint by ID (bMS 26R1+)', action: 'Get unmanaged endpoint' },
       { name: 'Get Unmanaged Endpoints', value: 'getUnmanagedEndpoints', description: 'Get all unmanaged endpoints (bMS 26R1+)', action: 'Get unmanaged endpoints' },
       { name: 'Search', value: 'search', description: 'Search endpoints by name or other criteria', action: 'Search endpoints' },
@@ -170,55 +178,6 @@ export const maintenanceWindowOperations26R1: INodeProperties[] = [
       { name: 'Update Group Maintenance Window (PATCH)', value: 'updateGroupMaintenanceWindow', description: 'Update a maintenance window for a group using JSON Patch (bMS 26R1+)', action: 'Update group maintenance window' },
     ],
     default: 'getEndpointMaintenanceWindow',
-  },
-];
-
-// ============================================================
-// Typed Endpoint Operations
-// ============================================================
-
-export const typedEndpointOperations25R2: INodeProperties[] = [
-  {
-    displayName: 'Operation',
-    name: 'operation',
-    type: 'options',
-    noDataExpression: true,
-    displayOptions: { show: { resource: ['typedEndpoint'], bmsVersion: ['25R2'] } },
-    options: [
-      { name: 'Create Industrial Endpoint', value: 'createIndustrialEndpoint', description: 'Create a new industrial endpoint (bMS 25R2 only)', action: 'Create industrial endpoint' },
-      { name: 'Delete', value: 'deleteTypedEndpoint', description: 'Delete an endpoint using its type-specific API path', action: 'Delete typed endpoint' },
-      { name: 'Delete Industrial Endpoint', value: 'deleteIndustrialEndpoint', description: 'Delete an industrial endpoint (bMS 25R2 only)', action: 'Delete industrial endpoint' },
-      { name: 'Get', value: 'getTypedEndpoint', description: 'Get a single endpoint by ID and platform type', action: 'Get typed endpoint' },
-      { name: 'Get Industrial Endpoint', value: 'getIndustrialEndpoint', description: 'Get an industrial endpoint by ID (bMS 25R2 only)', action: 'Get industrial endpoint' },
-      { name: 'Get Industrial Endpoints', value: 'getIndustrialEndpoints', description: 'Get all industrial endpoints (bMS 25R2 only)', action: 'Get industrial endpoints' },
-      { name: 'Get Industrial Endpoints By Group', value: 'getIndustrialEndpointsByGroup', description: 'Get industrial endpoints in a logical group, static group, or UDG (bMS 25R2 only)', action: 'Get industrial endpoints by group' },
-      { name: 'Get Many', value: 'getTypedEndpoints', description: 'Get many endpoints filtered by platform type (Windows/Android/iOS/Linux/Mac/Network)', action: 'Get many typed endpoints' },
-      { name: 'Get Typed Endpoints By Group', value: 'getTypedEndpointsByGroup', description: 'Get endpoints of a specific platform type in a group', action: 'Get typed endpoints by group' },
-      { name: 'Start Enrollment', value: 'startTypedEnrollment', description: 'Start enrollment for Windows, Android, iOS, or Mac endpoint', action: 'Start typed enrollment' },
-      { name: 'Update', value: 'updateTypedEndpoint', description: 'Update an endpoint using its type-specific API path', action: 'Update typed endpoint' },
-      { name: 'Update Industrial Endpoint', value: 'updateIndustrialEndpoint', description: 'Update an industrial endpoint (bMS 25R2 only)', action: 'Update industrial endpoint' },
-    ],
-     
-    default: 'getTypedEndpoints',
-  },
-];
-
-export const typedEndpointOperations26R1: INodeProperties[] = [
-  {
-    displayName: 'Operation',
-    name: 'operation',
-    type: 'options',
-    noDataExpression: true,
-    displayOptions: { show: { resource: ['typedEndpoint'], bmsVersion: ['26R1'] } },
-    options: [
-      { name: 'Delete', value: 'deleteTypedEndpoint', description: 'Delete an endpoint using its type-specific API path', action: 'Delete typed endpoint' },
-      { name: 'Get', value: 'getTypedEndpoint', description: 'Get a single endpoint by ID and platform type', action: 'Get typed endpoint' },
-      { name: 'Get Many', value: 'getTypedEndpoints', description: 'Get many endpoints filtered by platform type (Windows/Android/iOS/Linux/Mac/Network)', action: 'Get many typed endpoints' },
-      { name: 'Get Typed Endpoints By Group', value: 'getTypedEndpointsByGroup', description: 'Get endpoints of a specific platform type in a group', action: 'Get typed endpoints by group' },
-      { name: 'Start Enrollment', value: 'startTypedEnrollment', description: 'Start enrollment for Windows, Android, iOS, or Mac endpoint', action: 'Start typed enrollment' },
-      { name: 'Update', value: 'updateTypedEndpoint', description: 'Update an endpoint using its type-specific API path', action: 'Update typed endpoint' },
-    ],
-    default: 'getTypedEndpoints',
   },
 ];
 
@@ -2064,109 +2023,96 @@ export const maintenanceWindowFields: INodeProperties[] = [
 ];
 
 // ============================================================
-// Typed Endpoint Fields
+// Phase 14 — endpointType + getEndpointsByGroup + industrial fields
+// (appended to endpointFields above; typedEndpointFields removed)
 // ============================================================
 
-export const typedEndpointFields: INodeProperties[] = [
-  // ----------------------------------
-  //  Phase 9: Type-specific operations
-  // ----------------------------------
+// endpointType for get / getMany / delete (optional, defaults to 'all')
+const ENDPOINT_TYPE_OPTIONS_ALL = [
+  { name: 'All Platforms', value: 'all' },
+  { name: 'Android', value: 'android' },
+  { name: 'iOS', value: 'ios' },
+  { name: 'Linux', value: 'linux' },
+  { name: 'Mac', value: 'mac' },
+  { name: 'Network', value: 'network' },
+  { name: 'Windows', value: 'windows' },
+];
+
+// endpointType for update (required, no 'all')
+const ENDPOINT_TYPE_OPTIONS_REQUIRED = [
+  { name: 'Android', value: 'android' },
+  { name: 'iOS', value: 'ios' },
+  { name: 'Linux', value: 'linux' },
+  { name: 'Mac', value: 'mac' },
+  { name: 'Network', value: 'network' },
+  { name: 'Windows', value: 'windows' },
+];
+
+export const endpointTypeFields: INodeProperties[] = [
+  // endpointType for getMany
   {
     displayName: 'Platform Type',
-    name: 'platformType',
+    name: 'endpointType',
+    type: 'options',
+    default: 'all',
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getMany', 'getEndpointsByGroup'] } },
+    options: ENDPOINT_TYPE_OPTIONS_ALL,
+    description: 'Filter by endpoint platform type. Select "All Platforms" to return all types.',
+  },
+  // endpointType for get / delete (optional)
+  {
+    displayName: 'Platform Type',
+    name: 'endpointType',
+    type: 'options',
+    default: 'all',
+    displayOptions: { show: { resource: ['endpoint'], operation: ['get', 'delete'] } },
+    options: ENDPOINT_TYPE_OPTIONS_ALL,
+    description: 'Optionally use the type-specific API path. "All Platforms" uses the generic endpoint.',
+  },
+  // endpointType for update (required, no 'all')
+  {
+    displayName: 'Platform Type',
+    name: 'endpointType',
     type: 'options',
     required: true,
     default: 'windows',
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getTypedEndpoints', 'getTypedEndpoint', 'updateTypedEndpoint', 'deleteTypedEndpoint', 'startTypedEnrollment', 'getTypedEndpointsByGroup'] } },
+    displayOptions: { show: { resource: ['endpoint'], operation: ['update'] } },
+    options: ENDPOINT_TYPE_OPTIONS_REQUIRED,
+    description: 'The platform type of the endpoint to update',
+  },
+  // endpointType for startEnrollment (optional)
+  {
+    displayName: 'Platform Type',
+    name: 'endpointType',
+    type: 'options',
+    default: '',
+    displayOptions: { show: { resource: ['endpoint'], operation: ['startEnrollment'] } },
     options: [
       { name: 'Android', value: 'android' },
+      { name: 'Auto-Detect (API Lookup)', value: '' },
       { name: 'iOS', value: 'ios' },
-      { name: 'Linux', value: 'linux' },
       { name: 'Mac', value: 'mac' },
-      { name: 'Network', value: 'network' },
       { name: 'Windows', value: 'windows' },
     ],
-    description: 'The endpoint platform type',
+    description: 'Optionally specify the platform type to skip the auto-detect API call. Network and Linux do not support enrollment.',
   },
-  {
-    displayName: 'Endpoint ID',
-    name: 'typedEndpointId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getTypedEndpoint', 'updateTypedEndpoint', 'deleteTypedEndpoint', 'startTypedEnrollment'] } },
-    placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
-    description: 'The GUID of the endpoint',
-  },
-  {
-    displayName: 'Return All',
-    name: 'returnAll',
-    type: 'boolean',
-    default: false,
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getTypedEndpoints', 'getTypedEndpointsByGroup'] } },
-    description: 'Whether to return all results or only up to a given limit',
-    hint: 'Results are capped at 5,000 items regardless of this setting',
-  },
-  {
-    displayName: 'Limit',
-    name: 'limit',
-    type: 'number',
-    typeOptions: { minValue: 1 },
-    default: 50,
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getTypedEndpoints', 'getTypedEndpointsByGroup'], returnAll: [false] } },
-    description: 'Max number of results to return',
-  },
-  {
-    displayName: 'Options',
-    name: 'options',
-    type: 'collection',
-    placeholder: 'Add Option',
-    default: {},
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getTypedEndpoints', 'getTypedEndpointsByGroup'] } },
-    options: [
-      { displayName: 'Search Query', name: 'searchQuery', type: 'string', default: '', description: 'Filter results by name' },
-      { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order' },
-    ],
-  },
-  {
-    displayName: 'Update Fields',
-    name: 'updateFields',
-    type: 'collection',
-    placeholder: 'Add Field',
-    default: {},
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['updateTypedEndpoint'] } },
-    options: [
-      { displayName: 'Display Name', name: 'displayName', type: 'string', default: '' },
-      { displayName: 'Primary IP', name: 'primaryIP', type: 'string', default: '' },
-      { displayName: 'Primary MAC', name: 'primaryMAC', type: 'string', default: '' },
-      { displayName: 'Logical Group ID', name: 'logicalGroupId', type: 'string', default: '' },
-    ],
-  },
-  {
-    displayName: 'Enrollment Options',
-    name: 'enrollmentOptions',
-    type: 'collection',
-    placeholder: 'Add Option',
-    default: {},
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['startTypedEnrollment'] } },
-    options: [
-      { displayName: 'Email Recipient', name: 'emailRecipient', type: 'string', default: '', description: 'Email address to send enrollment instructions to' },
-      { displayName: 'Email Language ID', name: 'emailLanguageId', type: 'string', default: '', description: 'Language ID for the enrollment email' },
-    ],
-  },
+
+  // ----------------------------------
+  // getEndpointsByGroup fields
+  // ----------------------------------
   {
     displayName: 'Group Type',
     name: 'groupType',
     type: 'options',
     required: true,
     default: 'logical',
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getTypedEndpointsByGroup'] } },
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByGroup'] } },
     options: [
-      { name: 'AD User', value: 'adUser', description: 'Get typed endpoints assigned to an AD user' },
-      { name: 'Dynamic Group', value: 'dynamic', description: 'Windows endpoints only — /DynamicGroups/{id}/{Type}Endpoints' },
+      { name: 'AD User', value: 'adUser' },
+      { name: 'Dynamic Group', value: 'dynamic' },
       { name: 'Logical Group', value: 'logical' },
       { name: 'Static Group', value: 'static' },
-      { name: 'Universal Dynamic Group (26R1)', value: 'udg', description: 'Available in bMS 26R1 only for non-industrial types' },
+      { name: 'Universal Dynamic Group (26R1)', value: 'udg' },
     ],
     description: 'The type of group to query',
   },
@@ -2176,13 +2122,43 @@ export const typedEndpointFields: INodeProperties[] = [
     type: 'string',
     required: true,
     default: '',
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getTypedEndpointsByGroup'] } },
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByGroup'] } },
     placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
     description: 'The GUID of the group',
   },
+  {
+    displayName: 'Return All',
+    name: 'returnAll',
+    type: 'boolean',
+    default: false,
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByGroup'] } },
+    description: 'Whether to return all results or only up to a given limit',
+    hint: 'Results are capped at 5,000 items regardless of this setting',
+  },
+  {
+    displayName: 'Limit',
+    name: 'limit',
+    type: 'number',
+    typeOptions: { minValue: 1 },
+    default: 50,
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByGroup'], returnAll: [false] } },
+    description: 'Max number of results to return',
+  },
+  {
+    displayName: 'Options',
+    name: 'options',
+    type: 'collection',
+    placeholder: 'Add Option',
+    default: {},
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByGroup'] } },
+    options: [
+      { displayName: 'Search Query', name: 'searchQuery', type: 'string', default: '', description: 'Filter results by name' },
+      { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order' },
+    ],
+  },
 
   // ----------------------------------
-  //  Phase 9: Industrial endpoint fields (25R2 only)
+  // Industrial endpoint fields (25R2 only)
   // ----------------------------------
   {
     displayName: 'Industrial Endpoint ID',
@@ -2190,7 +2166,7 @@ export const typedEndpointFields: INodeProperties[] = [
     type: 'string',
     required: true,
     default: '',
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getIndustrialEndpoint', 'updateIndustrialEndpoint', 'deleteIndustrialEndpoint'] } },
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getIndustrialEndpoint', 'updateIndustrialEndpoint', 'deleteIndustrialEndpoint'] } },
     placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
     description: 'The GUID of the industrial endpoint',
   },
@@ -2200,7 +2176,7 @@ export const typedEndpointFields: INodeProperties[] = [
     type: 'string',
     required: true,
     default: '',
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['createIndustrialEndpoint'] } },
+    displayOptions: { show: { resource: ['endpoint'], operation: ['createIndustrialEndpoint'] } },
     description: 'Display name for the new industrial endpoint',
   },
   {
@@ -2209,7 +2185,7 @@ export const typedEndpointFields: INodeProperties[] = [
     type: 'collection',
     placeholder: 'Add Field',
     default: {},
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['createIndustrialEndpoint'] } },
+    displayOptions: { show: { resource: ['endpoint'], operation: ['createIndustrialEndpoint'] } },
     options: [
       { displayName: 'Primary IP', name: 'primaryIP', type: 'string', default: '' },
       { displayName: 'Primary MAC', name: 'primaryMAC', type: 'string', default: '' },
@@ -2222,7 +2198,7 @@ export const typedEndpointFields: INodeProperties[] = [
     type: 'collection',
     placeholder: 'Add Field',
     default: {},
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['updateIndustrialEndpoint'] } },
+    displayOptions: { show: { resource: ['endpoint'], operation: ['updateIndustrialEndpoint'] } },
     options: [
       { displayName: 'Display Name', name: 'displayName', type: 'string', default: '' },
       { displayName: 'Primary IP', name: 'primaryIP', type: 'string', default: '' },
@@ -2234,7 +2210,7 @@ export const typedEndpointFields: INodeProperties[] = [
     name: 'returnAll',
     type: 'boolean',
     default: false,
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getIndustrialEndpoints', 'getIndustrialEndpointsByGroup'] } },
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getIndustrialEndpoints', 'getIndustrialEndpointsByGroup'] } },
     description: 'Whether to return all results or only up to a given limit',
     hint: 'Results are capped at 5,000 items regardless of this setting',
   },
@@ -2244,7 +2220,7 @@ export const typedEndpointFields: INodeProperties[] = [
     type: 'number',
     typeOptions: { minValue: 1 },
     default: 50,
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getIndustrialEndpoints', 'getIndustrialEndpointsByGroup'], returnAll: [false] } },
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getIndustrialEndpoints', 'getIndustrialEndpointsByGroup'], returnAll: [false] } },
     description: 'Max number of results to return',
   },
   {
@@ -2253,7 +2229,7 @@ export const typedEndpointFields: INodeProperties[] = [
     type: 'collection',
     placeholder: 'Add Option',
     default: {},
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getIndustrialEndpoints', 'getIndustrialEndpointsByGroup'] } },
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getIndustrialEndpoints', 'getIndustrialEndpointsByGroup'] } },
     options: [
       { displayName: 'Search Query', name: 'searchQuery', type: 'string', default: '', description: 'Filter results by name' },
       { displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order' },
@@ -2265,7 +2241,7 @@ export const typedEndpointFields: INodeProperties[] = [
     type: 'options',
     required: true,
     default: 'logical',
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getIndustrialEndpointsByGroup'] } },
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getIndustrialEndpointsByGroup'] } },
     options: [
       { name: 'Logical Group', value: 'logical' },
       { name: 'Static Group', value: 'static' },
@@ -2279,7 +2255,7 @@ export const typedEndpointFields: INodeProperties[] = [
     type: 'string',
     required: true,
     default: '',
-    displayOptions: { show: { resource: ['typedEndpoint'], operation: ['getIndustrialEndpointsByGroup'] } },
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getIndustrialEndpointsByGroup'] } },
     placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
     description: 'The GUID of the group',
   },

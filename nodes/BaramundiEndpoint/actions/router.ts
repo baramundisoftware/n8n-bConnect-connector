@@ -74,6 +74,27 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
             case 'getEndpointsByADUser':
               responseData = await endpoint.getEndpointsByADUser.call(this, i);
               break;
+            case 'getEndpointsByGroup':
+              responseData = await endpoint.getEndpointsByGroup.call(this, i);
+              break;
+            case 'getIndustrialEndpoints':
+              responseData = await endpoint.getIndustrialEndpoints.call(this, i);
+              break;
+            case 'getIndustrialEndpoint':
+              responseData = await endpoint.getIndustrialEndpoint.call(this, i);
+              break;
+            case 'createIndustrialEndpoint':
+              responseData = await endpoint.createIndustrialEndpoint.call(this, i);
+              break;
+            case 'updateIndustrialEndpoint':
+              responseData = await endpoint.updateIndustrialEndpoint.call(this, i);
+              break;
+            case 'deleteIndustrialEndpoint':
+              responseData = await endpoint.deleteIndustrialEndpoint.call(this, i);
+              break;
+            case 'getIndustrialEndpointsByGroup':
+              responseData = await endpoint.getIndustrialEndpointsByGroup.call(this, i);
+              break;
             default:
               throw new NodeOperationError(
                 this.getNode(),
@@ -196,52 +217,6 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
               throw new NodeOperationError(
                 this.getNode(),
                 `Unknown operation "${operation}" for resource "maintenanceWindow"`,
-              );
-          }
-          break;
-
-        case 'typedEndpoint':
-          switch (operation) {
-            case 'getTypedEndpoints':
-              responseData = await endpoint.getTypedEndpoints.call(this, i);
-              break;
-            case 'getTypedEndpoint':
-              responseData = await endpoint.getTypedEndpoint.call(this, i);
-              break;
-            case 'updateTypedEndpoint':
-              responseData = await endpoint.updateTypedEndpoint.call(this, i);
-              break;
-            case 'deleteTypedEndpoint':
-              responseData = await endpoint.deleteTypedEndpoint.call(this, i);
-              break;
-            case 'startTypedEnrollment':
-              responseData = await endpoint.startTypedEnrollment.call(this, i);
-              break;
-            case 'getTypedEndpointsByGroup':
-              responseData = await endpoint.getTypedEndpointsByGroup.call(this, i);
-              break;
-            case 'getIndustrialEndpoints':
-              responseData = await endpoint.getIndustrialEndpoints.call(this, i);
-              break;
-            case 'getIndustrialEndpoint':
-              responseData = await endpoint.getIndustrialEndpoint.call(this, i);
-              break;
-            case 'createIndustrialEndpoint':
-              responseData = await endpoint.createIndustrialEndpoint.call(this, i);
-              break;
-            case 'updateIndustrialEndpoint':
-              responseData = await endpoint.updateIndustrialEndpoint.call(this, i);
-              break;
-            case 'deleteIndustrialEndpoint':
-              responseData = await endpoint.deleteIndustrialEndpoint.call(this, i);
-              break;
-            case 'getIndustrialEndpointsByGroup':
-              responseData = await endpoint.getIndustrialEndpointsByGroup.call(this, i);
-              break;
-            default:
-              throw new NodeOperationError(
-                this.getNode(),
-                `Unknown operation "${operation}" for resource "typedEndpoint"`,
               );
           }
           break;

@@ -684,6 +684,41 @@ Trigger: Schedule (weekly, before patch Tuesday).
 
 | ID | Task | Completed |
 |----|------|-----------|
+| P14.1 | Refactor `get`, `getMany`, `update`, `deleteEndpoint`, `startEnrollment` to accept `endpointType` param. Added `getEndpointsByGroup` function consolidating `getTypedEndpointsByGroup`. Fixed `update` to work for all platform types (was Windows-only). | 2026-04-02 |
+| P14.2 | Removed standalone typed functions: `getTypedEndpoints`, `getTypedEndpoint`, `updateTypedEndpoint`, `deleteTypedEndpoint`, `startTypedEnrollment`, `getTypedEndpointsByGroup`. Logic absorbed into main functions. | 2026-04-02 |
+| P14.3 | Updated `endpointOperations25R2/26R1` to include `getEndpointsByGroup` and industrial ops. Added `endpointTypeFields` array. Removed `typedEndpointOperations*` and `typedEndpointFields`. | 2026-04-02 |
+| P14.4 | Updated `router.ts`: added `getEndpointsByGroup` + industrial ops to `endpoint` case; removed `case 'typedEndpoint'` entirely. | 2026-04-02 |
+| P14.5 | Updated `BaramundiEndpoint.node.ts`: removed `typedEndpoint` from resource dropdown (6→5 resources), updated imports, added `endpointTypeFields` spread. | 2026-04-02 |
+| P14.6 | Updated `endpoint.execute.test.ts`: replaced typed endpoint tests with tests for new merged behavior. 554 tests passing. | 2026-04-02 |
+| P14.7 | Build 0 errors, lint 0 errors, 554 tests passing. Bumped version 0.6.0 → 0.7.0, updated CHANGELOG.md. | 2026-04-02 |
+
+---
+
+## Security — Threat Model Findings (2026-04-02)
+
+**Threat model**: `docs/THREAT-MODEL-2026-04-02.md`
+**Scope**: Full codebase review of v0.6.0
+
+### Backlog
+
+| ID | Task | Priority | Finding |
+|----|------|----------|---------|
+| SEC-04.1 | Add `validateODataString()` to `endpoint.search()` in `endpoint.execute.ts:114` | **HIGH** | F-2026-04: OData injection — only unvalidated `SearchQuery` in codebase |
+| SEC-04.2 | Add unit test: invalid OData input rejected by `search()` operation | HIGH | F-2026-04 |
+| SEC-04.3 | Grep-verify no remaining unvalidated `SearchQuery` assignments across all nodes | HIGH | F-2026-04 |
+| SEC-06.1 | Add code comment on `job.execute.ts:116` noting safety dependency on GUID validation | LOW | F-2026-06 |
+
+### Accepted (no action required)
+
+| ID | Finding | Severity | Rationale |
+|----|---------|----------|-----------|
+| F-2026-05 | `additionalFields` unvalidated in create/update ops | LOW | bConnect API validates server-side; n8n UI constrains field types |
+| F-2026-07 | lodash HIGH in n8n-workflow peer dep | ACCEPTED | `_.template`/`_.unset`/`_.omit` never called by this connector; upstream fix required |
+
+### Done
+
+| ID | Task | Completed |
+|----|------|-----------|
 | *(none yet)* | | |
 
 ---

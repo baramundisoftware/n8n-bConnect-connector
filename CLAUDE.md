@@ -37,7 +37,7 @@ n8nconnector/
 │   ├── transport/requestApi.ts       # HTTP client, pagination, retry
 │   ├── utils/                        # types, validation, errorMessages
 │   └── loadOptions.ts                # Dropdown population functions
-├── nodes/BaramundiEndpoint/          # Endpoint, groups, maintenance windows (~92 ops)
+├── nodes/BaramundiEndpoint/          # Endpoint (with endpointType), groups, maintenance windows (~85 ops)
 ├── nodes/BaramundiAsset/             # Asset, asset types, folders (~43 ops)
 ├── nodes/BaramundiJob/               # Job definitions, folders, instances, kiosk (~37 ops)
 ├── nodes/BaramundiSoftware/          # Software, bundles, updates, variables, UDG (~56 ops)

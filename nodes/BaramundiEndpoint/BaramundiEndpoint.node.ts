@@ -11,6 +11,7 @@ import {
   endpointFields,
   endpointOperations25R2,
   endpointOperations26R1,
+  endpointTypeFields,
   logicalGroupFields,
   logicalGroupOperations,
   maintenanceWindowFields,
@@ -18,9 +19,6 @@ import {
   maintenanceWindowOperations26R1,
   staticGroupFields,
   staticGroupOperations,
-  typedEndpointFields,
-  typedEndpointOperations25R2,
-  typedEndpointOperations26R1,
 } from './actions/endpoint/endpoint.fields';
 import { router } from './actions/router';
 import {
@@ -103,11 +101,6 @@ export class BaramundiEndpoint implements INodeType {
             value: 'staticGroup',
             description: 'Manage static endpoint groups',
           },
-          {
-            name: 'Typed Endpoint',
-            value: 'typedEndpoint',
-            description: 'Manage endpoints by platform type (Windows, Android, iOS, Linux, Mac, Network)',
-          },
         ],
         default: 'endpoint',
       },
@@ -119,15 +112,13 @@ export class BaramundiEndpoint implements INodeType {
       ...maintenanceWindowOperations25R2,
       ...maintenanceWindowOperations26R1,
       ...staticGroupOperations,
-      ...typedEndpointOperations25R2,
-      ...typedEndpointOperations26R1,
       // Fields
       ...dynamicGroupFields,
       ...endpointFields,
+      ...endpointTypeFields,
       ...logicalGroupFields,
       ...maintenanceWindowFields,
       ...staticGroupFields,
-      ...typedEndpointFields,
     ],
   };
 

@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-04-02
+
+> **Semver rationale**: Minor bump. Phase 14 removes the `typedEndpoint` resource from BaramundiEndpoint and merges platform-type filtering into the main `endpoint` resource (REQ-ENDPOINT-UX-1). **BREAKING CHANGE** — `resource: 'typedEndpoint'` no longer exists. Saved workflows using it must be updated.
+
+### Breaking Changes (Phase 14 — Typed Endpoint Merge)
+
+- The `typedEndpoint` resource in **Baramundi Endpoint** node has been removed.
+- Platform-type filtering is now done via the `endpointType` dropdown on `Get`, `Get Many`, `Update`, `Delete`, and the new `Get By Group` operation.
+- Industrial endpoint operations (25R2 only) moved from `typedEndpoint` resource to `endpoint` resource.
+
+### Added
+
+- `endpointType` dropdown (All Platforms / Windows / Android / iOS / Linux / Mac / Network) on `Get`, `Get Many`, `Delete` operations — defaults to "All Platforms" (generic path)
+- `endpointType` dropdown (required, no "All") on `Update` operation — fixes Windows-only limitation
+- Optional `endpointType` on `Start Enrollment` — skips the API lookup when set
+- New `Get By Group` operation on `endpoint` resource — unified typed group query with `groupType` (logical/static/dynamic/udg/adUser) and `endpointType` selectors
+- Industrial endpoint operations (`Get Industrial Endpoints`, `Get Industrial Endpoint`, `Create Industrial Endpoint`, `Update Industrial Endpoint`, `Delete Industrial Endpoint`, `Get Industrial Endpoints By Group`) moved to `endpoint` resource under 25R2 gating
+
+### Removed
+
+- `typedEndpoint` resource (all operations merged into `endpoint` resource)
+- Standalone typed functions: `getTypedEndpoints`, `getTypedEndpoint`, `updateTypedEndpoint`, `deleteTypedEndpoint`, `startTypedEnrollment`, `getTypedEndpointsByGroup`
+
 ## [0.6.0] - 2026-04-02
 
 > **Semver rationale**: Minor bump. Phase 13 splits the monolithic Baramundi node into 6 focused domain nodes (REQ-SPLIT-1). **BREAKING CHANGE** — the single `baramundi` node is replaced by 6 separate nodes. Existing saved workflows must be recreated using the new domain-specific nodes.
