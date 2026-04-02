@@ -671,6 +671,51 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 
 ---
 
+## Threat Model — Security Review 2026-04-02
+
+**Document**: `docs/THREAT-MODEL-2026-04-02.md`
+**Scope**: Full codebase review of v0.6.0 (6 nodes, ~321 operations)
+
+| ID | Finding | Severity | Status |
+|---|---|---|---|
+| REQ-AUDIT-F2026-04 | OData injection in `endpoint.search()` — missing `validateODataString()` | HIGH | OPEN |
+| REQ-AUDIT-F2026-05 | `additionalFields` passed to API without field-level validation | LOW | ACCEPTED — server-side validation sufficient |
+| REQ-AUDIT-F2026-06 | Template literal OData interpolation in `job.getInstances()` (GUID-validated, not exploitable) | INFO | NOTED |
+| REQ-AUDIT-F2026-07 | lodash HIGH in n8n-workflow peer dependency (`_.template` not used) | ACCEPTED | ACCEPTED — upstream dependency |
+
+### REQ-AUDIT-F2026-04 — OData Injection in endpoint.search() (HIGH)
+
+**Status**: OPEN
+
+**Description**: `endpoint.execute.ts:search()` passes `searchQuery` directly to the bConnect API without calling `validateODataString()`. All other 50+ search/filter sites in the codebase validate correctly.
+
+**File**: `nodes/BaramundiEndpoint/actions/endpoint/endpoint.execute.ts:114`
+
+**Mitigation**: Add `validateODataString()` call matching the pattern at line 488 of the same file. 3-line fix.
+
+**Quality**:
+- [ ] `validateODataString()` called on `searchQuery` in `search()` function
+- [ ] Unit test for invalid OData input in search operation
+- [ ] Grep confirms no remaining unvalidated `SearchQuery` assignments
+
+### REQ-AUDIT-F2026-05 — additionalFields Unvalidated (LOW — ACCEPTED)
+
+**Status**: ACCEPTED
+
+**Description**: Create/update operations spread `additionalFields`/`updateFields` directly into request bodies. The bConnect API validates server-side (returns 400/422 for invalid payloads). The n8n UI constrains field types via `INodeProperties`.
+
+**Risk acceptance**: Server-side validation is the primary control. Adding client-side field-level validation would duplicate the API's own validation and require maintaining a parallel schema. Accepted as defense-in-depth gap with low exploitability.
+
+### REQ-AUDIT-F2026-07 — lodash in n8n-workflow Peer Dependency (ACCEPTED)
+
+**Status**: ACCEPTED
+
+**Description**: 3 HIGH lodash vulns in `n8n-workflow@2.13.1` peer dependency. `_.template`, `_.unset`, `_.omit` are never called by this connector. Not fixable without upstream n8n update.
+
+**CI monitoring**: `npm audit --omit=dev --audit-level=high` runs in CI. Will flag if new runtime vulns appear.
+
+---
+
 ## REQ-RELEASE-1 — v0.4.2 Security Patch Release
 
 **Status**: OPEN

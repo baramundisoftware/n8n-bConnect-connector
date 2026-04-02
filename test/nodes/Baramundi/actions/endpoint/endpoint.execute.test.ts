@@ -381,6 +381,22 @@ describe('Endpoint Operations - Unit Tests', () => {
       expect(result).toBeDefined();
       expect(result).toHaveLength(0);
     });
+
+    it('should reject invalid OData in searchQuery (SEC-04.1)', async () => {
+      // Arrange — injection attempt: semicolon-separated statement
+      const mockContext = createMockExecuteFunctions(
+        {
+          searchQuery: "'; DROP TABLE Endpoints--",
+          returnAll: false,
+          limit: 50,
+        },
+        {},
+        {}
+      );
+
+      // Act & Assert
+      await expect(search.call(mockContext, 0)).rejects.toThrow();
+    });
   });
 
   describe('deleteEndpoint()', () => {

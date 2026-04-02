@@ -701,12 +701,7 @@ Trigger: Schedule (weekly, before patch Tuesday).
 
 ### Backlog
 
-| ID | Task | Priority | Finding |
-|----|------|----------|---------|
-| SEC-04.1 | Add `validateODataString()` to `endpoint.search()` in `endpoint.execute.ts:114` | **HIGH** | F-2026-04: OData injection — only unvalidated `SearchQuery` in codebase |
-| SEC-04.2 | Add unit test: invalid OData input rejected by `search()` operation | HIGH | F-2026-04 |
-| SEC-04.3 | Grep-verify no remaining unvalidated `SearchQuery` assignments across all nodes | HIGH | F-2026-04 |
-| SEC-06.1 | Add code comment on `job.execute.ts:116` noting safety dependency on GUID validation | LOW | F-2026-06 |
+*(empty)*
 
 ### Accepted (no action required)
 
@@ -719,7 +714,10 @@ Trigger: Schedule (weekly, before patch Tuesday).
 
 | ID | Task | Completed |
 |----|------|-----------|
-| *(none yet)* | | |
+| SEC-04.1 | Added `validateODataString()` to `search()` in `endpoint.execute.ts` — matches existing pattern at lines 488/608/728 | 2026-04-02 |
+| SEC-04.2 | Added unit test `should reject invalid OData in searchQuery (SEC-04.1)` — 555 tests passing | 2026-04-02 |
+| SEC-04.3 | Grep-verified: 2 remaining `SearchQuery:` sites — both validated (endpoint.execute.ts:124 validated above, job.execute.ts:117 GUID-validated) | 2026-04-02 |
+| SEC-06.1 | Added safety comment on `job.execute.ts:117` noting GUID validation dependency | 2026-04-02 |
 
 ---
 

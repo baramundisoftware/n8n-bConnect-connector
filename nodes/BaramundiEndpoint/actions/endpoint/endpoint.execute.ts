@@ -115,6 +115,11 @@ export async function search(
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
 
+  const sqValidation = validateODataString(searchQuery, 'Search Query');
+  if (!sqValidation.valid) {
+    throw new NodeOperationError(this.getNode(), sqValidation.errors.join('\n'), { itemIndex: index });
+  }
+
   const qs: Record<string, string | number> = {
     SearchQuery: searchQuery,
   };

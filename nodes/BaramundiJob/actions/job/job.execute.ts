@@ -112,6 +112,7 @@ export async function getInstances(
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
 
+  // Safety: jobId is GUID-validated above — template interpolation is not exploitable here.
   const qs: Record<string, string | number> = {
     SearchQuery: `JobDefinitionId eq '${jobId}'`,
   };
