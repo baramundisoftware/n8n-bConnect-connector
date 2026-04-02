@@ -18,7 +18,7 @@ import {
 	extractResourceLocatorValue,
 	validateRfc6902Patch,
 	type ValidationResult,
-} from '../../../../nodes/Baramundi/utils/validation';
+} from '../../../../nodes/shared/utils/validation';
 
 describe('Validation Utilities', () => {
 	describe('validateGuid', () => {

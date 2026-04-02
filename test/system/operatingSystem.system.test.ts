@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { getSystemTestConfig, skipIfNoCredentials, createSystemTestContext } from './setup';
-import * as os from '../../nodes/Baramundi/actions/operatingSystem/operatingSystem.execute';
+import * as os from '../../nodes/BaramundiAdmin/actions/operatingSystem/operatingSystem.execute';
 
 const skipConfig = skipIfNoCredentials();
 

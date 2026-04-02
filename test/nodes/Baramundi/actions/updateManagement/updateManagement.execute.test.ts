@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { IExecuteFunctions, IDataObject } from 'n8n-workflow';
-import * as updateManagement from '../../../../../nodes/Baramundi/actions/updateManagement/updateManagement.execute';
+import * as updateManagement from '../../../../../nodes/BaramundiSoftware/actions/updateManagement/updateManagement.execute';
 
 function createMockExecuteFunctions(nodeParameters: Record<string, any> = {}, credentials: Record<string, any> = {}, mockResponse: any = {}): IExecuteFunctions {
 	return {

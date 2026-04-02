@@ -6,7 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { IExecuteFunctions, IHttpRequestOptions } from 'n8n-workflow';
-import { apiRequest, apiRequestAllItems, MAX_PAGE_CAP } from '../../../../nodes/Baramundi/transport/requestApi';
+import { apiRequest, apiRequestAllItems, MAX_PAGE_CAP } from '../../../../nodes/shared/transport/requestApi';
 
 /**
  * Create a mock IExecuteFunctions for transport testing

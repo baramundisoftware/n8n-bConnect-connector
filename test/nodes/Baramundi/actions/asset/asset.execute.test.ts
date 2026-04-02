@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { NodeOperationError } from 'n8n-workflow';
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
-import { get, getMany, create, update, deleteAsset, getAssetTypes, getAssetType, getAssetsByEndpoint, getAssetsByLogicalGroup, createAssetType, deleteAssetType, getAssetStockAssets, getAssetStockFolders, createAssetStockFolder, updateAssetStockFolder, deleteAssetStockFolder, getAssetsByADObject, getAssetsByOrgUnit, getAssetStockFolder, getAssetStockSubFolders, getAssetTypeFolders, getAssetTypeFolder, createAssetTypeFolder, updateAssetTypeFolder, deleteAssetTypeFolder, getAssetTypeFolderSubFolders } from '../../../../../nodes/Baramundi/actions/asset/asset.execute';
+import { get, getMany, create, update, deleteAsset, getAssetTypes, getAssetType, getAssetsByEndpoint, getAssetsByLogicalGroup, createAssetType, deleteAssetType, getAssetStockAssets, getAssetStockFolders, createAssetStockFolder, updateAssetStockFolder, deleteAssetStockFolder, getAssetsByADObject, getAssetsByOrgUnit, getAssetStockFolder, getAssetStockSubFolders, getAssetTypeFolders, getAssetTypeFolder, createAssetTypeFolder, updateAssetTypeFolder, deleteAssetTypeFolder, getAssetTypeFolderSubFolders } from '../../../../../nodes/BaramundiAsset/actions/asset/asset.execute';
 
 // Mock helper function to create IExecuteFunctions
 function createMockExecuteFunctions(

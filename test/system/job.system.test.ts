@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { getSystemTestConfig, skipIfNoCredentials, createSystemTestContext } from './setup';
-import * as job from '../../nodes/Baramundi/actions/job/job.execute';
+import * as job from '../../nodes/BaramundiJob/actions/job/job.execute';
 
 const skipConfig = skipIfNoCredentials();
 

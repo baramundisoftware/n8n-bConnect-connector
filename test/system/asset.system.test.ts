@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { getSystemTestConfig, skipIfNoCredentials, createSystemTestContext } from './setup';
-import * as asset from '../../nodes/Baramundi/actions/asset/asset.execute';
+import * as asset from '../../nodes/BaramundiAsset/actions/asset/asset.execute';
 
 const skipConfig = skipIfNoCredentials();
 

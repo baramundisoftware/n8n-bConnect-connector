@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { getSystemTestConfig, skipIfNoCredentials, createSystemTestContext } from './setup';
-import * as server from '../../nodes/Baramundi/actions/serverManagement/serverManagement.execute';
+import * as server from '../../nodes/BaramundiAdmin/actions/serverManagement/serverManagement.execute';
 
 const skipConfig = skipIfNoCredentials();
 

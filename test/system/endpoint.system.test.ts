@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { getSystemTestConfig, skipIfNoCredentials, createSystemTestContext, generateTestResourceName } from './setup';
-import * as endpoint from '../../nodes/Baramundi/actions/endpoint/endpoint.execute';
+import * as endpoint from '../../nodes/BaramundiEndpoint/actions/endpoint/endpoint.execute';
 
 const skipConfig = skipIfNoCredentials();
 

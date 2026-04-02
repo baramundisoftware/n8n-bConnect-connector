@@ -7,7 +7,7 @@ import {
   getFolder,
   getSubFolders,
   getGroupsByFolder,
-} from '../../../../../nodes/Baramundi/actions/universalDynamicGroups/universalDynamicGroups.execute';
+} from '../../../../../nodes/BaramundiSoftware/actions/universalDynamicGroups/universalDynamicGroups.execute';
 
 function createMockExecuteFunctions(
   params: Record<string, any> = {},

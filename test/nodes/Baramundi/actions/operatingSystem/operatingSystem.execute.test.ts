@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { IExecuteFunctions, IDataObject } from 'n8n-workflow';
 
-import * as operatingSystem from '../../../../../nodes/Baramundi/actions/operatingSystem/operatingSystem.execute';
+import * as operatingSystem from '../../../../../nodes/BaramundiAdmin/actions/operatingSystem/operatingSystem.execute';
 
 // Mock helper function to create IExecuteFunctions
 function createMockExecuteFunctions(

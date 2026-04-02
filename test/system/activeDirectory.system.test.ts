@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeAll } from 'vitest';
 import { getSystemTestConfig, skipIfNoCredentials, createSystemTestContext } from './setup';
-import * as activeDirectory from '../../nodes/Baramundi/actions/activeDirectory/activeDirectory.execute';
+import * as activeDirectory from '../../nodes/BaramundiAdmin/actions/activeDirectory/activeDirectory.execute';
 
 const skipConfig = skipIfNoCredentials();
 

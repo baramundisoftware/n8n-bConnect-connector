@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
-import { getADGroups, getADGroup, getADGroupsByOrgUnit, getADUsersByGroup, getADUsers, getADUser, getADObjects, getADObject, getOrgUnits, getOrgUnit, getADGroupsByADGroup, getADObjectsByADGroup, getADObjectMemberships, getADObjectsByOrgUnit, getADUsersByOrgUnit, getOrgUnitsByOrgUnit } from '../../../../../nodes/Baramundi/actions/activeDirectory/activeDirectory.execute';
+import { getADGroups, getADGroup, getADGroupsByOrgUnit, getADUsersByGroup, getADUsers, getADUser, getADObjects, getADObject, getOrgUnits, getOrgUnit, getADGroupsByADGroup, getADObjectsByADGroup, getADObjectMemberships, getADObjectsByOrgUnit, getADUsersByOrgUnit, getOrgUnitsByOrgUnit } from '../../../../../nodes/BaramundiAdmin/actions/activeDirectory/activeDirectory.execute';
 
 // Mock helper function to create IExecuteFunctions
 function createMockExecuteFunctions(

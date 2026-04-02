@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeAll } from 'vitest';
 import { getSystemTestConfig, skipIfNoCredentials, createSystemTestContext } from './setup';
-import * as defenseControl from '../../nodes/Baramundi/actions/defenseControl/defenseControl.execute';
+import * as defenseControl from '../../nodes/BaramundiSecurity/actions/defenseControl/defenseControl.execute';
 
 const skipConfig = skipIfNoCredentials();
 

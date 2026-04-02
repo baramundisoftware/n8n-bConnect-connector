@@ -9,7 +9,7 @@ import {
   getDetectedVulnerabilitiesByEndpoint,
   getDetectedRuleViolations,
   getDetectedRuleViolationsByEndpoint,
-} from '../../../../../nodes/Baramundi/actions/compliance/compliance.execute';
+} from '../../../../../nodes/BaramundiSecurity/actions/compliance/compliance.execute';
 
 function createMockExecuteFunctions(
   params: Record<string, any> = {},

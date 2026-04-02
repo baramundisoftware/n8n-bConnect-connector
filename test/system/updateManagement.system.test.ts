@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeAll } from 'vitest';
 import { getSystemTestConfig, skipIfNoCredentials, createSystemTestContext } from './setup';
-import * as updateManagement from '../../nodes/Baramundi/actions/updateManagement/updateManagement.execute';
+import * as updateManagement from '../../nodes/BaramundiSoftware/actions/updateManagement/updateManagement.execute';
 
 const skipConfig = skipIfNoCredentials();
 

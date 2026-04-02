@@ -14,7 +14,7 @@ import {
   getMicrosoftDefenderWindowsEndpoint,
   getBitLockerSecrets,
   patchBitLockerSecrets,
-} from '../../../../../nodes/Baramundi/actions/defenseControl/defenseControl.execute';
+} from '../../../../../nodes/BaramundiSecurity/actions/defenseControl/defenseControl.execute';
 
 // Mock helper function to create IExecuteFunctions
 function createMockExecuteFunctions(

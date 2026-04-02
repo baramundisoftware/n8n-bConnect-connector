@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { IExecuteFunctions, IDataObject } from 'n8n-workflow';
 
-import * as variable from '../../../../../nodes/Baramundi/actions/variable/variable.execute';
+import * as variable from '../../../../../nodes/BaramundiSoftware/actions/variable/variable.execute';
 
 // Mock helper function to create IExecuteFunctions
 function createMockExecuteFunctions(

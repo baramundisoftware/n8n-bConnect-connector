@@ -31,7 +31,7 @@ import {
   getApiKeys,
   getDownloadJobs,
   getDownloadJob,
-} from '../../../../../nodes/Baramundi/actions/serverManagement/serverManagement.execute';
+} from '../../../../../nodes/BaramundiAdmin/actions/serverManagement/serverManagement.execute';
 
 // Mock helper function to create IExecuteFunctions
 function createMockExecuteFunctions(
