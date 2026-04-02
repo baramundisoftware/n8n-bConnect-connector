@@ -12,7 +12,7 @@
 | Parameter Validation | ✅ Complete | `validation.ts`, 206 call sites |
 | Dropdown Selection (loadOptions) | ✅ Complete | Endpoints + Job Definitions |
 | Enhanced Error Messages | ✅ Complete | `errorMessages.ts` + `requestApi.ts` |
-| Resource Locator (advanced search) | ⏳ Deferred | No blockers — Phase 11 in Tasks.md |
+| Resource Locator (advanced search) | ⏳ Deferred | No blockers — Phase 12 in Tasks.md |
 
 ---
 
@@ -59,7 +59,7 @@ The full `resourceLocator` component (type-ahead search, By URL mode) has not be
 
 **Current state:** The `methods` class property is already used correctly for `loadOptions`. Adding `listSearch` alongside it is straightforward. The `extractResourceLocatorValue()` helper in `validation.ts` is already written for backward compatibility.
 
-**Status:** Deferred — tracked as **Phase 11** in [Tasks.md](../Tasks.md).
+**Status:** Deferred — tracked as **Phase 12** in [Tasks.md](../Tasks.md).
 
 **Reference implementation:** See `UX_IMPROVEMENTS_GUIDE.md` §1–2 for the full code examples.
 

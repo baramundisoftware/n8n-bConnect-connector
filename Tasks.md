@@ -394,7 +394,77 @@
 
 ---
 
-## Phase 11 — Resource Locator UX
+## Phase 11 — Example Workflows for Senior IT Administrators
+
+**Goal**: Replace the two trivial placeholder workflows with a library of production-ready workflow templates that demonstrate real IT automation scenarios. Assess existing workflows for accuracy first, then build the new set.
+
+**Current state**: `example-workflows/` has 2 workflows (Jan 2026, day-one placeholders):
+- `01-list-endpoints.json` — manual trigger → getMany endpoints. No practical value.
+- `02-search-and-report.json` — search by "WIN" prefix → reshape. Outdated field names (`DisplayName`, `Id` — V2.0 uses camelCase).
+
+Both are pre-Phase 8 and reference fields that no longer exist. They need to be replaced, not extended.
+
+### Backlog
+
+| ID | Task | Priority |
+|----|------|----------|
+| P11E.1 | Audit existing 2 workflows — fix field names or delete | HIGH |
+| P11E.2 | Create workflow: **Endpoint Compliance Report** — get all endpoints, check compliance status (26R1), output CSV/table for weekly review | HIGH |
+| P11E.3 | Create workflow: **Job Failure Alert** — scheduled trigger, query job instances with status=Failed, send summary notification (email/Teams/Slack) | HIGH |
+| P11E.4 | Create workflow: **New Endpoint Onboarding** — webhook trigger on enrollment, add to logical group, set standard variables, execute baseline job | HIGH |
+| P11E.5 | Create workflow: **Stale Endpoint Report** — find endpoints with no contact in 30+ days, generate report for IT review | MEDIUM |
+| P11E.6 | Create workflow: **Software License Audit** — get all installed software across fleet, aggregate by publisher, compare against licensed list | MEDIUM |
+| P11E.7 | Create workflow: **Security Incident Response** — scheduled scan for active Defender threats, enrich with endpoint details, create ticket / send alert | MEDIUM |
+| P11E.8 | Create workflow: **Patch Compliance Dashboard** — query update management status, group by patch level, output summary for management reporting | MEDIUM |
+| P11E.9 | Create workflow: **BitLocker Key Retrieval** — form-triggered, retrieve recovery key for specific endpoint, log access for audit trail | LOW |
+| P11E.10 | Create workflow: **Maintenance Window Scheduler** — read schedule from Google Sheets / external source, set maintenance windows on endpoint groups | LOW |
+| P11E.11 | Update `example-workflows/README.md` — document all workflows, prerequisites, how to adapt credentials and IDs | HIGH |
+
+### Suggested Workflow Details
+
+**P11E.2 — Endpoint Compliance Report** (26R1 only)
+Uses: `compliance.getComplianceStatus` → `endpoint.getMany` → join by endpointId → Code node to flag non-compliant → send report.
+Trigger: Schedule (weekly Monday 07:00). Output: HTML email or Spreadsheet row.
+
+**P11E.3 — Job Failure Alert**
+Uses: `job.getJobInstances` (filter status=Failed, last 24h) → group by jobDefinitionId → `job.getJob` to get job names → Notification node.
+Trigger: Schedule (every 6h). Output: Teams/Slack message with failure count + job names.
+
+**P11E.4 — New Endpoint Onboarding**
+Uses: Webhook trigger (baramundi event or polling) → `endpoint.get` to read new endpoint → `endpoint.createStaticGroup` membership or `endpoint.updateStaticGroup` → `variable.updateVariable` to set asset owner, cost center → `job.createJobInstance` to run onboarding job.
+Trigger: Webhook or Schedule (every 15min, query endpoints created in last 15min).
+
+**P11E.5 — Stale Endpoint Report**
+Uses: `endpoint.getMany` (returnAll) → Code node filter `lastContact < now-30days` → aggregate by logical group → send report.
+Trigger: Schedule (monthly). Output: Email with list of stale endpoints + last contact date.
+
+**P11E.6 — Software License Audit**
+Uses: `software.getInstalledWindowsSoftware` (returnAll) → Code node aggregate by `publisher`+`displayName` → count installs → compare against license sheet → flag over/under-licensed products.
+Trigger: Schedule (monthly). Output: Spreadsheet with install counts vs license entitlements.
+
+**P11E.7 — Security Incident Response**
+Uses: `defenseControl.getMicrosoftDefenderThreats` (returnAll) → filter severity=High/Critical → `endpoint.get` for endpoint details → `defenseControl.getLocalAdminAccounts` for context → create ServiceNow/Jira ticket or send Teams alert.
+Trigger: Schedule (every 30min).
+
+**P11E.8 — Patch Compliance Dashboard**
+Uses: `updateManagement.getMaintenanceWindows` → `endpoint.getMany` per group → aggregate patch status → output summary statistics.
+Trigger: Schedule (daily). Output: Dashboard data or management report.
+
+**P11E.9 — BitLocker Key Retrieval**
+Uses: n8n Form trigger (IT helpdesk requests key) → `asset.getBitLockerSecret` → return key to requester → write audit log entry (date, requester, endpoint).
+Note: Security-critical — add approval step before returning key.
+
+**P11E.10 — Maintenance Window Scheduler**
+Uses: Google Sheets / HTTP Request to fetch maintenance schedule → `endpoint.getMany` by group → `endpoint.updateTypedEndpoint` to set maintenance window start/end per endpoint or group.
+Trigger: Schedule (weekly, before patch Tuesday).
+
+### Done
+
+*(empty)*
+
+---
+
+## Phase 12 — Resource Locator UX
 
 **Goal**: Replace plain GUID string fields with `resourceLocator` components for endpoints and jobs, and add `listSearch` methods alongside the existing `loadOptions` methods. This enables type-ahead search, GUID validation in the UI, and "By URL" mode.
 

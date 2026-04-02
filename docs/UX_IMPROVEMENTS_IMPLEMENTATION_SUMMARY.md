@@ -10,7 +10,7 @@ This document summarizes the UX improvements implementation effort for the n8n-n
 - ✅ Validation utilities — fully implemented, 206 call sites across all modules
 - ✅ loadOptions dropdowns — implemented as fallback for resource locator
 - ✅ Enhanced error messages — fully implemented in `errorMessages.ts` + `requestApi.ts`
-- ⏳ Resource locator — deferred, no technical blockers (Phase 11)
+- ⏳ Resource locator — deferred, no technical blockers (Phase 12)
 
 ---
 
@@ -107,13 +107,13 @@ was caused by placing `methods` **inside** the `description` object literal, rat
 
 The node already uses the correct pattern for `loadOptions` (class property `methods = { loadOptions: { ... } }`). Adding `listSearch` to the same `methods` block would compile correctly.
 
-**Status:** Deferred as Phase 11 — no technical blockers.
+**Status:** Deferred as Phase 12 — no technical blockers.
 
 ### Recommended Action
 
 **Option 1: Implement `listSearch` + `resourceLocator` (no blockers)**
 
-Add `listSearch` to the existing `methods` class property in `Baramundi.node.ts`, alongside `loadOptions`. Change relevant `type: 'string'` fields to `type: 'resourceLocator'`. Use `extractResourceLocatorValue()` for backward compatibility. Full code in `UX_IMPROVEMENTS_GUIDE.md` §1–2. Tracked as Phase 11 in `Tasks.md`.
+Add `listSearch` to the existing `methods` class property in `Baramundi.node.ts`, alongside `loadOptions`. Change relevant `type: 'string'` fields to `type: 'resourceLocator'`. Use `extractResourceLocatorValue()` for backward compatibility. Full code in `UX_IMPROVEMENTS_GUIDE.md` §1–2. Tracked as Phase 12 in `Tasks.md`.
 
 **Option 2: Keep loadOptions (current state, already done)**
 
@@ -199,7 +199,7 @@ Keep current string-based fields with validation:
 | Validation Utilities | ✅ Complete | `utils/validation.ts`, 80 tests, 206 call sites |
 | loadOptions Dropdowns | ✅ Complete | `Baramundi.node.ts` methods, 13 field uses |
 | Enhanced Error Handling | ✅ Complete | `utils/errorMessages.ts`, `transport/requestApi.ts` |
-| Resource Locator (listSearch) | ⏳ Deferred | Phase 11 in Tasks.md — no technical blockers |
+| Resource Locator (listSearch) | ⏳ Deferred | Phase 12 in Tasks.md — no technical blockers |
 
 ---
 
