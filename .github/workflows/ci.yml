@@ -6,7 +6,26 @@ on:
   pull_request:
     branches: [main, master]
 
+permissions:
+  contents: read
+  id-token: write    # Required for npm provenance (Sigstore OIDC)
+
 jobs:
+  dependency-review:
+    name: Dependency Review (SCA)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          deny-licenses: GPL-3.0-only, GPL-3.0-or-later, AGPL-3.0-only, AGPL-3.0-or-later, SSPL-1.0
+          comment-summary-in-pr: always
+
   build-and-test:
     name: Build, Lint, Test, Audit
     runs-on: ubuntu-latest
@@ -35,6 +54,11 @@ jobs:
 
       - name: Security audit (runtime dependencies only)
         run: npm audit --omit=dev --audit-level=high
+
+      - name: License compliance check
+        run: |
+          npx license-checker --production --failOn "GPL-3.0-only;GPL-3.0-or-later;AGPL-3.0-only;AGPL-3.0-or-later;SSPL-1.0" --summary
+          echo "License compliance OK — no denied licenses found"
 
       - name: File permission check (no 664 or executable .ts files)
         run: |

@@ -104,9 +104,11 @@ testing, UAT sign-off, versioning, or publishing.
           │  • Semver bump             │
           │  • CHANGELOG.md update     │
           │  • git tag vX.Y.Z          │
-          │  • npm publish             │
-          │  • GitHub Release          │
-          │  • Post-publish smoke test │
+          │  • SBOM generation          │
+          │  • GPG sign tarball         │
+          │  • npm publish --provenance │
+          │  • GitHub Release + assets  │
+          │  • Post-publish smoke test  │
           └────────────────────────────┘
                        │
                        ▼
@@ -169,6 +171,9 @@ Security is not a single step — it runs at three checkpoints:
 # Dependency vulnerabilities
 npm audit --audit-level=high       # blocks on high/critical
 
+# SCA — License compliance (REQ-SEC-SCA)
+npx license-checker --production --failOn "GPL-3.0-only;AGPL-3.0-only;SSPL-1.0"
+
 # Secrets scanning
 npx secretlint "**/*"              # blocks on credential leaks
 
@@ -192,6 +197,32 @@ Findings are classified:
 - SSL bypass feature (`Ignore SSL Issues`) explicitly tested and documented
 - SSRF vector (user-supplied server URL) validated against allowlist behavior
 
+### 4. Release Gate (`/process-release`) — Signing & SBOM
+```bash
+# SBOM generation (CycloneDX)
+npm run sbom                        # → sbom.json (attached to GitHub Release)
+
+# GPG sign tarball with baramundi certificate (REQ-SEC-SIGN)
+gpg --detach-sign --armor n8n-nodes-baramundi-management-solution-*.tgz
+
+# npm provenance (Sigstore — automatic in GitHub Actions)
+npm publish --provenance --access public
+```
+
+Release assets (uploaded to GitHub Release):
+- `n8n-nodes-baramundi-management-solution-<version>.tgz` — the package
+- `n8n-nodes-baramundi-management-solution-<version>.tgz.asc` — GPG detach-signature
+- `sbom.json` — CycloneDX Software Bill of Materials
+
+### 5. Continuous Monitoring — Mend (prepared, not yet active)
+
+Mend (formerly WhiteSource) configuration is committed at `.whitesource`. It activates
+automatically when the Mend GitHub App is installed on the repository. Provides:
+- Reachability analysis (is the vulnerable code path actually called?)
+- License audit trail with policy engine
+- Automated fix PRs for vulnerable dependencies
+- Historical vulnerability trend tracking
+
 ### Project-Specific Security Concerns (n8n bConnect node)
 
 | Risk | Location | Mitigation |
@@ -199,7 +230,9 @@ Findings are classified:
 | SSRF | `Server URL` credential field | Validate URL format; document that only internal BMS URLs should be used |
 | Credential exposure | API request logging | Verify Basic Auth header is never logged by transport layer |
 | SSL bypass | `Ignore SSL Issues` flag | Feature intentional; must be documented as risk-accepted |
-| Dependency chain | `node_modules` | `npm audit` on every push gate, Dependabot alerts enabled |
+| Dependency chain | `node_modules` | `npm audit` + GitHub Dependency Review + license-checker on every push gate; Dependabot alerts enabled; Mend prepared |
+| Unsigned artifacts | npm tarball, GitHub Release | npm provenance (Sigstore) + GPG detach-signature with baramundi certificate |
+| No SBOM | Published package | CycloneDX SBOM generated and attached to every GitHub Release |
 
 ---
 
@@ -218,6 +251,12 @@ npm install -g secretlint @secretlint/secretlint-rule-preset-recommend
 
 # CHANGELOG generation
 npm install -g conventional-changelog-cli
+
+# SBOM generation
+npm install -g @cyclonedx/cyclonedx-npm
+
+# License compliance
+npm install -g license-checker
 ```
 
 ### GitHub Repository Settings
@@ -233,6 +272,8 @@ Should include at minimum on every push to `master`:
 - `npm run type-check`
 - `npm test`
 - `npm audit --audit-level=high`
+- `license-checker --production --failOn` (denied licenses)
+- `actions/dependency-review-action@v4` (on PRs — SCA + license gate)
 
 ---
 

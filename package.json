@@ -52,6 +52,7 @@
     "test:system": "vitest run test/system",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "sbom": "npx @cyclonedx/cyclonedx-npm --output-file sbom.json --spec-version 1.5",
     "prepublishOnly": "npm run build"
   },
   "n8n": {

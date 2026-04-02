@@ -682,6 +682,7 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 | REQ-AUDIT-F2026-05 | `additionalFields` passed to API without field-level validation | LOW | ACCEPTED — server-side validation sufficient |
 | REQ-AUDIT-F2026-06 | Template literal OData interpolation in `job.getInstances()` (GUID-validated, not exploitable) | INFO | NOTED |
 | REQ-AUDIT-F2026-07 | lodash HIGH in n8n-workflow peer dependency (`_.template` not used) | ACCEPTED | ACCEPTED — upstream dependency |
+| REQ-AUDIT-F2026-08 | Silent workflow breakage when switching `bmsVersion` 25R2 → 26R1 | MEDIUM | OPEN — version-mismatch guards needed in router |
 
 ### REQ-AUDIT-F2026-04 — OData Injection in endpoint.search() (HIGH)
 
@@ -713,6 +714,39 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 **Description**: 3 HIGH lodash vulns in `n8n-workflow@2.13.1` peer dependency. `_.template`, `_.unset`, `_.omit` are never called by this connector. Not fixable without upstream n8n update.
 
 **CI monitoring**: `npm audit --omit=dev --audit-level=high` runs in CI. Will flag if new runtime vulns appear.
+
+---
+
+### REQ-AUDIT-F2026-08 — Silent Workflow Breakage on bmsVersion Migration (MEDIUM)
+
+**Status**: OPEN
+
+**Description**: When a customer upgrades their bMS server from 25R2 to 26R1 and changes the `bmsVersion` dropdown, workflows using 25R2-only operations break silently:
+
+1. 25R2-only operations disappear from the n8n UI (`displayOptions` hides them)
+2. The workflow JSON still contains the old operation value
+3. On execution, the router dispatches to the old function which calls a 25R2-only API endpoint
+4. The 26R1 API returns 404/405 with no indication that the version switch caused it
+
+**Affected operations**:
+
+| 25R2 Operation | 26R1 Replacement | Body format change |
+|---|---|---|
+| `replaceEndpointMaintenanceWindow` (PUT) | `updateEndpointMaintenanceWindow` (PATCH) | Full object → JSON Patch array |
+| `replaceGroupMaintenanceWindow` (PUT) | `updateGroupMaintenanceWindow` (PATCH) | Full object → JSON Patch array |
+| Industrial Endpoints CRUD (5 ops) | No equivalent | Operations removed in 26R1 |
+
+**Mitigation (Option B — minimum viable)**: Add version-mismatch guards in the router. When a 25R2-only operation is executed under `bmsVersion: '26R1'`, throw a clear `NodeOperationError` with:
+- What happened: "This operation is only available for bMS 25R2"
+- What to do: "Use 'Update Maintenance Window' (PATCH) instead"
+- Body format note: "The request body changed from full object replacement to JSON Patch"
+
+**Quality**:
+- [ ] Router throws `NodeOperationError` for all 25R2-only operations when `bmsVersion` is `26R1`
+- [ ] Error message names the 26R1 replacement operation (where one exists)
+- [ ] Error message notes body format change for maintenance window ops
+- [ ] Industrial Endpoints error states "not available in 26R1"
+- [ ] Unit test for each version-mismatch guard
 
 ---
 
@@ -1402,3 +1436,69 @@ After merge, the `endpoint` resource has these operations. Each operation that s
 - [ ] Package published to npm registry
 - [ ] Installable from n8n UI node manager
 - [ ] n8n compatibility test: install + use on n8n v1.x LTS
+
+---
+
+## REQ-SEC-SIGN — Artifact Signing & Provenance
+
+**Status**: OPEN
+**Priority**: MUST (v1.0.0 blocker)
+
+**Description**: Every published artifact must be cryptographically signed so consumers can verify authenticity and provenance. Two complementary mechanisms are required:
+
+1. **npm provenance (Sigstore)** — keyless, OIDC-based attestation via GitHub Actions. Produces a Sigstore provenance statement linking the npm tarball to its source commit. Displayed as a "Provenance" badge on npmjs.com. Consumers verify with `npm audit signatures`.
+2. **GPG / baramundi certificate signing** — the `.tgz` tarball distributed via GitHub Release is detach-signed with a baramundi code-signing certificate. Provides corporate-identity verification for enterprise customers who install via file transfer (REQ-PUBLISH-1) rather than npm registry.
+
+**Pre-conditions**:
+- [ ] baramundi code-signing certificate (or GPG key signed by baramundi CA) is available
+- [ ] GitHub Actions workflow has `id-token: write` permission (for Sigstore OIDC)
+- [ ] Signing key is stored as GitHub Actions secret (`GPG_PRIVATE_KEY`, `GPG_PASSPHRASE`)
+
+**Implementation**:
+- `/process-release` adds signing steps between `npm pack` and `npm publish`
+- CI publish job uses `npm publish --provenance --access public`
+- GPG detach-signature (`.asc`) uploaded alongside `.tgz` in GitHub Release assets
+- `INSTALLATION.md` documents signature verification procedure
+
+**Quality**:
+- [ ] `npm publish --provenance` succeeds in GitHub Actions and provenance badge is visible on npmjs.com
+- [ ] `.tgz.asc` signature file is present in every GitHub Release
+- [ ] `gpg --verify <package>.tgz.asc <package>.tgz` succeeds with baramundi certificate
+- [ ] `npm audit signatures` reports no invalid signatures for published package
+- [ ] `INSTALLATION.md` includes verification instructions for both npm provenance and GPG
+
+---
+
+## REQ-SEC-SCA — Software Composition Analysis & SBOM
+
+**Status**: OPEN
+**Priority**: MUST (v1.0.0 blocker)
+
+**Description**: Dependency supply chain security must go beyond `npm audit` to cover license compliance, malicious package detection, and SBOM generation. A two-tier approach:
+
+**Tier 1 — CI pipeline (every push to master)**:
+- **GitHub Dependency Review Action** — blocks PRs/pushes that introduce dependencies with known high/critical vulnerabilities or denied licenses.
+- **License policy** — deny `GPL-3.0-only`, `GPL-3.0-or-later`, `AGPL-3.0-only`, `AGPL-3.0-or-later`, `SSPL-1.0` (incompatible with MIT distribution).
+
+**Tier 2 — Release gate**:
+- **SBOM generation** — CycloneDX format (`sbom.json`) generated via `@cyclonedx/cyclonedx-npm`, attached as GitHub Release asset.
+- **Mend (WhiteSource) integration** — prepared configuration, ready to activate when baramundi Mend organization is provisioned. Provides: reachability analysis, license audit trail, policy engine, automated fix PRs.
+
+**Pre-conditions**:
+- [ ] `@cyclonedx/cyclonedx-npm` available as dev dependency or npx-invokable
+- [ ] GitHub Dependency Review Action added to CI workflow
+- [ ] Mend `.whitesource` configuration file committed (inactive until org provisioned)
+
+**Implementation**:
+- CI workflow: `actions/dependency-review-action@v4` with license deny-list
+- `/process-pr-review`: add license compliance check to security gate
+- `/process-release`: generate SBOM, attach to GitHub Release
+- Mend: `.whitesource` config committed, activates automatically when Mend GitHub App is installed
+
+**Quality**:
+- [ ] CI blocks on introduction of high/critical vulnerability in new dependency
+- [ ] CI blocks on introduction of GPL-3.0, AGPL-3.0, or SSPL-1.0 licensed dependency
+- [ ] `npm run sbom` generates valid CycloneDX JSON
+- [ ] SBOM is attached to GitHub Release as `sbom.json`
+- [ ] `.whitesource` config is valid and ready to activate
+- [ ] Mend scan produces clean report when activated (no high/critical findings in runtime deps)
