@@ -783,7 +783,7 @@ export async function createEndpointMaintenanceWindow(
     ...additionalFields,
   };
 
-  const response = await apiRequest.call(this, 'POST', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindows`, body);
+  const response = await apiRequest.call(this, 'POST', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindow`, body);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
 
@@ -825,9 +825,9 @@ export async function updateEndpointMaintenanceWindow(
     );
   }
 
-  await apiRequest.call(this, 'PATCH', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindows/${windowId}`, patchOperations);
+  await apiRequest.call(this, 'PATCH', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindow/${windowId}`, patchOperations);
 
-  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindows/${windowId}`);
+  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindow/${windowId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
 
@@ -843,7 +843,7 @@ export async function deleteEndpointMaintenanceWindow(
     throw new NodeOperationError(this.getNode(), `Invalid window ID:\n${windowIdValidation.errors.join('\n')}`, { itemIndex: index });
   }
 
-  await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindows/${windowId}`);
+  await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindow/${windowId}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: windowId });
 }
 
@@ -874,7 +874,7 @@ export async function createGroupMaintenanceWindow(
   };
 
   const groupTypePath = groupTypeMap[groupType];
-  const response = await apiRequest.call(this, 'POST', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindows`, body);
+  const response = await apiRequest.call(this, 'POST', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow`, body);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
 
@@ -927,9 +927,9 @@ export async function updateGroupMaintenanceWindow(
   };
 
   const groupTypePath = groupTypeMap[groupType];
-  await apiRequest.call(this, 'PATCH', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindows/${windowId}`, patchOperations);
+  await apiRequest.call(this, 'PATCH', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow/${windowId}`, patchOperations);
 
-  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindows/${windowId}`);
+  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow/${windowId}`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
 
@@ -956,7 +956,7 @@ export async function deleteGroupMaintenanceWindow(
   };
 
   const groupTypePath = groupTypeMap[groupType];
-  await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindows/${windowId}`);
+  await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow/${windowId}`);
   return this.helpers.returnJsonArray({ success: true, deletedId: windowId });
 }
 
@@ -992,7 +992,7 @@ export async function putEndpointMaintenanceWindow(
     throw new Error('maintenanceWindowJson must be a valid JSON object');
   }
 
-  const response = await apiRequest.call(this, 'PUT', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindows/${windowId}`, body);
+  const response = await apiRequest.call(this, 'PUT', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindow/${windowId}`, body);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
 
@@ -1027,7 +1027,7 @@ export async function putGroupMaintenanceWindow(
   }
 
   const groupTypePath = groupTypeMap[groupType];
-  const response = await apiRequest.call(this, 'PUT', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindows/${windowId}`, body);
+  const response = await apiRequest.call(this, 'PUT', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow/${windowId}`, body);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
 

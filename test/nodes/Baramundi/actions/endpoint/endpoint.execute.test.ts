@@ -2939,7 +2939,7 @@ describe('Endpoint Phase 6 - MaintenanceWindow PATCH Operations (26R1)', () => {
       expect(httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
           method: 'PATCH',
-          url: `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindows/${windowId}`,
+          url: `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindow/${windowId}`,
           body: [{ op: 'replace', path: '/enabled', value: true }],
         }),
       );
@@ -2980,7 +2980,7 @@ describe('Endpoint Phase 6 - MaintenanceWindow PATCH Operations (26R1)', () => {
       expect(httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
           method: 'PATCH',
-          url: `/endpoints/v2.0/LogicalGroups/${groupId}/MaintenanceWindows/${windowId}`,
+          url: `/endpoints/v2.0/LogicalGroups/${groupId}/MaintenanceWindow/${windowId}`,
           body: [{ op: 'replace', path: '/enabled', value: false }],
         }),
       );
@@ -3004,7 +3004,7 @@ describe('Endpoint Phase 6 - MaintenanceWindow PATCH Operations (26R1)', () => {
       expect(httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
           method: 'PATCH',
-          url: `/endpoints/v2.0/StaticGroups/${groupId}/MaintenanceWindows/${windowId}`,
+          url: `/endpoints/v2.0/StaticGroups/${groupId}/MaintenanceWindow/${windowId}`,
         }),
       );
     });
