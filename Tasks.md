@@ -383,135 +383,81 @@
 
 ## Phase 11 — Example Workflows for Senior IT Administrators
 
-**Goal**: Replace the two trivial placeholder workflows with a library of production-ready workflow templates that demonstrate real IT automation scenarios. Assess existing workflows for accuracy first, then build the new set.
+**Goal**: Replace the two broken placeholder workflows with production-ready workflow templates that demonstrate real IT automation scenarios for senior IT administrators.
 
-**Current state**: `example-workflows/` has 2 workflows (Jan 2026, day-one placeholders):
-- `01-list-endpoints.json` — manual trigger → getMany endpoints. No practical value.
-- `02-search-and-report.json` — search by "WIN" prefix → reshape. Outdated field names (`DisplayName`, `Id` — V2.0 uses camelCase).
+**Current state**: `example-workflows/` has 2 broken workflows (Jan 2026, pre-Phase 13):
+- `01-list-endpoints.json` — references removed node type `n8n-nodes-baramundi.baramundi`
+- `02-search-and-report.json` — same broken node type + outdated field names
 
-Both are pre-Phase 8 and reference fields that no longer exist. They need to be replaced, not extended.
+Both must be deleted and replaced.
+
+**Node type reference** (Phase 13+):
+- `n8n-nodes-baramundi-management-solution.baramundiEndpoint` — endpoints, groups, maintenance windows
+- `n8n-nodes-baramundi-management-solution.baramundiJob` — job definitions, instances, kiosk
+- `n8n-nodes-baramundi-management-solution.baramundiSecurity` — compliance, defense control
+- `n8n-nodes-baramundi-management-solution.baramundiSoftware` — software, variables, update mgmt
+- `n8n-nodes-baramundi-management-solution.baramundiAdmin` — AD, server management, OS
+- `n8n-nodes-baramundi-management-solution.baramundiAsset` — assets, asset types, folders
+
+**Operation name changes** (Phase 14): `getTypedEndpoints` is gone — use `getMany` with `endpointType: 'windows'` etc.
 
 ### Backlog
 
+| ID | Task | Acceptance Criteria |
+|----|------|---------------------|
+| P11.1 | Delete `01-list-endpoints.json` and `02-search-and-report.json` | Files removed; no references to old `n8n-nodes-baramundi.baramundi` node type remain |
+| P11.2 | Create **`01-patch-cycle.json`** — Patch Tuesday workflow: schedule trigger → get logical groups → set maintenance windows → trigger update job → wait → check results → report success/failure | Valid n8n JSON; imports without error; uses `baramundiEndpoint` (logicalGroup.getMany, maintenanceWindow.putGroupMaintenanceWindow) + `baramundiJob` (jobInstance.startJobInstance, jobInstance.getEndpointJobInstances); includes Code node for summary |
+| P11.3 | Create **`02-job-failure-alert.json`** — Scheduled job failure monitor: schedule (6h) → get all job instances → filter status=Failed → enrich with job definition name → send notification | Valid n8n JSON; uses `baramundiJob` (jobInstance.getAllJobInstances, jobDefinition.get); includes Code node for grouping + notification placeholder |
+| P11.4 | Create **`03-critical-cves.json`** (26R1) — Daily CVE scan: schedule → get detected vulnerabilities → filter critical (CVSS >= 9.0) → enrich with endpoint info → output report | Valid n8n JSON; uses `baramundiSecurity` (compliance.getDetectedVulnerabilities, compliance.getVulnerability) + `baramundiEndpoint` (endpoint.get); `bmsVersion: '26R1'` on security node |
+| P11.5 | Create **`04-stale-endpoint-report.json`** — Monthly stale device report: schedule → get all endpoints → Code node filters lastSeen > 30 days → aggregate by group → output | Valid n8n JSON; uses `baramundiEndpoint` (endpoint.getMany with `endpointType: 'all'`); Code node with date comparison logic; simple and self-contained |
+| P11.6 | Rewrite **`example-workflows/README.md`** — document all 4 workflows: purpose, prerequisites, which bMS version, which credentials, how to adapt GUIDs and schedules | README covers all workflows; includes prerequisites section (credentials, bMS version); includes "How to import" instructions |
+
+### Deferred (future phase)
+
 | ID | Task | Priority |
 |----|------|----------|
-| P11E.1 | Audit existing 2 workflows — fix field names or delete | HIGH |
-| P11E.2 | Create workflow: **Endpoint Compliance Report** — get all endpoints, check compliance status (26R1), output CSV/table for weekly review | HIGH |
-| P11E.3 | Create workflow: **Job Failure Alert** — scheduled trigger, query job instances with status=Failed, send summary notification (email/Teams/Slack) | HIGH |
-| P11E.4 | Create workflow: **New Endpoint Onboarding** — webhook trigger on enrollment, add to logical group, set standard variables, execute baseline job | HIGH |
-| P11E.5 | Create workflow: **Vulnerability Scan Cycle** — trigger VA job per group, wait, query fresh CVE detections + rule violations, deliver prioritised remediation report with escalation gate | HIGH |
-| P11E.5b | Create workflow: **Stale Endpoint Report** — find endpoints with no contact in 30+ days, generate report for IT review | MEDIUM |
-| P11E.6 | Create workflow: **Software License Audit** — get all installed software across fleet, aggregate by publisher, compare against licensed list | MEDIUM |
-| P11E.7 | Create workflow: **Security Incident Response** — scheduled scan for active Defender threats, enrich with endpoint details, create ticket / send alert | MEDIUM |
-| P11E.8 | Create workflow: **Patch Compliance Dashboard** — query update management status, group by patch level, output summary for management reporting | MEDIUM |
-| P11E.9 | Create workflow: **BitLocker Key Retrieval** — form-triggered, retrieve recovery key for specific endpoint, log access for audit trail | LOW |
-| P11E.10 | Create workflow: **Maintenance Window Scheduler** — read schedule from Google Sheets / external source, set maintenance windows on endpoint groups | LOW |
-| P11E.11 | Update `example-workflows/README.md` — document all workflows, prerequisites, how to adapt credentials and IDs | HIGH |
+| P11D.1 | Vulnerability Scan Cycle workflow (end-to-end: trigger VA job → wait → query CVEs → report) | MEDIUM |
+| P11D.2 | New Endpoint Onboarding workflow (poll for new endpoints → assign group → set variables → run job) | MEDIUM |
+| P11D.3 | Software License Audit workflow (get installed software → aggregate → compare against license list) | MEDIUM |
+| P11D.4 | Security Incident Response workflow (scan Defender threats → enrich → create ticket) | MEDIUM |
+| P11D.5 | Patch Compliance Dashboard workflow (update management status → group by patch level → report) | MEDIUM |
+| P11D.6 | BitLocker Key Retrieval workflow (form trigger → retrieve key → audit log) | LOW |
+| P11D.7 | Maintenance Window Scheduler workflow (external calendar → set windows on groups) | LOW |
 
-### Suggested Workflow Details
+### Workflow Design Notes
 
-**P11E.2 — Windows Patch Cycle** ⭐
-The end-to-end monthly/patch-Tuesday workflow. Sets maintenance windows on all Windows endpoint groups, triggers the update job, monitors execution, and produces a completion report.
+**01-patch-cycle.json** (P11.2)
+1. Schedule Trigger (e.g. 2nd Tuesday, 22:00)
+2. `baramundiEndpoint` → resource: logicalGroup, operation: getMany (returnAll)
+3. `baramundiEndpoint` → resource: maintenanceWindow, operation: putGroupMaintenanceWindow (for each group)
+4. `baramundiJob` → resource: jobInstance, operation: startJobInstance (Windows Update job def ID)
+5. Wait node (4h)
+6. `baramundiJob` → resource: jobInstance, operation: getEndpointJobInstances (per group)
+7. Code node — count succeeded/failed/pending per group
+8. Notification placeholder — HTML summary
 
-Steps:
-1. **Trigger**: Schedule node (e.g. Patch Tuesday — 2nd Tuesday of month, 22:00)
-2. **Get target groups**: `endpoint.getLogicalGroups` — fetch all groups tagged for patching
-3. **Set maintenance windows**: `endpoint.updateGroupMaintenanceWindow` (or `putGroupMaintenanceWindow` for full replace) — set start/end window per group
-4. **Trigger patch job**: `job.startJobInstance` — start the configured Windows Update job definition for each group
-5. **Wait**: n8n Wait node (e.g. 4 hours)
-6. **Check job results**: `job.getEndpointJobInstances` — get instance status per endpoint
-7. **Summarise**: Code node — count succeeded/failed/pending per group
-8. **Report**: Send HTML email or Teams message — "Patch cycle complete: 247 succeeded, 3 failed"
-9. **On failure**: Filter failed instances → `endpoint.get` for hostname/IP → escalation alert
+**02-job-failure-alert.json** (P11.3)
+1. Schedule Trigger (every 6h)
+2. `baramundiJob` → resource: jobInstance, operation: getAllJobInstances (returnAll)
+3. Code node — filter status=Failed in last 24h, group by jobDefinitionId
+4. `baramundiJob` → resource: jobDefinition, operation: get (enrich with job name)
+5. Notification placeholder — failure count + job names
 
-Key operations: `endpoint.getLogicalGroups`, `endpoint.putGroupMaintenanceWindow`, `job.startJobInstance`, `job.getEndpointJobInstances`, `job.getJobInstance`
+**03-critical-cves.json** (P11.4, 26R1 only)
+1. Schedule Trigger (daily 06:00)
+2. `baramundiSecurity` → resource: compliance, operation: getDetectedVulnerabilities (returnAll)
+3. Code node — filter severity=Critical or cvssScore >= 9.0
+4. `baramundiSecurity` → resource: compliance, operation: getVulnerability (per CVE ID)
+5. `baramundiEndpoint` → resource: endpoint, operation: get (enrich with hostname/group)
+6. Code node — deduplicate, sort by CVSS desc
+7. Notification placeholder — prioritised remediation table
 
----
-
-**P11E.3 — Windows Devices with Patch Problems** ⭐
-Identifies endpoints where the last patch job failed or never ran. Gives the IT team an actionable list before the next patch cycle.
-
-Steps:
-1. **Trigger**: Schedule (daily 07:00, or manually before patch review meeting)
-2. **Get all Windows endpoints**: `endpoint.getTypedEndpoints` (platformType: windows, returnAll)
-3. **Get recent job instances**: `job.getAllJobInstances` — filter to Windows Update job definition, last 30 days
-4. **Join**: Code node — for each endpoint, find its latest update job instance; flag endpoints with status=Failed, status=Stopped, or no instance in 30 days
-5. **Enrich failures**: `job.getJobInstance` — get error detail for failed instances
-6. **Group by failure type**: Code node — categorise by error code / failure reason
-7. **Output**: Spreadsheet rows or HTML table — endpoint name, last patch attempt, status, error, responsible group
-
-Key operations: `endpoint.getTypedEndpoints`, `job.getAllJobInstances`, `job.getJobInstance`, `job.getEndpointJobInstances`
-
----
-
-**P11E.4 — Windows Devices with Critical CVEs** ⭐ (26R1 only)
-Daily scan for endpoints with detected critical vulnerabilities. Produces a prioritised remediation list for the security team.
-
-Steps:
-1. **Trigger**: Schedule (daily 06:00)
-2. **Get all detected vulnerabilities**: `compliance.getDetectedVulnerabilities` (returnAll) — all active CVE detections
-3. **Filter critical**: Code node — keep only entries where `severity = Critical` or `cvssScore >= 9.0`
-4. **Get per-endpoint detail**: `compliance.getDetectedVulnerabilitiesByEndpoint` for each affected endpoint ID — full CVE list per machine
-5. **Enrich with endpoint info**: `endpoint.get` — hostname, primary user, logical group
-6. **Enrich with CVE details**: `compliance.getVulnerability` — CVE description, affected software, patch availability
-7. **Deduplicate and rank**: Code node — sort by CVSS score desc, deduplicate endpoints
-8. **Output**: Send to security team — table of endpoint / CVE / score / patch available / responsible group
-9. **Optional escalation**: If any endpoint has CVSS ≥ 9.5 and no patch available → immediate alert
-
-Key operations: `compliance.getDetectedVulnerabilities`, `compliance.getDetectedVulnerabilitiesByEndpoint`, `compliance.getVulnerability`, `endpoint.get`
-
----
-
-**P11E.5 — Vulnerability Scan Cycle** ⭐ (26R1 only)
-End-to-end automated vulnerability assessment: triggers the baramundi Vulnerability Assessment job across all endpoint groups, waits for completion, queries the fresh CVE results, and delivers a prioritised remediation report — all without manual console interaction.
-
-Steps:
-1. **Trigger**: Schedule node (weekly, e.g. Sunday 01:00) or manual trigger before security review
-2. **Get target groups**: `endpoint.getLogicalGroups` (returnAll) — fetch all groups in scope for scanning
-3. **Assign and start scan job**: For each group → `job.assignJobToLogicalGroup` (Vulnerability Assessment job definition ID) → `job.startJobInstance` — kick off the scan job per group
-4. **Wait for completion**: n8n Wait node (e.g. 2 hours) — allow scan to complete across fleet
-5. **Verify job results**: `job.getJobInstancesByLogicalGroup` per group — confirm all instances reached status=Succeeded or flag any failures
-6. **Query fresh CVE detections**: `compliance.getDetectedVulnerabilities` (returnAll) — all currently detected CVEs after the scan
-7. **Query rule violations**: `compliance.getDetectedRuleViolations` (returnAll) — compliance policy breaches detected alongside CVEs
-8. **Enrich with CVE details**: `compliance.getVulnerability` for each unique CVE ID — description, CVSS score, affected component, patch availability
-9. **Per-endpoint breakdown**: `compliance.getDetectedVulnerabilitiesByEndpoint` for top offenders — full exposure list per machine
-10. **Enrich with endpoint info**: `endpoint.get` — hostname, primary user, logical group, last contact
-11. **Prioritise**: Code node — rank by CVSS score desc, group by: Critical (≥9.0) / High (7.0–8.9) / Medium / Low
-12. **Report**: Send structured report to security team:
-    - Summary: total endpoints scanned, % with critical CVEs, new vs previously known
-    - Critical CVE table: CVE ID / CVSS / affected endpoints / patch available
-    - Top 10 most exposed endpoints
-    - Compliance rule violation summary
-13. **Escalation gate**: If any new Critical CVE (CVSS ≥ 9.0) detected since last run → immediate alert to security lead
-
-Key operations: `endpoint.getLogicalGroups`, `job.assignJobToLogicalGroup`, `job.startJobInstance`, `job.getJobInstancesByLogicalGroup`, `compliance.getDetectedVulnerabilities`, `compliance.getDetectedRuleViolations`, `compliance.getVulnerability`, `compliance.getDetectedVulnerabilitiesByEndpoint`, `endpoint.get`
-
-Note: Requires knowing the Vulnerability Assessment job definition ID (read once via `job.getJobs` filtered by name, store as workflow variable).
-
----
-
-**P11E.6 — Job Failure Alert**
-Uses: `job.getAllJobInstances` (filter status=Failed, last 24h) → group by jobDefinitionId → `job.getJob` to get job names → Notification node.
-Trigger: Schedule (every 6h). Output: Teams/Slack message with failure count + job names.
-
-**P11E.6 — New Endpoint Onboarding**
-Uses: Schedule poll (every 15min) → `endpoint.getTypedEndpoints` (filter created in last 15min) → `endpoint.updateStaticGroup` membership → `variable.updateVariableInstance` to set asset owner, cost center → `job.startJobInstance` to run onboarding job.
-
-**P11E.7 — Stale Endpoint Report**
-Uses: `endpoint.getTypedEndpoints` (returnAll) → Code node filter `lastContact < now-30days` → aggregate by logical group → send report.
-Trigger: Schedule (monthly). Output: Email with list of stale endpoints + last contact date.
-
-**P11E.8 — Software License Audit**
-Uses: `software.getInstalledWindowsSoftware` (returnAll) → Code node aggregate by `publisher`+`displayName` → count installs → compare against license sheet → flag over/under-licensed products.
-Trigger: Schedule (monthly). Output: Spreadsheet with install counts vs license entitlements.
-
-**P11E.9 — BitLocker Key Retrieval**
-Uses: n8n Form trigger (IT helpdesk requests key) → `asset.getBitLockerSecret` → return key to requester → write audit log entry (date, requester, endpoint).
-Note: Security-critical — add approval step before returning key.
-
-**P11E.10 — Maintenance Window Scheduler (external calendar)**
-Uses: Google Sheets / HTTP Request to fetch maintenance schedule → `endpoint.getLogicalGroups` → `endpoint.putGroupMaintenanceWindow` per group.
-Trigger: Schedule (weekly, before patch Tuesday).
+**04-stale-endpoint-report.json** (P11.5)
+1. Schedule Trigger (monthly, 1st Monday 08:00)
+2. `baramundiEndpoint` → resource: endpoint, operation: getMany (returnAll, endpointType: all)
+3. Code node — filter items where `lastSeen < now - 30 days`
+4. Code node — aggregate by logicalGroupId, count per group
+5. Notification placeholder — stale endpoint list with last contact date
 
 ### Done
 
