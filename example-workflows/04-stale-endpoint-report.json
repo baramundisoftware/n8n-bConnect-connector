@@ -1,5 +1,5 @@
 {
-  "name": "Baramundi — Stale Endpoint Report",
+  "name": "Baramundi \u2014 Stale Endpoint Report",
   "nodes": [
     {
       "parameters": {},
@@ -7,7 +7,10 @@
       "name": "Test Workflow",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -24,7 +27,10 @@
       "name": "Monthly (1st Monday 08:00)",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [200, 460],
+      "position": [
+        200,
+        460
+      ],
       "notes": "Fires on the first Monday of each month at 08:00."
     },
     {
@@ -39,13 +45,10 @@
       "name": "Get All Endpoints",
       "type": "n8n-nodes-baramundi-management-solution.baramundiEndpoint",
       "typeVersion": 1,
-      "position": [420, 300],
-      "credentials": {
-        "bconnectApi": {
-          "id": "1",
-          "name": "baramundi bConnect API"
-        }
-      }
+      "position": [
+        420,
+        300
+      ]
     },
     {
       "parameters": {
@@ -55,18 +58,28 @@
       "name": "Filter Stale (30+ days)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [640, 300]
+      "position": [
+        640,
+        300
+      ]
     },
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
           "conditions": [
             {
               "id": "has-stale",
               "leftValue": "={{ $json.hasStale }}",
               "rightValue": true,
-              "operator": { "type": "boolean", "operation": "equals" }
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
             }
           ],
           "combinator": "and"
@@ -76,7 +89,10 @@
       "name": "Any Stale?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [860, 300]
+      "position": [
+        860,
+        300
+      ]
     },
     {
       "parameters": {
@@ -86,34 +102,84 @@
       "name": "Aggregate by Group",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1080, 200]
+      "position": [
+        1080,
+        200
+      ]
     },
     {
       "parameters": {},
       "id": "no-op",
-      "name": "All Endpoints Active — Done",
+      "name": "All Endpoints Active \u2014 Done",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
-      "position": [1080, 400]
+      "position": [
+        1080,
+        400
+      ]
     }
   ],
   "connections": {
     "Test Workflow": {
-      "main": [[{ "node": "Get All Endpoints", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Get All Endpoints",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Monthly (1st Monday 08:00)": {
-      "main": [[{ "node": "Get All Endpoints", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Get All Endpoints",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Get All Endpoints": {
-      "main": [[{ "node": "Filter Stale (30+ days)", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Filter Stale (30+ days)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Filter Stale (30+ days)": {
-      "main": [[{ "node": "Any Stale?", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Any Stale?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Any Stale?": {
       "main": [
-        [{ "node": "Aggregate by Group", "type": "main", "index": 0 }],
-        [{ "node": "All Endpoints Active — Done", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Aggregate by Group",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "All Endpoints Active \u2014 Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },

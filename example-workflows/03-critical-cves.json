@@ -1,5 +1,5 @@
 {
-  "name": "Baramundi — Critical CVE Report (26R1)",
+  "name": "Baramundi \u2014 Critical CVE Report (26R1)",
   "nodes": [
     {
       "parameters": {},
@@ -7,7 +7,10 @@
       "name": "Test Workflow",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -24,7 +27,10 @@
       "name": "Daily 06:00",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [200, 460]
+      "position": [
+        200,
+        460
+      ]
     },
     {
       "parameters": {
@@ -38,13 +44,10 @@
       "name": "Get All Detected Vulnerabilities",
       "type": "n8n-nodes-baramundi-management-solution.baramundiSecurity",
       "typeVersion": 1,
-      "position": [420, 300],
-      "credentials": {
-        "bconnectApi": {
-          "id": "1",
-          "name": "baramundi bConnect API"
-        }
-      }
+      "position": [
+        420,
+        300
+      ]
     },
     {
       "parameters": {
@@ -57,13 +60,10 @@
       "name": "Get CVE Details",
       "type": "n8n-nodes-baramundi-management-solution.baramundiSecurity",
       "typeVersion": 1,
-      "position": [640, 300],
-      "credentials": {
-        "bconnectApi": {
-          "id": "1",
-          "name": "baramundi bConnect API"
-        }
-      }
+      "position": [
+        640,
+        300
+      ]
     },
     {
       "parameters": {
@@ -73,7 +73,10 @@
       "name": "Merge Detection + CVE Data",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [860, 300]
+      "position": [
+        860,
+        300
+      ]
     },
     {
       "parameters": {
@@ -83,18 +86,28 @@
       "name": "Filter Critical (CVSS >= 9.0)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1080, 300]
+      "position": [
+        1080,
+        300
+      ]
     },
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
           "conditions": [
             {
               "id": "has-critical",
               "leftValue": "={{ $json.hasCritical }}",
               "rightValue": true,
-              "operator": { "type": "boolean", "operation": "equals" }
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
             }
           ],
           "combinator": "and"
@@ -104,7 +117,10 @@
       "name": "Any Critical?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [1300, 300]
+      "position": [
+        1300,
+        300
+      ]
     },
     {
       "parameters": {
@@ -121,13 +137,10 @@
       "name": "Get Endpoint Info",
       "type": "n8n-nodes-baramundi-management-solution.baramundiEndpoint",
       "typeVersion": 1,
-      "position": [1520, 200],
-      "credentials": {
-        "bconnectApi": {
-          "id": "1",
-          "name": "baramundi bConnect API"
-        }
-      }
+      "position": [
+        1520,
+        200
+      ]
     },
     {
       "parameters": {
@@ -137,44 +150,118 @@
       "name": "Build Remediation Report",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1740, 200]
+      "position": [
+        1740,
+        200
+      ]
     },
     {
       "parameters": {},
       "id": "no-op",
-      "name": "No Critical CVEs — Done",
+      "name": "No Critical CVEs \u2014 Done",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
-      "position": [1520, 400]
+      "position": [
+        1520,
+        400
+      ]
     }
   ],
   "connections": {
     "Test Workflow": {
-      "main": [[{ "node": "Get All Detected Vulnerabilities", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Get All Detected Vulnerabilities",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Daily 06:00": {
-      "main": [[{ "node": "Get All Detected Vulnerabilities", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Get All Detected Vulnerabilities",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Get All Detected Vulnerabilities": {
-      "main": [[{ "node": "Get CVE Details", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Get CVE Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Get CVE Details": {
-      "main": [[{ "node": "Merge Detection + CVE Data", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Merge Detection + CVE Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Merge Detection + CVE Data": {
-      "main": [[{ "node": "Filter Critical (CVSS >= 9.0)", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Filter Critical (CVSS >= 9.0)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Filter Critical (CVSS >= 9.0)": {
-      "main": [[{ "node": "Any Critical?", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Any Critical?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Any Critical?": {
       "main": [
-        [{ "node": "Get Endpoint Info", "type": "main", "index": 0 }],
-        [{ "node": "No Critical CVEs — Done", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Get Endpoint Info",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Critical CVEs \u2014 Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Get Endpoint Info": {
-      "main": [[{ "node": "Build Remediation Report", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Build Remediation Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {

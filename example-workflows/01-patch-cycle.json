@@ -1,5 +1,5 @@
 {
-  "name": "Baramundi — Patch Tuesday Cycle",
+  "name": "Baramundi \u2014 Patch Tuesday Cycle",
   "nodes": [
     {
       "parameters": {},
@@ -7,7 +7,10 @@
       "name": "Test Workflow",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -24,7 +27,10 @@
       "name": "Patch Tuesday 22:00",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [200, 460],
+      "position": [
+        200,
+        460
+      ],
       "notes": "Fires on the 2nd Tuesday of each month at 22:00. Adjust the cron expression for your patch window."
     },
     {
@@ -37,13 +43,10 @@
       "name": "Get Logical Groups",
       "type": "n8n-nodes-baramundi-management-solution.baramundiEndpoint",
       "typeVersion": 1,
-      "position": [420, 300],
-      "credentials": {
-        "bconnectApi": {
-          "id": "1",
-          "name": "baramundi bConnect API"
-        }
-      }
+      "position": [
+        420,
+        300
+      ]
     },
     {
       "parameters": {
@@ -57,23 +60,20 @@
       "name": "Set Maintenance Window",
       "type": "n8n-nodes-baramundi-management-solution.baramundiEndpoint",
       "typeVersion": 1,
-      "position": [640, 300],
-      "credentials": {
-        "bconnectApi": {
-          "id": "1",
-          "name": "baramundi bConnect API"
-        }
-      },
+      "position": [
+        640,
+        300
+      ],
       "notes": "Sets a 6-hour maintenance window per group. Adjust startTime/endTime for your schedule."
     },
     {
       "parameters": {
-        "resource": "jobInstance",
-        "operation": "startJobInstance",
+        "resource": "jobDefinition",
+        "operation": "execute",
         "jobId": {
           "__rl": true,
           "mode": "id",
-          "value": "YOUR-WINDOWS-UPDATE-JOB-DEFINITION-GUID"
+          "value": "bb000001-0001-0001-0001-000000000002"
         },
         "endpointIds": "={{ $json.id }}"
       },
@@ -81,14 +81,11 @@
       "name": "Trigger Update Job",
       "type": "n8n-nodes-baramundi-management-solution.baramundiJob",
       "typeVersion": 1,
-      "position": [860, 300],
-      "credentials": {
-        "bconnectApi": {
-          "id": "1",
-          "name": "baramundi bConnect API"
-        }
-      },
-      "notes": "Replace YOUR-WINDOWS-UPDATE-JOB-DEFINITION-GUID with your actual Windows Update job definition ID."
+      "position": [
+        860,
+        300
+      ],
+      "notes": "Executes 'Windows Update - Critical Patches' job on each group's endpoints. Replace the Job ID with your actual Windows Update job definition GUID."
     },
     {
       "parameters": {
@@ -99,16 +96,19 @@
       "name": "Wait 4 Hours",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
-      "position": [1080, 300]
+      "position": [
+        1080,
+        300
+      ]
     },
     {
       "parameters": {
-        "resource": "jobDefinition",
+        "resource": "jobInstance",
         "operation": "getInstances",
         "jobId": {
           "__rl": true,
           "mode": "id",
-          "value": "YOUR-WINDOWS-UPDATE-JOB-DEFINITION-GUID"
+          "value": "bb000001-0001-0001-0001-000000000002"
         },
         "returnAll": false,
         "limit": 500
@@ -117,14 +117,11 @@
       "name": "Get Job Results (by Job Def)",
       "type": "n8n-nodes-baramundi-management-solution.baramundiJob",
       "typeVersion": 1,
-      "position": [1300, 300],
-      "credentials": {
-        "bconnectApi": {
-          "id": "1",
-          "name": "baramundi bConnect API"
-        }
-      },
-      "notes": "Fetches only instances of YOUR patch job — not all jobs in the system. Replace the GUID with the same job definition ID used in 'Trigger Update Job'."
+      "position": [
+        1300,
+        300
+      ],
+      "notes": "Fetches only instances of YOUR patch job \u2014 not all jobs in the system. Replace the GUID with the same job definition ID used in 'Trigger Update Job'."
     },
     {
       "parameters": {
@@ -134,48 +131,118 @@
       "name": "Build HTML Report",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1520, 300]
+      "position": [
+        1520,
+        300
+      ]
     },
     {
       "parameters": {
         "fromEmail": "n8n@company.com",
         "toEmail": "it-ops@company.com",
-        "subject": "=Patch Tuesday Report — {{ $json.failed > 0 ? $json.failed + ' failures' : 'All succeeded' }}",
+        "subject": "=Patch Tuesday Report \u2014 {{ $json.failed > 0 ? $json.failed + ' failures' : 'All succeeded' }}",
         "html": "={{ $json.html }}"
       },
       "id": "send-email",
       "name": "Send Report Email",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
-      "position": [1740, 300],
+      "position": [
+        1740,
+        300
+      ],
       "notes": "Configure your SMTP credentials. Or replace with Microsoft Teams / Slack node.",
       "disabled": true
     }
   ],
   "connections": {
     "Test Workflow": {
-      "main": [[{ "node": "Get Logical Groups", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Get Logical Groups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Patch Tuesday 22:00": {
-      "main": [[{ "node": "Get Logical Groups", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Get Logical Groups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Get Logical Groups": {
-      "main": [[{ "node": "Set Maintenance Window", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Set Maintenance Window",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Set Maintenance Window": {
-      "main": [[{ "node": "Trigger Update Job", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Trigger Update Job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Trigger Update Job": {
-      "main": [[{ "node": "Wait 4 Hours", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Wait 4 Hours",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Wait 4 Hours": {
-      "main": [[{ "node": "Get Job Results (by Job Def)", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Get Job Results (by Job Def)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Get Job Results (by Job Def)": {
-      "main": [[{ "node": "Build HTML Report", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Build HTML Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Build HTML Report": {
-      "main": [[{ "node": "Send Report Email", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Send Report Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {

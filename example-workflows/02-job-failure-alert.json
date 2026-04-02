@@ -1,5 +1,5 @@
 {
-  "name": "Baramundi — Job Failure Alert",
+  "name": "Baramundi \u2014 Job Failure Alert",
   "nodes": [
     {
       "parameters": {},
@@ -7,7 +7,10 @@
       "name": "Test Workflow",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -24,7 +27,10 @@
       "name": "Every 6 Hours",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [200, 460]
+      "position": [
+        200,
+        460
+      ]
     },
     {
       "parameters": {
@@ -37,13 +43,10 @@
       "name": "Get All Job Instances",
       "type": "n8n-nodes-baramundi-management-solution.baramundiJob",
       "typeVersion": 1,
-      "position": [420, 300],
-      "credentials": {
-        "bconnectApi": {
-          "id": "1",
-          "name": "baramundi bConnect API"
-        }
-      }
+      "position": [
+        420,
+        300
+      ]
     },
     {
       "parameters": {
@@ -53,18 +56,28 @@
       "name": "Filter Failed (24h)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [640, 300]
+      "position": [
+        640,
+        300
+      ]
     },
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
           "conditions": [
             {
               "id": "has-failures",
               "leftValue": "={{ $json.hasFailures }}",
               "rightValue": true,
-              "operator": { "type": "boolean", "operation": "equals" }
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
             }
           ],
           "combinator": "and"
@@ -74,7 +87,10 @@
       "name": "Any Failures?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [860, 300]
+      "position": [
+        860,
+        300
+      ]
     },
     {
       "parameters": {
@@ -90,54 +106,109 @@
       "name": "Get Job Definition Name",
       "type": "n8n-nodes-baramundi-management-solution.baramundiJob",
       "typeVersion": 1,
-      "position": [1080, 200],
-      "credentials": {
-        "bconnectApi": {
-          "id": "1",
-          "name": "baramundi bConnect API"
-        }
-      }
+      "position": [
+        1080,
+        200
+      ]
     },
     {
       "parameters": {
-        "jsCode": "// Build notification message\nconst items = $input.all();\nconst totalFailures = items.reduce((sum, i) => sum + (i.json.count || 0), 0);\nconst lines = items.map(i => `• ${i.json.name || i.json.jobDefinitionId}: ${i.json.count} failure(s)`);\n\nconst message = `🚨 *Job Failure Alert*\\n${totalFailures} failed job instance(s) in the last 24 hours:\\n\\n${lines.join('\\n')}`;\n\nreturn [{ json: { message, totalFailures } }];"
+        "jsCode": "// Build notification message\nconst items = $input.all();\nconst totalFailures = items.reduce((sum, i) => sum + (i.json.count || 0), 0);\nconst lines = items.map(i => `\u2022 ${i.json.name || i.json.jobDefinitionId}: ${i.json.count} failure(s)`);\n\nconst message = `\ud83d\udea8 *Job Failure Alert*\\n${totalFailures} failed job instance(s) in the last 24 hours:\\n\\n${lines.join('\\n')}`;\n\nreturn [{ json: { message, totalFailures } }];"
       },
       "id": "format-message",
       "name": "Format Notification",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1300, 200]
+      "position": [
+        1300,
+        200
+      ]
     },
     {
       "parameters": {},
       "id": "no-op",
-      "name": "No Failures — Done",
+      "name": "No Failures \u2014 Done",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
-      "position": [1080, 400]
+      "position": [
+        1080,
+        400
+      ]
     }
   ],
   "connections": {
     "Test Workflow": {
-      "main": [[{ "node": "Get All Job Instances", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Get All Job Instances",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Every 6 Hours": {
-      "main": [[{ "node": "Get All Job Instances", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Get All Job Instances",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Get All Job Instances": {
-      "main": [[{ "node": "Filter Failed (24h)", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Filter Failed (24h)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Filter Failed (24h)": {
-      "main": [[{ "node": "Any Failures?", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Any Failures?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Any Failures?": {
       "main": [
-        [{ "node": "Get Job Definition Name", "type": "main", "index": 0 }],
-        [{ "node": "No Failures — Done", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Get Job Definition Name",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Failures \u2014 Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Get Job Definition Name": {
-      "main": [[{ "node": "Format Notification", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Format Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
