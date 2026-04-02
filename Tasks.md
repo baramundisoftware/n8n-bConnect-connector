@@ -631,11 +631,11 @@ Trigger: Schedule (weekly, before patch Tuesday).
 |----|------|----------|-------|
 | ~~P13.1~~ | ~~**Create shared infrastructure**~~ | ~~HIGH~~ | ~~Moved to Done~~ |
 | ~~P13.2~~ | ~~**Create BaramundiEndpoint node**~~ | ~~HIGH~~ | ~~Moved to Done~~ |
-| P13.3 | **Create BaramundiAsset node** | HIGH | `baramundiAsset` — 3 resources (asset, assetType, assetFolder), ~43 ops. Move `actions/asset/`. Version-specific ops: asset has 25R2/26R1 variants. No LoadOptions. |
-| P13.4 | **Create BaramundiJob node** | HIGH | `baramundiJob` — 4 resources (jobDefinition, jobFolder, jobInstance, kioskRelease), ~37 ops. Move `actions/job/`. LoadOptions: getJobDefinitions. Skip dead `job` resource cases from router. |
-| P13.5 | **Create BaramundiSoftware node** | HIGH | `baramundiSoftware` — 5 resources (software, softwareBundle, updateManagement, variable, universalDynamicGroups), ~56 ops. Move `actions/software/`, `universalDynamicGroups/`, `updateManagement/`, `variable/`. Version-specific: software has 25R2/26R1 variants. `universalDynamicGroups` is 26R1+ only. |
-| P13.6 | **Create BaramundiAdmin node** | HIGH | `baramundiAdmin` — 7 resources (adUser, adGroup, adObject, orgUnit, serverManagement, microservice, operatingSystem), ~60 ops. Move `actions/activeDirectory/`, `operatingSystem/`. Copy `actions/serverManagement/` (shared with Security node). LoadOptions: getOrgUnits. Skip dead `activeDirectory` resource cases. |
-| P13.7 | **Create BaramundiSecurity node** | HIGH | `baramundiSecurity` — 3 resources (bmsecurity, compliance, defenseControl), ~33 ops. Move `actions/compliance/`, `actions/defenseControl/`. Copy `serverManagement/` module for bmsecurity handlers. `compliance` is 26R1+ only. |
+| ~~P13.3~~ | ~~**Create BaramundiAsset node**~~ | ~~HIGH~~ | ~~Moved to Done~~ |
+| ~~P13.4~~ | ~~**Create BaramundiJob node**~~ | ~~HIGH~~ | ~~Moved to Done~~ |
+| ~~P13.5~~ | ~~**Create BaramundiSoftware node**~~ | ~~HIGH~~ | ~~Moved to Done~~ |
+| ~~P13.6~~ | ~~**Create BaramundiAdmin node**~~ | ~~HIGH~~ | ~~Moved to Done~~ |
+| ~~P13.7~~ | ~~**Create BaramundiSecurity node**~~ | ~~HIGH~~ | ~~Moved to Done~~ |
 | P13.8 | **Update package.json and remove old node** | HIGH | Register 6 nodes in `n8n.nodes[]`, remove `Baramundi.node.js`. Delete `nodes/Baramundi/` entirely. `npm run build` + `npm test`. |
 | P13.9 | **Update tests** | HIGH | Move/update test files to match new node dirs. Update all import paths to new locations and shared utils. `npm test` — all pass. |
 | P13.10 | **Documentation and version bump** | HIGH | Update CHANGELOG.md, SDLC-PIPELINE.md. Bump version to 0.6.0. |
@@ -655,7 +655,12 @@ Trigger: Schedule (weekly, before patch Tuesday).
 | ID | Task | Completed |
 |----|------|-----------|
 | P13.1 | Create shared infrastructure — moved transport, utils, errorMessages, types, validation to `nodes/shared/`. Extracted 7 loadOptions into `nodes/shared/loadOptions.ts` with DRY helper. `tsc --noEmit` 0 errors, 550 tests pass. | 2026-04-02 |
-| P13.2 | Create BaramundiEndpoint node — 6 resources (endpoint, logicalGroup, staticGroup, dynamicGroup, maintenanceWindow, typedEndpoint), ~92 ops. Mini-router, LoadOptions, version-specific ops. `tsc --noEmit` 0 errors, 550 tests pass. | 2026-04-02 |
+| P13.2 | Create BaramundiEndpoint node — 6 resources, ~92 ops. Mini-router, LoadOptions, version-specific ops. | 2026-04-02 |
+| P13.3 | Create BaramundiAsset node — 3 resources (asset, assetType, assetFolder), ~43 ops. | 2026-04-02 |
+| P13.4 | Create BaramundiJob node — 4 resources (jobDefinition, jobFolder, jobInstance, kioskRelease), ~37 ops. | 2026-04-02 |
+| P13.5 | Create BaramundiSoftware node — 5 resources (software, softwareBundle, updateManagement, variable, universalDynamicGroups), ~56 ops. | 2026-04-02 |
+| P13.6 | Create BaramundiAdmin node — 7 resources (adUser, adGroup, adObject, orgUnit, serverManagement, microservice, operatingSystem), ~60 ops. | 2026-04-02 |
+| P13.7 | Create BaramundiSecurity node — 3 resources (bmsecurity, compliance, defenseControl), ~33 ops. | 2026-04-02 |
 
 ---
 
