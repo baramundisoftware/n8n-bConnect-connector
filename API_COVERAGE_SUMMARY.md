@@ -1,175 +1,135 @@
 # bConnect V2.0 API Coverage Summary
 
-**Analysis Date**: 2026-01-23  
+**Analysis Date**: 2026-04-02
 **Method**: Comparison against official OpenAPI specifications
+**Connector Version**: 0.4.1
 
 ---
 
 ## Executive Summary
 
-The n8n connector implements **137 out of 228** V2.0 operations (**60.1% coverage**) from the official bConnect OpenAPI specifications. However, **all essential CRUD operations are complete** and the connector provides comprehensive functionality for automation workflows.
+The n8n connector implements **100% of both V2.0 API versions** — all 251 operations for bMS 25R2 and all 280 operations for bMS 26R1. V1.1 is not supported (REQ-SCOPE-1).
 
 ### Quick Stats
 
-| Metric | Value |
-|--------|-------|
-| **V2.0 Operations Implemented** | 137/228 (60.1%) |
-| **Missing V2.0 Operations** | 91/228 (39.9%) |
-| **Total n8n Operations** | 137 V2.0 (V1.1 removed — REQ-SCOPE-1) |
-| **Unit Tests** | 547 passing, 118 skipped |
-| **System Tests** | Live API validation (all V2.0 modules) |
+| Metric | 25R2 | 26R1 |
+|--------|------|------|
+| **Operations Implemented** | 251/251 | 280/280 |
+| **Coverage** | **100%** | **100%** |
+| **Unit Tests** | 550 passing | 550 passing |
+| **System Tests (mock)** | 112 passing, 6 skipped by design | 112 passing, 6 skipped by design |
 
 ---
 
-## Coverage by Module
+## Coverage by Module — bMS 26R1
 
-| Module | Spec | Implemented | Coverage | Status |
-|--------|------|-------------|----------|--------|
-| DefenseControl | 11 | 11 | 100.0% | ✅ COMPLETE |
-| OperatingSystems | 9 | 9 | 100.0% | ✅ COMPLETE |
-| ServerManagement | 25 | 25 | 100.0% | ✅ COMPLETE |
-| Software | 4 | 4 | 100.0% | ✅ COMPLETE |
-| UpdateManagement | 3 | 3 | 100.0% | ✅ COMPLETE |
-| Variables | 13 | 11 | 84.6% | ⚠️ PARTIAL |
-| Assets | 24 | 16 | 66.7% | ⚠️ PARTIAL |
-| Jobs | 34 | 22 | 64.7% | ⚠️ PARTIAL |
-| ActiveDirectory | 16 | 10 | 62.5% | ⚠️ PARTIAL |
-| Endpoints | 89 | 26 | 29.2% | ⚠️ PARTIAL* |
+| Module | Spec | Implemented | Coverage |
+|--------|------|-------------|----------|
+| Active Directory | 16 | 16 | ✅ 100% |
+| Assets | 26 | 26 | ✅ 100% |
+| Compliance *(26R1 only)* | 8 | 8 | ✅ 100% |
+| Defense Control | 13 | 13 | ✅ 100% |
+| Endpoints | 103 | 103 | ✅ 100% |
+| Jobs | 33 | 33 | ✅ 100% |
+| Operating Systems | 9 | 9 | ✅ 100% |
+| Server Management | 30 | 30 | ✅ 100% |
+| Software | 20 | 20 | ✅ 100% |
+| Universal Dynamic Groups *(26R1 only)* | 6 | 6 | ✅ 100% |
+| Update Management | 3 | 3 | ✅ 100% |
+| Variables | 13 | 13 | ✅ 100% |
+| **TOTAL** | **280** | **280** | **✅ 100%** |
 
-\* Low coverage due to platform consolidation strategy (not missing functionality)
+## Coverage by Module — bMS 25R2
 
----
-
-## What's Missing? (91 Operations)
-
-### Priority 2: High-Value Operations (28 operations)
-
-**Jobs Module (12 operations)** - Contextual query operations
-- Get job instances by job definition, endpoint, or group
-- Get kiosk releases by context
-- Navigate job folder hierarchy
-
-**Active Directory Module (6 operations)** - Nested relationships
-- Get AD group memberships and hierarchies
-- Navigate organizational unit structure
-
-**Assets Module (8 operations)** - Folder management
-- Complete asset type folder CRUD operations
-- Asset stock folder hierarchy navigation
-
-**Variables Module (2 operations)** - Contextual queries
-- Get variables by Windows application or job definition
-
-### Priority 3: Platform-Specific Operations (63 operations)
-
-The Endpoints module currently uses a **consolidation strategy** for better UX:
-- Single `get/create/update/delete` operations work across all platforms
-- Eliminates need for platform-specific operations (Android, iOS, Linux, Mac, etc.)
-
-**Missing platform-specific operations**:
-- 9 Android-specific operations
-- 9 iOS-specific operations  
-- 9 Linux-specific operations
-- 9 Mac-specific operations
-- 9 Industrial-specific operations
-- 9 Network-specific operations
-- 9 Universal dynamic group platform queries
-
-**Strategic Decision Required**: Implement platform-specific operations for 100% spec compliance OR keep consolidated approach for better UX?
+| Module | Spec | Implemented | Coverage |
+|--------|------|-------------|----------|
+| Active Directory | 17 | 17 | ✅ 100% |
+| Assets | 24 | 24 | ✅ 100% |
+| Defense Control | 11 | 11 | ✅ 100% |
+| Endpoints | 112 | 112 | ✅ 100% |
+| Jobs | 33 | 33 | ✅ 100% |
+| Operating Systems | 9 | 9 | ✅ 100% |
+| Server Management | 25 | 25 | ✅ 100% |
+| Software | 4 | 4 | ✅ 100% |
+| Update Management | 3 | 3 | ✅ 100% |
+| Variables | 13 | 13 | ✅ 100% |
+| **TOTAL** | **251** | **251** | **✅ 100%** |
 
 ---
 
-## What's Complete? (137 Operations)
+## 25R2 vs 26R1 Version Differences
 
-### 100% Complete Modules (5 modules)
-
-1. **DefenseControl** - BitLocker, Local Admin, Defender operations
-2. **OperatingSystems** - OS folders and Windows endpoint operations
-3. **ServerManagement** - Server info, microservices, security groups/profiles, object permissions
-4. **Software** - Installed Windows software queries
-5. **UpdateManagement** - Windows update queries
-
-### Partially Complete Modules (4 modules)
-
-1. **Variables** - All CRUD operations, missing 2 contextual queries
-2. **Assets** - All CRUD operations, missing 8 folder operations
-3. **Jobs** - All CRUD operations, missing 12 contextual queries
-4. **ActiveDirectory** - Core operations, missing 6 nested queries
-
-### Platform-Consolidated Module (1 module)
-
-1. **Endpoints** - Universal operations work across all platforms
-   - ✅ Get/create/update/delete endpoints (any platform)
-   - ✅ Group operations (logical, static, dynamic)
-   - ✅ Maintenance windows
-   - ✅ Enrollment operations
-   - ❌ Platform-specific operations (Android, iOS, Linux, Mac, Industrial, Network)
+| Feature | 25R2 | 26R1 |
+|---------|------|------|
+| Industrial Endpoints | ✅ Available | ❌ Removed |
+| Compliance API (8 ops) | ❌ | ✅ New |
+| Universal Dynamic Groups (6 ops) | ❌ | ✅ New |
+| Software Bundles (16 ops) | ❌ | ✅ New |
+| Entra ID Data (3 ops) | ❌ | ✅ New |
+| Unmanaged Endpoints (3 ops) | ❌ | ✅ New |
+| API Keys / Download Jobs / MSW Cleanup (5 ops) | ❌ | ✅ New |
+| BitLocker Secrets (2 ops) | ❌ | ✅ New |
+| Maintenance Window Update | PUT (full replace) | PATCH (partial update) |
 
 ---
 
-## Roadmap to 100% Coverage
+## Test Coverage
 
-See **[tasks_bConnect_Complete.md](./tasks_bConnect_Complete.md)** for detailed implementation plan.
+### Unit Tests (550 passing)
 
-### Phase 1: High-Value Operations (2-3 weeks)
-- **Effort**: 18-27 hours
-- **Impact**: Enables critical reporting and monitoring workflows
-- **Deliverables**: 28 operations, 56 unit tests, 28 system tests
+All operations have dedicated unit tests using mocked `IExecuteFunctions` contexts. Tests cover happy path, error cases (invalid GUIDs, missing required fields), and pagination logic.
 
-### Phase 2: Platform-Specific Operations (4-6 weeks) - OPTIONAL
-- **Effort**: 20-30 hours
-- **Impact**: Achieves 100% spec compliance
-- **Deliverables**: 63 operations, 126 unit tests, 63 system tests
+### System Tests (112 passing, 6 skipped by design)
 
-### Phase 3: Documentation (1 week)
-- **Effort**: 8-10 hours
-- **Impact**: Users can discover and use all operations
+System tests run against `bConnectMock_V2.0` (standard-readwrite, 26R1 profile). All modules are covered including full CRUD round-trips.
 
----
+**Skipped by design (6 tests)** — destructive/disruptive operations never safe to run in any test environment:
+- Microservice start / stop / restart (3)
+- Management server restart / cancel-restart (2)
+- Asset type create/delete — requires complex pre-existing hierarchy (1)
 
-## Comparison: n8n vs bConnect MCP
+To run system tests:
+```bash
+# Start mock
+cd /home/ansible/MCP/bConnectMock_V2.0
+PORT=13433 BCONNECT_PROFILE=standard-readwrite BCONNECT_BMS_VERSION=26r1 \
+  RATE_LIMIT_ENABLED=false BIND_ADDRESS=127.0.0.1 node build/index.js &
 
-| Tool | V2.0 Operations | Strategy |
-|------|----------------|----------|
-| **n8n Connector** | 137 | Granular + Consolidated (V2.0 only) |
-| **bConnect MCP** | 94 | Tool-based with parameters |
-| **OpenAPI Spec (25R2)** | 228 | Platform-specific |
-| **OpenAPI Spec (26R1)** | 264 | +36 ops vs 25R2 |
-
-**Key Difference**: The n8n connector provides MORE V2.0 operations than MCP but fewer than the full spec due to intelligent platform consolidation. V1.1 is not supported (REQ-SCOPE-1).
-
----
-
-## Recommendations
-
-### For Automation Workflows (Current State)
-✅ **Ready to use** - All essential operations available
-- Complete CRUD for all resources
-- Comprehensive endpoint management
-- Full job execution control
-- Security and compliance operations
-
-### For 100% Spec Compliance
-📋 **Follow roadmap** in tasks_bConnect_Complete.md
-- Phase 1: Add 28 contextual query operations (high ROI)
-- Phase 2: Add 63 platform-specific operations (optional)
-
-### Strategic Considerations
-🤔 **Consolidation vs Compliance**
-- **Pros of consolidation**: Better UX, fewer operations to learn, single workflow pattern
-- **Pros of platform-specific**: Exact API parity, explicit type safety, spec compliance
-- **Current feedback**: No user complaints about consolidated approach
+# Run tests
+cd /home/ansible/MCP/n8nconnector
+BCONNECT_BASE_URL=http://localhost:13433 \
+BCONNECT_USERNAME=admin BCONNECT_PASSWORD=admin \
+BCONNECT_IGNORE_SSL=false \
+BCONNECT_TEST_ENDPOINT_ID=d0000001-0001-0001-0001-000000000001 \
+npx vitest run test/system/
+```
 
 ---
 
-## Files
+## Platform Consolidation Strategy (Endpoints Module)
 
-- **Gap Analysis**: [tasks_bConnect_Complete.md](./tasks_bConnect_Complete.md)
-- **Main Tasks**: [tasks_todo.md](./tasks_todo.md)
-- **OpenAPI Specs**: `/home/ansible/claudinno/bConnect-MCP/openapi-specs/`
+The Endpoints module uses a consolidation approach: rather than exposing 6+ separate resources per platform type, a single `endpointType` selector determines the API path. This covers:
+
+- **Get / Get By ID / Update / Delete** — via `getTypedEndpoints`, `getTypedEndpoint`, `updateTypedEndpoint`, `deleteTypedEndpoint` (platformType: windows, android, ios, linux, mac, network)
+- **Create** — via `endpoint.create` (endpointType selector)
+- **Start Enrollment** — via `startTypedEnrollment`
+- **Group queries** — via `getTypedEndpointsByGroup` (platformType + groupType)
+- **Industrial endpoints (25R2 only)** — dedicated `getIndustrialEndpoint*` operations
+
+This maps one-to-many against the spec but provides the same functional coverage with better UX.
 
 ---
 
-**Generated by**: Claude Code Analysis  
-**Based on**: Official bConnect OpenAPI specifications  
-**Validation**: System tests against live API (https://bms-win22srv:444/bconnect)
+## Detailed Analysis Files
+
+| File | Contents |
+|------|----------|
+| [n8nconnectorImplementationStatusAnalysis26R1.md](./n8nconnectorImplementationStatusAnalysis26R1.md) | Full op-by-op 26R1 coverage table |
+| [n8nconnectorImplementationStatusAnalysis25R2.md](./n8nconnectorImplementationStatusAnalysis25R2.md) | Full op-by-op 25R2 coverage table |
+| [CHANGELOG.md](./CHANGELOG.md) | Version history and change log |
+| [Tasks.md](./Tasks.md) | Phase-by-phase implementation history |
+
+---
+
+**Generated by**: Claude Code  
+**Validation**: System tests against bConnectMock_V2.0 (`/home/ansible/MCP/bConnectMock_V2.0`)
