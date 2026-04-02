@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.4] - 2026-04-02
+
+> **Semver rationale**: Patch bump. Documentation, CI, and test improvements only. No new operations, no breaking changes, no bug fixes to user-facing behavior.
+
+### Added
+
+- **README Security section** — documents build-time-only npm vulnerability scope, artifact integrity verification, and responsible disclosure process
+- **`npm run license-check`** script — enforces GPL/AGPL/SSPL deny-list on production dependencies using `license-checker`
+- **SDLC process: signed git tags** — release pipeline now mandates `git tag -s` (GPG-signed) for all releases; branch protection documented for future GitHub repo
+
+### Changed
+
+- **INSTALLATION.md rewritten** for v0.8.4 — correct package name (`n8n-nodes-baramundi-management-solution`), GPG signature verification procedure, Docker instructions, SSL security note
+- **CI upgraded to Node 22** — resolves `isolated-vm` native build failure on Node 20 (transitive dep via `@n8n/ai-node-sdk`)
+
+### Security
+
+- **ProductManagement/ removed from git** — internal PM decision documents (PDF + MD) removed from version control and added to `.gitignore`
+
+### Tests
+
+- Branch coverage improved from 75.36% to **80.08%** (target ≥ 80% ✓)
+- 86 new tests across 10 files targeting `returnAll` branches, error paths, and option parameters
+- Total tests: 986 → **1072**
+
 ## [0.8.3] - 2026-04-02
 
 ### Fixed
