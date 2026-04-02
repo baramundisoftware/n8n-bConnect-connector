@@ -1,6 +1,63 @@
 import type { INodeProperties } from 'n8n-workflow';
 
 // ============================================================
+// Shared resourceLocator definition for endpoint ID fields
+// ============================================================
+
+const GUID_REGEX = '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$';
+
+function endpointLocator(
+  displayOptions: INodeProperties['displayOptions'],
+): INodeProperties {
+  return {
+    displayName: 'Endpoint',
+    name: 'endpointId',
+    type: 'resourceLocator',
+    required: true,
+    default: { mode: 'list', value: '' },
+    displayOptions,
+    modes: [
+      {
+        displayName: 'From List',
+        name: 'list',
+        type: 'list',
+        typeOptions: {
+          searchListMethod: 'endpointSearch',
+          searchable: true,
+          searchFilterRequired: false,
+        },
+      },
+      {
+        displayName: 'By ID',
+        name: 'id',
+        type: 'string',
+        validation: [
+          {
+            type: 'regex',
+            properties: {
+              regex: GUID_REGEX,
+              errorMessage: 'Not a valid GUID (expected: 12345678-1234-1234-1234-123456789012)',
+            },
+          },
+        ],
+        placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
+      },
+      {
+        displayName: 'By URL',
+        name: 'url',
+        type: 'string',
+        placeholder: 'https://bms-server/endpoint/{guid}',
+        extractValue: {
+          type: 'regex',
+          regex: '([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})',
+        },
+      },
+    ],
+    description: 'The endpoint to operate on',
+  };
+}
+
+// ============================================================
 // Core Endpoint Operations
 // ============================================================
 
@@ -189,45 +246,12 @@ export const endpointFields: INodeProperties[] = [
   // ----------------------------------
   //         endpoint:get, endpoint:delete
   // ----------------------------------
-  {
-    displayName: 'Endpoint Name or ID',
-    name: 'endpointSelection',
-    type: 'options',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['get', 'delete'],
-      },
+  endpointLocator({
+    show: {
+      resource: ['endpoint'],
+      operation: ['get', 'delete'],
     },
-    typeOptions: {
-      loadOptionsMethod: 'getEndpoints',
-    },
-    options: [
-      {
-        name: 'Enter Custom GUID...',
-        value: '__custom__',
-      },
-    ],
-    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-  },
-  {
-    displayName: 'Endpoint ID',
-    name: 'endpointId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['get', 'delete'],
-        endpointSelection: ['__custom__'],
-      },
-    },
-    placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
-    description: 'Enter the endpoint GUID manually',
-  },
+  }),
 
   // ----------------------------------
   //         endpoint:getMany
@@ -631,45 +655,12 @@ export const endpointFields: INodeProperties[] = [
   // ----------------------------------
   //         endpoint:update
   // ----------------------------------
-  {
-    displayName: 'Endpoint Name or ID',
-    name: 'endpointSelection',
-    type: 'options',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['update'],
-      },
+  endpointLocator({
+    show: {
+      resource: ['endpoint'],
+      operation: ['update'],
     },
-    typeOptions: {
-      loadOptionsMethod: 'getEndpoints',
-    },
-    options: [
-      {
-        name: 'Enter Custom GUID...',
-        value: '__custom__',
-      },
-    ],
-    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-  },
-  {
-    displayName: 'Endpoint ID',
-    name: 'endpointId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['update'],
-        endpointSelection: ['__custom__'],
-      },
-    },
-    placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
-    description: 'Enter the endpoint GUID manually',
-  },
+  }),
   {
     displayName: 'Update Fields',
     name: 'updateFields',
@@ -738,45 +729,12 @@ export const endpointFields: INodeProperties[] = [
   // ----------------------------------
   //         endpoint:startEnrollment
   // ----------------------------------
-  {
-    displayName: 'Endpoint Name or ID',
-    name: 'endpointSelection',
-    type: 'options',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['startEnrollment'],
-      },
+  endpointLocator({
+    show: {
+      resource: ['endpoint'],
+      operation: ['startEnrollment'],
     },
-    typeOptions: {
-      loadOptionsMethod: 'getEndpoints',
-    },
-    options: [
-      {
-        name: 'Enter Custom GUID...',
-        value: '__custom__',
-      },
-    ],
-    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-  },
-  {
-    displayName: 'Endpoint ID',
-    name: 'endpointId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['startEnrollment'],
-        endpointSelection: ['__custom__'],
-      },
-    },
-    placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
-    description: 'Enter the endpoint GUID manually',
-  },
+  }),
   {
     displayName: 'Enrollment Options',
     name: 'enrollmentOptions',
@@ -811,90 +769,23 @@ export const endpointFields: INodeProperties[] = [
   // ----------------------------------
   //         endpoint:triggerIntuneInstallation
   // ----------------------------------
-  {
-    displayName: 'Endpoint Name or ID',
-    name: 'endpointSelection',
-    type: 'options',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['triggerIntuneInstallation'],
-      },
+  endpointLocator({
+    show: {
+      resource: ['endpoint'],
+      operation: ['triggerIntuneInstallation'],
     },
-    typeOptions: {
-      loadOptionsMethod: 'getEndpoints',
-    },
-    options: [
-      {
-        name: 'Enter Custom GUID...',
-        value: '__custom__',
-      },
-    ],
-    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-  },
-  {
-    displayName: 'Endpoint ID',
-    name: 'endpointId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['triggerIntuneInstallation'],
-        endpointSelection: ['__custom__'],
-      },
-    },
-    placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
-    description: 'Enter the endpoint GUID manually',
-  },
+  }),
 
   // ----------------------------------
   //         endpoint: EntraId operations (26R1+)
   // ----------------------------------
-  {
-    displayName: 'Endpoint Name or ID',
-    name: 'endpointSelection',
-    type: 'options',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['setEntraIdData', 'deleteEntraIdData'],
-        bmsVersion: ['26R1'],
-      },
+  endpointLocator({
+    show: {
+      resource: ['endpoint'],
+      operation: ['setEntraIdData', 'deleteEntraIdData'],
+      bmsVersion: ['26R1'],
     },
-    typeOptions: {
-      loadOptionsMethod: 'getEndpoints',
-    },
-    options: [
-      {
-        name: 'Enter Custom GUID...',
-        value: '__custom__',
-      },
-    ],
-    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-  },
-  {
-    displayName: 'Endpoint ID',
-    name: 'endpointId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['endpoint'],
-        operation: ['setEntraIdData', 'deleteEntraIdData'],
-        bmsVersion: ['26R1'],
-        endpointSelection: ['__custom__'],
-      },
-    },
-    placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
-    description: 'Enter the endpoint GUID manually',
-  },
+  }),
   {
     displayName: 'Entra ID Device ID',
     name: 'entraIdDeviceId',
@@ -1676,45 +1567,12 @@ export const maintenanceWindowFields: INodeProperties[] = [
   // ----------------------------------
   //         maintenanceWindow: endpoint selection
   // ----------------------------------
-  {
-    displayName: 'Endpoint Name or ID',
-    name: 'endpointSelection',
-    type: 'options',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['maintenanceWindow'],
-        operation: ['createEndpointMaintenanceWindow', 'updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow', 'putEndpointMaintenanceWindow', 'getEndpointMaintenanceWindow'],
-      },
+  endpointLocator({
+    show: {
+      resource: ['maintenanceWindow'],
+      operation: ['createEndpointMaintenanceWindow', 'updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow', 'putEndpointMaintenanceWindow', 'getEndpointMaintenanceWindow'],
     },
-    typeOptions: {
-      loadOptionsMethod: 'getEndpoints',
-    },
-    options: [
-      {
-        name: 'Enter Custom GUID...',
-        value: '__custom__',
-      },
-    ],
-    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-  },
-  {
-    displayName: 'Endpoint ID',
-    name: 'endpointId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['maintenanceWindow'],
-        operation: ['createEndpointMaintenanceWindow', 'updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow', 'putEndpointMaintenanceWindow', 'getEndpointMaintenanceWindow'],
-        endpointSelection: ['__custom__'],
-      },
-    },
-    placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
-    description: 'Enter the endpoint GUID manually',
-  },
+  }),
   {
     displayName: 'Window ID',
     name: 'windowId',

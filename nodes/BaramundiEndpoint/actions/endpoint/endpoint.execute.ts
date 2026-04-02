@@ -10,6 +10,7 @@ import {
 	validateMaintenanceWindow,
 	validateRfc6902Patch,
 	validateODataString,
+	extractResourceLocatorValue,
 } from '../../../shared/utils/validation';
 
 const TYPED_ENDPOINT_PATH: Record<string, string> = {
@@ -36,10 +37,7 @@ export async function get(
   index: number,
 ): Promise<INodeExecutionData[]> {
   // Get endpoint ID from either dropdown selection or custom GUID input
-  const endpointSelection = this.getNodeParameter('endpointSelection', index) as string;
-  const endpointId = endpointSelection === '__custom__'
-    ? this.getNodeParameter('endpointId', index) as string
-    : endpointSelection;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const endpointType = this.getNodeParameter('endpointType', index, 'all') as string;
 
   // Validate GUID format
@@ -143,10 +141,7 @@ export async function deleteEndpoint(
   index: number,
 ): Promise<INodeExecutionData[]> {
   // Get endpoint ID from either dropdown selection or custom GUID input
-  const endpointSelection = this.getNodeParameter('endpointSelection', index) as string;
-  const endpointId = endpointSelection === '__custom__'
-    ? this.getNodeParameter('endpointId', index) as string
-    : endpointSelection;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const endpointType = this.getNodeParameter('endpointType', index, 'all') as string;
 
   // Validate GUID format
@@ -271,10 +266,7 @@ export async function update(
   index: number,
 ): Promise<INodeExecutionData[]> {
   // Get endpoint ID from either dropdown selection or custom GUID input
-  const endpointSelection = this.getNodeParameter('endpointSelection', index) as string;
-  const endpointId = endpointSelection === '__custom__'
-    ? this.getNodeParameter('endpointId', index) as string
-    : endpointSelection;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const endpointType = this.getNodeParameter('endpointType', index, 'windows') as string;
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
@@ -357,10 +349,7 @@ export async function startEnrollment(
   index: number,
 ): Promise<INodeExecutionData[]> {
   // Get endpoint ID from either dropdown selection or custom GUID input
-  const endpointSelection = this.getNodeParameter('endpointSelection', index) as string;
-  const endpointId = endpointSelection === '__custom__'
-    ? this.getNodeParameter('endpointId', index) as string
-    : endpointSelection;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const enrollmentOptions = this.getNodeParameter('enrollmentOptions', index, {}) as IDataObject;
 
   // Validate endpoint ID
@@ -435,10 +424,7 @@ export async function triggerIntuneInstallation(
   index: number,
 ): Promise<INodeExecutionData[]> {
   // Get endpoint ID from either dropdown selection or custom GUID input
-  const endpointSelection = this.getNodeParameter('endpointSelection', index) as string;
-  const endpointId = endpointSelection === '__custom__'
-    ? this.getNodeParameter('endpointId', index) as string
-    : endpointSelection;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
 
   // Validate endpoint ID
   const guidValidation = validateGuid(endpointId);
@@ -766,10 +752,7 @@ export async function createEndpointMaintenanceWindow(
   index: number,
 ): Promise<INodeExecutionData[]> {
   // Get endpoint ID from either dropdown selection or custom GUID input
-  const endpointSelection = this.getNodeParameter('endpointSelection', index) as string;
-  const endpointId = endpointSelection === '__custom__'
-    ? this.getNodeParameter('endpointId', index) as string
-    : endpointSelection;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const startTime = this.getNodeParameter('startTime', index) as string;
   const endTime = this.getNodeParameter('endTime', index) as string;
   const additionalFields = this.getNodeParameter('additionalFields', index, {}) as IDataObject;
@@ -809,10 +792,7 @@ export async function updateEndpointMaintenanceWindow(
   index: number,
 ): Promise<INodeExecutionData[]> {
   // Get endpoint ID from either dropdown selection or custom GUID input
-  const endpointSelection = this.getNodeParameter('endpointSelection', index) as string;
-  const endpointId = endpointSelection === '__custom__'
-    ? this.getNodeParameter('endpointId', index) as string
-    : endpointSelection;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const windowId = this.getNodeParameter('windowId', index) as string;
   const windowIdValidation = validateGuid(windowId);
   if (!windowIdValidation.valid) {
@@ -856,10 +836,7 @@ export async function deleteEndpointMaintenanceWindow(
   index: number,
 ): Promise<INodeExecutionData[]> {
   // Get endpoint ID from either dropdown selection or custom GUID input
-  const endpointSelection = this.getNodeParameter('endpointSelection', index) as string;
-  const endpointId = endpointSelection === '__custom__'
-    ? this.getNodeParameter('endpointId', index) as string
-    : endpointSelection;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const windowId = this.getNodeParameter('windowId', index) as string;
   const windowIdValidation = validateGuid(windowId);
   if (!windowIdValidation.valid) {
@@ -991,10 +968,7 @@ export async function putEndpointMaintenanceWindow(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const endpointSelection = this.getNodeParameter('endpointSelection', index) as string;
-  const endpointId = endpointSelection === '__custom__'
-    ? this.getNodeParameter('endpointId', index) as string
-    : endpointSelection;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const windowId = this.getNodeParameter('windowId', index) as string;
   const maintenanceWindowJson = this.getNodeParameter('maintenanceWindowJson', index) as string;
 
@@ -1065,10 +1039,7 @@ export async function setEntraIdData(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const endpointSelection = this.getNodeParameter('endpointSelection', index) as string;
-  const endpointId = endpointSelection === '__custom__'
-    ? this.getNodeParameter('endpointId', index) as string
-    : endpointSelection;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
 
   const validation = validateGuid(endpointId);
   if (!validation.valid) {
@@ -1101,10 +1072,7 @@ export async function deleteEntraIdData(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const endpointSelection = this.getNodeParameter('endpointSelection', index) as string;
-  const endpointId = endpointSelection === '__custom__'
-    ? this.getNodeParameter('endpointId', index) as string
-    : endpointSelection;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
 
   const validation = validateGuid(endpointId);
   if (!validation.valid) {

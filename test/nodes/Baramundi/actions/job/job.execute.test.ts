@@ -63,7 +63,7 @@ describe('Job Operations', () => {
       };
 
       const mockContext = createMockExecuteFunctions(
-        { jobSelection: jobId, jobId },
+        { jobId },
         {},
         mockJob
       );
@@ -83,7 +83,7 @@ describe('Job Operations', () => {
 
     it('should handle 404 errors for non-existent jobs', async () => {
       const jobId = '88888888-8888-8888-8888-888888888888';
-      const mockContext = createMockExecuteFunctions({ jobSelection: jobId, jobId });
+      const mockContext = createMockExecuteFunctions({ jobId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
         const error: any = new Error('Not Found');
@@ -280,7 +280,7 @@ describe('Job Operations', () => {
       };
 
       const mockContext = createMockExecuteFunctions(
-        { jobSelection: jobId, jobId,
+        { jobId,
           endpointIds: endpointId,
         },
         {},
@@ -313,7 +313,7 @@ describe('Job Operations', () => {
       };
 
       const mockContext = createMockExecuteFunctions(
-        { jobSelection: jobId, jobId,
+        { jobId,
           endpointIds,
         },
         {},
@@ -338,7 +338,7 @@ describe('Job Operations', () => {
       const mockResponse = { jobInstanceId: 'instance-123' };
 
       const mockContext = createMockExecuteFunctions(
-        { jobSelection: jobId, jobId,
+        { jobId,
           endpointIds: endpointId,
           options: { comment: 'Urgent deployment for security patch' },
         },
@@ -363,7 +363,7 @@ describe('Job Operations', () => {
       const mockResponse = { jobInstanceId: 'instance-123' };
 
       const mockContext = createMockExecuteFunctions(
-        { jobSelection: jobId, jobId,
+        { jobId,
           endpointIds: endpointId,
           options: { priority: 'High' },
         },
@@ -388,7 +388,7 @@ describe('Job Operations', () => {
       const mockResponse = { jobInstanceId: 'instance-123' };
 
       const mockContext = createMockExecuteFunctions(
-        { jobSelection: jobId, jobId,
+        { jobId,
           endpointIds: endpointId,
           options: {
             comment: 'Emergency patch',
@@ -415,7 +415,7 @@ describe('Job Operations', () => {
       const jobId = '88888888-8888-8888-8888-888888888888';
       const endpointId = '11111111-1111-1111-1111-111111111111';
       const mockContext = createMockExecuteFunctions(
-        { jobSelection: jobId, jobId,
+        { jobId,
         endpointIds: endpointId,
       });
 
@@ -462,7 +462,7 @@ describe('Job Operations', () => {
       };
 
       const mockContext = createMockExecuteFunctions(
-        { jobSelection: jobId, jobId,
+        { jobId,
           returnAll: false,
           limit: 50,
         },
@@ -517,7 +517,7 @@ describe('Job Operations', () => {
       };
 
       const mockContext = createMockExecuteFunctions(
-        { jobSelection: jobId, jobId,
+        { jobId,
           returnAll: true,
         },
         {},
@@ -547,7 +547,7 @@ describe('Job Operations', () => {
       };
 
       const mockContext = createMockExecuteFunctions(
-        { jobSelection: jobId, jobId,
+        { jobId,
           returnAll: false,
           limit: 50,
         },
@@ -564,7 +564,7 @@ describe('Job Operations', () => {
     it('should handle errors when fetching job instances', async () => {
       const jobId = '88888888-8888-8888-8888-888888888888';
       const mockContext = createMockExecuteFunctions(
-        { jobSelection: jobId, jobId,
+        { jobId,
         returnAll: false,
         limit: 50,
       });
@@ -819,7 +819,7 @@ describe('Job Operations', () => {
       const jobId = '12345678-1234-1234-1234-123456789abc';
       const mockJob = { id: jobId, name: 'Test Job' };
 
-      const mockContext = createMockExecuteFunctions({ jobSelection: jobId, jobId },
+      const mockContext = createMockExecuteFunctions({ jobId },
         { baseUrl: 'https://custom-bms-server:443/bconnect' },
         mockJob
       );
@@ -837,7 +837,7 @@ describe('Job Operations', () => {
       const jobId = '12345678-1234-1234-1234-123456789abc';
       const mockJob = { id: jobId, name: 'Test Job' };
 
-      const mockContext = createMockExecuteFunctions({ jobSelection: jobId, jobId },
+      const mockContext = createMockExecuteFunctions({ jobId },
         { ignoreSslIssues: true },
         mockJob
       );
@@ -933,7 +933,7 @@ describe('Job Operations', () => {
 
       const mockContext = createMockExecuteFunctions(
         {
-          endpointSelection: endpointId,
+          endpointId,
           endpointId,
           returnAll: false,
           limit: 50,
@@ -991,7 +991,7 @@ describe('Job Operations', () => {
 
       const mockContext = createMockExecuteFunctions(
         {
-          endpointSelection: endpointId,
+          endpointId,
           endpointId,
           returnAll: true,
         },
@@ -1025,8 +1025,7 @@ describe('Job Operations', () => {
 
       const mockContext = createMockExecuteFunctions(
         {
-          endpointSelection: '__custom__',
-          endpointId: customEndpointId,
+                    endpointId: customEndpointId,
           returnAll: false,
           limit: 50,
         },
@@ -1059,7 +1058,7 @@ describe('Job Operations', () => {
 
       const mockContext = createMockExecuteFunctions(
         {
-          endpointSelection: endpointId,
+          endpointId,
           endpointId,
           returnAll: false,
           limit: 50,
@@ -1077,7 +1076,7 @@ describe('Job Operations', () => {
     it('should handle errors when fetching endpoint job instances', async () => {
       const endpointId = '11111111-1111-1111-1111-111111111111';
       const mockContext = createMockExecuteFunctions({
-        endpointSelection: endpointId,
+        endpointId,
         endpointId,
         returnAll: false,
         limit: 50,
@@ -1112,7 +1111,7 @@ describe('Job Operations', () => {
 
       const mockContext = createMockExecuteFunctions(
         {
-          endpointSelection: endpointId,
+          endpointId,
           endpointId,
           returnAll: false,
           limit: 10,
@@ -1768,7 +1767,7 @@ describe('Job Operations', () => {
       };
 
       const mockContext = createMockExecuteFunctions(
-        { jobDefinitionSelection: jobDefinitionId, jobDefinitionId,
+        { jobDefinitionId,
           targetType,
           targetId,
         },
@@ -1805,7 +1804,7 @@ describe('Job Operations', () => {
 
       const mockContext = createMockExecuteFunctions(
         {
-          jobDefinitionSelection: '88888888-8888-8888-8888-888888888888',
+          jobDefinitionId: '88888888-8888-8888-8888-888888888888',
           jobDefinitionId: '88888888-8888-8888-8888-888888888888',
           targetType: 'LogicalGroup',
           targetId: '22222222-2222-2222-2222-222222222222',
@@ -1832,7 +1831,7 @@ describe('Job Operations', () => {
 
     it('should handle 409 errors when creating duplicate kiosk release', async () => {
       const mockContext = createMockExecuteFunctions({
-        jobDefinitionSelection: '88888888-8888-8888-8888-888888888888',
+        jobDefinitionId: '88888888-8888-8888-8888-888888888888',
         jobDefinitionId: '88888888-8888-8888-8888-888888888888',
         targetType: 'Endpoint',
         targetId: '80808080-8080-8080-8080-808080808080',
@@ -2013,7 +2012,7 @@ describe('Job Operations', () => {
       };
 
       const mockContext = createMockExecuteFunctions(
-        { jobSelection: jobId, jobId,
+        { jobId,
           updateFields: { name: newName },
         },
         {},
@@ -2050,7 +2049,7 @@ describe('Job Operations', () => {
       };
 
       const mockContext = createMockExecuteFunctions(
-        { jobSelection: jobId, jobId,
+        { jobId,
           updateFields: {
             name: 'New Name',
             displayName: 'New Display Name',
@@ -2079,7 +2078,7 @@ describe('Job Operations', () => {
     it('should throw error when no fields to update', async () => {
       const jobId = '88888888-8888-8888-8888-888888888888';
       const mockContext = createMockExecuteFunctions(
-        { jobSelection: jobId, jobId,
+        { jobId,
         updateFields: {},
       });
 
@@ -2091,7 +2090,7 @@ describe('Job Operations', () => {
       const mockResponse = { id: jobId, name: 'Name' };
 
       const mockContext = createMockExecuteFunctions(
-        { jobSelection: jobId, jobId,
+        { jobId,
           updateFields: { name: 'Name', description: '' },
         },
         {},
@@ -2109,7 +2108,7 @@ describe('Job Operations', () => {
     it('should handle 404 errors when updating non-existent job', async () => {
       const jobId = '88888888-8888-8888-8888-888888888888';
       const mockContext = createMockExecuteFunctions(
-        { jobSelection: jobId, jobId,
+        { jobId,
         updateFields: { name: 'New Name' },
       });
 
@@ -2128,7 +2127,7 @@ describe('Job Operations', () => {
       const jobId = '88888888-8888-8888-8888-888888888888';
       const mockResponse = {};
 
-      const mockContext = createMockExecuteFunctions({ jobSelection: jobId, jobId },
+      const mockContext = createMockExecuteFunctions({ jobId },
         {},
         mockResponse
       );
@@ -2147,7 +2146,7 @@ describe('Job Operations', () => {
 
     it('should handle 404 errors when deleting non-existent job', async () => {
       const jobId = '88888888-8888-8888-8888-888888888888';
-      const mockContext = createMockExecuteFunctions({ jobSelection: jobId, jobId });
+      const mockContext = createMockExecuteFunctions({ jobId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
         const error: any = new Error('Not Found');
@@ -2160,7 +2159,7 @@ describe('Job Operations', () => {
 
     it('should handle 409 errors when job is in use', async () => {
       const jobId = '88888888-8888-8888-8888-888888888888';
-      const mockContext = createMockExecuteFunctions({ jobSelection: jobId, jobId });
+      const mockContext = createMockExecuteFunctions({ jobId });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {
         const error: any = new Error('Cannot delete job: active instances exist');

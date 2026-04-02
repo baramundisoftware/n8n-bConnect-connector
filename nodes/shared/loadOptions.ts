@@ -1,8 +1,11 @@
 import type {
   IExecuteFunctions,
   ILoadOptionsFunctions,
+  INodeListSearchResult,
   INodePropertyOptions,
 } from 'n8n-workflow';
+
+import { validateODataString } from './utils/validation';
 
 import { apiRequest } from './transport/requestApi';
 import type {
@@ -141,4 +144,122 @@ export async function getStaticGroups(this: ILoadOptionsFunctions): Promise<INod
 
 export async function getDynamicGroups(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
   return getNamedItems.call(this, '/endpoints/v2.0/DynamicGroups');
+}
+
+// ─── listSearch methods (for resourceLocator components) ────────────────────
+
+const SEARCH_PAGE_SIZE = 50;
+
+export async function endpointSearch(
+  this: ILoadOptionsFunctions,
+  filter?: string,
+  paginationToken?: string,
+): Promise<INodeListSearchResult> {
+  const page = paginationToken ? parseInt(paginationToken, 10) : 0;
+  const qs: Record<string, string | number> = {
+    PageSize: SEARCH_PAGE_SIZE,
+    Page: page,
+    OrderBy: 'DisplayName asc',
+  };
+  if (filter) {
+    const validation = validateODataString(filter, 'Search filter');
+    if (!validation.valid) {
+      return { results: [] };
+    }
+    qs.SearchQuery = `contains(DisplayName,'${filter.replace(/'/g, "''")}')`;
+  }
+
+  const response = await apiRequest.call(
+    this as unknown as IExecuteFunctions,
+    'GET',
+    '/endpoints/v2.0/Endpoints',
+    {},
+    qs,
+  );
+  const paged = response as unknown as BConnectPagedResponse<BConnectEndpointItem>;
+  const data = paged.data ?? [];
+
+  return {
+    results: data.map((ep) => ({
+      name: `${ep.displayName}${ep.hostName ? ` (${ep.hostName})` : ''}`,
+      value: ep.id,
+    })),
+    paginationToken: paged.hasNextPage ? String(page + 1) : undefined,
+  };
+}
+
+export async function jobDefinitionSearch(
+  this: ILoadOptionsFunctions,
+  filter?: string,
+  paginationToken?: string,
+): Promise<INodeListSearchResult> {
+  const page = paginationToken ? parseInt(paginationToken, 10) : 0;
+  const qs: Record<string, string | number> = {
+    PageSize: SEARCH_PAGE_SIZE,
+    Page: page,
+    OrderBy: 'Name asc',
+  };
+  if (filter) {
+    const validation = validateODataString(filter, 'Search filter');
+    if (!validation.valid) {
+      return { results: [] };
+    }
+    qs.SearchQuery = `contains(Name,'${filter.replace(/'/g, "''")}')`;
+  }
+
+  const response = await apiRequest.call(
+    this as unknown as IExecuteFunctions,
+    'GET',
+    '/jobs/v2.0/JobDefinitions',
+    {},
+    qs,
+  );
+  const paged = response as unknown as BConnectPagedResponse<BConnectJobDefinitionItem>;
+  const data = paged.data ?? [];
+
+  return {
+    results: data.map((job) => ({
+      name: `${job.name}${job.type ? ` [${job.type}]` : ''}`,
+      value: job.id,
+    })),
+    paginationToken: paged.hasNextPage ? String(page + 1) : undefined,
+  };
+}
+
+export async function jobFolderSearch(
+  this: ILoadOptionsFunctions,
+  filter?: string,
+  paginationToken?: string,
+): Promise<INodeListSearchResult> {
+  const page = paginationToken ? parseInt(paginationToken, 10) : 0;
+  const qs: Record<string, string | number> = {
+    PageSize: SEARCH_PAGE_SIZE,
+    Page: page,
+    OrderBy: 'Name asc',
+  };
+  if (filter) {
+    const validation = validateODataString(filter, 'Search filter');
+    if (!validation.valid) {
+      return { results: [] };
+    }
+    qs.SearchQuery = `contains(Name,'${filter.replace(/'/g, "''")}')`;
+  }
+
+  const response = await apiRequest.call(
+    this as unknown as IExecuteFunctions,
+    'GET',
+    '/jobs/v2.0/Folders',
+    {},
+    qs,
+  );
+  const paged = response as unknown as BConnectPagedResponse<BConnectNamedItem>;
+  const data = paged.data ?? [];
+
+  return {
+    results: data.map((folder) => ({
+      name: folder.name ?? folder.id,
+      value: folder.id,
+    })),
+    paginationToken: paged.hasNextPage ? String(page + 1) : undefined,
+  };
 }

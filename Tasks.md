@@ -531,16 +531,9 @@ Trigger: Schedule (weekly, before patch Tuesday).
 
 ### Backlog
 
-| ID | Task | Priority | Acceptance Criteria | Depends on |
-|----|------|----------|---------------------|------------|
-| P15.1 | Add `endpointSearch` to `methods.listSearch` in `BaramundiEndpoint.node.ts` — search endpoints by name/hostname via `SearchQuery` OData filter, support `paginationToken` (page number) | HIGH | Method returns `INodeListSearchResult` with `{ name, value }` items; empty filter returns first page; filter searches by `DisplayName`; pagination works | — |
-| P15.2 | Add `jobDefinitionSearch` and `jobFolderSearch` to `methods.listSearch` in `BaramundiJob.node.ts` — same pattern as P15.1 | HIGH | Both methods return `INodeListSearchResult`; filter searches by `Name`; pagination works | — |
-| P15.3 | Update `endpoint.fields.ts` — change all 6 `endpointId` fields (in `endpoint` resource) from `type: 'string'` to `type: 'resourceLocator'` with 3 modes: By ID (GUID regex), From List (`endpointSearch`), By URL (GUID regex extract) | HIGH | All `endpointId` fields in endpoint resource use `resourceLocator`; `default: { mode: 'list', value: '' }`; GUID regex validates in UI | P15.1 |
-| P15.4 | Update `job.fields.ts` — change `jobDefinitionId` fields (in `jobDefinition` + `jobInstance` resources) and `folderId` fields (in `jobFolder` resource) to `resourceLocator` | HIGH | Same 3-mode pattern as P15.3; `jobDefinitionId` uses `jobDefinitionSearch`; `folderId` uses `jobFolderSearch` | P15.2 |
-| P15.5 | Update `endpoint.execute.ts` — replace all `this.getNodeParameter('endpointId', index) as string` (10 sites) with `extractResourceLocatorValue(this.getNodeParameter('endpointId', index))`. Same for `job.execute.ts` `jobDefinitionId` (5 sites) and `folderId` | HIGH | All ID extraction uses `extractResourceLocatorValue()`; both string and `{ mode, value }` formats work | P15.3, P15.4 |
-| P15.6 | Unit tests: (a) 2 tests for `endpointSearch` (empty filter, with filter + pagination); (b) 2 tests for `jobDefinitionSearch`; (c) 2 tests for `jobFolderSearch`; (d) verify existing endpoint/job execute tests still pass with `resourceLocator` object format | MEDIUM | 6+ new tests; all existing tests pass; tests mock `apiRequest` | P15.5 |
-| P15.7 | Extend `listSearch` to other high-value resources: logical groups, variables, assets, `endpointId` in non-Endpoint nodes | LOW | Deferred — not blocking release | — |
-| P15.8 | Build + lint + full test run — 0 errors, bump version 0.7.0 → 0.8.0, update CHANGELOG with breaking change note for `endpointId`/`jobDefinitionId` field type change | HIGH | `tsc --noEmit` 0 errors; ESLint 0 errors; all tests pass; CHANGELOG documents breaking change | P15.6 |
+| ID | Task | Priority | Notes |
+|----|------|----------|-------|
+| P15.7 | Extend `listSearch` to other high-value resources: logical groups, variables, assets, `endpointId` in non-Endpoint nodes | LOW | Deferred — not blocking release |
 
 ### Design
 
@@ -551,7 +544,15 @@ Trigger: Schedule (weekly, before patch Tuesday).
 
 ### Done
 
-*(empty)*
+| ID | Task | Completed |
+|----|------|-----------|
+| P15.1 | Added `endpointSearch` to `methods.listSearch` in `BaramundiEndpoint.node.ts` — server-side search via OData `SearchQuery` filter with pagination | 2026-04-02 |
+| P15.2 | Added `jobDefinitionSearch` and `jobFolderSearch` to `methods.listSearch` in `BaramundiJob.node.ts` | 2026-04-02 |
+| P15.3 | Converted all 6 `endpointId` fields in `endpoint.fields.ts` from `endpointSelection`+`endpointId` string pair to single `resourceLocator` with 3 modes (From List, By ID, By URL). Added `endpointLocator()` helper. | 2026-04-02 |
+| P15.4 | Converted `jobId` (5 fields), `jobDefinitionId` (2 fields), and `folderId` (4 fields) in `job.fields.ts` to `resourceLocator`. Added `jobDefinitionLocator()` and `jobFolderLocator()` helpers. | 2026-04-02 |
+| P15.5 | Replaced all `endpointSelection`/`jobSelection`/`jobDefinitionSelection` 3-line extraction patterns with `extractResourceLocatorValue()` — 12 sites in `endpoint.execute.ts`, 7 in `job.execute.ts`. | 2026-04-02 |
+| P15.6 | 7 new unit tests for listSearch methods (3 endpointSearch, 2 jobDefinitionSearch, 2 jobFolderSearch). All existing tests updated and passing. 562 total tests. | 2026-04-02 |
+| P15.8 | Build 0 errors, lint 0 errors (1 pre-existing warning), 562 tests passing. Bumped 0.7.0 → 0.8.0. CHANGELOG updated with breaking changes. | 2026-04-02 |
 
 ---
 

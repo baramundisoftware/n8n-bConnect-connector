@@ -1,5 +1,109 @@
 import type { INodeProperties } from 'n8n-workflow';
 
+const GUID_REGEX = '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$';
+
+function jobDefinitionLocator(
+  displayOptions: INodeProperties['displayOptions'],
+): INodeProperties {
+  return {
+    displayName: 'Job Definition',
+    name: 'jobId',
+    type: 'resourceLocator',
+    required: true,
+    default: { mode: 'list', value: '' },
+    displayOptions,
+    modes: [
+      {
+        displayName: 'From List',
+        name: 'list',
+        type: 'list',
+        typeOptions: {
+          searchListMethod: 'jobDefinitionSearch',
+          searchable: true,
+          searchFilterRequired: false,
+        },
+      },
+      {
+        displayName: 'By ID',
+        name: 'id',
+        type: 'string',
+        validation: [
+          {
+            type: 'regex',
+            properties: {
+              regex: GUID_REGEX,
+              errorMessage: 'Not a valid GUID (expected: 12345678-1234-1234-1234-123456789012)',
+            },
+          },
+        ],
+        placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
+      },
+      {
+        displayName: 'By URL',
+        name: 'url',
+        type: 'string',
+        placeholder: 'https://bms-server/job/{guid}',
+        extractValue: {
+          type: 'regex',
+          regex: '([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})',
+        },
+      },
+    ],
+    description: 'The job definition to operate on',
+  };
+}
+
+function jobFolderLocator(
+  displayOptions: INodeProperties['displayOptions'],
+): INodeProperties {
+  return {
+    displayName: 'Job Folder',
+    name: 'folderId',
+    type: 'resourceLocator',
+    required: true,
+    default: { mode: 'list', value: '' },
+    displayOptions,
+    modes: [
+      {
+        displayName: 'From List',
+        name: 'list',
+        type: 'list',
+        typeOptions: {
+          searchListMethod: 'jobFolderSearch',
+          searchable: true,
+          searchFilterRequired: false,
+        },
+      },
+      {
+        displayName: 'By ID',
+        name: 'id',
+        type: 'string',
+        validation: [
+          {
+            type: 'regex',
+            properties: {
+              regex: GUID_REGEX,
+              errorMessage: 'Not a valid GUID (expected: 12345678-1234-1234-1234-123456789012)',
+            },
+          },
+        ],
+        placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
+      },
+      {
+        displayName: 'By URL',
+        name: 'url',
+        type: 'string',
+        placeholder: 'https://bms-server/folder/{guid}',
+        extractValue: {
+          type: 'regex',
+          regex: '([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})',
+        },
+      },
+    ],
+    description: 'The job folder to operate on',
+  };
+}
+
 export const jobOperations: INodeProperties[] = [
   {
     displayName: 'Operation',
@@ -173,44 +277,12 @@ export const jobFields: INodeProperties[] = [
   // ----------------------------------
   //         job:get
   // ----------------------------------
-  {
-    displayName: 'Job Name or ID',
-    name: 'jobSelection',
-    type: 'options',
-    required: true,
-    typeOptions: {
-      loadOptionsMethod: 'getJobDefinitions',
+  jobDefinitionLocator({
+    show: {
+      resource: ['job'],
+      operation: ['get'],
     },
-    options: [
-      {
-        name: 'Enter Custom GUID...',
-        value: '__custom__',
-      },
-    ],
-    default: '__custom__',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['get'],
-      },
-    },
-    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-  },
-  {
-    displayName: 'Job ID',
-    name: 'jobId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['get'],
-        jobSelection: ['__custom__'],
-      },
-    },
-    description: 'The GUID of the job',
-  },
+  }),
 
   // ----------------------------------
   //         job:getMany
@@ -280,44 +352,12 @@ export const jobFields: INodeProperties[] = [
   // ----------------------------------
   //         job:execute
   // ----------------------------------
-  {
-    displayName: 'Job Name or ID',
-    name: 'jobSelection',
-    type: 'options',
-    required: true,
-    typeOptions: {
-      loadOptionsMethod: 'getJobDefinitions',
+  jobDefinitionLocator({
+    show: {
+      resource: ['job'],
+      operation: ['execute'],
     },
-    options: [
-      {
-        name: 'Enter Custom GUID...',
-        value: '__custom__',
-      },
-    ],
-    default: '__custom__',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['execute'],
-      },
-    },
-    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-  },
-  {
-    displayName: 'Job ID',
-    name: 'jobId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['execute'],
-        jobSelection: ['__custom__'],
-      },
-    },
-    description: 'The GUID of the job to execute',
-  },
+  }),
   {
     displayName: 'Endpoint IDs',
     name: 'endpointIds',
@@ -370,44 +410,12 @@ export const jobFields: INodeProperties[] = [
   // ----------------------------------
   //         job:getInstances
   // ----------------------------------
-  {
-    displayName: 'Job Name or ID',
-    name: 'jobSelection',
-    type: 'options',
-    required: true,
-    typeOptions: {
-      loadOptionsMethod: 'getJobDefinitions',
+  jobDefinitionLocator({
+    show: {
+      resource: ['job'],
+      operation: ['getInstances'],
     },
-    options: [
-      {
-        name: 'Enter Custom GUID...',
-        value: '__custom__',
-      },
-    ],
-    default: '__custom__',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['getInstances'],
-      },
-    },
-    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-  },
-  {
-    displayName: 'Job ID',
-    name: 'jobId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['getInstances'],
-        jobSelection: ['__custom__'],
-      },
-    },
-    description: 'The GUID of the job to get instances for',
-  },
+  }),
   {
     displayName: 'Return All',
     name: 'returnAll',
@@ -528,42 +536,45 @@ export const jobFields: INodeProperties[] = [
   //         job:getEndpointJobInstances
   // ----------------------------------
   {
-    displayName: 'Endpoint Name or ID',
-    name: 'endpointSelection',
-    type: 'options',
+    displayName: 'Endpoint',
+    name: 'endpointId',
+    type: 'resourceLocator',
     required: true,
-    typeOptions: {
-      loadOptionsMethod: 'getEndpoints',
+    default: { mode: 'id', value: '' },
+    displayOptions: {
+      show: {
+        resource: ['job'],
+        operation: ['getEndpointJobInstances'],
+      },
     },
-    options: [
+    modes: [
       {
-        name: 'Enter Custom GUID...',
-        value: '__custom__',
+        displayName: 'By ID',
+        name: 'id',
+        type: 'string',
+        validation: [
+          {
+            type: 'regex',
+            properties: {
+              regex: GUID_REGEX,
+              errorMessage: 'Not a valid GUID (expected: 12345678-1234-1234-1234-123456789012)',
+            },
+          },
+        ],
+        placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
+      },
+      {
+        displayName: 'By URL',
+        name: 'url',
+        type: 'string',
+        placeholder: 'https://bms-server/endpoint/{guid}',
+        extractValue: {
+          type: 'regex',
+          regex: '([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})',
+        },
       },
     ],
-    default: '__custom__',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['getEndpointJobInstances'],
-      },
-    },
-    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-  },
-  {
-    displayName: 'Endpoint ID',
-    name: 'endpointId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['getEndpointJobInstances'],
-        endpointSelection: ['__custom__'],
-      },
-    },
-    description: 'The GUID of the endpoint',
+    description: 'The endpoint to query job instances for',
   },
   {
     displayName: 'Return All',
@@ -737,20 +748,12 @@ export const jobFields: INodeProperties[] = [
   // ----------------------------------
   //         job:getFolder
   // ----------------------------------
-  {
-    displayName: 'Folder ID',
-    name: 'folderId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['getFolder'],
-      },
+  jobFolderLocator({
+    show: {
+      resource: ['job'],
+      operation: ['getFolder'],
     },
-    description: 'The GUID of the job folder',
-  },
+  }),
 
   // ----------------------------------
   //         job:createFolder
@@ -802,20 +805,12 @@ export const jobFields: INodeProperties[] = [
   // ----------------------------------
   //         job:updateFolder
   // ----------------------------------
-  {
-    displayName: 'Folder ID',
-    name: 'folderId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['updateFolder'],
-      },
+  jobFolderLocator({
+    show: {
+      resource: ['job'],
+      operation: ['updateFolder'],
     },
-    description: 'The GUID of the job folder to update',
-  },
+  }),
   {
     displayName: 'Update Fields',
     name: 'updateFields',
@@ -856,20 +851,12 @@ export const jobFields: INodeProperties[] = [
   // ----------------------------------
   //         job:deleteFolder
   // ----------------------------------
-  {
-    displayName: 'Folder ID',
-    name: 'folderId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['deleteFolder'],
-      },
+  jobFolderLocator({
+    show: {
+      resource: ['job'],
+      operation: ['deleteFolder'],
     },
-    description: 'The GUID of the job folder to delete',
-  },
+  }),
 
   // ----------------------------------
   //         job:getKioskReleases
@@ -958,42 +945,13 @@ export const jobFields: INodeProperties[] = [
   //         job:createKioskRelease
   // ----------------------------------
   {
-    displayName: 'Job Definition Name or ID',
-    name: 'jobDefinitionSelection',
-    type: 'options',
-    required: true,
-    typeOptions: {
-      loadOptionsMethod: 'getJobDefinitions',
-    },
-    options: [
-      {
-        name: 'Enter Custom GUID...',
-        value: '__custom__',
-      },
-    ],
-    default: '__custom__',
-    displayOptions: {
+    ...jobDefinitionLocator({
       show: {
         resource: ['job'],
         operation: ['createKioskRelease'],
       },
-    },
-    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-  },
-  {
-    displayName: 'Job Definition ID',
+    }),
     name: 'jobDefinitionId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['createKioskRelease'],
-        jobDefinitionSelection: ['__custom__'],
-      },
-    },
-    description: 'The GUID of the job definition',
   },
   {
     displayName: 'Target Type',
@@ -1171,44 +1129,12 @@ export const jobFields: INodeProperties[] = [
   // ----------------------------------
   //         job:update
   // ----------------------------------
-  {
-    displayName: 'Job Name or ID',
-    name: 'jobSelection',
-    type: 'options',
-    required: true,
-    typeOptions: {
-      loadOptionsMethod: 'getJobDefinitions',
+  jobDefinitionLocator({
+    show: {
+      resource: ['job'],
+      operation: ['update'],
     },
-    options: [
-      {
-        name: 'Enter Custom GUID...',
-        value: '__custom__',
-      },
-    ],
-    default: '__custom__',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['update'],
-      },
-    },
-    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-  },
-  {
-    displayName: 'Job ID',
-    name: 'jobId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['update'],
-        jobSelection: ['__custom__'],
-      },
-    },
-    description: 'The GUID of the job definition to update',
-  },
+  }),
   {
     displayName: 'Update Fields',
     name: 'updateFields',
@@ -1256,57 +1182,19 @@ export const jobFields: INodeProperties[] = [
   // ----------------------------------
   //         job:delete
   // ----------------------------------
-  {
-    displayName: 'Job Name or ID',
-    name: 'jobSelection',
-    type: 'options',
-    required: true,
-    typeOptions: {
-      loadOptionsMethod: 'getJobDefinitions',
+  jobDefinitionLocator({
+    show: {
+      resource: ['job'],
+      operation: ['delete'],
     },
-    options: [
-      {
-        name: 'Enter Custom GUID...',
-        value: '__custom__',
-      },
-    ],
-    default: '__custom__',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['delete'],
-      },
-    },
-    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-  },
-  {
-    displayName: 'Job ID',
-    name: 'jobId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['delete'],
-        jobSelection: ['__custom__'],
-      },
-    },
-    description: 'The GUID of the job definition to delete',
-  },
+  }),
 
   // ----------------------------------
   //  Phase 8D — new fields
   // ----------------------------------
-  {
-    displayName: 'Folder ID',
-    name: 'folderId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: { show: { resource: ['job'], operation: ['getSubFolders', 'getJobDefinitionsByFolder'] } },
-    description: 'The GUID of the job folder',
-  },
+  jobFolderLocator({
+    show: { resource: ['job'], operation: ['getSubFolders', 'getJobDefinitionsByFolder'] },
+  }),
   {
     displayName: 'Job Definition ID',
     name: 'jobId',
@@ -1353,13 +1241,10 @@ export const jobFields: INodeProperties[] = [
     description: 'The GUID of the Universal Dynamic Group',
   },
   {
-    displayName: 'Job Definition ID',
+    ...jobDefinitionLocator({
+      show: { resource: ['job'], operation: ['assignJobToLogicalGroup', 'assignJobToStaticGroup', 'assignJobToDynamicGroup', 'assignJobToUDG'] },
+    }),
     name: 'jobDefinitionId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: { show: { resource: ['job'], operation: ['assignJobToLogicalGroup', 'assignJobToStaticGroup', 'assignJobToDynamicGroup', 'assignJobToUDG'] } },
-    description: 'The GUID of the job definition to assign',
   },
   {
     displayName: 'Endpoint ID',

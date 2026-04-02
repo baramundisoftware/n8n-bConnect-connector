@@ -26,6 +26,7 @@ import {
   getLogicalGroups,
   getStaticGroups,
   getDynamicGroups,
+  endpointSearch,
 } from '../shared/loadOptions';
 
 export class BaramundiEndpoint implements INodeType {
@@ -128,6 +129,9 @@ export class BaramundiEndpoint implements INodeType {
       getLogicalGroups,
       getStaticGroups,
       getDynamicGroups,
+    },
+    listSearch: {
+      endpointSearch,
     },
   };
 

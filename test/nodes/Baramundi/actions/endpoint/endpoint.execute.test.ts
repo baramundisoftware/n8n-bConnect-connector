@@ -57,7 +57,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       };
 
       const mockContext = createMockExecuteFunctions(
-        { endpointId, endpointSelection: endpointId },
+        { endpointId },
         {},
         mockEndpoint
       );
@@ -82,7 +82,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       // Arrange
       const endpointId = '00000000-0000-0000-0000-000000000000';
       const mockContext = createMockExecuteFunctions(
-        { endpointId, endpointSelection: endpointId },
+        { endpointId },
         {},
         {}
       );
@@ -404,7 +404,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       // Arrange
       const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
       const mockContext = createMockExecuteFunctions(
-        { endpointId, endpointSelection: endpointId },
+        { endpointId },
         {},
         {} // DELETE returns empty response
       );
@@ -432,7 +432,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       // Arrange
       const endpointId = '00000000-0000-0000-0000-000000000000';
       const mockContext = createMockExecuteFunctions(
-        { endpointId, endpointSelection: endpointId },
+        { endpointId },
         {},
         {}
       );
@@ -453,7 +453,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       const customBaseUrl = 'https://custom-server:444/bconnect';
       const endpointId = '12345678-1234-1234-1234-123456789012';
       const mockContext = createMockExecuteFunctions(
-        { endpointId, endpointSelection: endpointId },
+        { endpointId },
         { baseUrl: customBaseUrl },
         { id: endpointId }
       );
@@ -473,7 +473,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       // Arrange
       const endpointId = '87654321-4321-4321-4321-210987654321';
       const mockContext = createMockExecuteFunctions(
-        { endpointId, endpointSelection: endpointId },
+        { endpointId },
         { ignoreSslIssues: true },
         { id: endpointId }
       );
@@ -948,7 +948,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       const mockContext = createMockExecuteFunctions(
         {
           endpointId,
-          endpointSelection: endpointId,
+          endpointId,
           enrollmentOptions: {
             emailRecipient: 'user@company.com',
             emailLanguageId: 1033,
@@ -997,7 +997,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       const mockContext = createMockExecuteFunctions(
         {
           endpointId,
-          endpointSelection: endpointId,
+          endpointId,
           enrollmentOptions: {},
         },
         {},
@@ -1036,7 +1036,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       const mockContext = createMockExecuteFunctions(
         {
           endpointId,
-          endpointSelection: endpointId,
+          endpointId,
           enrollmentOptions: {
             emailRecipient: 'test@example.com',
             emailLanguageId: 1031,
@@ -1079,7 +1079,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       const mockContext = createMockExecuteFunctions(
         {
           endpointId,
-          endpointSelection: endpointId,
+          endpointId,
           enrollmentOptions: {},
         },
         {},
@@ -1104,7 +1104,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       const mockContext = createMockExecuteFunctions(
         {
           endpointId,
-          endpointSelection: endpointId,
+          endpointId,
         },
         {},
         mockResponse
@@ -1134,7 +1134,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       const mockContext = createMockExecuteFunctions(
         {
           endpointId,
-          endpointSelection: endpointId,
+          endpointId,
         },
         {},
         {}
@@ -1156,8 +1156,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       const mockContext = createMockExecuteFunctions(
         {
           endpointId: customEndpointId,
-          endpointSelection: '__custom__',
-        },
+                  },
         {},
         mockResponse
       );
@@ -1194,7 +1193,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       const mockContext = createMockExecuteFunctions(
         {
           endpointId,
-          endpointSelection: endpointId,
+          endpointId,
           updateFields,
         },
         {},
@@ -1244,7 +1243,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       const mockContext = createMockExecuteFunctions(
         {
           endpointId,
-          endpointSelection: endpointId,
+          endpointId,
           updateFields,
         },
         {},
@@ -1283,7 +1282,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       const mockContext = createMockExecuteFunctions(
         {
           endpointId,
-          endpointSelection: endpointId,
+          endpointId,
           updateFields: {},
         },
         {},
@@ -1311,7 +1310,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       const mockContext = createMockExecuteFunctions(
         {
           endpointId,
-          endpointSelection: endpointId,
+          endpointId,
           updateFields,
         },
         {},
@@ -1346,7 +1345,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       const mockContext = createMockExecuteFunctions(
         {
           endpointId,
-          endpointSelection: endpointId,
+          endpointId,
           updateFields: { displayName: 'new-name' },
         },
         {},
@@ -1371,7 +1370,7 @@ describe('Endpoint Operations - Unit Tests', () => {
       const mockContext = createMockExecuteFunctions(
         {
           endpointId,
-          endpointSelection: endpointId,
+          endpointId,
           updateFields,
         },
         {},
@@ -2794,8 +2793,7 @@ describe('Endpoint Phase 4 - EntraId Operations', () => {
     it('should return array of length 1 on success', async () => {
       const mockContext = createMockExecuteFunctions(
         {
-          endpointSelection: '__custom__',
-          endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+                    endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
           entraIdDeviceId: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
           additionalFields: {},
         },
@@ -2811,8 +2809,7 @@ describe('Endpoint Phase 4 - EntraId Operations', () => {
     it('should return success true', async () => {
       const mockContext = createMockExecuteFunctions(
         {
-          endpointSelection: '__custom__',
-          endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+                    endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
         },
         {},
         {},
@@ -2891,8 +2888,7 @@ describe('Endpoint Phase 4 - MaintenanceWindow PUT Operations', () => {
     it('should call httpRequest with method PUT', async () => {
       const mockContext = createMockExecuteFunctions(
         {
-          endpointSelection: '__custom__',
-          endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+                    endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
           windowId: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
           maintenanceWindowJson: '{"maintenanceWindowDefinitionType":"daily","intervals":[]}',
         },
@@ -2931,8 +2927,7 @@ describe('Endpoint Phase 6 - MaintenanceWindow PATCH Operations (26R1)', () => {
       const windowId = 'b2c3d4e5-f6a7-8901-bcde-f12345678901';
       const mockContext = createMockExecuteFunctions(
         {
-          endpointSelection: '__custom__',
-          endpointId,
+                    endpointId,
           windowId,
           updateFields: { enabled: true },
         },
@@ -2953,8 +2948,7 @@ describe('Endpoint Phase 6 - MaintenanceWindow PATCH Operations (26R1)', () => {
     it('should throw when no fields to update', async () => {
       const mockContext = createMockExecuteFunctions(
         {
-          endpointSelection: '__custom__',
-          endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+                    endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
           windowId: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
           updateFields: {},
         },
@@ -3226,7 +3220,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
     it('should fetch a single iOS endpoint by ID when endpointType=ios', async () => {
       const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
       const ctx = createMockExecuteFunctions(
-        { endpointSelection: endpointId, endpointType: 'ios' },
+        { endpointId, endpointType: 'ios' },
         {},
         { id: endpointId, displayName: 'iPhone-01' },
       );
@@ -3240,7 +3234,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
     it('should use generic path when endpointType=all', async () => {
       const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
       const ctx = createMockExecuteFunctions(
-        { endpointSelection: endpointId, endpointType: 'all' },
+        { endpointId, endpointType: 'all' },
         {},
         { id: endpointId },
       );
@@ -3255,7 +3249,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
     it('should PATCH a Linux endpoint at type-specific path', async () => {
       const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
       const ctx = createMockExecuteFunctions(
-        { endpointSelection: endpointId, endpointType: 'linux', updateFields: { displayName: 'linux-01' } },
+        { endpointId, endpointType: 'linux', updateFields: { displayName: 'linux-01' } },
         {},
         { id: endpointId, displayName: 'linux-01' },
       );
@@ -3269,7 +3263,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
     it('should PATCH a Mac endpoint at type-specific path', async () => {
       const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
       const ctx = createMockExecuteFunctions(
-        { endpointSelection: endpointId, endpointType: 'mac', updateFields: { displayName: 'mac-01' } },
+        { endpointId, endpointType: 'mac', updateFields: { displayName: 'mac-01' } },
         {},
         { id: endpointId, displayName: 'mac-01' },
       );
@@ -3285,7 +3279,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
     it('should DELETE a Mac endpoint at type-specific path', async () => {
       const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
       const ctx = createMockExecuteFunctions(
-        { endpointSelection: endpointId, endpointType: 'mac' },
+        { endpointId, endpointType: 'mac' },
         {},
         {},
       );
@@ -3301,7 +3295,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
     it('should POST enrollment for an Android endpoint using explicit type', async () => {
       const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
       const ctx = createMockExecuteFunctions(
-        { endpointSelection: endpointId, endpointType: 'android', enrollmentOptions: {} },
+        { endpointId, endpointType: 'android', enrollmentOptions: {} },
         {},
         {},
       );
@@ -3315,7 +3309,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
     it('should throw for Network endpoints which do not support enrollment', async () => {
       const endpointId = '98cdf559-1733-42b4-ae1f-42eabf7f9281';
       const ctx = createMockExecuteFunctions(
-        { endpointSelection: endpointId, endpointType: 'network', enrollmentOptions: {} },
+        { endpointId, endpointType: 'network', enrollmentOptions: {} },
         {},
         {},
       );

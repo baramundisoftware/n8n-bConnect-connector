@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-04-02
+
+> **Semver rationale**: Minor bump. Phase 15 upgrades endpoint and job selection fields from plain string/dropdown to `resourceLocator` components with type-ahead search, GUID validation, and URL extraction. **BREAKING CHANGE** — `endpointSelection` and `jobSelection` parameters no longer exist. The `endpointId`, `jobId`, `jobDefinitionId`, and `folderId` parameters now accept `resourceLocator` objects (`{ mode, value }`). Existing workflows will still execute correctly (backward-compatible value extraction), but may need re-saving in the n8n editor.
+
+### Breaking Changes (Phase 15 — Resource Locator UX)
+
+- **`endpointSelection`** parameter removed from all endpoint operations. Replaced by `endpointId` as `type: 'resourceLocator'` with modes: From List (searchable), By ID (GUID-validated), By URL.
+- **`jobSelection`** parameter removed from all job definition operations. Replaced by `jobId` as `type: 'resourceLocator'`.
+- **`jobDefinitionSelection`** parameter removed from kiosk release operations. Replaced by `jobDefinitionId` as `type: 'resourceLocator'`.
+- **`folderId`** fields in job folder operations upgraded from `type: 'string'` to `type: 'resourceLocator'`.
+
+### Added
+
+- `endpointSearch` listSearch method — server-side search of endpoints by display name with pagination (OData `SearchQuery` filter)
+- `jobDefinitionSearch` listSearch method — server-side search of job definitions by name
+- `jobFolderSearch` listSearch method — server-side search of job folders by name
+- OData filter sanitization (`validateODataString`) applied to all listSearch methods to prevent injection
+- GUID validation in the UI via regex mode validation (immediate feedback before API call)
+- 7 new unit tests for listSearch methods
+- ADR-005: Resource Locator UX architectural decision record
+
+### Changed
+
+- All `endpointId` fields in BaramundiEndpoint node now use `resourceLocator` component
+- All `jobId`, `jobDefinitionId`, `folderId` fields in BaramundiJob node now use `resourceLocator` component
+- Execute functions use `extractResourceLocatorValue()` for backward-compatible value extraction
+- 562 total tests passing (was 555)
+
 ## [0.7.0] - 2026-04-02
 
 > **Semver rationale**: Minor bump. Phase 14 removes the `typedEndpoint` resource from BaramundiEndpoint and merges platform-type filtering into the main `endpoint` resource (REQ-ENDPOINT-UX-1). **BREAKING CHANGE** — `resource: 'typedEndpoint'` no longer exists. Saved workflows using it must be updated.

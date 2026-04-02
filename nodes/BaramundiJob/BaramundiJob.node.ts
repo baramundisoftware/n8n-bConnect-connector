@@ -16,7 +16,7 @@ import {
   kioskReleaseFields,
 } from './actions/job/job.fields';
 import { router } from './actions/router';
-import { getJobDefinitions } from '../shared/loadOptions';
+import { getJobDefinitions, jobDefinitionSearch, jobFolderSearch } from '../shared/loadOptions';
 
 export class BaramundiJob implements INodeType {
   description: INodeTypeDescription = {
@@ -105,6 +105,10 @@ export class BaramundiJob implements INodeType {
   methods = {
     loadOptions: {
       getJobDefinitions,
+    },
+    listSearch: {
+      jobDefinitionSearch,
+      jobFolderSearch,
     },
   };
 

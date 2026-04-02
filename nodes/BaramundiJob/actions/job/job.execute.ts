@@ -1,16 +1,13 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../../shared/transport/requestApi';
-import { validateGuid, validateODataString } from '../../../shared/utils/validation';
+import { validateGuid, validateODataString, extractResourceLocatorValue } from '../../../shared/utils/validation';
 
 export async function get(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const jobSelection = this.getNodeParameter('jobSelection', index) as string;
-  const jobId = jobSelection === '__custom__'
-    ? this.getNodeParameter('jobId', index) as string
-    : jobSelection;
+  const jobId = extractResourceLocatorValue(this.getNodeParameter('jobId', index));
   const _jobIdValidation = validateGuid(jobId);
   if (!_jobIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _jobIdValidation.errors.join(', '), { itemIndex: index });
@@ -64,10 +61,7 @@ export async function execute(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const jobSelection = this.getNodeParameter('jobSelection', index) as string;
-  const jobId = jobSelection === '__custom__'
-    ? this.getNodeParameter('jobId', index) as string
-    : jobSelection;
+  const jobId = extractResourceLocatorValue(this.getNodeParameter('jobId', index));
   const _jobIdValidation = validateGuid(jobId);
   if (!_jobIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _jobIdValidation.errors.join(', '), { itemIndex: index });
@@ -101,10 +95,7 @@ export async function getInstances(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const jobSelection = this.getNodeParameter('jobSelection', index) as string;
-  const jobId = jobSelection === '__custom__'
-    ? this.getNodeParameter('jobId', index) as string
-    : jobSelection;
+  const jobId = extractResourceLocatorValue(this.getNodeParameter('jobId', index));
   const _jobIdValidation = validateGuid(jobId);
   if (!_jobIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _jobIdValidation.errors.join(', '), { itemIndex: index });
@@ -204,10 +195,7 @@ export async function getEndpointJobInstances(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const endpointSelection = this.getNodeParameter('endpointSelection', index) as string;
-  const endpointId = endpointSelection === '__custom__'
-    ? this.getNodeParameter('endpointId', index) as string
-    : endpointSelection;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const _endpointIdValidation = validateGuid(endpointId);
   if (!_endpointIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
@@ -336,7 +324,7 @@ export async function getFolder(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const folderId = this.getNodeParameter('folderId', index) as string;
+  const folderId = extractResourceLocatorValue(this.getNodeParameter('folderId', index));
   const _folderIdValidation = validateGuid(folderId);
   if (!_folderIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _folderIdValidation.errors.join(', '), { itemIndex: index });
@@ -365,7 +353,7 @@ export async function updateFolder(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const folderId = this.getNodeParameter('folderId', index) as string;
+  const folderId = extractResourceLocatorValue(this.getNodeParameter('folderId', index));
   const _folderIdValidation = validateGuid(folderId);
   if (!_folderIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _folderIdValidation.errors.join(', '), { itemIndex: index });
@@ -398,7 +386,7 @@ export async function deleteFolder(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const folderId = this.getNodeParameter('folderId', index) as string;
+  const folderId = extractResourceLocatorValue(this.getNodeParameter('folderId', index));
   const _folderIdValidation = validateGuid(folderId);
   if (!_folderIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _folderIdValidation.errors.join(', '), { itemIndex: index });
@@ -469,10 +457,7 @@ export async function createKioskRelease(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const jobDefinitionSelection = this.getNodeParameter('jobDefinitionSelection', index) as string;
-  const jobDefinitionId = jobDefinitionSelection === '__custom__'
-    ? this.getNodeParameter('jobDefinitionId', index) as string
-    : jobDefinitionSelection;
+  const jobDefinitionId = extractResourceLocatorValue(this.getNodeParameter('jobDefinitionId', index));
   const _jobDefinitionIdValidation = validateGuid(jobDefinitionId);
   if (!_jobDefinitionIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _jobDefinitionIdValidation.errors.join(', '), { itemIndex: index });
@@ -535,10 +520,7 @@ export async function update(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const jobSelection = this.getNodeParameter('jobSelection', index) as string;
-  const jobId = jobSelection === '__custom__'
-    ? this.getNodeParameter('jobId', index) as string
-    : jobSelection;
+  const jobId = extractResourceLocatorValue(this.getNodeParameter('jobId', index));
   const _jobIdValidation = validateGuid(jobId);
   if (!_jobIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _jobIdValidation.errors.join(', '), { itemIndex: index });
@@ -571,10 +553,7 @@ export async function deleteJob(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const jobSelection = this.getNodeParameter('jobSelection', index) as string;
-  const jobId = jobSelection === '__custom__'
-    ? this.getNodeParameter('jobId', index) as string
-    : jobSelection;
+  const jobId = extractResourceLocatorValue(this.getNodeParameter('jobId', index));
   const _jobIdValidation = validateGuid(jobId);
   if (!_jobIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _jobIdValidation.errors.join(', '), { itemIndex: index });
@@ -591,7 +570,7 @@ export async function getSubFolders(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const folderId = this.getNodeParameter('folderId', index) as string;
+  const folderId = extractResourceLocatorValue(this.getNodeParameter('folderId', index));
   const _folderIdValidation = validateGuid(folderId);
   if (!_folderIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _folderIdValidation.errors.join(', '), { itemIndex: index });
@@ -613,7 +592,7 @@ export async function getJobDefinitionsByFolder(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const folderId = this.getNodeParameter('folderId', index) as string;
+  const folderId = extractResourceLocatorValue(this.getNodeParameter('folderId', index));
   const _folderIdValidation = validateGuid(folderId);
   if (!_folderIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _folderIdValidation.errors.join(', '), { itemIndex: index });
@@ -750,7 +729,7 @@ export async function assignJobToLogicalGroup(
   if (!_logicalGroupIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _logicalGroupIdValidation.errors.join(', '), { itemIndex: index });
   }
-  const jobDefinitionId = this.getNodeParameter('jobDefinitionId', index) as string;
+  const jobDefinitionId = extractResourceLocatorValue(this.getNodeParameter('jobDefinitionId', index));
   const _jobDefinitionIdValidation = validateGuid(jobDefinitionId);
   if (!_jobDefinitionIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _jobDefinitionIdValidation.errors.join(', '), { itemIndex: index });
@@ -768,7 +747,7 @@ export async function assignJobToStaticGroup(
   if (!_staticGroupIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _staticGroupIdValidation.errors.join(', '), { itemIndex: index });
   }
-  const jobDefinitionId = this.getNodeParameter('jobDefinitionId', index) as string;
+  const jobDefinitionId = extractResourceLocatorValue(this.getNodeParameter('jobDefinitionId', index));
   const _jobDefinitionIdValidation = validateGuid(jobDefinitionId);
   if (!_jobDefinitionIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _jobDefinitionIdValidation.errors.join(', '), { itemIndex: index });
@@ -786,7 +765,7 @@ export async function assignJobToDynamicGroup(
   if (!_dynamicGroupIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _dynamicGroupIdValidation.errors.join(', '), { itemIndex: index });
   }
-  const jobDefinitionId = this.getNodeParameter('jobDefinitionId', index) as string;
+  const jobDefinitionId = extractResourceLocatorValue(this.getNodeParameter('jobDefinitionId', index));
   const _jobDefinitionIdValidation = validateGuid(jobDefinitionId);
   if (!_jobDefinitionIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _jobDefinitionIdValidation.errors.join(', '), { itemIndex: index });
@@ -804,7 +783,7 @@ export async function assignJobToUDG(
   if (!_udgIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _udgIdValidation.errors.join(', '), { itemIndex: index });
   }
-  const jobDefinitionId = this.getNodeParameter('jobDefinitionId', index) as string;
+  const jobDefinitionId = extractResourceLocatorValue(this.getNodeParameter('jobDefinitionId', index));
   const _jobDefinitionIdValidation = validateGuid(jobDefinitionId);
   if (!_jobDefinitionIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _jobDefinitionIdValidation.errors.join(', '), { itemIndex: index });
