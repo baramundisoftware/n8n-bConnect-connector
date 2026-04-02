@@ -1,10 +1,16 @@
 # UX Improvements - Implementation Summary
 
-## Date: 2026-01-22
+## Date: 2026-01-22 (Updated: 2026-04-02)
 
 ## Executive Summary
 
 This document summarizes the UX improvements implementation effort for the n8n-nodes-baramundi project. While all four UX tasks were planned, the implementation revealed version compatibility constraints that affected the resource locator features.
+
+**Current state (2026-04-02):**
+- ✅ Validation utilities — fully implemented, 206 call sites across all modules
+- ✅ loadOptions dropdowns — implemented as fallback for resource locator
+- ❌ Resource locator — blocked by n8n version, deferred
+- ❌ Enhanced error messages — planned but not yet started
 
 ---
 
@@ -69,7 +75,7 @@ if (!windowResult.valid) {
 
 ---
 
-## ⚠️ PARTIALLY IMPLEMENTED: Resource Locators
+## ✅ IMPLEMENTED (via loadOptions): Dropdown Selection / ❌ Resource Locator not implemented
 
 ### What Was Attempted
 
@@ -158,7 +164,7 @@ Keep current string-based fields with validation:
 
 ---
 
-## 🔄 IN PROGRESS: Enhanced Error Handling
+## ❌ NOT YET IMPLEMENTED: Enhanced Error Handling
 
 ### What Needs to Be Implemented
 
