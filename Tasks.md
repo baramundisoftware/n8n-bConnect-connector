@@ -422,40 +422,79 @@ Both are pre-Phase 8 and reference fields that no longer exist. They need to be 
 
 ### Suggested Workflow Details
 
-**P11E.2 — Endpoint Compliance Report** (26R1 only)
-Uses: `compliance.getComplianceStatus` → `endpoint.getMany` → join by endpointId → Code node to flag non-compliant → send report.
-Trigger: Schedule (weekly Monday 07:00). Output: HTML email or Spreadsheet row.
+**P11E.2 — Windows Patch Cycle** ⭐
+The end-to-end monthly/patch-Tuesday workflow. Sets maintenance windows on all Windows endpoint groups, triggers the update job, monitors execution, and produces a completion report.
 
-**P11E.3 — Job Failure Alert**
-Uses: `job.getJobInstances` (filter status=Failed, last 24h) → group by jobDefinitionId → `job.getJob` to get job names → Notification node.
+Steps:
+1. **Trigger**: Schedule node (e.g. Patch Tuesday — 2nd Tuesday of month, 22:00)
+2. **Get target groups**: `endpoint.getLogicalGroups` — fetch all groups tagged for patching
+3. **Set maintenance windows**: `endpoint.updateGroupMaintenanceWindow` (or `putGroupMaintenanceWindow` for full replace) — set start/end window per group
+4. **Trigger patch job**: `job.startJobInstance` — start the configured Windows Update job definition for each group
+5. **Wait**: n8n Wait node (e.g. 4 hours)
+6. **Check job results**: `job.getEndpointJobInstances` — get instance status per endpoint
+7. **Summarise**: Code node — count succeeded/failed/pending per group
+8. **Report**: Send HTML email or Teams message — "Patch cycle complete: 247 succeeded, 3 failed"
+9. **On failure**: Filter failed instances → `endpoint.get` for hostname/IP → escalation alert
+
+Key operations: `endpoint.getLogicalGroups`, `endpoint.putGroupMaintenanceWindow`, `job.startJobInstance`, `job.getEndpointJobInstances`, `job.getJobInstance`
+
+---
+
+**P11E.3 — Windows Devices with Patch Problems** ⭐
+Identifies endpoints where the last patch job failed or never ran. Gives the IT team an actionable list before the next patch cycle.
+
+Steps:
+1. **Trigger**: Schedule (daily 07:00, or manually before patch review meeting)
+2. **Get all Windows endpoints**: `endpoint.getTypedEndpoints` (platformType: windows, returnAll)
+3. **Get recent job instances**: `job.getAllJobInstances` — filter to Windows Update job definition, last 30 days
+4. **Join**: Code node — for each endpoint, find its latest update job instance; flag endpoints with status=Failed, status=Stopped, or no instance in 30 days
+5. **Enrich failures**: `job.getJobInstance` — get error detail for failed instances
+6. **Group by failure type**: Code node — categorise by error code / failure reason
+7. **Output**: Spreadsheet rows or HTML table — endpoint name, last patch attempt, status, error, responsible group
+
+Key operations: `endpoint.getTypedEndpoints`, `job.getAllJobInstances`, `job.getJobInstance`, `job.getEndpointJobInstances`
+
+---
+
+**P11E.4 — Windows Devices with Critical CVEs** ⭐ (26R1 only)
+Daily scan for endpoints with detected critical vulnerabilities. Produces a prioritised remediation list for the security team.
+
+Steps:
+1. **Trigger**: Schedule (daily 06:00)
+2. **Get all detected vulnerabilities**: `compliance.getDetectedVulnerabilities` (returnAll) — all active CVE detections
+3. **Filter critical**: Code node — keep only entries where `severity = Critical` or `cvssScore >= 9.0`
+4. **Get per-endpoint detail**: `compliance.getDetectedVulnerabilitiesByEndpoint` for each affected endpoint ID — full CVE list per machine
+5. **Enrich with endpoint info**: `endpoint.get` — hostname, primary user, logical group
+6. **Enrich with CVE details**: `compliance.getVulnerability` — CVE description, affected software, patch availability
+7. **Deduplicate and rank**: Code node — sort by CVSS score desc, deduplicate endpoints
+8. **Output**: Send to security team — table of endpoint / CVE / score / patch available / responsible group
+9. **Optional escalation**: If any endpoint has CVSS ≥ 9.5 and no patch available → immediate alert
+
+Key operations: `compliance.getDetectedVulnerabilities`, `compliance.getDetectedVulnerabilitiesByEndpoint`, `compliance.getVulnerability`, `endpoint.get`
+
+---
+
+**P11E.5 — Job Failure Alert**
+Uses: `job.getAllJobInstances` (filter status=Failed, last 24h) → group by jobDefinitionId → `job.getJob` to get job names → Notification node.
 Trigger: Schedule (every 6h). Output: Teams/Slack message with failure count + job names.
 
-**P11E.4 — New Endpoint Onboarding**
-Uses: Webhook trigger (baramundi event or polling) → `endpoint.get` to read new endpoint → `endpoint.createStaticGroup` membership or `endpoint.updateStaticGroup` → `variable.updateVariable` to set asset owner, cost center → `job.createJobInstance` to run onboarding job.
-Trigger: Webhook or Schedule (every 15min, query endpoints created in last 15min).
+**P11E.6 — New Endpoint Onboarding**
+Uses: Schedule poll (every 15min) → `endpoint.getTypedEndpoints` (filter created in last 15min) → `endpoint.updateStaticGroup` membership → `variable.updateVariableInstance` to set asset owner, cost center → `job.startJobInstance` to run onboarding job.
 
-**P11E.5 — Stale Endpoint Report**
-Uses: `endpoint.getMany` (returnAll) → Code node filter `lastContact < now-30days` → aggregate by logical group → send report.
+**P11E.7 — Stale Endpoint Report**
+Uses: `endpoint.getTypedEndpoints` (returnAll) → Code node filter `lastContact < now-30days` → aggregate by logical group → send report.
 Trigger: Schedule (monthly). Output: Email with list of stale endpoints + last contact date.
 
-**P11E.6 — Software License Audit**
+**P11E.8 — Software License Audit**
 Uses: `software.getInstalledWindowsSoftware` (returnAll) → Code node aggregate by `publisher`+`displayName` → count installs → compare against license sheet → flag over/under-licensed products.
 Trigger: Schedule (monthly). Output: Spreadsheet with install counts vs license entitlements.
-
-**P11E.7 — Security Incident Response**
-Uses: `defenseControl.getMicrosoftDefenderThreats` (returnAll) → filter severity=High/Critical → `endpoint.get` for endpoint details → `defenseControl.getLocalAdminAccounts` for context → create ServiceNow/Jira ticket or send Teams alert.
-Trigger: Schedule (every 30min).
-
-**P11E.8 — Patch Compliance Dashboard**
-Uses: `updateManagement.getMaintenanceWindows` → `endpoint.getMany` per group → aggregate patch status → output summary statistics.
-Trigger: Schedule (daily). Output: Dashboard data or management report.
 
 **P11E.9 — BitLocker Key Retrieval**
 Uses: n8n Form trigger (IT helpdesk requests key) → `asset.getBitLockerSecret` → return key to requester → write audit log entry (date, requester, endpoint).
 Note: Security-critical — add approval step before returning key.
 
-**P11E.10 — Maintenance Window Scheduler**
-Uses: Google Sheets / HTTP Request to fetch maintenance schedule → `endpoint.getMany` by group → `endpoint.updateTypedEndpoint` to set maintenance window start/end per endpoint or group.
+**P11E.10 — Maintenance Window Scheduler (external calendar)**
+Uses: Google Sheets / HTTP Request to fetch maintenance schedule → `endpoint.getLogicalGroups` → `endpoint.putGroupMaintenanceWindow` per group.
 Trigger: Schedule (weekly, before patch Tuesday).
 
 ### Done
