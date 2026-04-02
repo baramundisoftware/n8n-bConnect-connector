@@ -40,7 +40,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "main": "dist/nodes/Baramundi/Baramundi.node.js",
+  "main": "dist/nodes/BaramundiEndpoint/BaramundiEndpoint.node.js",
   "scripts": {
     "dev": "npx @n8n/node-cli dev",
     "build": "npx @n8n/node-cli build",
@@ -57,7 +57,12 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "nodes": [
-      "dist/nodes/Baramundi/Baramundi.node.js"
+      "dist/nodes/BaramundiEndpoint/BaramundiEndpoint.node.js",
+      "dist/nodes/BaramundiAsset/BaramundiAsset.node.js",
+      "dist/nodes/BaramundiJob/BaramundiJob.node.js",
+      "dist/nodes/BaramundiSoftware/BaramundiSoftware.node.js",
+      "dist/nodes/BaramundiAdmin/BaramundiAdmin.node.js",
+      "dist/nodes/BaramundiSecurity/BaramundiSecurity.node.js"
     ],
     "credentials": [
       "dist/credentials/BconnectApi.credentials.js"

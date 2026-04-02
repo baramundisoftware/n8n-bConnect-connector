@@ -940,6 +940,294 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 
 ---
 
+## REQ-SPLIT-1 — Split into 6 Domain Nodes
+
+**Status**: OPEN
+
+**Description**: Split the monolithic `Baramundi` node (28 resources, ~222 sidebar actions) into 6 focused domain nodes. Each node covers a distinct management domain, reducing sidebar clutter and the in-editor resource dropdown from 28 entries to 3–7 per node.
+
+**Rationale**: 222 actions in a single n8n node is overwhelming. n8n's standard pattern for large API surfaces is multiple nodes (e.g., Google Sheets / Drive / Docs). Splitting improves discoverability, reduces cognitive load, and makes each node's purpose immediately clear. Pre-1.0, no backward compat needed.
+
+**Node definitions**:
+
+| Node | Class | Resources | Ops | Source Modules |
+|------|-------|-----------|-----|----------------|
+| **Baramundi Endpoint** | `BaramundiEndpoint` | endpoint, logicalGroup, staticGroup, dynamicGroup, maintenanceWindow, typedEndpoint | ~92 | endpoint/ |
+| **Baramundi Asset** | `BaramundiAsset` | asset, assetType, assetFolder | ~43 | asset/ |
+| **Baramundi Job** | `BaramundiJob` | jobDefinition, jobFolder, jobInstance, kioskRelease | ~37 | job/ |
+| **Baramundi Software** | `BaramundiSoftware` | software, softwareBundle, updateManagement, variable, universalDynamicGroups | ~56 | software/, universalDynamicGroups/, updateManagement/, variable/ |
+| **Baramundi Admin** | `BaramundiAdmin` | adUser, adGroup, adObject, orgUnit, serverManagement, microservice, operatingSystem | ~60 | activeDirectory/, serverManagement/, operatingSystem/ |
+| **Baramundi Security** | `BaramundiSecurity` | bmsecurity, compliance, defenseControl | ~33 | serverManagement/ (bmsecurity), compliance/, defenseControl/ |
+
+**Shared infrastructure** (single source of truth in `nodes/shared/`):
+
+| File | Purpose |
+|------|---------|
+| `shared/transport/requestApi.ts` | `apiRequest()`, `apiRequestAllItems()` with retry/backoff |
+| `shared/utils/types.ts` | TypeScript interfaces (BConnectPagedResponse, etc.) |
+| `shared/utils/validation.ts` | 11 validation functions (GUID, email, MAC, OData, etc.) |
+| `shared/utils/errorMessages.ts` | HTTP error classification and troubleshooting hints |
+| `shared/loadOptions.ts` | 7 dropdown population functions (getEndpoints, getJobDefinitions, etc.) |
+
+### Node 1: Baramundi Endpoint
+
+- **Class**: `BaramundiEndpoint`, **name**: `baramundiEndpoint`
+- **Description**: Manage endpoints, groups, and maintenance windows via bConnect API
+
+| Resource | Value | Ops | Source |
+|----------|-------|-----|--------|
+| Endpoint | `endpoint` | 54 | `actions/endpoint/` |
+| Logical Group | `logicalGroup` | 7 | `actions/endpoint/` |
+| Static Group | `staticGroup` | 6 | `actions/endpoint/` |
+| Dynamic Group | `dynamicGroup` | 3 | `actions/endpoint/` |
+| Maintenance Window | `maintenanceWindow` | 10 | `actions/endpoint/` |
+| Typed Endpoint | `typedEndpoint` | 12 | `actions/endpoint/` |
+
+- **LoadOptions**: `getEndpoints`, `getLogicalGroups`, `getStaticGroups`, `getDynamicGroups`
+- **Version-specific operations**: `endpointOperations25R2/26R1`, `maintenanceWindowOperations25R2/26R1`, `typedEndpointOperations25R2/26R1`
+
+### Node 2: Baramundi Asset
+
+- **Class**: `BaramundiAsset`, **name**: `baramundiAsset`
+- **Description**: Manage assets, asset types, and folders via bConnect API
+
+| Resource | Value | Ops | Source |
+|----------|-------|-----|--------|
+| Asset | `asset` | 26 | `actions/asset/` |
+| Asset Type | `assetType` | 4 | `actions/asset/` |
+| Asset Folder | `assetFolder` | 13 | `actions/asset/` |
+
+- **LoadOptions**: none
+- **Version-specific operations**: `assetOperations25R2Trimmed/26R1Trimmed`
+
+### Node 3: Baramundi Job
+
+- **Class**: `BaramundiJob`, **name**: `baramundiJob`
+- **Description**: Manage job definitions, folders, instances, and kiosk releases via bConnect API
+
+| Resource | Value | Ops | Source |
+|----------|-------|-----|--------|
+| Job Definition | `jobDefinition` | 7 | `actions/job/` |
+| Job Folder | `jobFolder` | 6 | `actions/job/` |
+| Job Instance | `jobInstance` | 16 | `actions/job/` |
+| Kiosk Release | `kioskRelease` | 8 | `actions/job/` |
+
+- **LoadOptions**: `getJobDefinitions`
+- **Version-specific operations**: none
+
+### Node 4: Baramundi Software
+
+- **Class**: `BaramundiSoftware`, **name**: `baramundiSoftware`
+- **Description**: Manage software, bundles, updates, variables, and universal dynamic groups via bConnect API
+
+| Resource | Value | Ops | Source |
+|----------|-------|-----|--------|
+| Software | `software` | 19 | `actions/software/` |
+| Software Bundle | `softwareBundle` | 15 | `actions/software/` |
+| Update Management | `updateManagement` | 3 | `actions/updateManagement/` |
+| Variable | `variable` | 13 | `actions/variable/` |
+| Universal Dynamic Group | `universalDynamicGroups` | 6 | `actions/universalDynamicGroups/` |
+
+- **LoadOptions**: none
+- **Version-specific operations**: `softwareOperations25R2Trimmed/26R1Trimmed`
+- **Note**: `universalDynamicGroups` is 26R1+ only — hide via `displayOptions` when bmsVersion=25R2
+
+### Node 5: Baramundi Admin
+
+- **Class**: `BaramundiAdmin`, **name**: `baramundiAdmin`
+- **Description**: Manage Active Directory, server infrastructure, and operating systems via bConnect API
+
+| Resource | Value | Ops | Source |
+|----------|-------|-----|--------|
+| AD User | `adUser` | 4 | `actions/activeDirectory/` |
+| AD Group | `adGroup` | 4 | `actions/activeDirectory/` |
+| AD Object | `adObject` | 5 | `actions/activeDirectory/` |
+| Org Unit | `orgUnit` | 3 | `actions/activeDirectory/` |
+| Server Management | `serverManagement` | 30 | `actions/serverManagement/` |
+| Microservice | `microservice` | 5 | `actions/serverManagement/` |
+| Operating System | `operatingSystem` | 9 | `actions/operatingSystem/` |
+
+- **LoadOptions**: `getOrgUnits`
+- **Version-specific operations**: none
+
+### Node 6: Baramundi Security
+
+- **Class**: `BaramundiSecurity`, **name**: `baramundiSecurity`
+- **Description**: Manage security profiles, compliance rules, and defense controls via bConnect API
+
+| Resource | Value | Ops | Source |
+|----------|-------|-----|--------|
+| Security | `bmsecurity` | 12 | `actions/serverManagement/` |
+| Compliance | `compliance` | 8 | `actions/compliance/` |
+| Defense Control | `defenseControl` | 13 | `actions/defenseControl/` |
+
+- **LoadOptions**: none
+- **Version-specific operations**: none
+- **Note**: `compliance` is 26R1+ only — hide via `displayOptions` when bmsVersion=25R2
+
+### Target directory layout
+
+```
+nodes/
+├── shared/
+│   ├── transport/requestApi.ts
+│   ├── utils/types.ts
+│   ├── utils/validation.ts
+│   ├── utils/errorMessages.ts
+│   └── loadOptions.ts
+├── BaramundiEndpoint/
+│   ├── BaramundiEndpoint.node.ts
+│   ├── baramundi.svg
+│   └── actions/
+│       ├── router.ts              (mini-router: endpoint resources only)
+│       └── endpoint/              (moved from Baramundi/actions/endpoint/)
+├── BaramundiAsset/
+│   ├── BaramundiAsset.node.ts
+│   ├── baramundi.svg
+│   └── actions/
+│       ├── router.ts
+│       └── asset/
+├── BaramundiJob/
+│   ├── BaramundiJob.node.ts
+│   ├── baramundi.svg
+│   └── actions/
+│       ├── router.ts
+│       └── job/
+├── BaramundiSoftware/
+│   ├── BaramundiSoftware.node.ts
+│   ├── baramundi.svg
+│   └── actions/
+│       ├── router.ts
+│       ├── software/
+│       ├── universalDynamicGroups/
+│       ├── updateManagement/
+│       └── variable/
+├── BaramundiAdmin/
+│   ├── BaramundiAdmin.node.ts
+│   ├── baramundi.svg
+│   └── actions/
+│       ├── router.ts
+│       ├── activeDirectory/
+│       ├── serverManagement/
+│       └── operatingSystem/
+└── BaramundiSecurity/
+    ├── BaramundiSecurity.node.ts
+    ├── baramundi.svg
+    └── actions/
+        ├── router.ts
+        ├── compliance/
+        └── defenseControl/
+```
+
+### Each node must have
+
+1. **bmsVersion dropdown** — options `25R2`, `26R1`; default `26R1`
+2. **Resource dropdown** — only the resources assigned to that node
+3. **Operations + Fields** — spread from fields files, filtered by resource assignment
+4. **LoadOptions** — only the methods needed by that node's resources (import from `shared/loadOptions.ts`)
+5. **execute()** — delegates to the node's mini-router
+6. **Metadata** — `credentials: [{ name: 'bconnectApi', required: true }]`, same `requestDefaults`, `inputs`/`outputs` as current node
+
+### Mini-router pattern
+
+Each node gets its own router extracted from the monolithic `router.ts`:
+
+```typescript
+// Example: BaramundiEndpoint/actions/router.ts
+import { endpoint } from './endpoint';
+
+export async function router(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+  const items = this.getInputData();
+  const resource = this.getNodeParameter('resource', 0) as string;
+  const operation = this.getNodeParameter('operation', 0) as string;
+  const returnData: INodeExecutionData[] = [];
+
+  for (let i = 0; i < items.length; i++) {
+    try {
+      let responseData: INodeExecutionData[] = [];
+      switch (resource) {
+        case 'endpoint':
+          switch (operation) {
+            case 'get': responseData = await endpoint.get.call(this, i); break;
+            // ... only this node's operations
+          }
+          break;
+        case 'logicalGroup':
+          // ...
+      }
+      returnData.push(...responseData);
+    } catch (error) {
+      if (this.continueOnFail()) {
+        returnData.push({ json: { error: (error as Error).message } });
+      } else { throw error; }
+    }
+  }
+  return [returnData];
+}
+```
+
+### Import path pattern
+
+Action modules reach shared code via relative paths:
+```typescript
+// From BaramundiEndpoint/actions/endpoint/endpoint.execute.ts:
+import { apiRequest } from '../../../../shared/transport/requestApi';
+import { validateGuid } from '../../../../shared/utils/validation';
+```
+
+### Node registration (package.json)
+
+```json
+"n8n": {
+  "n8nNodesApiVersion": 1,
+  "nodes": [
+    "dist/nodes/BaramundiEndpoint/BaramundiEndpoint.node.js",
+    "dist/nodes/BaramundiAsset/BaramundiAsset.node.js",
+    "dist/nodes/BaramundiJob/BaramundiJob.node.js",
+    "dist/nodes/BaramundiSoftware/BaramundiSoftware.node.js",
+    "dist/nodes/BaramundiAdmin/BaramundiAdmin.node.js",
+    "dist/nodes/BaramundiSecurity/BaramundiSecurity.node.js"
+  ],
+  "credentials": [
+    "dist/credentials/BconnectApi.credentials.js"
+  ]
+}
+```
+
+### Dead code to exclude
+
+The monolithic router has unreachable cases for old resource values that no longer exist in the dropdown:
+- `case 'activeDirectory':` (16 ops) — replaced by `adUser`, `adGroup`, `adObject`, `orgUnit`
+- `case 'job':` (37 ops) — replaced by `jobDefinition`, `jobFolder`, `jobInstance`, `kioskRelease`
+
+Do **NOT** carry these into the new mini-routers.
+
+### bmsecurity handler sharing
+
+The `bmsecurity` operations are implemented in `serverManagement.execute.ts`. Copy the full `serverManagement/` module into both BaramundiAdmin and BaramundiSecurity nodes. Each router calls only its own operations. Unused handlers are dead code but harmless. Optionally refactor into a separate `bmsecurity.execute.ts` later.
+
+**Constraints**:
+- All 6 nodes share the existing `bconnectApi` credential
+- All nodes use the same `baramundi.svg` icon
+- Each node declares its own `bmsVersion` dropdown (25R2, 26R1)
+- Version-conditional resources (`compliance` = 26R1+, `universalDynamicGroups` = 26R1+) use `displayOptions`
+- Old monolithic `Baramundi` node removed entirely (no deprecation wrapper)
+
+**Quality**:
+- [ ] `npm run build` compiles all 6 nodes without errors
+- [ ] `npm test` — all existing tests pass with updated import paths
+- [ ] Each node appears in n8n sidebar with correct name and icon
+- [ ] Each node's resource dropdown shows only its assigned resources
+- [ ] Version-conditional resources hidden when bmsVersion=25R2
+- [ ] At least one operation per node executes successfully against bConnect API
+- [ ] No node exceeds ~92 actions in sidebar (Endpoint is largest)
+- [ ] `nodes/Baramundi/` directory fully removed
+- [ ] `nodes/shared/` has no circular dependencies
+- [ ] `package.json` registers all 6 nodes and single credential
+
+
+---
+
 ## REQ-PUBLISH-1 — Distribution Package
 
 **Status**: OPEN

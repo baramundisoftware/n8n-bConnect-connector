@@ -636,7 +636,7 @@ Trigger: Schedule (weekly, before patch Tuesday).
 | ~~P13.5~~ | ~~**Create BaramundiSoftware node**~~ | ~~HIGH~~ | ~~Moved to Done~~ |
 | ~~P13.6~~ | ~~**Create BaramundiAdmin node**~~ | ~~HIGH~~ | ~~Moved to Done~~ |
 | ~~P13.7~~ | ~~**Create BaramundiSecurity node**~~ | ~~HIGH~~ | ~~Moved to Done~~ |
-| P13.8 | **Update package.json and remove old node** | HIGH | Register 6 nodes in `n8n.nodes[]`, remove `Baramundi.node.js`. Delete `nodes/Baramundi/` entirely. `npm run build` + `npm test`. |
+| ~~P13.8~~ | ~~**Update package.json and remove old node**~~ | ~~HIGH~~ | ~~Moved to Done~~ |
 | P13.9 | **Update tests** | HIGH | Move/update test files to match new node dirs. Update all import paths to new locations and shared utils. `npm test` — all pass. |
 | P13.10 | **Documentation and version bump** | HIGH | Update CHANGELOG.md, SDLC-PIPELINE.md. Bump version to 0.6.0. |
 
@@ -661,6 +661,7 @@ Trigger: Schedule (weekly, before patch Tuesday).
 | P13.5 | Create BaramundiSoftware node — 5 resources (software, softwareBundle, updateManagement, variable, universalDynamicGroups), ~56 ops. | 2026-04-02 |
 | P13.6 | Create BaramundiAdmin node — 7 resources (adUser, adGroup, adObject, orgUnit, serverManagement, microservice, operatingSystem), ~60 ops. | 2026-04-02 |
 | P13.7 | Create BaramundiSecurity node — 3 resources (bmsecurity, compliance, defenseControl), ~33 ops. | 2026-04-02 |
+| P13.8 | Update package.json — registered 6 nodes, removed old `nodes/Baramundi/` directory. `tsc --noEmit` 0 errors. | 2026-04-02 |
 
 ---
 
