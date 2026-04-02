@@ -1,0 +1,115 @@
+{
+  "name": "Baramundi — Stale Endpoint Report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 1-7 * 1"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Monthly (1st Monday 08:00)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 300],
+      "notes": "Fires on the first Monday of each month at 08:00."
+    },
+    {
+      "parameters": {
+        "resource": "endpoint",
+        "operation": "getMany",
+        "endpointType": "all",
+        "returnAll": true
+      },
+      "id": "get-endpoints",
+      "name": "Get All Endpoints",
+      "type": "n8n-nodes-baramundi-management-solution.baramundiEndpoint",
+      "typeVersion": 1,
+      "position": [420, 300],
+      "credentials": {
+        "bconnectApi": {
+          "id": "1",
+          "name": "baramundi bConnect API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter endpoints not seen in 30+ days\nconst STALE_DAYS = 30;\nconst cutoff = new Date(Date.now() - STALE_DAYS * 24 * 60 * 60 * 1000);\n\nconst stale = $input.all().filter(i => {\n  const lastSeen = new Date(i.json.lastSeen || i.json.lastContact || 0);\n  return lastSeen < cutoff;\n});\n\nif (stale.length === 0) {\n  return [{ json: { hasStale: false, summary: `No endpoints inactive for ${STALE_DAYS}+ days.` } }];\n}\n\nreturn stale.map(i => ({\n  json: {\n    hasStale: true,\n    displayName: i.json.displayName || i.json.hostName || 'Unknown',\n    lastSeen: i.json.lastSeen || i.json.lastContact || 'Never',\n    logicalGroupId: i.json.logicalGroupId || '-',\n    endpointType: i.json.endpointType || '-',\n    primaryUser: i.json.primaryUser || '-',\n  }\n}));"
+      },
+      "id": "filter-stale",
+      "name": "Filter Stale (30+ days)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [640, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "has-stale",
+              "leftValue": "={{ $json.hasStale }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-stale",
+      "name": "Any Stale?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [860, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Aggregate stale endpoints by group and build summary\nconst items = $input.all();\nconst byGroup = {};\nfor (const i of items) {\n  const group = i.json.logicalGroupId || 'Unassigned';\n  if (!byGroup[group]) byGroup[group] = [];\n  byGroup[group].push(i.json);\n}\n\nconst groupSummary = Object.entries(byGroup).map(([group, endpoints]) => ({\n  group,\n  count: endpoints.length,\n  endpoints: endpoints.map(e => `${e.displayName} (last: ${e.lastSeen})`).join(', '),\n}));\n\nreturn [{ json: {\n  totalStale: items.length,\n  groups: groupSummary,\n  staleEndpoints: items.map(i => i.json),\n} }];"
+      },
+      "id": "aggregate",
+      "name": "Aggregate by Group",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1080, 200]
+    },
+    {
+      "parameters": {},
+      "id": "no-op",
+      "name": "All Endpoints Active — Done",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1080, 400]
+    }
+  ],
+  "connections": {
+    "Monthly (1st Monday 08:00)": {
+      "main": [[{ "node": "Get All Endpoints", "type": "main", "index": 0 }]]
+    },
+    "Get All Endpoints": {
+      "main": [[{ "node": "Filter Stale (30+ days)", "type": "main", "index": 0 }]]
+    },
+    "Filter Stale (30+ days)": {
+      "main": [[{ "node": "Any Stale?", "type": "main", "index": 0 }]]
+    },
+    "Any Stale?": {
+      "main": [
+        [{ "node": "Aggregate by Group", "type": "main", "index": 0 }],
+        [{ "node": "All Endpoints Active — Done", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateId": "baramundi-stale-endpoints",
+    "instanceId": ""
+  }
+}

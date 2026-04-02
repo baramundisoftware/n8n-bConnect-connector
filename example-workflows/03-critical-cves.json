@@ -1,0 +1,162 @@
+{
+  "name": "Baramundi — Critical CVE Report (26R1)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Daily 06:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "bmsVersion": "26R1",
+        "resource": "compliance",
+        "operation": "getDetectedVulnerabilities",
+        "returnAll": true
+      },
+      "id": "get-vulns",
+      "name": "Get All Detected Vulnerabilities",
+      "type": "n8n-nodes-baramundi-management-solution.baramundiSecurity",
+      "typeVersion": 1,
+      "position": [420, 300],
+      "credentials": {
+        "bconnectApi": {
+          "id": "1",
+          "name": "baramundi bConnect API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter to Critical severity or CVSS >= 9.0\nconst critical = $input.all().filter(i => {\n  const sev = (i.json.severity || '').toLowerCase();\n  const cvss = parseFloat(i.json.cvssScore) || 0;\n  return sev === 'critical' || cvss >= 9.0;\n});\n\nif (critical.length === 0) {\n  return [{ json: { hasCritical: false, summary: 'No critical CVEs detected.' } }];\n}\n\nreturn critical.map(i => ({ json: { ...i.json, hasCritical: true } }));"
+      },
+      "id": "filter-critical",
+      "name": "Filter Critical (CVSS >= 9.0)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [640, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "has-critical",
+              "leftValue": "={{ $json.hasCritical }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-critical",
+      "name": "Any Critical?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [860, 300]
+    },
+    {
+      "parameters": {
+        "bmsVersion": "26R1",
+        "resource": "compliance",
+        "operation": "getVulnerability",
+        "vulnerabilityId": "={{ $json.vulnerabilityId || $json.id }}"
+      },
+      "id": "enrich-cve",
+      "name": "Get CVE Details",
+      "type": "n8n-nodes-baramundi-management-solution.baramundiSecurity",
+      "typeVersion": 1,
+      "position": [1080, 200],
+      "credentials": {
+        "bconnectApi": {
+          "id": "1",
+          "name": "baramundi bConnect API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "endpoint",
+        "operation": "get",
+        "endpointId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.endpointId }}"
+        },
+        "endpointType": "all"
+      },
+      "id": "enrich-endpoint",
+      "name": "Get Endpoint Info",
+      "type": "n8n-nodes-baramundi-management-solution.baramundiEndpoint",
+      "typeVersion": 1,
+      "position": [1300, 200],
+      "credentials": {
+        "bconnectApi": {
+          "id": "1",
+          "name": "baramundi bConnect API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build prioritised CVE remediation report\nconst items = $input.all();\nitems.sort((a, b) => (parseFloat(b.json.cvssScore) || 0) - (parseFloat(a.json.cvssScore) || 0));\n\n// Deduplicate by endpoint+CVE\nconst seen = new Set();\nconst unique = items.filter(i => {\n  const key = `${i.json.endpointId}-${i.json.vulnerabilityId}`;\n  if (seen.has(key)) return false;\n  seen.add(key);\n  return true;\n});\n\nconst rows = unique.map(i => ({\n  endpoint: i.json.displayName || i.json.hostName || i.json.endpointId,\n  cve: i.json.cveId || i.json.vulnerabilityId || '-',\n  cvss: i.json.cvssScore || '-',\n  description: (i.json.description || '').substring(0, 120),\n  group: i.json.logicalGroupId || '-',\n}));\n\nreturn [{ json: { report: rows, count: unique.length } }];"
+      },
+      "id": "build-report",
+      "name": "Build Remediation Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1520, 200]
+    },
+    {
+      "parameters": {},
+      "id": "no-op",
+      "name": "No Critical CVEs — Done",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1080, 400]
+    }
+  ],
+  "connections": {
+    "Daily 06:00": {
+      "main": [[{ "node": "Get All Detected Vulnerabilities", "type": "main", "index": 0 }]]
+    },
+    "Get All Detected Vulnerabilities": {
+      "main": [[{ "node": "Filter Critical (CVSS >= 9.0)", "type": "main", "index": 0 }]]
+    },
+    "Filter Critical (CVSS >= 9.0)": {
+      "main": [[{ "node": "Any Critical?", "type": "main", "index": 0 }]]
+    },
+    "Any Critical?": {
+      "main": [
+        [{ "node": "Get CVE Details", "type": "main", "index": 0 }],
+        [{ "node": "No Critical CVEs — Done", "type": "main", "index": 0 }]
+      ]
+    },
+    "Get CVE Details": {
+      "main": [[{ "node": "Get Endpoint Info", "type": "main", "index": 0 }]]
+    },
+    "Get Endpoint Info": {
+      "main": [[{ "node": "Build Remediation Report", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateId": "baramundi-critical-cves",
+    "instanceId": ""
+  }
+}

@@ -1,137 +1,96 @@
-# Example Workflows for n8n Baramundi Connector
+# Example Workflows
 
-This directory contains ready-to-use workflow templates for the n8n Baramundi connector.
+Production-ready n8n workflow templates for the baramundi Management Suite connector.
+
+## Prerequisites
+
+- n8n with `n8n-nodes-baramundi-management-solution` installed
+- **bConnect API credential** configured (Credentials > Add > "baramundi bConnect API"):
+  - Server URL: `https://your-bms-server:444/bconnect`
+  - Username / Password: service account with bConnect API access
+  - Ignore SSL Issues: enable for self-signed certificates
+- baramundi Management Suite **25R2** or **26R1** (workflows note version requirements)
 
 ## How to Import
 
-1. Open n8n at http://localhost:5678
-2. Click **Workflows** → **Import from File**
-3. Select one of the JSON files from this directory
-4. Configure credentials when prompted
-5. Click **Execute** or **Test workflow** to run
+1. Open n8n
+2. Click **Workflows** > **Import from File**
+3. Select a `.json` file from this directory
+4. Update the **bConnect API credential** on each baramundi node
+5. Replace placeholder GUIDs (e.g. `YOUR-WINDOWS-UPDATE-JOB-DEFINITION-GUID`) with your actual IDs
+6. Adjust schedule triggers to match your maintenance windows
 
-## Available Workflows
+## Workflows
 
-### 01-list-endpoints.json
-**Purpose**: Simple workflow to list all baramundi endpoints
+### 01-patch-cycle.json — Patch Tuesday Cycle
 
-**What it does**:
-- Triggers manually
-- Fetches all endpoints from baramundi
-- Displays them in n8n
+**Purpose**: End-to-end monthly patching — sets maintenance windows, triggers the Windows Update job, waits for completion, and sends an HTML report with a styled failure table.
 
-**Use case**: Testing connectivity and viewing your managed devices
+**Trigger**: Schedule (2nd Tuesday of month, 22:00)
 
----
+**Nodes**: Baramundi Endpoint (Logical Group, Maintenance Window) + Baramundi Job (Job Instance) + Code + Email
 
-### 02-search-and-report.json
-**Purpose**: Search for specific endpoints and process results
+**What to customise**:
+- Replace `YOUR-WINDOWS-UPDATE-JOB-DEFINITION-GUID` with your Windows Update job definition ID
+- Adjust the cron expression for your patch window
+- Adjust the wait duration (default: 4 hours)
+- Configure the Send Report Email node with your SMTP credentials (disabled by default)
 
-**What it does**:
-- Searches for endpoints matching "WIN" (Windows machines)
-- Processes and formats the results
-- Extracts key information (name, ID, last contact, user)
-
-**Use case**: Finding specific devices and generating reports
-
-**Customize**:
-- Change `searchQuery` from "WIN" to your search term
-- Modify the Code node to extract different fields
+**bMS version**: 25R2 or 26R1
 
 ---
 
-## Creating Your Own Workflows
+### 02-job-failure-alert.json — Job Failure Alert
 
-### Basic Structure
+**Purpose**: Monitors all job instances every 6 hours. If any failed in the last 24 hours, groups them by job definition, enriches with the job name, and formats a notification message.
 
-Every workflow needs at least:
-1. **Trigger** - When to run (Manual, Schedule, Webhook, etc.)
-2. **Baramundi Node** - What to do with baramundi
-3. **Processing** - Optional data transformation
-4. **Output** - Email, Slack, Database, etc.
+**Trigger**: Schedule (every 6 hours)
 
-### Common Patterns
+**Nodes**: Baramundi Job (Job Instance, Job Definition) + Code + If
 
-#### Pattern 1: Scheduled Maintenance
-```
-Schedule Trigger (daily)
-  → Baramundi: Get endpoints
-  → Code: Filter inactive
-  → Baramundi: Execute cleanup job
-  → Email: Send report
-```
+**What to customise**:
+- Add a Slack, Teams, or Email node after "Format Notification" to deliver the alert
+- Adjust the schedule interval
+- Change the 24-hour lookback window in the Code node
 
-#### Pattern 2: Event-Driven Response
-```
-Webhook Trigger (from monitoring)
-  → Baramundi: Search for endpoint
-  → IF: Endpoint found
-    → Baramundi: Execute remediation job
-    → Slack: Notify team
-```
+**bMS version**: 25R2 or 26R1
 
-#### Pattern 3: Compliance Monitoring
-```
-Schedule Trigger (weekly)
-  → Baramundi: Get all endpoints
-  → Code: Check compliance rules
-  → IF: Non-compliant found
-    → Baramundi: Get job instances
-    → Database: Log violations
-    → Email: Alert security team
-```
+---
 
-## Tips for Building Workflows
+### 03-critical-cves.json — Critical CVE Report (26R1)
 
-1. **Start Simple**: Begin with manual triggers and basic operations
-2. **Test Incrementally**: Add one node at a time and test
-3. **Use Code Nodes**: JavaScript/Python for complex logic
-4. **Error Handling**: Add IF nodes to handle errors gracefully
-5. **Pagination**: Use "Return All" for complete results
-6. **Credentials**: Test credentials before building complex workflows
+**Purpose**: Daily scan for endpoints with critical vulnerabilities (CVSS >= 9.0). Enriches each finding with CVE details and endpoint information, then produces a prioritised remediation list.
 
-## Credential Configuration
+**Trigger**: Schedule (daily 06:00)
 
-Before using these workflows, configure your baramundi credentials:
+**Nodes**: Baramundi Security (Compliance) + Baramundi Endpoint + Code + If
 
-1. Go to **Credentials** → **Add Credential**
-2. Search for "baramundi bConnect API"
-3. Fill in:
-   - **Server URL**: `https://bms-win22srv:444/bconnect`
-   - **Username**: `Administrator`
-   - **Password**: Your password
-   - **Ignore SSL**: `true` (for self-signed certificates)
-4. Click **Test** to verify
+**What to customise**:
+- Adjust the CVSS threshold in the Filter Critical code node (default: 9.0)
+- Add a notification node after "Build Remediation Report" to send results to your security team
 
-## Troubleshooting
+**bMS version**: 26R1 only (uses Compliance module)
 
-### Workflow Not Finding Baramundi Node
-- Ensure n8n is running with custom node: `npm run dev`
-- Check that `dist/` folder contains compiled files
-- Restart n8n if you just built the node
+---
 
-### Authentication Errors
-- Verify credentials are correct
-- Check server URL includes `/bconnect`
-- Enable "Ignore SSL Issues" for self-signed certs
-- Ensure user has bConnect API permissions
+### 04-stale-endpoint-report.json — Stale Endpoint Report
 
-### Empty Results
-- Verify search query is not too restrictive
-- Check user permissions in baramundi
-- Try "Get Many" instead of "Search"
-- Increase page size or use "Return All"
+**Purpose**: Monthly report of endpoints that haven't been seen in 30+ days. Aggregates stale devices by logical group for IT review and potential cleanup.
 
-## Next Steps
+**Trigger**: Schedule (1st Monday of month, 08:00)
 
-1. Import and test the basic workflows
-2. Modify them to match your environment
-3. Combine with other n8n nodes (Email, Slack, Database)
-4. Set up scheduled automation
-5. Build custom workflows for your use cases
+**Nodes**: Baramundi Endpoint + Code + If
 
-## Resources
+**What to customise**:
+- Change `STALE_DAYS` in the Code node (default: 30)
+- Add an Email or spreadsheet node after "Aggregate by Group" to deliver the report
 
-- [n8n Documentation](https://docs.n8n.io/)
-- [Baramundi bConnect API](https://docs.baramundi.com/)
-- [Main README](../README.md)
+**bMS version**: 25R2 or 26R1
+
+## Tips
+
+- **Start with a manual trigger** while testing — change to Schedule once confirmed working
+- **Use "Return All"** for complete datasets, or set a limit for testing
+- **resourceLocator fields** support search-by-name — click the field and type to find endpoints/jobs
+- **Code nodes** use JavaScript — access input with `$input.all()`, return with `return [{ json: {...} }]`
+- All baramundi nodes require the same `bconnectApi` credential — configure it once, reuse everywhere

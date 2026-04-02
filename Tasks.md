@@ -403,14 +403,7 @@ Both must be deleted and replaced.
 
 ### Backlog
 
-| ID | Task | Acceptance Criteria |
-|----|------|---------------------|
-| P11.1 | Delete `01-list-endpoints.json` and `02-search-and-report.json` | Files removed; no references to old `n8n-nodes-baramundi.baramundi` node type remain |
-| P11.2 | Create **`01-patch-cycle.json`** — Patch Tuesday workflow: schedule trigger → get logical groups → set maintenance windows → trigger update job → wait → check results → report success/failure | Valid n8n JSON; imports without error; uses `baramundiEndpoint` (logicalGroup.getMany, maintenanceWindow.putGroupMaintenanceWindow) + `baramundiJob` (jobInstance.startJobInstance, jobInstance.getEndpointJobInstances); includes Code node for summary |
-| P11.3 | Create **`02-job-failure-alert.json`** — Scheduled job failure monitor: schedule (6h) → get all job instances → filter status=Failed → enrich with job definition name → send notification | Valid n8n JSON; uses `baramundiJob` (jobInstance.getAllJobInstances, jobDefinition.get); includes Code node for grouping + notification placeholder |
-| P11.4 | Create **`03-critical-cves.json`** (26R1) — Daily CVE scan: schedule → get detected vulnerabilities → filter critical (CVSS >= 9.0) → enrich with endpoint info → output report | Valid n8n JSON; uses `baramundiSecurity` (compliance.getDetectedVulnerabilities, compliance.getVulnerability) + `baramundiEndpoint` (endpoint.get); `bmsVersion: '26R1'` on security node |
-| P11.5 | Create **`04-stale-endpoint-report.json`** — Monthly stale device report: schedule → get all endpoints → Code node filters lastSeen > 30 days → aggregate by group → output | Valid n8n JSON; uses `baramundiEndpoint` (endpoint.getMany with `endpointType: 'all'`); Code node with date comparison logic; simple and self-contained |
-| P11.6 | Rewrite **`example-workflows/README.md`** — document all 4 workflows: purpose, prerequisites, which bMS version, which credentials, how to adapt GUIDs and schedules | README covers all workflows; includes prerequisites section (credentials, bMS version); includes "How to import" instructions |
+*(empty — all tasks complete)*
 
 ### Deferred (future phase)
 
@@ -461,7 +454,14 @@ Both must be deleted and replaced.
 
 ### Done
 
-*(empty)*
+| ID | Task | Completed |
+|----|------|-----------|
+| P11.1 | Deleted broken `01-list-endpoints.json` and `02-search-and-report.json` (referenced removed `n8n-nodes-baramundi.baramundi` node type) | 2026-04-02 |
+| P11.2 | Created `01-patch-cycle.json` — 8-node workflow: Schedule → Get Groups → Set MW → Trigger Job → Wait → Get Results → Build HTML Report (styled failure table) → Email | 2026-04-02 |
+| P11.3 | Created `02-job-failure-alert.json` — 7-node workflow: Schedule (6h) → Get All Instances → Filter Failed (24h) → If → Enrich Job Name → Format Notification | 2026-04-02 |
+| P11.4 | Created `03-critical-cves.json` (26R1) — 8-node workflow: Schedule (daily) → Get Vulnerabilities → Filter Critical (CVSS >= 9.0) → Get CVE Details → Get Endpoint → Build Report | 2026-04-02 |
+| P11.5 | Created `04-stale-endpoint-report.json` — 6-node workflow: Schedule (monthly) → Get All Endpoints → Filter Stale (30+ days) → If → Aggregate by Group | 2026-04-02 |
+| P11.6 | Rewrote `example-workflows/README.md` — prerequisites, import instructions, per-workflow documentation with customisation notes, bMS version requirements, tips | 2026-04-02 |
 
 ---
 
