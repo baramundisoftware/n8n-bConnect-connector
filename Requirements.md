@@ -1019,6 +1019,32 @@ Add a CI step to verify permissions after checkout, or configure the repository'
 
 ---
 
+## REQ-UX-3 — Type-Filtered Endpoint Picker
+
+**Status**: COMPLETED ✅ 2026-04-02
+
+**Description**: The `endpointSearch` listSearch method must filter the endpoint picker list to match the `endpointType` selected by the user. Without filtering, selecting `endpointType = 'windows'` still shows Android/iOS/Linux/network endpoints in the picker — choosing one would cause a 404 at execution time because the typed API path (e.g. `/WindowsEndpoints/{id}`) rejects non-matching IDs.
+
+**Implementation**: `endpointSearch` reads the sibling `endpointType` parameter via `getCurrentNodeParameter('endpointType')` (the correct n8n API for listSearch context) and switches the API path accordingly:
+
+| `endpointType` | API path used by picker |
+|---|---|
+| `all` / absent | `/endpoints/v2.0/Endpoints` |
+| `windows` | `/endpoints/v2.0/WindowsEndpoints` |
+| `android` | `/endpoints/v2.0/AndroidEndpoints` |
+| `ios` | `/endpoints/v2.0/IosEndpoints` |
+| `linux` | `/endpoints/v2.0/LinuxEndpoints` |
+| `mac` | `/endpoints/v2.0/MacEndpoints` |
+| `network` | `/endpoints/v2.0/NetworkEndpoints` |
+
+**Quality**:
+- [x] `endpointSearch` calls the typed path when `endpointType` is set
+- [x] Falls back to `/Endpoints` when `endpointType` is `'all'` or absent
+- [x] 10 unit tests in `test/unit/endpointSearch.test.ts` — all passing
+- [x] No regression in existing 821 tests
+
+---
+
 ## REQ-SPLIT-1 — Split into 6 Domain Nodes
 
 **Status**: OPEN
