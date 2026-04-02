@@ -1,7 +1,7 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../../shared/transport/requestApi';
-import { validateGuid, validateODataString } from '../../../shared/utils/validation';
+import { validateGuid, validateODataString , extractResourceLocatorValue } from '../../../shared/utils/validation';
 
 // ============================================================================
 // VARIABLE DEFINITIONS OPERATIONS
@@ -290,7 +290,7 @@ export async function getVariableInstancesByEndpoint(
 	this: IExecuteFunctions,
 	index: number,
 ): Promise<INodeExecutionData[]> {
-	const endpointId = this.getNodeParameter('endpointId', index) as string;
+	const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
 	const _endpointIdValidation = validateGuid(endpointId);
 	if (!_endpointIdValidation.valid) {
 		throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });

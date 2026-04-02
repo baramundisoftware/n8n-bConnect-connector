@@ -15,6 +15,7 @@ import {
   assetFolderFields,
 } from './actions/asset/asset.fields';
 import { router } from './actions/router';
+import { endpointSearch } from '../shared/loadOptions';
 
 export class BaramundiAsset implements INodeType {
   description: INodeTypeDescription = {
@@ -92,6 +93,12 @@ export class BaramundiAsset implements INodeType {
       ...assetTypeFields,
       ...assetFolderFields,
     ],
+  };
+
+  methods = {
+    listSearch: {
+      endpointSearch,
+    },
   };
 
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {

@@ -1,7 +1,7 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../../shared/transport/requestApi';
-import { validateGuid, validateRfc6902Patch, validateODataString } from '../../../shared/utils/validation';
+import { validateGuid, validateRfc6902Patch, validateODataString , extractResourceLocatorValue } from '../../../shared/utils/validation';
 
 // ============================================================================
 // BITLOCKER OPERATIONS
@@ -52,7 +52,7 @@ export async function getBitLockerWindowsEndpoint(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const _endpointIdValidation = validateGuid(endpointId);
   if (!_endpointIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
@@ -69,7 +69,7 @@ export async function getLocalAdministrativeAccounts(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const _endpointIdValidation = validateGuid(endpointId);
   if (!_endpointIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
@@ -82,7 +82,7 @@ export async function triggerLocalAdminAccountsUpdate(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const _endpointIdValidation = validateGuid(endpointId);
   if (!_endpointIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
@@ -95,7 +95,7 @@ export async function patchLocalAdminUserCredentials(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const _endpointIdValidation = validateGuid(endpointId);
   if (!_endpointIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
@@ -185,7 +185,7 @@ export async function getMicrosoftDefenderThreatsByEndpoint(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const _endpointIdValidation = validateGuid(endpointId);
   if (!_endpointIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
@@ -346,7 +346,7 @@ export async function getMicrosoftDefenderWindowsEndpoint(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const _endpointIdValidation = validateGuid(endpointId);
   if (!_endpointIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
@@ -363,7 +363,7 @@ export async function getBitLockerSecrets(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const _endpointIdValidation = validateGuid(endpointId);
   if (!_endpointIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });
@@ -376,7 +376,7 @@ export async function patchBitLockerSecrets(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const _endpointIdValidation = validateGuid(endpointId);
   if (!_endpointIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _endpointIdValidation.errors.join(', '), { itemIndex: index });

@@ -1,7 +1,7 @@
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems } from '../../../shared/transport/requestApi';
-import { validateGuid, validateODataString } from '../../../shared/utils/validation';
+import { validateGuid, validateODataString , extractResourceLocatorValue } from '../../../shared/utils/validation';
 
 export async function getRules(this: IExecuteFunctions, index: number): Promise<INodeExecutionData[]> {
 	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
@@ -80,7 +80,7 @@ export async function getDetectedVulnerabilities(this: IExecuteFunctions, index:
 }
 
 export async function getDetectedVulnerabilitiesByEndpoint(this: IExecuteFunctions, index: number): Promise<INodeExecutionData[]> {
-	const endpointId = this.getNodeParameter('endpointId', index) as string;
+	const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
 	const endpointValidation = validateGuid(endpointId);
 	if (!endpointValidation.valid) throw new NodeOperationError(this.getNode(), `Endpoint ID: ${endpointValidation.errors.join(', ')}`, { itemIndex: index });
 	const returnAll = this.getNodeParameter('returnAll', index) as boolean;
@@ -117,7 +117,7 @@ export async function getDetectedRuleViolations(this: IExecuteFunctions, index: 
 }
 
 export async function getDetectedRuleViolationsByEndpoint(this: IExecuteFunctions, index: number): Promise<INodeExecutionData[]> {
-	const endpointId = this.getNodeParameter('endpointId', index) as string;
+	const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
 	const endpointValidation = validateGuid(endpointId);
 	if (!endpointValidation.valid) throw new NodeOperationError(this.getNode(), `Endpoint ID: ${endpointValidation.errors.join(', ')}`, { itemIndex: index });
 	const returnAll = this.getNodeParameter('returnAll', index) as boolean;

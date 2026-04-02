@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { endpointLocator } from '../../../shared/resourceLocators';
 
 const COMMON_ASSET_OPTIONS = [
   { name: 'Get', value: 'get', description: 'Get an asset by ID', action: 'Get an asset' },
@@ -469,20 +470,12 @@ export const assetFields: INodeProperties[] = [
   // ----------------------------------
   //         asset:getAssetsByEndpoint
   // ----------------------------------
-  {
-    displayName: 'Endpoint ID',
-    name: 'endpointId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['asset'],
-        operation: ['getAssetsByEndpoint'],
-      },
+  endpointLocator({
+    show: {
+      resource: ['asset'],
+      operation: ['getAssetsByEndpoint'],
     },
-    description: 'The GUID of the endpoint',
-  },
+  }),
 
   // ----------------------------------
   //         asset:getAssetsByLogicalGroup

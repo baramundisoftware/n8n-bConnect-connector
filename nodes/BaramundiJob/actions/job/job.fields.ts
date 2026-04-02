@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { endpointLocator } from '../../../shared/resourceLocators';
 
 const GUID_REGEX = '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$';
 
@@ -1246,15 +1247,7 @@ export const jobFields: INodeProperties[] = [
     }),
     name: 'jobDefinitionId',
   },
-  {
-    displayName: 'Endpoint ID',
-    name: 'endpointId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: { show: { resource: ['job'], operation: ['getKioskReleasesByEndpoint'] } },
-    description: 'The GUID of the endpoint',
-  },
+  endpointLocator({ show: { resource: ['job'], operation: ['getKioskReleasesByEndpoint'] } }),
   {
     displayName: 'AD Object ID',
     name: 'adObjectId',

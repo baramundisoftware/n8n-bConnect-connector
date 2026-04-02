@@ -74,7 +74,7 @@ describe.skipIf(skipConfig.skip)('Endpoint API - System Tests', () => {
 
       // Now get that specific endpoint
       const context = createSystemTestContext({
-        endpointSelection: endpointId,
+        endpointId,
         endpointId,
       }, config!);
 
@@ -120,7 +120,7 @@ describe.skipIf(skipConfig.skip)('Endpoint API - System Tests', () => {
 
       // Update the endpoint
       const updateContext = createSystemTestContext({
-        endpointSelection: endpointId,
+        endpointId,
         endpointId,
         updateFields: {
           comment: 'System test comment - ' + new Date().toISOString(),
@@ -136,7 +136,7 @@ describe.skipIf(skipConfig.skip)('Endpoint API - System Tests', () => {
       // Restore original comment
       try {
         const restoreContext = createSystemTestContext({
-          endpointSelection: endpointId,
+          endpointId,
           endpointId,
           updateFields: {
             comment: originalComment || '',
@@ -333,7 +333,7 @@ describe.skipIf(skipConfig.skip)('Endpoint API - System Tests', () => {
     it('should handle invalid endpoint ID', async () => {
       const endpointId = '00000000-0000-0000-0000-000000000000';
       const context = createSystemTestContext({
-        endpointSelection: endpointId,
+        endpointId,
         endpointId,
       }, config!);
 
@@ -343,7 +343,7 @@ describe.skipIf(skipConfig.skip)('Endpoint API - System Tests', () => {
     it('should handle invalid GUID format', async () => {
       const endpointId = 'invalid-guid';
       const context = createSystemTestContext({
-        endpointSelection: '__custom__',
+        
         endpointId,
       }, config!);
 

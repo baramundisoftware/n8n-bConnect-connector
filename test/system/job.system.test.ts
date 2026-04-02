@@ -86,7 +86,7 @@ describe.skipIf(skipConfig.skip)('Jobs API - System Tests', () => {
 
       // Get specific job
       const context = createSystemTestContext({
-        jobSelection: jobId,
+        jobId,
         jobId,
       }, config!);
 
@@ -130,7 +130,7 @@ describe.skipIf(skipConfig.skip)('Jobs API - System Tests', () => {
 
       // Get instances for that job
       const context = createSystemTestContext({
-        jobSelection: jobId,
+        jobId,
         jobId,
         returnAll: false,
         limit: 10,
@@ -153,7 +153,7 @@ describe.skipIf(skipConfig.skip)('Jobs API - System Tests', () => {
       }
 
       const context = createSystemTestContext({
-        endpointSelection: testEndpointId,
+        endpointId: testEndpointId,
         endpointId: testEndpointId,
         returnAll: false,
         limit: 10,
@@ -182,7 +182,7 @@ describe.skipIf(skipConfig.skip)('Jobs API - System Tests', () => {
       }
 
       const context = createSystemTestContext({
-        endpointSelection: testEndpointId,
+        endpointId: testEndpointId,
         endpointId: testEndpointId,
         returnAll: true,
       }, config!);
@@ -202,7 +202,7 @@ describe.skipIf(skipConfig.skip)('Jobs API - System Tests', () => {
       }
 
       const context = createSystemTestContext({
-        endpointSelection: '__custom__',
+        
         endpointId: testEndpointId,
         returnAll: false,
         limit: 5,
@@ -475,7 +475,7 @@ describe.skipIf(skipConfig.skip)('Jobs API - System Tests', () => {
     it('should handle invalid job definition ID', async () => {
       const jobId = '00000000-0000-0000-0000-000000000000';
       const context = createSystemTestContext({
-        jobSelection: jobId,
+        jobId,
         jobId,
       }, config!);
 

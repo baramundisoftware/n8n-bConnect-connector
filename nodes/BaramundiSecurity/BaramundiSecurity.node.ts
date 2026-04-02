@@ -11,6 +11,7 @@ import {
 import { complianceOperations, complianceFields } from './actions/compliance/compliance.fields';
 import { defenseControlOperations, defenseControlFields } from './actions/defenseControl/defenseControl.fields';
 import { router } from './actions/router';
+import { endpointSearch } from '../shared/loadOptions';
 
 export class BaramundiSecurity implements INodeType {
   description: INodeTypeDescription = {
@@ -87,6 +88,12 @@ export class BaramundiSecurity implements INodeType {
       ...complianceFields,
       ...defenseControlFields,
     ],
+  };
+
+  methods = {
+    listSearch: {
+      endpointSearch,
+    },
   };
 
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {

@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { endpointLocator } from '../../../shared/resourceLocators';
 
 export const defenseControlOperations: INodeProperties[] = [
   {
@@ -186,29 +187,21 @@ export const defenseControlFields: INodeProperties[] = [
   // ----------------------------------
   //         defenseControl:getBitLockerWindowsEndpoint
   // ----------------------------------
-  {
-    displayName: 'Endpoint ID',
-    name: 'endpointId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['defenseControl'],
-        operation: [
-          'getBitLockerWindowsEndpoint',
-          'getLocalAdministrativeAccounts',
-          'triggerLocalAdminAccountsUpdate',
-          'patchLocalAdminUserCredentials',
-          'getMicrosoftDefenderThreatsByEndpoint',
-          'getMicrosoftDefenderWindowsEndpoint',
-          'getBitLockerSecrets',
-          'patchBitLockerSecrets',
-        ],
-      },
+  endpointLocator({
+    show: {
+      resource: ['defenseControl'],
+      operation: [
+        'getBitLockerWindowsEndpoint',
+        'getLocalAdministrativeAccounts',
+        'triggerLocalAdminAccountsUpdate',
+        'patchLocalAdminUserCredentials',
+        'getMicrosoftDefenderThreatsByEndpoint',
+        'getMicrosoftDefenderWindowsEndpoint',
+        'getBitLockerSecrets',
+        'patchBitLockerSecrets',
+      ],
     },
-    description: 'The GUID of the endpoint',
-  },
+  }),
 
   // ----------------------------------
   //         defenseControl:patchBitLockerSecrets (26R1+)

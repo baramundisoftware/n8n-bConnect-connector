@@ -16,6 +16,7 @@ import { universalDynamicGroupsOperations, universalDynamicGroupsFields } from '
 import { updateManagementOperations, updateManagementFields } from './actions/updateManagement/updateManagement.fields';
 import { variableOperations, variableFields } from './actions/variable/variable.fields';
 import { router } from './actions/router';
+import { endpointSearch } from '../shared/loadOptions';
 
 export class BaramundiSoftware implements INodeType {
   description: INodeTypeDescription = {
@@ -107,6 +108,12 @@ export class BaramundiSoftware implements INodeType {
       ...updateManagementFields,
       ...variableFields,
     ],
+  };
+
+  methods = {
+    listSearch: {
+      endpointSearch,
+    },
   };
 
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {

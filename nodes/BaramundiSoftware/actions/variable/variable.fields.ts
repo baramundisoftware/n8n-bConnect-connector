@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { endpointLocator } from '../../../shared/resourceLocators';
 
 export const variableOperations: INodeProperties[] = [
 	{
@@ -363,20 +364,12 @@ export const variableFields: INodeProperties[] = [
 	// ----------------------------------
 	//         variable:getVariableInstancesByEndpoint
 	// ----------------------------------
-	{
-		displayName: 'Endpoint ID',
-		name: 'endpointId',
-		type: 'string',
-		required: true,
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['variable'],
-				operation: ['getVariableInstancesByEndpoint'],
-			},
+	endpointLocator({
+		show: {
+			resource: ['variable'],
+			operation: ['getVariableInstancesByEndpoint'],
 		},
-		description: 'The GUID of the endpoint',
-	},
+	}),
 
 	// ----------------------------------
 	//         variable:getVariableInstancesByLogicalGroup

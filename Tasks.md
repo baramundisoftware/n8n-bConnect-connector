@@ -531,14 +531,12 @@ Trigger: Schedule (weekly, before patch Tuesday).
 
 ### Backlog
 
-| ID | Task | Priority | Notes |
-|----|------|----------|-------|
-| P15.7 | Extend `listSearch` to other high-value resources: logical groups, variables, assets, `endpointId` in non-Endpoint nodes | LOW | Deferred — not blocking release |
+*(empty — all tasks complete)*
 
 ### Design
 
 - **ADR**: `docs/adr/ADR-005-resource-locator-ux.md`
-- **Scope**: `endpointId` in BaramundiEndpoint only; `jobDefinitionId`/`folderId` in BaramundiJob only. Secondary `endpointId` in other nodes stays `type: 'string'` (P15.7).
+- **Scope**: All `endpointId` fields across all 6 nodes; `jobId`/`jobDefinitionId`/`folderId` in BaramundiJob.
 - **Breaking change**: Saved workflows still execute (helper handles both formats), but n8n editor may show field as empty until re-selected. Acceptable pre-1.0.
 - **No new dependencies**.
 
@@ -552,6 +550,7 @@ Trigger: Schedule (weekly, before patch Tuesday).
 | P15.4 | Converted `jobId` (5 fields), `jobDefinitionId` (2 fields), and `folderId` (4 fields) in `job.fields.ts` to `resourceLocator`. Added `jobDefinitionLocator()` and `jobFolderLocator()` helpers. | 2026-04-02 |
 | P15.5 | Replaced all `endpointSelection`/`jobSelection`/`jobDefinitionSelection` 3-line extraction patterns with `extractResourceLocatorValue()` — 12 sites in `endpoint.execute.ts`, 7 in `job.execute.ts`. | 2026-04-02 |
 | P15.6 | 7 new unit tests for listSearch methods (3 endpointSearch, 2 jobDefinitionSearch, 2 jobFolderSearch). All existing tests updated and passing. 562 total tests. | 2026-04-02 |
+| P15.7 | Extended `endpointSearch` listSearch + `endpointLocator` resourceLocator to all 6 nodes. Created shared `resourceLocators.ts`. Converted all remaining `endpointId` string fields (Security/2, Admin/1, Software/3, Asset/1, Job/1). Updated all execute functions. | 2026-04-02 |
 | P15.8 | Build 0 errors, lint 0 errors (1 pre-existing warning), 562 tests passing. Bumped 0.7.0 → 0.8.0. CHANGELOG updated with breaking changes. | 2026-04-02 |
 
 ---
@@ -713,6 +712,9 @@ Trigger: Schedule (weekly, before patch Tuesday).
 ### Backlog
 
 *(empty)*
+
+| SEC-08.1 | Add version-mismatch guards in BaramundiEndpoint router: throw `NodeOperationError` when 25R2-only ops (`replaceEndpointMaintenanceWindow`, `replaceGroupMaintenanceWindow`, Industrial Endpoints) are executed with `bmsVersion: '26R1'`. Error must name the 26R1 replacement and note body format change. | **HIGH** | F-2026-08: Silent workflow breakage on bmsVersion migration |
+| SEC-08.2 | Unit tests for each version-mismatch guard (maintenance window PUT under 26R1, industrial endpoints under 26R1) | HIGH | F-2026-08 |
 
 ### Accepted (no action required)
 

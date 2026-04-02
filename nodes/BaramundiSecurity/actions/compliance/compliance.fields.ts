@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { endpointLocator } from '../../../shared/resourceLocators';
 
 export const complianceOperations: INodeProperties[] = [{
 	displayName: 'Operation',
@@ -38,15 +39,7 @@ export const complianceFields: INodeProperties[] = [
 		displayOptions: { show: { resource: ['compliance'], operation: ['getVulnerability'], bmsVersion: ['26R1'] } },
 		description: 'The GUID of the vulnerability',
 	},
-	{
-		displayName: 'Endpoint ID',
-		name: 'endpointId',
-		type: 'string',
-		required: true,
-		default: '',
-		displayOptions: { show: { resource: ['compliance'], operation: ['getDetectedVulnerabilitiesByEndpoint', 'getDetectedRuleViolationsByEndpoint'], bmsVersion: ['26R1'] } },
-		description: 'The GUID of the endpoint',
-	},
+	endpointLocator({ show: { resource: ['compliance'], operation: ['getDetectedVulnerabilitiesByEndpoint', 'getDetectedRuleViolationsByEndpoint'], bmsVersion: ['26R1'] } }),
 	{
 		displayName: 'Return All',
 		name: 'returnAll',

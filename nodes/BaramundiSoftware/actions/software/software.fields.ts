@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { endpointLocator } from '../../../shared/resourceLocators';
 
 const COMMON_SOFTWARE_OPTIONS = [
 	{ name: 'Get Installed Software', value: 'getInstalledWindowsSoftware', description: 'Get all installed Windows software', action: 'Get installed software' },
@@ -49,7 +50,7 @@ export const softwareFields: INodeProperties[] = [
 		{ displayName: 'Search Query', name: 'searchQuery', type: 'string', default: '', description: 'Filter results by name' },
 		{ displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order' },
 	]},
-	{ displayName: 'Endpoint ID', name: 'endpointId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['getInstalledSoftwareByEndpoint'] } }, description: 'The GUID of the endpoint' },
+	endpointLocator({ show: { resource: ['software'], operation: ['getInstalledSoftwareByEndpoint'] } }),
 	{ displayName: 'Logical Group ID', name: 'logicalGroupId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['getInstalledSoftwareByLogicalGroup'] } }, description: 'The GUID of the logical group' },
 	{ displayName: 'Universal Dynamic Group ID', name: 'universalDynamicGroupId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['getInstalledSoftwareByUniversalDynamicGroup'] } }, description: 'The GUID of the universal dynamic group' },
 

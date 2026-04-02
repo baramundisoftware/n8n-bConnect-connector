@@ -1174,7 +1174,7 @@ export async function getEndpointMaintenanceWindow(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const endpointId = this.getNodeParameter('endpointId', index) as string;
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
   const endpointIdValidation = validateGuid(endpointId);
   if (!endpointIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), `Invalid endpoint ID:\n${endpointIdValidation.errors.join('\n')}`, { itemIndex: index });

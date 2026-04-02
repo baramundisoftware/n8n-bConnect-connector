@@ -17,7 +17,7 @@ import {
 } from './actions/serverManagement/serverManagement.fields';
 import { operatingSystemOperations, operatingSystemFields } from './actions/operatingSystem/operatingSystem.fields';
 import { router } from './actions/router';
-import { getOrgUnits } from '../shared/loadOptions';
+import { getOrgUnits, endpointSearch } from '../shared/loadOptions';
 
 export class BaramundiAdmin implements INodeType {
   description: INodeTypeDescription = {
@@ -111,6 +111,9 @@ export class BaramundiAdmin implements INodeType {
   methods = {
     loadOptions: {
       getOrgUnits,
+    },
+    listSearch: {
+      endpointSearch,
     },
   };
 

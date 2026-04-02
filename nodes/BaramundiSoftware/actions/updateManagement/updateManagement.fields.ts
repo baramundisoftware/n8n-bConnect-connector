@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { endpointLocator } from '../../../shared/resourceLocators';
 
 export const updateManagementOperations: INodeProperties[] = [{
 	displayName: 'Operation', name: 'operation', type: 'options', noDataExpression: true,
@@ -18,7 +19,7 @@ export const updateManagementFields: INodeProperties[] = [
 		{ displayName: 'Search Query', name: 'searchQuery', type: 'string', default: '', description: 'Filter results by name' },
 		{ displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order' },
 	]},
-	{ displayName: 'Endpoint ID', name: 'endpointId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['updateManagement'], operation: ['getWindowsEndpoint', 'updateWindowsEndpoint'] } }, description: 'The GUID of the Windows endpoint' },
+	endpointLocator({ show: { resource: ['updateManagement'], operation: ['getWindowsEndpoint', 'updateWindowsEndpoint'] } }),
 	{ displayName: 'Update Fields', name: 'updateFields', type: 'collection', placeholder: 'Add Field', default: {}, displayOptions: { show: { resource: ['updateManagement'], operation: ['updateWindowsEndpoint'] } }, options: [
 		{ displayName: 'Update Profile ID', name: 'updateProfileId', type: 'string', default: '', description: 'The GUID of the update profile' },
 	]},

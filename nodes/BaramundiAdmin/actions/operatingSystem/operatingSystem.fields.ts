@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { endpointLocator } from '../../../shared/resourceLocators';
 
 export const operatingSystemOperations: INodeProperties[] = [
 	{
@@ -221,20 +222,12 @@ export const operatingSystemFields: INodeProperties[] = [
 	},
 
 	// Endpoint ID fields
-	{
-		displayName: 'Endpoint ID',
-		name: 'endpointId',
-		type: 'string',
-		required: true,
-		default: '',
-		displayOptions: {
-			show: {
-				resource: ['operatingSystem'],
-				operation: ['getWindowsEndpoint', 'updateWindowsEndpoint'],
-			},
+	endpointLocator({
+		show: {
+			resource: ['operatingSystem'],
+			operation: ['getWindowsEndpoint', 'updateWindowsEndpoint'],
 		},
-		description: 'The GUID of the Windows endpoint',
-	},
+	}),
 
 	// Update Windows endpoint fields
 	{
