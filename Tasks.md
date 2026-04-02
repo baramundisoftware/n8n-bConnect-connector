@@ -697,6 +697,12 @@ Both must be deleted and replaced.
 | P16.7 | **E2E tests against real bMS** — env-var gated (`BMS_URL`/`BMS_USER`/`BMS_PASS`). Destructive ops opt-in (`BMS_E2E_DESTRUCTIVE=true`). | MEDIUM | Postponed — requires live bMS access | P16.6 |
 | P16.8 | **Add OpenAPI cross-check to SDLC process** — update `/process-design-review` Step 3a and `/process-qa-gate` Step 3 with spec verification checklist | MEDIUM | SDLC docs updated; checklist enforced in next design review | — |
 
+### Done (P16.8)
+
+| ID | Task | Completed |
+|----|------|----------|
+| P16.8 | Updated `/process-design-review` Step 3a and `/process-qa-gate` Step 3c with OpenAPI path cross-check instructions. Fixed duplicate `cd` line in mock startup. | 2026-04-02 |
+
 ### Done
 
 | ID | Task | Completed |
