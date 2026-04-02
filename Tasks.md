@@ -694,7 +694,6 @@ Both must be deleted and replaced.
 | P16.3 | **Verify StaticGroups/DynamicGroups base CRUD** — test against real bMS (or accept as undocumented). If 404: remove operations + fields + router cases + tests. If working: add comment noting undocumented API. | MEDIUM | Verified against real bMS or documented as accepted risk | — (postponed until bMS access) |
 | P16.4 | **Add automated path validation test** — create `test/unit/apiPaths.test.ts` that: (a) extracts all path strings from `*.execute.ts` via regex, (b) loads all OpenAPI spec JSON from `/home/ansible/MCP/bConnectOpenAPI/26R1/`, (c) strips domain prefix from connector paths, (d) asserts each path exists in spec. Run in CI. | MEDIUM | Test passes with 0 unmatched paths; runs as part of `npx vitest run`; catches any future drift | P16.1, P16.2 |
 | P16.5 | **Update tests + CHANGELOG** — fix all unit test assertions for changed paths, bump version, document breaking changes (windowId removal) in CHANGELOG | HIGH | All tests pass; CHANGELOG entry for path fixes | P16.1, P16.2 |
-| P16.6 | **E2E tests for all operations against bConnectMock** — one file per node in `test/e2e/`. Real HTTP against `localhost:8765` (standard-readwrite). Cover GET/POST/PATCH/DELETE. Verify response structure. Skip when mock not running. | HIGH | 6 test files; covers all ~220 operations; all pass against mock; `npx vitest run test/e2e/` green | P16.1, P16.2 |
 | P16.7 | **E2E tests against real bMS** — env-var gated (`BMS_URL`/`BMS_USER`/`BMS_PASS`). Destructive ops opt-in (`BMS_E2E_DESTRUCTIVE=true`). | MEDIUM | Postponed — requires live bMS access | P16.6 |
 | P16.8 | **Add OpenAPI cross-check to SDLC process** — update `/process-design-review` Step 3a and `/process-qa-gate` Step 3 with spec verification checklist | MEDIUM | SDLC docs updated; checklist enforced in next design review | — |
 
@@ -707,6 +706,7 @@ Both must be deleted and replaced.
 | P16.2 | Fixed MW paths: `WindowsEndpoints` → `Endpoints`; removed `/{windowId}` from all PATCH/DELETE/PUT (MW is singleton); removed `windowId` field from UI + execute. BREAKING. | 2026-04-02 |
 | P16.4 | Created `test/unit/apiPaths.test.ts` — extracts all connector paths, validates against OpenAPI specs. 3 tests, runs in CI. Known exceptions documented. | 2026-04-02 |
 | P16.5 | Updated CHANGELOG (0.8.2), bumped version, documented breaking windowId removal + all path fixes. | 2026-04-02 |
+| P16.6 | Created 6 E2E test files in `test/e2e/` (endpoint, asset, job, software, admin, security) + shared `helpers.ts`. 191 E2E tests covering all operations. Runs against bConnectMock at localhost:8765, skip gracefully when unavailable. 780 tests total passing. | 2026-04-02 |
 
 ---
 
