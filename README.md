@@ -38,6 +38,30 @@ This node allows you to automate interactions with baramundi Management Suite, e
 - **Security Features**: BitLocker management, SSH key deployment, and setup file integrity verification
 - **Compliance & Inventory**: Track hardware/software inventory, custom attributes, and compliance violations
 
+## Quick Start
+
+```bash
+cd /home/ansible/MCP/n8nconnector
+npm install && npm run build
+./start-n8n-dev.sh
+```
+
+Then open **http://localhost:5678** (allow 2–5 minutes on first run).
+
+### Your First Workflow
+
+1. Click **"+ Create new workflow"** → **"Add first step"**
+2. Search for **"Manual Trigger"** and add it
+3. Click **"+"** after the trigger → search **"Baramundi"** and add it
+4. In the Baramundi node:
+   - **Credential**: select your baramundi credential (or add one via *Credentials → Add Credential → baramundi bConnect API*)
+   - **Resource**: `Endpoint` · **Operation**: `Get Many` · **Return All**: on
+5. Click **"Test workflow"** — your endpoints should appear
+
+> If the Baramundi node doesn't show up: run `npm run build`, then restart with `./start-n8n-dev.sh`.
+
+---
+
 ## Installation
 
 ### Development Setup (DevContainer)
@@ -544,6 +568,20 @@ The dropdown feature requires:
 - Valid baramundi bConnect API credentials
 - Network access to the bConnect API server
 - bConnect API v2.0 enabled on baramundi Management Server
+
+## Useful Commands
+
+```bash
+./start-n8n-dev.sh      # Start n8n (recommended)
+pkill -f n8n            # Stop n8n
+npm run build           # Rebuild node
+npm test                # Run tests
+npm run test:coverage   # Run tests with coverage report
+ps aux | grep n8n       # Check n8n status
+tail -f /tmp/n8n.log    # View logs
+```
+
+---
 
 ## Contributing
 

@@ -609,6 +609,10 @@ Trigger: Schedule (weekly, before patch Tuesday).
 | P12.10 | Updated all `displayOptions.show.resource` in `endpoint.fields.ts` to new resource values | 2026-04-02 |
 | P12.11 | All 550 unit tests pass with new resource split (endpoint.execute.test.ts: 118 tests green) | 2026-04-02 |
 | P12.2 | Split `job` resource into 4 resources (Job Definition, Job Folder, Job Instance, Kiosk Release) | 2026-04-02 |
+| P12.3 | Split `serverManagement` into 3 resources (Server Management, Microservice, Security) | 2026-04-02 |
+| P12.4 | Split `asset` into 3 resources (Asset, Asset Type, Asset Folder) | 2026-04-02 |
+| P12.5 | Split `software` into 2 resources (Software, Software Bundle) | 2026-04-02 |
+| P12.6 | Split `activeDirectory` into 4 resources (AD User, AD Group, AD Object, Org Unit) | 2026-04-02 |
 
 ---
 

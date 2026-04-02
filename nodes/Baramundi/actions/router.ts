@@ -880,6 +880,37 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
           }
           break;
 
+        case 'microservice':
+          switch (operation) {
+            case 'getMicroservices': responseData = await serverManagement.getMicroservices.call(this, i); break;
+            case 'getMicroservice': responseData = await serverManagement.getMicroservice.call(this, i); break;
+            case 'startMicroservice': responseData = await serverManagement.startMicroservice.call(this, i); break;
+            case 'stopMicroservice': responseData = await serverManagement.stopMicroservice.call(this, i); break;
+            case 'restartMicroservice': responseData = await serverManagement.restartMicroservice.call(this, i); break;
+            default:
+              throw new NodeOperationError(this.getNode(), `Unknown operation "${operation}" for resource "microservice"`);
+          }
+          break;
+
+        case 'bmsecurity':
+          switch (operation) {
+            case 'getSecurityGroups': responseData = await serverManagement.getSecurityGroups.call(this, i); break;
+            case 'getSecurityGroup': responseData = await serverManagement.getSecurityGroup.call(this, i); break;
+            case 'createSecurityGroup': responseData = await serverManagement.createSecurityGroup.call(this, i); break;
+            case 'updateSecurityGroup': responseData = await serverManagement.updateSecurityGroup.call(this, i); break;
+            case 'deleteSecurityGroup': responseData = await serverManagement.deleteSecurityGroup.call(this, i); break;
+            case 'getSecurityProfiles': responseData = await serverManagement.getSecurityProfiles.call(this, i); break;
+            case 'getSecurityProfile': responseData = await serverManagement.getSecurityProfile.call(this, i); break;
+            case 'createSecurityProfile': responseData = await serverManagement.createSecurityProfile.call(this, i); break;
+            case 'updateSecurityProfile': responseData = await serverManagement.updateSecurityProfile.call(this, i); break;
+            case 'deleteSecurityProfile': responseData = await serverManagement.deleteSecurityProfile.call(this, i); break;
+            case 'getAccessRights': responseData = await serverManagement.getAccessRights.call(this, i); break;
+            case 'updateObjectPermissions': responseData = await serverManagement.updateObjectPermissions.call(this, i); break;
+            default:
+              throw new NodeOperationError(this.getNode(), `Unknown operation "${operation}" for resource "bmsecurity"`);
+          }
+          break;
+
         case 'software':
           switch (operation) {
             case 'getInstalledWindowsSoftware':
@@ -1074,6 +1105,110 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
                 this.getNode(),
                 `Unknown operation "${operation}" for resource "universalDynamicGroups"`,
               );
+          }
+          break;
+
+        // P12.4 — assetType sub-resource (routes to same execute functions as 'asset')
+        case 'assetType':
+          switch (operation) {
+            case 'getAssetTypes': responseData = await asset.getAssetTypes.call(this, i); break;
+            case 'getAssetType': responseData = await asset.getAssetType.call(this, i); break;
+            case 'createAssetType': responseData = await asset.createAssetType.call(this, i); break;
+            case 'deleteAssetType': responseData = await asset.deleteAssetType.call(this, i); break;
+            default:
+              throw new NodeOperationError(this.getNode(), `Unknown operation "${operation}" for resource "assetType"`);
+          }
+          break;
+
+        // P12.4 — assetFolder sub-resource (routes to same execute functions as 'asset')
+        case 'assetFolder':
+          switch (operation) {
+            case 'getAssetStockAssets': responseData = await asset.getAssetStockAssets.call(this, i); break;
+            case 'getAssetStockFolders': responseData = await asset.getAssetStockFolders.call(this, i); break;
+            case 'createAssetStockFolder': responseData = await asset.createAssetStockFolder.call(this, i); break;
+            case 'updateAssetStockFolder': responseData = await asset.updateAssetStockFolder.call(this, i); break;
+            case 'deleteAssetStockFolder': responseData = await asset.deleteAssetStockFolder.call(this, i); break;
+            case 'getAssetStockFolder': responseData = await asset.getAssetStockFolder.call(this, i); break;
+            case 'getAssetStockSubFolders': responseData = await asset.getAssetStockSubFolders.call(this, i); break;
+            case 'getAssetTypeFolders': responseData = await asset.getAssetTypeFolders.call(this, i); break;
+            case 'getAssetTypeFolder': responseData = await asset.getAssetTypeFolder.call(this, i); break;
+            case 'createAssetTypeFolder': responseData = await asset.createAssetTypeFolder.call(this, i); break;
+            case 'updateAssetTypeFolder': responseData = await asset.updateAssetTypeFolder.call(this, i); break;
+            case 'deleteAssetTypeFolder': responseData = await asset.deleteAssetTypeFolder.call(this, i); break;
+            case 'getAssetTypeFolderSubFolders': responseData = await asset.getAssetTypeFolderSubFolders.call(this, i); break;
+            default:
+              throw new NodeOperationError(this.getNode(), `Unknown operation "${operation}" for resource "assetFolder"`);
+          }
+          break;
+
+        // P12.5 — softwareBundle sub-resource (routes to same execute functions as 'software')
+        case 'softwareBundle':
+          switch (operation) {
+            case 'getBundles': responseData = await software.getBundles.call(this, i); break;
+            case 'getBundle': responseData = await software.getBundle.call(this, i); break;
+            case 'createBundle': responseData = await software.createBundle.call(this, i); break;
+            case 'deleteBundle': responseData = await software.deleteBundle.call(this, i); break;
+            case 'getBundleFolders': responseData = await software.getBundleFolders.call(this, i); break;
+            case 'getBundleFolder': responseData = await software.getBundleFolder.call(this, i); break;
+            case 'getBundleSubFolders': responseData = await software.getBundleSubFolders.call(this, i); break;
+            case 'createBundleFolder': responseData = await software.createBundleFolder.call(this, i); break;
+            case 'deleteBundleFolder': responseData = await software.deleteBundleFolder.call(this, i); break;
+            case 'getBundleApplicationsByBundle': responseData = await software.getBundleApplicationsByBundle.call(this, i); break;
+            case 'addApplicationToBundle': responseData = await software.addApplicationToBundle.call(this, i); break;
+            case 'replaceApplicationInBundle': responseData = await software.replaceApplicationInBundle.call(this, i); break;
+            case 'updateBundleFolder': responseData = await software.updateBundleFolder.call(this, i); break;
+            case 'getBundleApplications': responseData = await software.getBundleApplications.call(this, i); break;
+            case 'deleteBundleApplication': responseData = await software.deleteBundleApplication.call(this, i); break;
+            default:
+              throw new NodeOperationError(this.getNode(), `Unknown operation "${operation}" for resource "softwareBundle"`);
+          }
+          break;
+
+        // P12.6 — adUser sub-resource (routes to same execute functions as 'activeDirectory')
+        case 'adUser':
+          switch (operation) {
+            case 'getADUsers': responseData = await activeDirectory.getADUsers.call(this, i); break;
+            case 'getADUser': responseData = await activeDirectory.getADUser.call(this, i); break;
+            case 'getADUsersByGroup': responseData = await activeDirectory.getADUsersByGroup.call(this, i); break;
+            case 'getADUsersByOrgUnit': responseData = await activeDirectory.getADUsersByOrgUnit.call(this, i); break;
+            default:
+              throw new NodeOperationError(this.getNode(), `Unknown operation "${operation}" for resource "adUser"`);
+          }
+          break;
+
+        // P12.6 — adGroup sub-resource (routes to same execute functions as 'activeDirectory')
+        case 'adGroup':
+          switch (operation) {
+            case 'getADGroups': responseData = await activeDirectory.getADGroups.call(this, i); break;
+            case 'getADGroup': responseData = await activeDirectory.getADGroup.call(this, i); break;
+            case 'getADGroupsByADGroup': responseData = await activeDirectory.getADGroupsByADGroup.call(this, i); break;
+            case 'getADGroupsByOrgUnit': responseData = await activeDirectory.getADGroupsByOrgUnit.call(this, i); break;
+            default:
+              throw new NodeOperationError(this.getNode(), `Unknown operation "${operation}" for resource "adGroup"`);
+          }
+          break;
+
+        // P12.6 — adObject sub-resource (routes to same execute functions as 'activeDirectory')
+        case 'adObject':
+          switch (operation) {
+            case 'getADObjects': responseData = await activeDirectory.getADObjects.call(this, i); break;
+            case 'getADObject': responseData = await activeDirectory.getADObject.call(this, i); break;
+            case 'getADObjectsByADGroup': responseData = await activeDirectory.getADObjectsByADGroup.call(this, i); break;
+            case 'getADObjectsByOrgUnit': responseData = await activeDirectory.getADObjectsByOrgUnit.call(this, i); break;
+            case 'getADObjectMemberships': responseData = await activeDirectory.getADObjectMemberships.call(this, i); break;
+            default:
+              throw new NodeOperationError(this.getNode(), `Unknown operation "${operation}" for resource "adObject"`);
+          }
+          break;
+
+        // P12.6 — orgUnit sub-resource (routes to same execute functions as 'activeDirectory')
+        case 'orgUnit':
+          switch (operation) {
+            case 'getOrgUnits': responseData = await activeDirectory.getOrgUnits.call(this, i); break;
+            case 'getOrgUnit': responseData = await activeDirectory.getOrgUnit.call(this, i); break;
+            case 'getOrgUnitsByOrgUnit': responseData = await activeDirectory.getOrgUnitsByOrgUnit.call(this, i); break;
+            default:
+              throw new NodeOperationError(this.getNode(), `Unknown operation "${operation}" for resource "orgUnit"`);
           }
           break;
 

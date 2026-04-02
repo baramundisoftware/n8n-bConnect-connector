@@ -7,8 +7,21 @@ import type {
   INodeTypeDescription,
 } from 'n8n-workflow';
 
-import { activeDirectoryFields, activeDirectoryOperations } from './actions/activeDirectory/activeDirectory.fields';
-import { assetFields, assetOperations25R2, assetOperations26R1 } from './actions/asset/asset.fields';
+import {
+  activeDirectoryFields,
+  activeDirectoryOperations,
+  adUserOperations, adUserFields,
+  adGroupOperations, adGroupFields,
+  adObjectOperations, adObjectFields,
+  orgUnitOperations, orgUnitFields,
+} from './actions/activeDirectory/activeDirectory.fields';
+import {
+  assetFields,
+  assetOperations25R2Trimmed,
+  assetOperations26R1Trimmed,
+  assetTypeOperations, assetTypeFields,
+  assetFolderOperations, assetFolderFields,
+} from './actions/asset/asset.fields';
 import { complianceFields, complianceOperations } from './actions/compliance/compliance.fields';
 import { universalDynamicGroupsFields, universalDynamicGroupsOperations } from './actions/universalDynamicGroups/universalDynamicGroups.fields';
 import { defenseControlFields, defenseControlOperations } from './actions/defenseControl/defenseControl.fields';
@@ -40,8 +53,20 @@ import {
   kioskReleaseOperations,
 } from './actions/job/job.fields';
 import { operatingSystemFields, operatingSystemOperations } from './actions/operatingSystem/operatingSystem.fields';
-import { serverManagementFields, serverManagementOperations } from './actions/serverManagement/serverManagement.fields';
-import { softwareFields, softwareOperations25R2, softwareOperations26R1 } from './actions/software/software.fields';
+import {
+  serverManagementFields,
+  serverManagementOperations,
+  microserviceFields,
+  microserviceOperations,
+  bmsecurityFields,
+  bmsecurityOperations,
+} from './actions/serverManagement/serverManagement.fields';
+import {
+  softwareFields,
+  softwareOperations25R2Trimmed,
+  softwareOperations26R1Trimmed,
+  softwareBundleOperations, softwareBundleFields,
+} from './actions/software/software.fields';
 import { updateManagementFields, updateManagementOperations } from './actions/updateManagement/updateManagement.fields';
 import { variableFields, variableOperations } from './actions/variable/variable.fields';
 import { router } from './actions/router';
@@ -100,16 +125,16 @@ export class Baramundi implements INodeType {
         type: 'options',
         noDataExpression: true,
         options: [
-          {
-            name: 'Active Directory',
-            value: 'activeDirectory',
-            description: 'Query Active Directory groups, users, and objects',
-          },
+          { name: 'AD Group', value: 'adGroup', description: 'Query Active Directory groups' },
+          { name: 'AD Object', value: 'adObject', description: 'Query Active Directory objects and memberships' },
+          { name: 'AD User', value: 'adUser', description: 'Query Active Directory users' },
           {
             name: 'Asset',
             value: 'asset',
             description: 'Manage assets in baramundi',
           },
+          { name: 'Asset Folder', value: 'assetFolder', description: 'Manage asset stock and type folders' },
+          { name: 'Asset Type', value: 'assetType', description: 'Manage asset type definitions' },
           {
             name: 'Compliance',
             value: 'compliance',
@@ -161,20 +186,32 @@ export class Baramundi implements INodeType {
             description: 'Manage endpoint and group maintenance windows',
           },
           {
+            name: 'Microservice',
+            value: 'microservice',
+            description: 'Start, stop, and monitor baramundi microservices',
+          },
+          {
             name: 'Operating System',
             value: 'operatingSystem',
             description: 'Manage OS folders and endpoint OS configurations',
           },
+          { name: 'Org Unit', value: 'orgUnit', description: 'Query Active Directory organizational units' },
+          {
+            name: 'Security',
+            value: 'bmsecurity',
+            description: 'Manage security groups, profiles, and access rights',
+          },
           {
             name: 'Server Management',
             value: 'serverManagement',
-            description: 'Manage baramundi server infrastructure and security',
+            description: 'Manage baramundi server infrastructure (gateways, DIPs, cloud connectors)',
           },
           {
             name: 'Software',
             value: 'software',
-            description: 'Query installed Windows software inventory',
+            description: 'Query installed software inventory',
           },
+          { name: 'Software Bundle', value: 'softwareBundle', description: 'Manage software bundles and applications' },
           {
             name: 'Static Group',
             value: 'staticGroup',
@@ -207,8 +244,14 @@ export class Baramundi implements INodeType {
       ...complianceOperations,
       ...universalDynamicGroupsOperations,
       ...activeDirectoryOperations,
-      ...assetOperations25R2,
-      ...assetOperations26R1,
+      ...adUserOperations,
+      ...adGroupOperations,
+      ...adObjectOperations,
+      ...orgUnitOperations,
+      ...assetOperations25R2Trimmed,
+      ...assetOperations26R1Trimmed,
+      ...assetTypeOperations,
+      ...assetFolderOperations,
       ...defenseControlOperations,
       ...dynamicGroupOperations,
       ...endpointOperations25R2,
@@ -225,15 +268,24 @@ export class Baramundi implements INodeType {
       ...kioskReleaseOperations,
       ...operatingSystemOperations,
       ...serverManagementOperations,
-      ...softwareOperations25R2,
-      ...softwareOperations26R1,
+      ...microserviceOperations,
+      ...bmsecurityOperations,
+      ...softwareOperations25R2Trimmed,
+      ...softwareOperations26R1Trimmed,
+      ...softwareBundleOperations,
       ...updateManagementOperations,
       ...variableOperations,
       // Fields
       ...complianceFields,
       ...universalDynamicGroupsFields,
       ...activeDirectoryFields,
+      ...adUserFields,
+      ...adGroupFields,
+      ...adObjectFields,
+      ...orgUnitFields,
       ...assetFields,
+      ...assetTypeFields,
+      ...assetFolderFields,
       ...defenseControlFields,
       ...dynamicGroupFields,
       ...endpointFields,
@@ -247,7 +299,10 @@ export class Baramundi implements INodeType {
       ...kioskReleaseFields,
       ...operatingSystemFields,
       ...serverManagementFields,
+      ...microserviceFields,
+      ...bmsecurityFields,
       ...softwareFields,
+      ...softwareBundleFields,
       ...updateManagementFields,
       ...variableFields,
     ],
