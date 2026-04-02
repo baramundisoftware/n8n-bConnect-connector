@@ -7,7 +7,7 @@ Enables IT administrators to automate endpoint management, job execution, softwa
 deployment, compliance checks, and MDM operations from n8n workflows.
 
 **npm package**: `n8n-nodes-baramundi-management-solution`
-**Current version**: 0.5.0 (not yet published — targeting v1.0.0 as first release)
+**Current version**: 0.6.0 (not yet published — targeting v1.0.0 as first release)
 **License**: MIT
 
 ---
@@ -33,26 +33,16 @@ deployment, compliance checks, and MDM operations from n8n workflows.
 n8nconnector/
 ├── credentials/
 │   └── BconnectApi.credentials.ts    # Basic Auth credential type
-├── nodes/Baramundi/
-│   ├── Baramundi.node.ts             # Main node: resource list, bmsVersion param, methods
-│   ├── baramundi.svg
-│   ├── transport/
-│   │   └── requestApi.ts             # HTTP client, pagination, retry
-│   └── actions/
-│       ├── router.ts                 # Dispatches resource+operation → execute fn
-│       ├── endpoint/                 # Endpoint, Logical Group, Static Group,
-│       │                             #   Dynamic Group, Maintenance Window, Typed Endpoint
-│       ├── job/                      # Job Definition, Job Folder, Job Instance, Kiosk Release
-│       ├── serverManagement/         # Server Management, Microservice, Security
-│       ├── asset/                    # Asset, Asset Type, Asset Folder
-│       ├── software/                 # Software, Software Bundle
-│       ├── activeDirectory/          # AD User, AD Group, AD Object, Org Unit
-│       ├── compliance/               # Compliance (26R1+)
-│       ├── universalDynamicGroups/   # UDG (26R1+)
-│       ├── defenseControl/
-│       ├── variable/
-│       ├── operatingSystem/
-│       └── updateManagement/
+├── nodes/shared/                     # Shared infrastructure (all nodes import from here)
+│   ├── transport/requestApi.ts       # HTTP client, pagination, retry
+│   ├── utils/                        # types, validation, errorMessages
+│   └── loadOptions.ts                # Dropdown population functions
+├── nodes/BaramundiEndpoint/          # Endpoint, groups, maintenance windows (~92 ops)
+├── nodes/BaramundiAsset/             # Asset, asset types, folders (~43 ops)
+├── nodes/BaramundiJob/               # Job definitions, folders, instances, kiosk (~37 ops)
+├── nodes/BaramundiSoftware/          # Software, bundles, updates, variables, UDG (~56 ops)
+├── nodes/BaramundiAdmin/             # AD, server management, microservices, OS (~60 ops)
+├── nodes/BaramundiSecurity/          # Security, compliance, defense control (~33 ops)
 ├── test/
 │   ├── unit/                         # Vitest unit tests (mocked apiRequest)
 │   └── system/                       # Live bConnect API tests (skipped in CI)
@@ -108,9 +98,9 @@ Use `apiRequestAllItems()` for "Return All" operations. Safety cap: 1000 pages.
 
 | File | Purpose |
 |---|---|
-| `nodes/Baramundi/Baramundi.node.ts` | Node entry point — resource list, `bmsVersion`, `loadOptions`, `listSearch` methods |
-| `nodes/Baramundi/transport/requestApi.ts` | All HTTP logic — auth, retry, pagination |
-| `nodes/Baramundi/actions/router.ts` | `resource` + `operation` → execute function dispatch |
+| `nodes/Baramundi*/Baramundi*.node.ts` | 6 node entry points — resource list, `bmsVersion`, `loadOptions` |
+| `nodes/shared/transport/requestApi.ts` | All HTTP logic — auth, retry, pagination |
+| `nodes/Baramundi*/actions/router.ts` | Per-node `resource` + `operation` → execute function dispatch |
 | `credentials/BconnectApi.credentials.ts` | Credential fields + `testCredentials` |
 | `test/unit/` | Unit tests — one file per action module |
 

@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-04-02
+
+> **Semver rationale**: Minor bump. Phase 13 splits the monolithic Baramundi node into 6 focused domain nodes (REQ-SPLIT-1). **BREAKING CHANGE** — the single `baramundi` node is replaced by 6 separate nodes. Existing saved workflows must be recreated using the new domain-specific nodes.
+
+### Breaking Changes (Phase 13 — Domain Node Split)
+
+The single `baramundi` node (28 resources, ~222 actions) is replaced by 6 domain nodes:
+
+- **Baramundi Endpoint** (`baramundiEndpoint`) — endpoint, logicalGroup, staticGroup, dynamicGroup, maintenanceWindow, typedEndpoint (~92 ops)
+- **Baramundi Asset** (`baramundiAsset`) — asset, assetType, assetFolder (~43 ops)
+- **Baramundi Job** (`baramundiJob`) — jobDefinition, jobFolder, jobInstance, kioskRelease (~37 ops)
+- **Baramundi Software** (`baramundiSoftware`) — software, softwareBundle, updateManagement, variable, universalDynamicGroups (~56 ops)
+- **Baramundi Admin** (`baramundiAdmin`) — adUser, adGroup, adObject, orgUnit, serverManagement, microservice, operatingSystem (~60 ops)
+- **Baramundi Security** (`baramundiSecurity`) — bmsecurity, compliance, defenseControl (~33 ops)
+
+### Added
+
+- Shared infrastructure in `nodes/shared/` (transport, utils, loadOptions)
+- 6 independent node entry points with focused resource dropdowns
+- Each node has its own mini-router for clean operation dispatch
+
+### Removed
+
+- Monolithic `nodes/Baramundi/` directory and single-node architecture
+- Dead router cases for legacy `activeDirectory` and `job` resource values
+
 ## [0.5.0] - 2026-04-02
 
 > **Semver rationale**: Minor bump. Phase 12 splits 6 monolithic resources into ~25 focused resources for n8n action picker UX (REQ-UX-2). **BREAKING CHANGE** — existing saved workflows referencing `resource: 'endpoint'`, `resource: 'job'`, `resource: 'activeDirectory'`, `resource: 'asset'`, `resource: 'software'`, or `resource: 'serverManagement'` for sub-resource operations will need to be updated to the new resource values. See migration notes below.
