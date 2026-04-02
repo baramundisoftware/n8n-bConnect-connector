@@ -1398,3 +1398,133 @@ export const jobFields: INodeProperties[] = [
     description: 'Max number of results to return',
   },
 ];
+
+// ============================================================================
+// NEW SPLIT RESOURCE EXPORTS — P12.2
+// ============================================================================
+
+// Helper: clone a field array replacing resource value
+function withResource(fields: INodeProperties[], newResource: string): INodeProperties[] {
+  return fields.map((f) => {
+    const clone = JSON.parse(JSON.stringify(f)) as INodeProperties;
+    if (clone.displayOptions?.show?.resource) {
+      clone.displayOptions.show.resource = [newResource];
+    }
+    return clone;
+  });
+}
+
+// ── Operation lists per resource ─────────────────────────────────────────────
+
+const jobDefinitionOpValues = new Set([
+  'get', 'getMany', 'create', 'update', 'delete', 'execute', 'getJobDefinitionsByFolder',
+]);
+const jobFolderOpValues = new Set([
+  'getFolders', 'getFolder', 'createFolder', 'updateFolder', 'deleteFolder', 'getSubFolders',
+]);
+const jobInstanceOpValues = new Set([
+  'getInstances', 'getAllJobInstances', 'getJobInstance', 'getEndpointJobInstances',
+  'startJobInstance', 'stopJobInstance', 'resumeJobInstance', 'deleteJobInstance',
+  'getJobInstancesByLogicalGroup', 'getJobInstancesByStaticGroup',
+  'getJobInstancesByDynamicGroup', 'getJobInstancesByUDG',
+  'assignJobToLogicalGroup', 'assignJobToStaticGroup', 'assignJobToDynamicGroup', 'assignJobToUDG',
+]);
+const kioskReleaseOpValues = new Set([
+  'getKioskReleases', 'getKioskRelease', 'createKioskRelease', 'withdrawKioskRelease',
+  'getKioskReleasesByJobDefinition', 'getKioskReleasesByEndpoint',
+  'getKioskReleasesByLogicalGroup', 'getKioskReleasesByADObject',
+]);
+
+function filterOptions(
+  ops: INodeProperties[],
+  allowed: Set<string>,
+  defaultOp: string,
+): INodeProperties[] {
+  return ops.map((prop) => {
+    const clone = JSON.parse(JSON.stringify(prop)) as INodeProperties;
+    if (Array.isArray(clone.options)) {
+      clone.options = (clone.options as INodeProperties[]).filter(
+        (o: INodeProperties) => allowed.has((o as unknown as { value: string }).value),
+      );
+    }
+    clone.default = defaultOp;
+    return clone;
+  });
+}
+
+export const jobDefinitionOperations: INodeProperties[] = filterOptions(
+  withResource(jobOperations, 'jobDefinition'),
+  jobDefinitionOpValues,
+  'getMany',
+);
+
+export const jobFolderOperations: INodeProperties[] = filterOptions(
+  withResource(jobOperations, 'jobFolder'),
+  jobFolderOpValues,
+  'getFolders',
+);
+
+export const jobInstanceOperations: INodeProperties[] = filterOptions(
+  withResource(jobOperations, 'jobInstance'),
+  jobInstanceOpValues,
+  'getInstances',
+);
+
+export const kioskReleaseOperations: INodeProperties[] = filterOptions(
+  withResource(jobOperations, 'kioskRelease'),
+  kioskReleaseOpValues,
+  'getKioskReleases',
+);
+
+// ── Field lists per resource ─────────────────────────────────────────────────
+// A field belongs to a resource if ALL the operation values in its displayOptions
+// are in that resource's operation set.
+
+function fieldsForResource(
+  fields: INodeProperties[],
+  allowed: Set<string>,
+  newResource: string,
+): INodeProperties[] {
+  return fields
+    .filter((f) => {
+      const ops = f.displayOptions?.show?.operation as string[] | undefined;
+      if (!ops) return false;
+      return ops.some((op) => allowed.has(op));
+    })
+    .map((f) => {
+      const clone = JSON.parse(JSON.stringify(f)) as INodeProperties;
+      if (clone.displayOptions?.show?.resource) {
+        clone.displayOptions.show.resource = [newResource];
+      }
+      // If the operation list has ops outside the allowed set, filter them
+      const ops = clone.displayOptions?.show?.operation as string[] | undefined;
+      if (ops) {
+        clone.displayOptions!.show!.operation = ops.filter((op) => allowed.has(op));
+      }
+      return clone;
+    });
+}
+
+export const jobDefinitionFields: INodeProperties[] = fieldsForResource(
+  jobFields,
+  jobDefinitionOpValues,
+  'jobDefinition',
+);
+
+export const jobFolderFields: INodeProperties[] = fieldsForResource(
+  jobFields,
+  jobFolderOpValues,
+  'jobFolder',
+);
+
+export const jobInstanceFields: INodeProperties[] = fieldsForResource(
+  jobFields,
+  jobInstanceOpValues,
+  'jobInstance',
+);
+
+export const kioskReleaseFields: INodeProperties[] = fieldsForResource(
+  jobFields,
+  kioskReleaseOpValues,
+  'kioskRelease',
+);

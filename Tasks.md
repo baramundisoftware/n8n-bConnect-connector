@@ -608,6 +608,7 @@ Trigger: Schedule (weekly, before patch Tuesday).
 | P12.9 | Updated `router.ts` with 5 new case blocks routing to existing `endpoint.*` functions | 2026-04-02 |
 | P12.10 | Updated all `displayOptions.show.resource` in `endpoint.fields.ts` to new resource values | 2026-04-02 |
 | P12.11 | All 550 unit tests pass with new resource split (endpoint.execute.test.ts: 118 tests green) | 2026-04-02 |
+| P12.2 | Split `job` resource into 4 resources (Job Definition, Job Folder, Job Instance, Kiosk Release) | 2026-04-02 |
 
 ---
 

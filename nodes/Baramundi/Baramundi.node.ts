@@ -29,7 +29,16 @@ import {
   typedEndpointOperations25R2,
   typedEndpointOperations26R1,
 } from './actions/endpoint/endpoint.fields';
-import { jobFields, jobOperations } from './actions/job/job.fields';
+import {
+  jobDefinitionFields,
+  jobDefinitionOperations,
+  jobFolderFields,
+  jobFolderOperations,
+  jobInstanceFields,
+  jobInstanceOperations,
+  kioskReleaseFields,
+  kioskReleaseOperations,
+} from './actions/job/job.fields';
 import { operatingSystemFields, operatingSystemOperations } from './actions/operatingSystem/operatingSystem.fields';
 import { serverManagementFields, serverManagementOperations } from './actions/serverManagement/serverManagement.fields';
 import { softwareFields, softwareOperations25R2, softwareOperations26R1 } from './actions/software/software.fields';
@@ -122,9 +131,24 @@ export class Baramundi implements INodeType {
             description: 'Manage endpoints (devices) in baramundi',
           },
           {
-            name: 'Job',
-            value: 'job',
-            description: 'Manage jobs and job execution',
+            name: 'Job Definition',
+            value: 'jobDefinition',
+            description: 'Manage job definitions (scripts and deployments)',
+          },
+          {
+            name: 'Job Folder',
+            value: 'jobFolder',
+            description: 'Manage job definition folders',
+          },
+          {
+            name: 'Job Instance',
+            value: 'jobInstance',
+            description: 'Manage and monitor job execution instances',
+          },
+          {
+            name: 'Kiosk Release',
+            value: 'kioskRelease',
+            description: 'Manage kiosk software releases',
           },
           {
             name: 'Logical Group',
@@ -195,7 +219,10 @@ export class Baramundi implements INodeType {
       ...staticGroupOperations,
       ...typedEndpointOperations25R2,
       ...typedEndpointOperations26R1,
-      ...jobOperations,
+      ...jobDefinitionOperations,
+      ...jobFolderOperations,
+      ...jobInstanceOperations,
+      ...kioskReleaseOperations,
       ...operatingSystemOperations,
       ...serverManagementOperations,
       ...softwareOperations25R2,
@@ -214,7 +241,10 @@ export class Baramundi implements INodeType {
       ...maintenanceWindowFields,
       ...staticGroupFields,
       ...typedEndpointFields,
-      ...jobFields,
+      ...jobDefinitionFields,
+      ...jobFolderFields,
+      ...jobInstanceFields,
+      ...kioskReleaseFields,
       ...operatingSystemFields,
       ...serverManagementFields,
       ...softwareFields,
