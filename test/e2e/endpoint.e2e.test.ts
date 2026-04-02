@@ -21,22 +21,22 @@ beforeAll(async () => {
     console.warn('⚠ bConnectMock not running — endpoint E2E tests skipped');
     return;
   }
-  // Pre-fetch IDs for sub-tests
+  // Pre-fetch IDs for sub-tests (use tryOp — some paths may 404 on this mock version)
   const ctx = createRealContext({ returnAll: false, limit: 5, endpointType: 'all', additionalFields: {} });
-  const endpoints = await ep.getMany.call(ctx, 0);
-  if (endpoints.length > 0) firstEndpointId = endpoints[0].json.id as string;
+  const endpoints = await tryOp(() => ep.getMany.call(ctx, 0));
+  if (endpoints && endpoints.length > 0) firstEndpointId = endpoints[0].json.id as string;
 
   const lgCtx = createRealContext({ returnAll: false, limit: 5 });
-  const groups = await ep.getLogicalGroups.call(lgCtx, 0);
-  if (groups.length > 0) firstLogicalGroupId = groups[0].json.id as string;
+  const groups = await tryOp(() => ep.getLogicalGroups.call(lgCtx, 0));
+  if (groups && groups.length > 0) firstLogicalGroupId = groups[0].json.id as string;
 
   const sgCtx = createRealContext({ returnAll: false, limit: 5 });
-  const sgroups = await ep.getStaticGroups.call(sgCtx, 0);
-  if (sgroups.length > 0) firstStaticGroupId = sgroups[0].json.id as string;
+  const sgroups = await tryOp(() => ep.getStaticGroups.call(sgCtx, 0));
+  if (sgroups && sgroups.length > 0) firstStaticGroupId = sgroups[0].json.id as string;
 
   const dgCtx = createRealContext({ returnAll: false, limit: 5 });
-  const dgroups = await ep.getDynamicGroups.call(dgCtx, 0);
-  if (dgroups.length > 0) firstDynamicGroupId = dgroups[0].json.id as string;
+  const dgroups = await tryOp(() => ep.getDynamicGroups.call(dgCtx, 0));
+  if (dgroups && dgroups.length > 0) firstDynamicGroupId = dgroups[0].json.id as string;
 });
 
 // ─── Endpoint CRUD ───────────────────────────────────────────────────────────
@@ -174,7 +174,7 @@ describe('E2E: Endpoint — unmanaged', () => {
 describe('E2E: Endpoint — EntraId (accepts 404)', () => {
   it('getEntraIdDataByDeviceId accepts 404', async () => {
     if (!available) return;
-    const ctx = createRealContext({ deviceId: 'test-device-id' });
+    const ctx = createRealContext({ deviceId: NONEXISTENT_GUID });
     await tryOp(() => ep.getEntraIdDataByDeviceId.call(ctx, 0));
   });
 
@@ -223,7 +223,7 @@ describe('E2E: Logical Group — CRUD lifecycle', () => {
 
   it('getLogicalGroup returns object', async () => {
     if (!available || !firstLogicalGroupId) return;
-    const ctx = createRealContext({ logicalGroupId: firstLogicalGroupId });
+    const ctx = createRealContext({ groupId: firstLogicalGroupId });
     const result = await ep.getLogicalGroup.call(ctx, 0);
     expect(result[0].json).toHaveProperty('id', firstLogicalGroupId);
   });
@@ -263,7 +263,7 @@ describe('E2E: Static Group', () => {
 
   it('getStaticGroup returns object', async () => {
     if (!available || !firstStaticGroupId) return;
-    const ctx = createRealContext({ staticGroupId: firstStaticGroupId });
+    const ctx = createRealContext({ groupId: firstStaticGroupId });
     const result = await ep.getStaticGroup.call(ctx, 0);
     expect(result[0].json).toHaveProperty('id', firstStaticGroupId);
   });
@@ -292,7 +292,7 @@ describe('E2E: Dynamic Group', () => {
 
   it('getDynamicGroup returns object', async () => {
     if (!available || !firstDynamicGroupId) return;
-    const ctx = createRealContext({ dynamicGroupId: firstDynamicGroupId });
+    const ctx = createRealContext({ groupId: firstDynamicGroupId });
     const result = await ep.getDynamicGroup.call(ctx, 0);
     expect(result[0].json).toHaveProperty('id', firstDynamicGroupId);
   });

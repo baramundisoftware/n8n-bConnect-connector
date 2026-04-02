@@ -4,6 +4,9 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    // E2E tests hit a rate-limited mock (100 req/min) — allow generous timeouts
+    hookTimeout: 30000,
+    testTimeout: 15000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

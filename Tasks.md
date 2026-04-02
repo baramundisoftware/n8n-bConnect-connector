@@ -706,7 +706,7 @@ Both must be deleted and replaced.
 | P16.2 | Fixed MW paths: `WindowsEndpoints` → `Endpoints`; removed `/{windowId}` from all PATCH/DELETE/PUT (MW is singleton); removed `windowId` field from UI + execute. BREAKING. | 2026-04-02 |
 | P16.4 | Created `test/unit/apiPaths.test.ts` — extracts all connector paths, validates against OpenAPI specs. 3 tests, runs in CI. Known exceptions documented. | 2026-04-02 |
 | P16.5 | Updated CHANGELOG (0.8.2), bumped version, documented breaking windowId removal + all path fixes. | 2026-04-02 |
-| P16.6 | Created 6 E2E test files in `test/e2e/` (endpoint, asset, job, software, admin, security) + shared `helpers.ts`. 191 E2E tests covering all operations. Runs against bConnectMock at localhost:8765, skip gracefully when unavailable. 780 tests total passing. | 2026-04-02 |
+| P16.6 | Created 6 E2E test files + shared helpers covering all operations. 210 E2E tests. Auto-start mock in process-qa-gate Step 3 (RATE_LIMIT_ENABLED=false). Added variable/updateManagement/UDG modules. 799 tests total passing. | 2026-04-02 |
 
 ---
 

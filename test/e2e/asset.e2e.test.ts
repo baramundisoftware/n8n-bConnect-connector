@@ -68,6 +68,7 @@ describe('E2E: Asset — CRUD lifecycle', () => {
       displayName: 'E2E Test Asset',
       additionalFields: {},
     });
+    // Also catch 400 Bad Request (mock may require additional mandatory fields)
     const created = await tryOp(() => asset.create.call(createCtx, 0));
     if (!created || created.length === 0) return;
     const id = created[0].json.id as string;

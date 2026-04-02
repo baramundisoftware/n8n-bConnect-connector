@@ -62,7 +62,7 @@ describe('E2E: Compliance — getVulnerabilities', () => {
 describe('E2E: Compliance — getVulnerability', () => {
   it('accepts response or 404', async () => {
     if (!available) return;
-    await tryOp(() => comp.getVulnerability.call(createRealContext({ vulnerabilityId: 'CVE-2024-0001' }), 0));
+    await tryOp(() => comp.getVulnerability.call(createRealContext({ vulnerabilityId: NONEXISTENT_GUID }), 0));
   });
 });
 

@@ -87,7 +87,7 @@ describe('E2E: Job — CRUD lifecycle', () => {
 describe('E2E: Job — execute (accepts 404)', () => {
   it('execute job definition', async () => {
     if (!available || !firstJobId) return;
-    const ctx = createRealContext({ jobId: firstJobId, endpointIds: [], options: {} });
+    const ctx = createRealContext({ jobId: firstJobId, endpointIds: '', options: {} });
     await tryOp(() => job.execute.call(ctx, 0));
   });
 });
