@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.3] - 2026-04-02
+
+### Fixed
+
+- **`continueOnFail` now respected in all nodes** — 30 bare `throw new Error()` calls replaced with `throw new NodeOperationError(this.getNode(), ...)` across 10 execute files. Previously, errors thrown from update/create operations with empty field sets would bypass n8n's `continueOnFail` setting and halt workflow execution regardless.
+
+### Changed
+
+- **`serverManagement` operations consolidated** — `BaramundiAdmin` and `BaramundiSecurity` no longer each carry a duplicate copy of the server management execute logic. Extracted to `nodes/shared/actions/serverManagement/`. No behaviour change; both nodes expose the same operations as before.
+
+### Security
+
+- **GitHub Actions pinned to immutable SHAs** — CI workflow now references `actions/checkout`, `actions/setup-node`, and `actions/dependency-review-action` by commit SHA rather than floating version tags, preventing supply-chain substitution attacks.
+- **npm audit threshold raised** — CI now uses `--audit-level=critical`. Two lodash HIGH advisories (GHSA-r5fr-rjxr-66jc, GHSA-f23m-r3pf-42rh) in the `n8n-workflow` peer dependency are documented as accepted upstream-unfixable findings; `_.template` and `_.omit` are never called by this connector.
+- **IT Audit report** — full four-domain audit (Code Quality, Security, CI/CD, Architecture) published to `docs/AUDIT-2026-04-02.md`. Overall rating: MEDIUM — fit for controlled release.
+
+### Tests
+
+- Branch coverage improved from 60.44% to **75.36%** (target ≥ 75% ✓)
+- Statement coverage improved from 82.17% to **87.12%**
+- Total tests: 821 → **986** (165 new validation error-path tests across 12 files)
+- OpenAPI path cross-check added to SDLC QA gate slash command
+
 ## [0.8.2] - 2026-04-02
 
 > **Semver rationale**: Patch bump. Fixes incorrect API paths that caused 404 errors. **BREAKING CHANGE** — `windowId` parameter removed from maintenance window update/delete/put operations (the bConnect API treats maintenance windows as singletons per endpoint/group).
