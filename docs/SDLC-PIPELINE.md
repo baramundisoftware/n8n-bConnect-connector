@@ -7,6 +7,7 @@ implemented as Claude Code slash commands. The pipeline extends the inner build
 loop (`/process-start-task`) with phase-gate commands that enforce design review,
 code review, security scanning, QA validation, and release management.
 
+**Current version**: 0.8.2
 **Workflow model:** Trunk-based development on `master` (solo developer).
 No feature branches or pull requests. The gates enforce quality and security
 directly before pushing to `origin/master`.
@@ -72,6 +73,7 @@ testing, UAT sign-off, versioning, or publishing.
           │         lead-dev           │
           │                            │
           │  • npm audit (no high/crit)│
+          │  • License compliance      │
           │  • semgrep SAST scan       │
           │  • Secrets scan            │
           │  • Full unit test suite    │
@@ -87,7 +89,8 @@ testing, UAT sign-off, versioning, or publishing.
           │  Roles: qa-engineer,       │
           │         perf-engineer      │
           │                            │
-          │  • E2E tests (live API)    │
+          │  • E2E tests (bConnectMock)│
+          │  • System tests (live API) │
           │  • Regression suite        │
           │  • Performance baseline    │
           │  • UAT checklist           │
@@ -146,11 +149,11 @@ All roles are globally defined in `~/.claude/commands/`.
 | `/lead-dev` | start-task, pr-review | Implementation, code review |
 | `/backend-dev` | start-task | API, business logic |
 | `/test-engineer` | start-task | Unit tests (TDD) |
-| `/security-engineer` | pr-review | OWASP, SAST, dependency scan, secrets |
+| `/security-engineer` | pr-review | OWASP, SAST, SCA, dependency scan, license compliance, secrets |
 | `/qa-engineer` | pr-review, qa-gate | Integration, E2E, UAT |
 | `/perf-engineer` | qa-gate | Benchmarks, performance regression |
 | `/tech-writer` | release | CHANGELOG, release notes, README |
-| `/devops-engineer` | release | Semver, git tag, npm publish, GitHub Release |
+| `/devops-engineer` | release | Semver, git tag, SBOM, signing, npm publish, GitHub Release |
 
 No new roles are required. All ten existing roles cover the full pipeline.
 
@@ -158,7 +161,7 @@ No new roles are required. All ten existing roles cover the full pipeline.
 
 ## Security Integration
 
-Security is not a single step — it runs at three checkpoints:
+Security is not a single step — it runs at five checkpoints:
 
 ### 1. Design Review (`/process-design-review`)
 - Threat model for new features
@@ -172,7 +175,7 @@ Security is not a single step — it runs at three checkpoints:
 npm audit --audit-level=high       # blocks on high/critical
 
 # SCA — License compliance (REQ-SEC-SCA)
-npx license-checker --production --failOn "GPL-3.0-only;AGPL-3.0-only;SSPL-1.0"
+npx license-checker --production --failOn "GPL-3.0-only;GPL-3.0-or-later;AGPL-3.0-only;AGPL-3.0-or-later;SSPL-1.0"
 
 # Secrets scanning
 npx secretlint "**/*"              # blocks on credential leaks
@@ -193,6 +196,8 @@ Findings are classified:
 | Low / Info | Log in code review summary |
 
 ### 3. QA Gate (`/process-qa-gate`)
+- E2E tests against bConnectMock (`docker-compose.test.yml`) — all 6 nodes, ~210 tests
+- System tests against live bMS server (`test/system/`, requires `BMS_URL` env var)
 - Live API integration tests validate no credential exposure in logs
 - SSL bypass feature (`Ignore SSL Issues`) explicitly tested and documented
 - SSRF vector (user-supplied server URL) validated against allowlist behavior
@@ -240,9 +245,11 @@ automatically when the Mend GitHub App is installed on the repository. Provides:
 
 ### Already Available
 - `npm audit` — dependency vulnerability scan
-- `npx` — runs semgrep, secretlint without global install
+- `npx` — runs semgrep, secretlint, license-checker, cyclonedx without global install
 - `gh` (GitHub CLI) — release management, CI status checks
 - `git` — tagging, branching
+- `docker` / `docker compose` — bConnectMock for E2E tests
+- `gpg` — tarball signing with baramundi certificate
 
 ### Install Once (recommended global)
 ```bash
@@ -261,19 +268,29 @@ npm install -g license-checker
 
 ### GitHub Repository Settings
 - **Dependabot alerts**: enable in repo Settings → Security → Dependabot
-- **GitHub Actions**: CI workflow (`.github/workflows/ci.yml`) — runs on every push to master
+- **GitHub Actions**: CI workflow (`.github/workflows/ci.yml`) — runs on every push/PR to master
 - **npm token**: stored as `NPM_TOKEN` in GitHub repo secrets for publish step
+- **GPG signing key**: stored as `GPG_PRIVATE_KEY` + `GPG_PASSPHRASE` in GitHub repo secrets (for tarball signing)
+- **Mend GitHub App**: install when baramundi Mend org is provisioned (`.whitesource` config ready)
 - **No branch protection needed** — trunk-based, solo developer
 
 ### CI Workflow (`.github/workflows/ci.yml`)
-Should include at minimum on every push to `master`:
+
+Two jobs run on every push to `master` / PR against `master`:
+
+**Job 1: `dependency-review`** (PRs only)
+- `actions/dependency-review-action@v4` — blocks high/critical vulns and denied licenses (GPL-3.0, AGPL-3.0, SSPL-1.0)
+
+**Job 2: `build-and-test`** (every push + PR)
 - `npm ci`
 - `npm run lint`
-- `npm run type-check`
-- `npm test`
-- `npm audit --audit-level=high`
+- `npm run build` (TypeScript compilation)
+- `npm run test:unit` (Vitest — unit tests only, excludes `test/system/`)
+- `npm audit --omit=dev --audit-level=high` (runtime deps only)
 - `license-checker --production --failOn` (denied licenses)
-- `actions/dependency-review-action@v4` (on PRs — SCA + license gate)
+- File permission check (all `.ts` files must be 644)
+
+**Permissions**: `contents: read`, `id-token: write` (for future npm provenance)
 
 ---
 
@@ -309,11 +326,17 @@ Should include at minimum on every push to `master`:
 | `Tasks.md` | all process commands | Task backlog and done tracking |
 | `Requirements.md` | design-review, release | Requirements and acceptance criteria |
 | `CLAUDE.md` | all commands | Project context, conventions |
-| `.github/workflows/ci.yml` | ongoing | Automated build + test on push to master |
+| `.github/workflows/ci.yml` | ongoing | CI: build, lint, test, audit, license check, dependency review |
 | `CHANGELOG.md` | release | Release history |
+| `.whitesource` | ongoing (when activated) | Mend SCA configuration — license policy, auto-remediation |
+| `docker-compose.test.yml` | qa-gate | bConnectMock container for E2E tests |
+| `vitest.config.ts` | build, test | Test runner configuration |
+| `docs/adr/` | design-review | Architectural Decision Records (ADR-001, ADR-002, ADR-005) |
 | `NPM_TOKEN` (GitHub secret) | release | npm publish authentication |
+| `GPG_PRIVATE_KEY` (GitHub secret) | release | baramundi certificate for tarball signing |
+| `GPG_PASSPHRASE` (GitHub secret) | release | Passphrase for GPG signing key |
 | Dependabot enabled | ongoing | Automated dependency vulnerability alerts |
 
 ---
 
-*Document version: 1.1 — 2026-04-02 (trunk-based development, master branch)*
+*Document version: 1.2 — 2026-04-02 (added SCA, artifact signing, SBOM, Mend; synced with actual CI/project state)*

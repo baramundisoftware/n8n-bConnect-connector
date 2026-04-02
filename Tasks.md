@@ -710,6 +710,31 @@ Both must be deleted and replaced.
 
 ---
 
+## Maintenance — Vitest 1.x → 4.x Upgrade (optional)
+
+**Goal**: Upgrade vitest from 1.6.x to 4.x to resolve moderate esbuild vulnerability (GHSA-67mh-4wv8-2f99) in transitive dep chain vitest → vite → esbuild ≤0.24.2.
+
+**Priority**: Optional / Low — the esbuild vuln is a dev server cross-origin read, not exploitable in our context (we never run a dev server; vitest is test-only). **Risk is effectively zero for this project.**
+
+**Einschätzung**: **High maintenance cost, low benefit.** The upgrade spans 3 major versions (1.x → 2.x → 3.x → 4.x), each with breaking changes to mock behavior, config options, and coverage reporting. Expected effort:
+- Mock API changes (`vi.restoreAllMocks()` semantics changed, getter defaults differ)
+- Config migration (deprecated options removed across versions)
+- Coverage baseline will shift (V8 remapping logic changed) — need to re-evaluate all coverage numbers
+- Requires Vite 6.0+ (transitive, but may surface further compat issues)
+- 799 tests need validation after each step
+
+**Recommendation**: Defer until either (a) a vitest upgrade is forced by Node.js or n8n framework compat, or (b) the next major maintenance window. Do not pursue solely to fix this moderate-severity dev-only vuln.
+
+### Backlog
+
+| ID | Task | Notes |
+|----|------|-------|
+| VM.1 | Upgrade vitest 1.x → 2.x, fix breaking changes, validate all tests | Step 1 of incremental migration |
+| VM.2 | Upgrade vitest 2.x → 3.x, migrate config (workspace → projects) | Step 2 |
+| VM.3 | Upgrade vitest 3.x → 4.x, fix mock/coverage changes, re-baseline | Step 3 — resolves esbuild vuln |
+
+---
+
 ## Notes
 
 - **System tests** (`test/system/`) require a live bMS server. They are skipped in CI unless `BMS_URL` env var is set. Do not block phases on system test results.
