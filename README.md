@@ -323,189 +323,107 @@ In any Baramundi node, the first parameter is **baramundi Management Suite Versi
 
 > **Note**: The `25R2` version option will remain available until baramundi Management Suite 25R2 reaches end-of-life (expected ~2028).
 
-## Available Resources & Operations
+## Available Nodes & Resources
 
-### Endpoint
+The connector provides **6 specialized n8n nodes**, each covering a domain of baramundi Management Suite. Together they expose **~321 operations** across **28 resources**.
 
-Manage endpoints (devices) in baramundi.
+### Baramundi Endpoint (~92 ops)
 
-| Operation | Description | Selection Method |
-|-----------|-------------|------------------|
-| **Get** | Retrieve a single endpoint by ID | Dropdown or custom GUID |
-| **Get Many** | List endpoints with pagination | N/A |
-| **Search** | Search endpoints by name | N/A |
-| **Update** | Modify endpoint properties | Dropdown or custom GUID |
-| **Delete** | Remove an endpoint | Dropdown or custom GUID |
-| **Start Enrollment** | Initiate endpoint enrollment | Dropdown or custom GUID |
+| Resource | Description | Ops |
+|----------|-------------|-----|
+| Endpoint | Core endpoint CRUD, search, enrollment, Entra ID, unmanaged endpoints | 16 |
+| Logical Group | Logical group CRUD, sub-groups, get endpoints | 7 |
+| Static Group | Static group CRUD, get endpoints | 6 |
+| Dynamic Group | Dynamic group queries, get endpoints | 3 |
+| Maintenance Window | Endpoint and group maintenance windows (create/get/update/delete) | 10 |
+| Typed Endpoint | Platform-typed CRUD (Windows, Linux, macOS, Android, iOS, Network) + Industrial (25R2) | 12 |
 
-**Selection Features:**
-- **Smart Dropdown**: Search through up to 100 endpoints from your baramundi server
-- **Custom GUID**: Enter any endpoint GUID manually for advanced scenarios
-- **Real-time Loading**: Endpoints populated directly from your baramundi API
+### Baramundi Job (~37 ops)
 
-**Get Many Options:**
-- `orderBy`: Sort order (e.g., `DisplayName asc`, `LastContact desc`)
-- `orgUnitId`: Filter by organizational unit GUID
+| Resource | Description | Ops |
+|----------|-------------|-----|
+| Job Definition | Job CRUD, execute, get by folder | 7 |
+| Job Folder | Folder CRUD, sub-folders | 6 |
+| Job Instance | Instance monitoring, group assignment, start/stop/resume | 16 |
+| Kiosk Release | Kiosk release lifecycle, get by endpoint/group/AD object | 8 |
 
-### Job
+### Baramundi Asset (~43 ops)
 
-Manage jobs and job execution.
+| Resource | Description | Ops |
+|----------|-------------|-----|
+| Asset | Asset CRUD, get by endpoint/AD object/group/org unit | 9 |
+| Asset Type | Asset type definitions | 4 |
+| Asset Folder | Stock and type folder management | 13 |
 
-| Operation | Description | Selection Method |
-|-----------|-------------|------------------|
-| **Get** | Retrieve a single job definition by ID | Dropdown or custom GUID |
-| **Get Many** | List jobs with pagination | N/A |
-| **Execute** | Run a job on endpoints | Dropdown or custom GUID |
-| **Get Instances** | View job execution history for a specific job | Dropdown or custom GUID |
-| **Get All Job Instances** | View all job instances across all jobs | N/A |
-| **Create Kiosk Release** | Create kiosk app release | Dropdown or custom GUID |
-| **Update** | Modify job definition properties | Dropdown or custom GUID |
-| **Delete** | Remove a job definition | Dropdown or custom GUID |
+### Baramundi Software (~56 ops)
 
-**Selection Features:**
-- **Smart Dropdown**: Browse up to 100 job definitions with type labels (e.g., "Windows Update [Deployment]")
-- **Custom GUID**: Enter any job GUID manually for scripting scenarios
-- **Searchable**: Filter jobs by name instantly
+| Resource | Description | Ops |
+|----------|-------------|-----|
+| Software | Installed software queries | 4 |
+| Software Bundle | Bundle + folder + application management (26R1+) | 15 |
+| Update Management | Windows update management | 3 |
+| Variable | Variable definitions and instances | 13 |
+| Universal Dynamic Group | UDG groups and folders (26R1+) | 6 |
 
-**Execute Options:**
-- `comment`: Optional comment for the job execution
-- `priority`: `Low`, `Normal`, or `High`
+### Baramundi Admin (~60 ops)
 
-**Get All Job Instances Options:**
-- `returnAll`: Fetch all job instances (with automatic pagination) or limit results
-- `limit`: Maximum number of instances to return (default: 50)
-- `searchQuery`: OData filter query (e.g., `state eq 'Running'`, `state eq 'FinishedSuccessfully'`)
-- `orderBy`: Sort order (e.g., `start desc`, `lastAction desc`)
+| Resource | Description | Ops |
+|----------|-------------|-----|
+| AD User | Active Directory user queries | 4 |
+| AD Group | Active Directory group queries | 4 |
+| AD Object | AD object queries + group memberships | 5 |
+| Org Unit | Organizational unit queries | 3 |
+| Server Management | Server infrastructure, DIP, download jobs, API keys | 13 |
+| Microservice | Microservice start/stop/restart | 5 |
+| Operating System | OS installation management | 9 |
 
-**Key Difference:**
-- **Get Instances**: Requires a specific job ID and retrieves instances for that job only
-- **Get All Job Instances**: No job ID required - retrieves instances from all jobs, with optional filters
+### Baramundi Security (~33 ops)
 
-### Organizational Unit
+| Resource | Description | Ops |
+|----------|-------------|-----|
+| Security | Security groups, profiles, access rights | 12 |
+| Compliance | Compliance rules, vulnerabilities, violations (26R1+) | 8 |
+| Defense Control | BitLocker, Defender, local admin management | 13 |
 
-Manage organizational units (logical groups).
+### Selection Features
 
-| Operation | Description | Selection Method |
-|-----------|-------------|------------------|
-| **Get** | Retrieve a single OU by ID | Dropdown or custom GUID |
-| **Get Many** | List organizational units | N/A |
-| **Get Children** | List child OUs of a parent | Dropdown or custom GUID |
-
-**Selection Features:**
-- **Smart Dropdown**: Navigate organizational structure with searchable dropdown
-- **Custom GUID**: Enter OU GUID manually when needed
+- **Smart Dropdowns**: Search through up to 100 items from your baramundi server
+- **Custom GUID**: Enter any GUID manually for advanced scenarios
+- **Truncation indicator**: When more than 100 items exist, a notice is shown
 
 ## Example Workflows
 
-### Using the Smart Dropdown Feature
-
-The baramundi node includes intelligent dropdown menus that make it easy to select endpoints, jobs, and organizational units without needing to know their GUIDs.
-
-**Example: Execute a Job on an Endpoint**
-
-1. Add a **Baramundi** node to your workflow
-2. Select **Resource**: `Job`
-3. Select **Operation**: `Execute`
-4. **Job Selection**: Click the dropdown and search for your job (e.g., "Windows Update")
-   - The dropdown automatically loads up to 100 jobs from your baramundi server
-   - Jobs display with type labels: "Windows Update [Deployment]"
-   - Use the search box to filter jobs by name
-5. **Endpoint IDs**: Enter endpoint GUIDs (or use expressions from previous nodes)
-6. Configure optional settings (comment, priority)
-7. Execute the workflow
-
-**Custom GUID Fallback**: For advanced scenarios (expressions, scripts, or dynamic values), select "Enter Custom GUID..." from any dropdown to manually enter a GUID.
-
-### 1. Deploy Software to New Endpoints
-
-```
-Trigger (Schedule)
-    → baramundi: Search endpoints (filter: new)
-    → IF: Missing required software
-    → baramundi: Execute deployment job (use dropdown to select job)
-    → Slack: Notify IT team
-```
-
-### 2. Daily Compliance Report
-
-```
-Trigger (Cron: 0 8 * * *)
-    → baramundi: Get Many endpoints
-    → Code: Analyze compliance status
-    → IF: Non-compliant endpoints found
-    → Email: Send compliance report
-    → Spreadsheet: Log results
-```
-
-### 3. Automated Endpoint Cleanup
-
-```
-Trigger (Weekly)
-    → baramundi: Get Many endpoints
-    → Code: Filter inactive (>90 days)
-    → baramundi: Delete endpoint (use dropdown to select, for each)
-    → Database: Archive endpoint data
-```
-
-### 4. Job Execution Monitoring
-
-```
-Trigger (Every 5 minutes)
-    → baramundi: Get Job Instances (use dropdown to select job)
-    → IF: Failed jobs found
-    → PagerDuty: Create incident
-    → Slack: Alert on-call team
-```
-
-### 5. Interactive Workflow with Dropdown Selection
-
-```
-Trigger (Webhook)
-    → baramundi: Get endpoint (use dropdown to browse and select)
-    → baramundi: Execute job on endpoint (use dropdown to select job)
-    → HTTP Response: Return job execution status
-```
-
-**Benefits:**
-- No need to look up GUIDs in baramundi console
-- Searchable dropdowns for quick filtering
-- Type-safe selections reduce errors
-- Fallback to custom GUID for dynamic scenarios
+See `example-workflows/` for importable n8n workflow JSON files.
 
 ## Project Structure
 
 ```
 n8nconnector/
 ├── credentials/
-│   └── BconnectApi.credentials.ts    # Authentication configuration
-├── nodes/
-│   └── Baramundi/
-│       ├── Baramundi.node.ts         # Main node definition
-│       ├── baramundi.svg             # Node icon
-│       ├── transport/
-│       │   └── requestApi.ts         # API request helpers with pagination
-│       └── actions/
-│           ├── router.ts             # Request routing logic
-│           ├── endpoint/
-│           │   ├── index.ts
-│           │   ├── endpoint.fields.ts    # UI field definitions
-│           │   └── endpoint.execute.ts   # Operation implementations
-│           ├── job/
-│           │   ├── index.ts
-│           │   ├── job.fields.ts
-│           │   └── job.execute.ts
-│           └── orgUnit/
-│               ├── index.ts
-│               ├── orgUnit.fields.ts
-│               └── orgUnit.execute.ts
-├── dist/                             # Compiled output (generated)
-├── package.json
-├── tsconfig.json
-├── eslint.config.mjs
-├── .prettierrc
-├── .gitignore
-├── tasks.md                          # Project task tracking
-└── README.md                         # This file
+│   └── BconnectApi.credentials.ts       # Basic Auth credential type
+├── nodes/shared/                        # Shared infrastructure (all nodes import from here)
+│   ├── transport/requestApi.ts          # HTTP client, pagination, retry, backoff
+│   ├── utils/                           # types, validation, errorMessages
+│   └── loadOptions.ts                   # Dropdown population functions
+├── nodes/BaramundiEndpoint/             # Endpoint, groups, maintenance windows (~92 ops)
+│   ├── BaramundiEndpoint.node.ts
+│   └── actions/                         # endpoint, logicalGroup, staticGroup, dynamicGroup,
+│                                        #   maintenanceWindow, typedEndpoint
+├── nodes/BaramundiAsset/                # Asset, asset types, folders (~43 ops)
+├── nodes/BaramundiJob/                  # Job definitions, folders, instances, kiosk (~37 ops)
+├── nodes/BaramundiSoftware/             # Software, bundles, updates, variables, UDG (~56 ops)
+├── nodes/BaramundiAdmin/                # AD, server management, microservices, OS (~60 ops)
+├── nodes/BaramundiSecurity/             # Security, compliance, defense control (~33 ops)
+├── test/
+│   ├── unit/                            # Vitest unit tests (mocked apiRequest)
+│   └── system/                          # Live bConnect API tests (skipped in CI)
+├── example-workflows/                   # n8n workflow JSON templates
+├── docs/                                # ADRs, SDLC pipeline docs
+├── dist/                                # Compiled output (generated)
+├── Tasks.md                             # Project task tracking
+├── Requirements.md                      # Requirements with MoSCoW priorities
+├── CHANGELOG.md
+└── README.md
 ```
 
 ## API Reference
@@ -520,7 +438,7 @@ This node uses the baramundi bConnect REST API V2.0.
 
 The node handles pagination automatically when using "Return All" option:
 - Page size: 100 items per request
-- Safety limit: 1000 pages maximum
+- Safety limit: 50 pages maximum (5000 items default cap)
 
 ## Compatibility
 

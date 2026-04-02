@@ -42,8 +42,8 @@
   },
   "main": "dist/nodes/BaramundiEndpoint/BaramundiEndpoint.node.js",
   "scripts": {
-    "dev": "npx @n8n/node-cli dev",
-    "build": "npx @n8n/node-cli build",
+    "dev": "n8n-node dev",
+    "build": "n8n-node build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,json}\"",
@@ -75,7 +75,7 @@
     "CHANGELOG.md"
   ],
   "devDependencies": {
-    "@n8n/node-cli": "^0.17.0",
+    "@n8n/node-cli": ">=0.17.0 <0.23.0",
     "@types/node": "^20.0.0",
     "@vitest/coverage-v8": "^1.6.0",
     "axios": "^1.13.2",

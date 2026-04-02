@@ -28,7 +28,7 @@ jobs:
         run: npm run lint
 
       - name: TypeScript build
-        run: npx @n8n/node-cli build
+        run: npm run build
 
       - name: Unit tests
         run: npm run test:unit
