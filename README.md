@@ -501,6 +501,47 @@ tail -f /tmp/n8n.log    # View logs
 
 ---
 
+## Security
+
+### Dependency Vulnerability Posture
+
+Running `npm audit` on this package will report vulnerabilities inherited from the **n8n build toolchain and peer dependencies**. These are **not present in the runtime package** installed on your n8n instance.
+
+| Package | Severity | Source | Runtime Impact |
+|---------|----------|--------|----------------|
+| `handlebars` | CRITICAL | `@n8n/node-cli` (build tool) | None — build-time only, not in `dist/` |
+| `lodash` | HIGH | `n8n-workflow` (peer dep) | None — `_.template` and `_.omit` are never called by this connector |
+| `minimatch` | HIGH | `@n8n/node-cli` (build tool) | None — build-time only |
+| `esbuild` | MODERATE | `vitest` → `vite` (dev tool) | None — test runner only |
+
+**The compiled runtime package (`dist/`) has zero known vulnerabilities.** You can verify this yourself:
+
+```bash
+cd ~/.n8n/custom
+npm audit --omit=dev
+```
+
+These findings are tracked and re-evaluated with each release. When upstream packages release fixes, they will be adopted immediately.
+
+### Artifact Integrity
+
+Distribution tarballs are GPG-signed with an RSA-4096 key. To verify a downloaded package:
+
+```bash
+# Import the signing key (first time only)
+gpg --import baramundi-signing-key.asc
+
+# Verify the tarball
+gpg --verify n8n-nodes-baramundi-management-solution-<version>.tgz.asc \
+             n8n-nodes-baramundi-management-solution-<version>.tgz
+```
+
+### Reporting Security Issues
+
+If you discover a security vulnerability, please report it to **support@baramundi.com** rather than opening a public issue.
+
+---
+
 ## Contributing
 
 1. Fork the repository

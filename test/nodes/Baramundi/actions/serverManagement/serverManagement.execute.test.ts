@@ -764,4 +764,53 @@ describe('Validation error paths', () => {
     const mock = createMockExecuteFunctions({ returnAll: false, limit: 10, options: { searchQuery: 'name eq "test"' } });
     await expect(getSecurityProfiles.call(mock, 0)).rejects.toThrow();
   });
+
+  it('should throw NodeOperationError for invalid GUID in downloadJobId (getDownloadJob)', async () => {
+    const mock = createMockExecuteFunctions({ downloadJobId: 'not-a-guid' });
+    await expect(getDownloadJob.call(mock, 0)).rejects.toThrow();
+  });
+});
+
+describe('returnAll: true branches', () => {
+  const multiPage1 = {
+    currentPage: 0, pageSize: 2, totalPages: 2, totalItems: 3,
+    hasPreviousPage: false, hasNextPage: true,
+    data: [{ id: 'sm1' }, { id: 'sm2' }],
+  };
+  const multiPage2 = {
+    currentPage: 1, pageSize: 2, totalPages: 2, totalItems: 3,
+    hasPreviousPage: true, hasNextPage: false,
+    data: [{ id: 'sm3' }],
+  };
+
+  function createReturnAllMock(params: Record<string, any>, pages: any[]): IExecuteFunctions {
+    let callIndex = 0;
+    return {
+      getNodeParameter: vi.fn((name: string, _i: number, def?: any) => params[name] ?? def),
+      getCredentials: vi.fn(async () => ({ baseUrl: 'https://bms:444/bconnect', username: 'u', password: 'test-password-do-not-use', ignoreSslIssues: false })),
+      helpers: {
+        httpRequest: vi.fn(async () => { const r = pages[callIndex] || pages[pages.length - 1]; callIndex++; return r; }),
+        returnJsonArray: vi.fn((data: any) => (Array.isArray(data) ? data : [data]).map((j: any) => ({ json: j })) as INodeExecutionData[]),
+      },
+      getNode: vi.fn(() => ({ id: 'test', name: 'Baramundi', type: 'test', typeVersion: 1, position: [0, 0], parameters: {} })),
+    } as unknown as IExecuteFunctions;
+  }
+
+  it('getDownloadJobs returnAll=true', async () => {
+    const mock = createReturnAllMock({ returnAll: true }, [multiPage1, multiPage2]);
+    const result = await getDownloadJobs.call(mock, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getSecurityGroups returnAll=true', async () => {
+    const mock = createReturnAllMock({ returnAll: true, options: {} }, [multiPage1, multiPage2]);
+    const result = await getSecurityGroups.call(mock, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getSecurityProfiles returnAll=true', async () => {
+    const mock = createReturnAllMock({ returnAll: true, options: {} }, [multiPage1, multiPage2]);
+    const result = await getSecurityProfiles.call(mock, 0);
+    expect(result).toHaveLength(3);
+  });
 });

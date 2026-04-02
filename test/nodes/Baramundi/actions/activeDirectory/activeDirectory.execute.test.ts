@@ -857,6 +857,142 @@ describe('Active Directory Operations', () => {
   });
 });
 
+describe('returnAll: true branches', () => {
+  const multiPage1 = {
+    currentPage: 0, pageSize: 2, totalPages: 2, totalItems: 3,
+    hasPreviousPage: false, hasNextPage: true,
+    data: [{ id: 'x1' }, { id: 'x2' }],
+  };
+  const multiPage2 = {
+    currentPage: 1, pageSize: 2, totalPages: 2, totalItems: 3,
+    hasPreviousPage: true, hasNextPage: false,
+    data: [{ id: 'x3' }],
+  };
+
+  it('getADObjectsByADGroup returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { adGroupId: '33333333-3333-3333-3333-333333333333', returnAll: true, options: {} },
+      {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getADObjectsByADGroup.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getADObjectMemberships returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { adObjectId: '66666666-6666-6666-6666-666666666666', returnAll: true, options: {} },
+      {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getADObjectMemberships.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getADObjectsByOrgUnit returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { orgUnitId: '44444444-4444-4444-4444-444444444444', returnAll: true, options: {} },
+      {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getADObjectsByOrgUnit.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getADUsersByOrgUnit returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { orgUnitId: '44444444-4444-4444-4444-444444444444', returnAll: true, options: {} },
+      {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getADUsersByOrgUnit.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getADGroups returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { returnAll: true, options: {} }, {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getADGroups.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getADObjectsByADGroup with searchQuery and orderBy options', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { adGroupId: '33333333-3333-3333-3333-333333333333', returnAll: false, limit: 50, options: { searchQuery: 'Name eq test', orderBy: 'Name asc' } },
+      {}, { data: [{ id: 'x1' }] },
+    );
+    const result = await getADObjectsByADGroup.call(mockContext, 0);
+    expect(result).toHaveLength(1);
+  });
+
+  it('getADObjectMemberships with searchQuery and orderBy options', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { adObjectId: '66666666-6666-6666-6666-666666666666', returnAll: false, limit: 50, options: { searchQuery: 'Name eq test', orderBy: 'Name asc' } },
+      {}, { data: [{ id: 'x1' }] },
+    );
+    const result = await getADObjectMemberships.call(mockContext, 0);
+    expect(result).toHaveLength(1);
+  });
+
+  it('getADObjectsByOrgUnit with searchQuery and orderBy options', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { orgUnitId: '44444444-4444-4444-4444-444444444444', returnAll: false, limit: 50, options: { searchQuery: 'Name eq test', orderBy: 'Name asc' } },
+      {}, { data: [{ id: 'x1' }] },
+    );
+    const result = await getADObjectsByOrgUnit.call(mockContext, 0);
+    expect(result).toHaveLength(1);
+  });
+
+  it('getADUsersByOrgUnit with searchQuery and orderBy options', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { orgUnitId: '44444444-4444-4444-4444-444444444444', returnAll: false, limit: 50, options: { searchQuery: 'Name eq test', orderBy: 'Name asc' } },
+      {}, { data: [{ id: 'x1' }] },
+    );
+    const result = await getADUsersByOrgUnit.call(mockContext, 0);
+    expect(result).toHaveLength(1);
+  });
+
+  it('getOrgUnitsByOrgUnit with searchQuery and orderBy options', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { orgUnitId: '44444444-4444-4444-4444-444444444444', returnAll: false, limit: 50, options: { searchQuery: 'Name eq test', orderBy: 'Name asc' } },
+      {}, { data: [{ id: 'x1' }] },
+    );
+    const result = await getOrgUnitsByOrgUnit.call(mockContext, 0);
+    expect(result).toHaveLength(1);
+  });
+
+  it('getADUsers returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { returnAll: true, options: {} }, {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getADUsers.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getADObjects returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { returnAll: true, options: {} }, {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getADObjects.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getADGroupsByOrgUnit returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { orgUnitId: '44444444-4444-4444-4444-444444444444', returnAll: true, options: {} },
+      {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getADGroupsByOrgUnit.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getADUsersByGroup returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { adGroupId: '33333333-3333-3333-3333-333333333333', returnAll: true, options: {} },
+      {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getADUsersByGroup.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+});
+
 describe('Validation error paths', () => {
   it('should throw NodeOperationError for invalid GUID in adGroupId (getADGroup)', async () => {
     const mock = createMockExecuteFunctions({ adGroupId: 'not-a-guid' });

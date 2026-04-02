@@ -361,3 +361,47 @@ describe('Validation error paths', () => {
 		await expect(operatingSystem.getWindowsEndpoints.call(mock, 0)).rejects.toThrow();
 	});
 });
+
+describe('returnAll: true branches', () => {
+	const multiPage1 = {
+		currentPage: 0, pageSize: 2, totalPages: 2, totalItems: 3,
+		hasPreviousPage: false, hasNextPage: true,
+		data: [{ id: 'o1' }, { id: 'o2' }],
+	};
+	const multiPage2 = {
+		currentPage: 1, pageSize: 2, totalPages: 2, totalItems: 3,
+		hasPreviousPage: true, hasNextPage: false,
+		data: [{ id: 'o3' }],
+	};
+
+	function createReturnAllCtx(params: Record<string, any>, pages: any[]) {
+		let callIndex = 0;
+		return {
+			getNodeParameter: vi.fn((name: string, _i: number, def?: any) => params[name] ?? def),
+			getCredentials: vi.fn(async () => ({ baseUrl: 'https://bms:444/bconnect', username: 'u', password: 'test-password-do-not-use', ignoreSslIssues: false })),
+			helpers: {
+				httpRequest: vi.fn(async () => { const r = pages[callIndex] || pages[pages.length - 1]; callIndex++; return r; }),
+				returnJsonArray: vi.fn((data: any) => (Array.isArray(data) ? data : [data]).map((j: any) => ({ json: j }))),
+			},
+			getNode: vi.fn(() => ({ name: 'Baramundi', type: 'test', typeVersion: 1, position: [0, 0], parameters: {} })),
+		} as any;
+	}
+
+	it('getFolders returnAll=true', async () => {
+		const ctx = createReturnAllCtx({ returnAll: true, options: {} }, [multiPage1, multiPage2]);
+		const result = await operatingSystem.getFolders.call(ctx, 0);
+		expect(result).toHaveLength(3);
+	});
+
+	it('getFoldersByFolderId returnAll=true', async () => {
+		const ctx = createReturnAllCtx({ folderId: '77777777-7777-7777-7777-777777777777', returnAll: true, options: {} }, [multiPage1, multiPage2]);
+		const result = await operatingSystem.getFoldersByFolderId.call(ctx, 0);
+		expect(result).toHaveLength(3);
+	});
+
+	it('getWindowsEndpoints returnAll=true', async () => {
+		const ctx = createReturnAllCtx({ returnAll: true, options: {} }, [multiPage1, multiPage2]);
+		const result = await operatingSystem.getWindowsEndpoints.call(ctx, 0);
+		expect(result).toHaveLength(3);
+	});
+});

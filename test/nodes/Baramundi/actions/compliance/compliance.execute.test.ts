@@ -219,6 +219,62 @@ describe('Compliance Operations', () => {
   });
 });
 
+describe('returnAll: true branches', () => {
+  const multiPage1 = {
+    currentPage: 0, pageSize: 2, totalPages: 2, totalItems: 3,
+    hasPreviousPage: false, hasNextPage: true,
+    data: [{ id: 'c1' }, { id: 'c2' }],
+  };
+  const multiPage2 = {
+    currentPage: 1, pageSize: 2, totalPages: 2, totalItems: 3,
+    hasPreviousPage: true, hasNextPage: false,
+    data: [{ id: 'c3' }],
+  };
+
+  function createReturnAllMock(params: Record<string, any>, pages: any[]) {
+    let callIndex = 0;
+    return {
+      getNodeParameter: vi.fn((name: string, _i: number, def?: any) => params[name] ?? def),
+      getCredentials: vi.fn(async () => ({ baseUrl: 'https://bms:444/bconnect', username: 'u', password: 'test-password-do-not-use', ignoreSslIssues: false })),
+      helpers: {
+        httpRequest: vi.fn(async () => { const r = pages[callIndex] || pages[pages.length - 1]; callIndex++; return r; }),
+        returnJsonArray: vi.fn((data: any) => (Array.isArray(data) ? data : [data]).map((j: any) => ({ json: j }))),
+      },
+      getNode: vi.fn(() => ({ id: 'test', name: 'Baramundi', type: 'test', typeVersion: 1, position: [0, 0], parameters: {} })),
+    } as any;
+  }
+
+  it('getDetectedRuleViolations returnAll=true', async () => {
+    const mock = createReturnAllMock({ returnAll: true, options: {} }, [multiPage1, multiPage2]);
+    const result = await getDetectedRuleViolations.call(mock, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getDetectedRuleViolationsByEndpoint returnAll=true', async () => {
+    const mock = createReturnAllMock({ endpointId: ENDPOINT_ID, returnAll: true }, [multiPage1, multiPage2]);
+    const result = await getDetectedRuleViolationsByEndpoint.call(mock, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getVulnerabilities returnAll=true', async () => {
+    const mock = createReturnAllMock({ returnAll: true, options: {} }, [multiPage1, multiPage2]);
+    const result = await getVulnerabilities.call(mock, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getDetectedVulnerabilities returnAll=true', async () => {
+    const mock = createReturnAllMock({ returnAll: true, options: {} }, [multiPage1, multiPage2]);
+    const result = await getDetectedVulnerabilities.call(mock, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getDetectedVulnerabilitiesByEndpoint returnAll=true', async () => {
+    const mock = createReturnAllMock({ endpointId: ENDPOINT_ID, returnAll: true }, [multiPage1, multiPage2]);
+    const result = await getDetectedVulnerabilitiesByEndpoint.call(mock, 0);
+    expect(result).toHaveLength(3);
+  });
+});
+
 describe('Validation error paths', () => {
   it('should throw NodeOperationError for invalid GUID in ruleId (getRule)', async () => {
     const mock = createMockExecuteFunctions({ ruleId: 'not-a-guid' });

@@ -2397,3 +2397,95 @@ describe('Validation error paths', () => {
     await expect(getKioskReleases.call(mock, 0)).rejects.toThrow();
   });
 });
+
+describe('Job returnAll: true branches', () => {
+  const multiPage1 = {
+    currentPage: 0, pageSize: 2, totalPages: 2, totalItems: 3,
+    hasPreviousPage: false, hasNextPage: true,
+    data: [{ id: 'j1' }, { id: 'j2' }],
+  };
+  const multiPage2 = {
+    currentPage: 1, pageSize: 2, totalPages: 2, totalItems: 3,
+    hasPreviousPage: true, hasNextPage: false,
+    data: [{ id: 'j3' }],
+  };
+
+  function createReturnAllCtx(params: Record<string, any>, pages: any[]) {
+    let callIndex = 0;
+    return {
+      getNodeParameter: vi.fn((name: string, _i: number, def?: any) => params[name] ?? def),
+      getCredentials: vi.fn(async () => ({ baseUrl: 'https://bms:444/bconnect', username: 'u', password: 'test-password-do-not-use', ignoreSslIssues: false })),
+      helpers: {
+        httpRequest: vi.fn(async () => { const r = pages[callIndex] || pages[pages.length - 1]; callIndex++; return r; }),
+        returnJsonArray: vi.fn((data: any) => (Array.isArray(data) ? data : [data]).map((j: any) => ({ json: j }))),
+      },
+      getNode: vi.fn(() => ({ name: 'Baramundi', type: 'test', typeVersion: 1, position: [0, 0], parameters: {} })),
+    } as any;
+  }
+
+  it('getSubFolders returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ folderId: '77777777-7777-7777-7777-777777777777', returnAll: true }, [multiPage1, multiPage2]);
+    const result = await getSubFolders.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getJobDefinitionsByFolder returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ folderId: '77777777-7777-7777-7777-777777777777', returnAll: true }, [multiPage1, multiPage2]);
+    const result = await getJobDefinitionsByFolder.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getKioskReleasesByJobDefinition returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ jobId: '88888888-8888-8888-8888-888888888888', returnAll: true }, [multiPage1, multiPage2]);
+    const result = await getKioskReleasesByJobDefinition.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getJobInstancesByLogicalGroup returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ logicalGroupId: '22222222-2222-2222-2222-222222222222', returnAll: true }, [multiPage1, multiPage2]);
+    const result = await getJobInstancesByLogicalGroup.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getJobInstancesByStaticGroup returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ staticGroupId: '33333333-3333-3333-3333-333333333333', returnAll: true }, [multiPage1, multiPage2]);
+    const result = await getJobInstancesByStaticGroup.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getJobInstancesByDynamicGroup returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ dynamicGroupId: '44444444-4444-4444-4444-444444444444', returnAll: true }, [multiPage1, multiPage2]);
+    const result = await getJobInstancesByDynamicGroup.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getJobInstancesByUDG returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ udgId: '55555555-5555-5555-5555-555555555555', returnAll: true }, [multiPage1, multiPage2]);
+    const result = await getJobInstancesByUDG.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getKioskReleasesByEndpoint returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ endpointId: '11111111-1111-1111-1111-111111111111', returnAll: true }, [multiPage1, multiPage2]);
+    const result = await getKioskReleasesByEndpoint.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getKioskReleasesByLogicalGroup returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ logicalGroupId: '22222222-2222-2222-2222-222222222222', returnAll: true }, [multiPage1, multiPage2]);
+    const result = await getKioskReleasesByLogicalGroup.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getKioskReleasesByADObject returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ adObjectId: '66666666-6666-6666-6666-666666666666', returnAll: true }, [multiPage1, multiPage2]);
+    const result = await getKioskReleasesByADObject.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getKioskReleases returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ returnAll: true, options: {} }, [multiPage1, multiPage2]);
+    const result = await getKioskReleases.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+});

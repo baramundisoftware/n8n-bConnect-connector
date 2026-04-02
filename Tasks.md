@@ -811,6 +811,27 @@ Both must be deleted and replaced.
 
 ---
 
+## GitHub Repository Setup (CICD-02, REQ-PUBLISH-1)
+
+**Goal**: Create a private GitHub repository to enable branch protection, CI runs on GitHub, and prepare for eventual public release.
+
+**Prerequisite**: Management approval for private GitHub hosting.
+
+### Backlog
+
+| ID | Task | Priority | Acceptance Criteria |
+|----|------|----------|---------------------|
+| GH-01 | **Ask Philipp for approval** to publish the codebase in a **private** GitHub repository. Clarify: code stays invisible until explicit decision to go public (REQ-PUBLISH-2). | P0 — blocks all GH tasks | Approval granted or denied |
+| GH-02 | Create private GitHub repo, add remote, push `master` + tags | P0 | `git remote -v` shows GitHub origin; CI workflow runs green |
+| GH-03 | Enable branch protection on `master`: require CI status checks, disable force-push | P0 | CICD-02 resolved |
+| GH-04 | Sign git tags with GPG key going forward | P1 | CICD-05 resolved |
+
+### Done
+
+*(empty)*
+
+---
+
 ## Notes
 
 - **System tests** (`test/system/`) require a live bMS server. They are skipped in CI unless `BMS_URL` env var is set. Do not block phases on system test results.

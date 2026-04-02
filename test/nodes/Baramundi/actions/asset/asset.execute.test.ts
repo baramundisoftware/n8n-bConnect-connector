@@ -1326,6 +1326,97 @@ describe('Asset Phase 4 - AD Object and OrgUnit Operations', () => {
   });
 });
 
+describe('returnAll: true branches', () => {
+  const multiPage1 = {
+    currentPage: 0, pageSize: 2, totalPages: 2, totalItems: 3,
+    hasPreviousPage: false, hasNextPage: true,
+    data: [{ id: 'a1' }, { id: 'a2' }],
+  };
+  const multiPage2 = {
+    currentPage: 1, pageSize: 2, totalPages: 2, totalItems: 3,
+    hasPreviousPage: true, hasNextPage: false,
+    data: [{ id: 'a3' }],
+  };
+
+  it('getAssetsByLogicalGroup returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { logicalGroupId: '22222222-2222-2222-2222-222222222222', returnAll: true, options: {} },
+      {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getAssetsByLogicalGroup.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getAssetStockAssets returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { returnAll: true, options: {} }, {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getAssetStockAssets.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getAssetStockFolders returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { returnAll: true, options: {} }, {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getAssetStockFolders.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getAssetsByADObject returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { adObjectId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', returnAll: true },
+      {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getAssetsByADObject.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getAssetsByOrgUnit returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { orgUnitId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', returnAll: true },
+      {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getAssetsByOrgUnit.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getAssetStockSubFolders returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { folderId: '77777777-7777-7777-7777-777777777777', returnAll: true, options: {} },
+      {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getAssetStockSubFolders.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getAssetTypeFolders returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { returnAll: true, options: {} }, {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getAssetTypeFolders.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getAssetTypeFolderSubFolders returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { assetTypeFolderId: '90909090-9090-9090-9090-909090909090', returnAll: true, options: {} },
+      {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getAssetTypeFolderSubFolders.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getAssetsByEndpoint returnAll=true', async () => {
+    const mockContext = createMockExecuteFunctions(
+      { endpointId: '11111111-1111-1111-1111-111111111111', returnAll: true, options: {} },
+      {}, {}, [multiPage1, multiPage2],
+    );
+    const result = await getAssetsByEndpoint.call(mockContext, 0);
+    expect(result).toHaveLength(3);
+  });
+});
+
 describe('Validation error paths', () => {
   it('should throw NodeOperationError for invalid GUID in assetId (get)', async () => {
     const mock = createMockExecuteFunctions({ assetId: 'not-a-guid' });

@@ -531,6 +531,62 @@ describe('DefenseControl Phase 4 - BitLocker Secrets', () => {
   });
 });
 
+describe('returnAll: true branches', () => {
+  const multiPage1 = {
+    currentPage: 0, pageSize: 2, totalPages: 2, totalItems: 3,
+    hasPreviousPage: false, hasNextPage: true,
+    data: [{ id: 'd1' }, { id: 'd2' }],
+  };
+  const multiPage2 = {
+    currentPage: 1, pageSize: 2, totalPages: 2, totalItems: 3,
+    hasPreviousPage: true, hasNextPage: false,
+    data: [{ id: 'd3' }],
+  };
+
+  function createReturnAllMock(params: Record<string, any>, pages: any[]): IExecuteFunctions {
+    let callIndex = 0;
+    return {
+      getNodeParameter: vi.fn((name: string, _i: number, def?: any) => params[name] ?? def),
+      getCredentials: vi.fn(async () => ({ baseUrl: 'https://bms:444/bconnect', username: 'u', password: 'test-password-do-not-use', ignoreSslIssues: false })),
+      helpers: {
+        httpRequest: vi.fn(async () => { const r = pages[callIndex] || pages[pages.length - 1]; callIndex++; return r; }),
+        returnJsonArray: vi.fn((data: any) => (Array.isArray(data) ? data : [data]).map((j: any) => ({ json: j })) as INodeExecutionData[]),
+      },
+      getNode: vi.fn(() => ({ id: 'test', name: 'Baramundi', type: 'test', typeVersion: 1, position: [0, 0], parameters: {} })),
+    } as unknown as IExecuteFunctions;
+  }
+
+  it('getBitLockerWindowsEndpoints returnAll=true', async () => {
+    const mock = createReturnAllMock({ returnAll: true, options: {} }, [multiPage1, multiPage2]);
+    const result = await getBitLockerWindowsEndpoints.call(mock, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getMicrosoftDefenderThreats returnAll=true', async () => {
+    const mock = createReturnAllMock({ returnAll: true, options: {} }, [multiPage1, multiPage2]);
+    const result = await getMicrosoftDefenderThreats.call(mock, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getMicrosoftDefenderThreatsByEndpoint returnAll=true', async () => {
+    const mock = createReturnAllMock({ endpointId: '11111111-1111-1111-1111-111111111111', returnAll: true, options: {} }, [multiPage1, multiPage2]);
+    const result = await getMicrosoftDefenderThreatsByEndpoint.call(mock, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getMicrosoftDefenderThreatsByLogicalGroup returnAll=true', async () => {
+    const mock = createReturnAllMock({ logicalGroupId: '22222222-2222-2222-2222-222222222222', returnAll: true, options: {} }, [multiPage1, multiPage2]);
+    const result = await getMicrosoftDefenderThreatsByLogicalGroup.call(mock, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getMicrosoftDefenderWindowsEndpoints returnAll=true', async () => {
+    const mock = createReturnAllMock({ returnAll: true, options: {} }, [multiPage1, multiPage2]);
+    const result = await getMicrosoftDefenderWindowsEndpoints.call(mock, 0);
+    expect(result).toHaveLength(3);
+  });
+});
+
 describe('Validation error paths', () => {
   it('should throw NodeOperationError for invalid GUID in endpointId (getBitLockerWindowsEndpoint)', async () => {
     const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid' });

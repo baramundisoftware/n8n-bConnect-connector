@@ -143,6 +143,23 @@ describe('getOptions methods', () => {
       const result = await getDynamicGroups.call(mockCtx);
       expect(result[0]).toEqual({ name: 'Dynamic1', value: 'dg1' });
     });
+
+    it('should add truncation notice when hasNextPage is true (getNamedItems)', async () => {
+      const mockCtx = createMockLoadOptionsFunctions({
+        data: [{ id: 'g1', name: 'Group1' }],
+        hasNextPage: true,
+      });
+      const result = await getLogicalGroups.call(mockCtx);
+      expect(result).toHaveLength(2);
+      expect(result[1].name).toContain('showing first 100');
+    });
+
+    it('should return empty array on error (getNamedItems)', async () => {
+      const mockCtx = createMockLoadOptionsFunctions({});
+      (mockCtx.helpers.httpRequest as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('fail'));
+      const result = await getLogicalGroups.call(mockCtx);
+      expect(result).toEqual([]);
+    });
   });
 });
 

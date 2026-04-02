@@ -244,6 +244,79 @@ describe('Software Phase 8E — Bundle Application / Folder Operations', () => {
   });
 });
 
+describe('returnAll: true branches', () => {
+  const multiPage1 = {
+    currentPage: 0, pageSize: 2, totalPages: 2, totalItems: 3,
+    hasPreviousPage: false, hasNextPage: true,
+    data: [{ id: 's1' }, { id: 's2' }],
+  };
+  const multiPage2 = {
+    currentPage: 1, pageSize: 2, totalPages: 2, totalItems: 3,
+    hasPreviousPage: true, hasNextPage: false,
+    data: [{ id: 's3' }],
+  };
+
+  function createReturnAllCtx(params: Record<string, any>, pages: any[]) {
+    let callIndex = 0;
+    return {
+      getNodeParameter: vi.fn((name: string, _i: number, def?: any) => params[name] ?? def),
+      getCredentials: vi.fn(async () => ({ baseUrl: 'https://bms:444/bconnect', username: 'u', password: 'test-password-do-not-use', ignoreSslIssues: false })),
+      helpers: {
+        httpRequest: vi.fn(async () => { const r = pages[callIndex] || pages[pages.length - 1]; callIndex++; return r; }),
+        returnJsonArray: vi.fn((data: any) => (Array.isArray(data) ? data : [data]).map((j: any) => ({ json: j }))),
+      },
+      getNode: vi.fn(() => ({ name: 'Baramundi', type: 'test', typeVersion: 1, position: [0, 0], parameters: {} })),
+    } as any;
+  }
+
+  it('getInstalledWindowsSoftware returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ returnAll: true, options: {} }, [multiPage1, multiPage2]);
+    const result = await software.getInstalledWindowsSoftware.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getInstalledSoftwareByEndpoint returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ endpointId: '11111111-1111-1111-1111-111111111111', returnAll: true, options: {} }, [multiPage1, multiPage2]);
+    const result = await software.getInstalledSoftwareByEndpoint.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getInstalledSoftwareByLogicalGroup returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ logicalGroupId: '22222222-2222-2222-2222-222222222222', returnAll: true, options: {} }, [multiPage1, multiPage2]);
+    const result = await software.getInstalledSoftwareByLogicalGroup.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getInstalledSoftwareByUniversalDynamicGroup returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ universalDynamicGroupId: '78787878-7878-7878-7878-787878787878', returnAll: true, options: {} }, [multiPage1, multiPage2]);
+    const result = await software.getInstalledSoftwareByUniversalDynamicGroup.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getBundleApplicationsByBundle returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ bundleId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', returnAll: true }, [multiPage1, multiPage2]);
+    const result = await software.getBundleApplicationsByBundle.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getBundleApplications returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ returnAll: true }, [multiPage1, multiPage2]);
+    const result = await software.getBundleApplications.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('getBundleFolders returnAll=true', async () => {
+    const ctx = createReturnAllCtx({ returnAll: true }, [multiPage1, multiPage2]);
+    const result = await software.getBundleFolders.call(ctx, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('updateBundleFolder throws when no fields to update', async () => {
+    const ctx = createReturnAllCtx({ bundleFolderId: '34343434-3434-3434-3434-343434343434', updateFields: {} }, []);
+    await expect(software.updateBundleFolder.call(ctx, 0)).rejects.toThrow('No fields to update specified');
+  });
+});
+
 describe('Validation error paths', () => {
   it('should throw NodeOperationError for invalid GUID in endpointId (getInstalledSoftwareByEndpoint)', async () => {
     const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid', returnAll: false, limit: 10 });

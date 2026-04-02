@@ -106,7 +106,7 @@ testing, UAT sign-off, versioning, or publishing.
           │                            │
           │  • Semver bump             │
           │  • CHANGELOG.md update     │
-          │  • git tag vX.Y.Z          │
+          │  • git tag -s vX.Y.Z       │
           │  • SBOM generation          │
           │  • GPG sign tarball         │
           │  • npm publish --provenance │
@@ -272,7 +272,8 @@ npm install -g license-checker
 - **npm token**: stored as `NPM_TOKEN` in GitHub repo secrets for publish step
 - **GPG signing key**: stored as `GPG_PRIVATE_KEY` + `GPG_PASSPHRASE` in GitHub repo secrets (for tarball signing)
 - **Mend GitHub App**: install when baramundi Mend org is provisioned (`.whitesource` config ready)
-- **No branch protection needed** — trunk-based, solo developer
+- **Branch protection**: require CI status checks on `master`, disable force-push (when GitHub repo is created)
+- **Signed git tags**: all release tags must use `git tag -s` (GPG-signed) — never `git tag -a`
 
 ### CI Workflow (`.github/workflows/ci.yml`)
 
