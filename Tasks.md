@@ -695,6 +695,8 @@ Both must be deleted and replaced.
 | P16.3 | **Verify StaticGroups/DynamicGroups base CRUD** — test `GET /endpoints/v2.0/StaticGroups` and `GET /endpoints/v2.0/DynamicGroups` against real bMS server. If 404: remove or gate these operations. If working: document as undocumented API. | MEDIUM | These paths are not in any OpenAPI spec but may work in practice. Need live server verification. |
 | P16.4 | **Add automated path validation** — create a test that extracts all API paths from execute files and validates them against the OpenAPI spec JSON files. Run as part of CI. | MEDIUM | Prevents future path drift. |
 | P16.5 | Update tests + CHANGELOG for all fixes | HIGH | After P16.1–P16.3 |
+| P16.6 | **E2E tests for all operations against bConnectMock** — create comprehensive E2E test suite in `test/e2e/` that exercises every operation in every node against the mock (standard-readwrite profile). One test file per node: `endpoint.e2e.test.ts`, `job.e2e.test.ts`, `security.e2e.test.ts`, `software.e2e.test.ts`, `admin.e2e.test.ts`, `asset.e2e.test.ts`. Tests should: (a) use real HTTP against `localhost:8765`, (b) cover GET/POST/PATCH/PUT/DELETE operations, (c) verify response structure matches expected fields, (d) skip gracefully when mock is not running. Run with `npx vitest run test/e2e/`. | HIGH | After P16.1–P16.2 (paths must be correct first) |
+| P16.7 | **E2E tests against real bMS server** — extend E2E suite with env-var gating (`BMS_URL`, `BMS_USER`, `BMS_PASS`). When set, run same operations against real bConnect. Skip destructive operations (create/update/delete) unless `BMS_E2E_DESTRUCTIVE=true`. Validates paths, auth, response schemas on real infrastructure. | MEDIUM | Postponed — requires live bMS access |
 
 ### Done
 
