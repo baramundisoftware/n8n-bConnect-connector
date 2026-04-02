@@ -1518,20 +1518,6 @@ export const maintenanceWindowFields: INodeProperties[] = [
     },
   }),
   {
-    displayName: 'Window ID',
-    name: 'windowId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['maintenanceWindow'],
-        operation: ['updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow', 'putEndpointMaintenanceWindow'],
-      },
-    },
-    description: 'The GUID of the maintenance window',
-  },
-  {
     displayName: 'Maintenance Window (JSON)',
     name: 'maintenanceWindowJson',
     type: 'json',
@@ -1687,20 +1673,6 @@ export const maintenanceWindowFields: INodeProperties[] = [
       { name: 'Dynamic', value: 'dynamic' },
     ],
     description: 'Type of the group',
-  },
-  {
-    displayName: 'Window ID',
-    name: 'windowId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['maintenanceWindow'],
-        operation: ['updateGroupMaintenanceWindow', 'deleteGroupMaintenanceWindow', 'putGroupMaintenanceWindow'],
-      },
-    },
-    description: 'The GUID of the maintenance window',
   },
   {
     displayName: 'Maintenance Window (JSON)',

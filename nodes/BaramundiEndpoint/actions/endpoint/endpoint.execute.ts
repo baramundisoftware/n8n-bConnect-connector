@@ -783,7 +783,7 @@ export async function createEndpointMaintenanceWindow(
     ...additionalFields,
   };
 
-  const response = await apiRequest.call(this, 'POST', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindow`, body);
+  const response = await apiRequest.call(this, 'POST', `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`, body);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
 
@@ -793,11 +793,7 @@ export async function updateEndpointMaintenanceWindow(
 ): Promise<INodeExecutionData[]> {
   // Get endpoint ID from either dropdown selection or custom GUID input
   const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
-  const windowId = this.getNodeParameter('windowId', index) as string;
-  const windowIdValidation = validateGuid(windowId);
-  if (!windowIdValidation.valid) {
-    throw new NodeOperationError(this.getNode(), `Invalid window ID:\n${windowIdValidation.errors.join('\n')}`, { itemIndex: index });
-  }
+  // MaintenanceWindow is a singleton per endpoint/group — no windowId needed
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
   const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
@@ -825,9 +821,9 @@ export async function updateEndpointMaintenanceWindow(
     );
   }
 
-  await apiRequest.call(this, 'PATCH', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindow/${windowId}`, patchOperations);
+  await apiRequest.call(this, 'PATCH', `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`, patchOperations);
 
-  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindow/${windowId}`);
+  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
 
@@ -837,14 +833,10 @@ export async function deleteEndpointMaintenanceWindow(
 ): Promise<INodeExecutionData[]> {
   // Get endpoint ID from either dropdown selection or custom GUID input
   const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
-  const windowId = this.getNodeParameter('windowId', index) as string;
-  const windowIdValidation = validateGuid(windowId);
-  if (!windowIdValidation.valid) {
-    throw new NodeOperationError(this.getNode(), `Invalid window ID:\n${windowIdValidation.errors.join('\n')}`, { itemIndex: index });
-  }
+  // MaintenanceWindow is a singleton per endpoint/group — no windowId needed
 
-  await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindow/${windowId}`);
-  return this.helpers.returnJsonArray({ success: true, deletedId: windowId });
+  await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`);
+  return this.helpers.returnJsonArray({ success: true });
 }
 
 export async function createGroupMaintenanceWindow(
@@ -888,11 +880,7 @@ export async function updateGroupMaintenanceWindow(
     throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
   }
   const groupType = this.getNodeParameter('groupType', index) as string;
-  const windowId = this.getNodeParameter('windowId', index) as string;
-  const windowIdValidation = validateGuid(windowId);
-  if (!windowIdValidation.valid) {
-    throw new NodeOperationError(this.getNode(), `Invalid window ID:\n${windowIdValidation.errors.join('\n')}`, { itemIndex: index });
-  }
+  // MaintenanceWindow is a singleton per endpoint/group — no windowId needed
   const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
 
   const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
@@ -927,9 +915,9 @@ export async function updateGroupMaintenanceWindow(
   };
 
   const groupTypePath = groupTypeMap[groupType];
-  await apiRequest.call(this, 'PATCH', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow/${windowId}`, patchOperations);
+  await apiRequest.call(this, 'PATCH', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow`, patchOperations);
 
-  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow/${windowId}`);
+  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
 
@@ -943,11 +931,7 @@ export async function deleteGroupMaintenanceWindow(
     throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
   }
   const groupType = this.getNodeParameter('groupType', index) as string;
-  const windowId = this.getNodeParameter('windowId', index) as string;
-  const windowIdValidation = validateGuid(windowId);
-  if (!windowIdValidation.valid) {
-    throw new NodeOperationError(this.getNode(), `Invalid window ID:\n${windowIdValidation.errors.join('\n')}`, { itemIndex: index });
-  }
+  // MaintenanceWindow is a singleton per endpoint/group — no windowId needed
 
   const groupTypeMap: Record<string, string> = {
     logical: 'LogicalGroups',
@@ -956,8 +940,8 @@ export async function deleteGroupMaintenanceWindow(
   };
 
   const groupTypePath = groupTypeMap[groupType];
-  await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow/${windowId}`);
-  return this.helpers.returnJsonArray({ success: true, deletedId: windowId });
+  await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow`);
+  return this.helpers.returnJsonArray({ success: true });
 }
 
 // ----------------------------------
@@ -969,7 +953,7 @@ export async function putEndpointMaintenanceWindow(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
-  const windowId = this.getNodeParameter('windowId', index) as string;
+  // MaintenanceWindow is a singleton per endpoint — no windowId needed
   const maintenanceWindowJson = this.getNodeParameter('maintenanceWindowJson', index) as string;
 
   const validation = validateGuid(endpointId);
@@ -980,10 +964,6 @@ export async function putEndpointMaintenanceWindow(
       { itemIndex: index },
     );
   }
-  const windowIdValidation = validateGuid(windowId);
-  if (!windowIdValidation.valid) {
-    throw new NodeOperationError(this.getNode(), `Invalid window ID:\n${windowIdValidation.errors.join('\n')}`, { itemIndex: index });
-  }
 
   let body: IDataObject;
   try {
@@ -992,7 +972,7 @@ export async function putEndpointMaintenanceWindow(
     throw new Error('maintenanceWindowJson must be a valid JSON object');
   }
 
-  const response = await apiRequest.call(this, 'PUT', `/endpoints/v2.0/WindowsEndpoints/${endpointId}/MaintenanceWindow/${windowId}`, body);
+  const response = await apiRequest.call(this, 'PUT', `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`, body);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
 
@@ -1006,11 +986,7 @@ export async function putGroupMaintenanceWindow(
     throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
   }
   const groupType = this.getNodeParameter('groupType', index) as string;
-  const windowId = this.getNodeParameter('windowId', index) as string;
-  const windowIdValidation = validateGuid(windowId);
-  if (!windowIdValidation.valid) {
-    throw new NodeOperationError(this.getNode(), `Invalid window ID:\n${windowIdValidation.errors.join('\n')}`, { itemIndex: index });
-  }
+  // MaintenanceWindow is a singleton per endpoint/group — no windowId needed
   const maintenanceWindowJson = this.getNodeParameter('maintenanceWindowJson', index) as string;
 
   const groupTypeMap: Record<string, string> = {
@@ -1027,7 +1003,7 @@ export async function putGroupMaintenanceWindow(
   }
 
   const groupTypePath = groupTypeMap[groupType];
-  const response = await apiRequest.call(this, 'PUT', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow/${windowId}`, body);
+  const response = await apiRequest.call(this, 'PUT', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow`, body);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
 

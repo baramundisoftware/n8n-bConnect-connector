@@ -14,12 +14,12 @@ export async function getMany(this: IExecuteFunctions, index: number): Promise<I
 	}
 
 	if (returnAll) {
-		const data = await apiRequestAllItems.call(this, 'GET', '/endpoints/v2.0/UniversalDynamicGroups', {}, qs);
+		const data = await apiRequestAllItems.call(this, 'GET', '/universaldynamicgroups/v2.0/UniversalDynamicGroups', {}, qs);
 		return this.helpers.returnJsonArray(data);
 	}
 	qs.PageSize = this.getNodeParameter('limit', index) as number;
 	qs.Page = 0;
-	const response = await apiRequest.call(this, 'GET', '/endpoints/v2.0/UniversalDynamicGroups', {}, qs);
+	const response = await apiRequest.call(this, 'GET', '/universaldynamicgroups/v2.0/UniversalDynamicGroups', {}, qs);
 	return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
 }
 
@@ -29,7 +29,7 @@ export async function get(this: IExecuteFunctions, index: number): Promise<INode
 	if (!_idValidation.valid) {
 		throw new NodeOperationError(this.getNode(), _idValidation.errors.join(', '), { itemIndex: index });
 	}
-	const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/UniversalDynamicGroups/${id}`);
+	const response = await apiRequest.call(this, 'GET', `/universaldynamicgroups/v2.0/UniversalDynamicGroups/${id}`);
 	return this.helpers.returnJsonArray([response as IDataObject]);
 }
 
@@ -38,12 +38,12 @@ export async function getFolders(this: IExecuteFunctions, index: number): Promis
 	const qs: Record<string, string | number> = {};
 
 	if (returnAll) {
-		const data = await apiRequestAllItems.call(this, 'GET', '/endpoints/v2.0/UniversalDynamicGroupsFolder', {}, qs);
+		const data = await apiRequestAllItems.call(this, 'GET', '/universaldynamicgroups/v2.0/UniversalDynamicGroupsFolder', {}, qs);
 		return this.helpers.returnJsonArray(data);
 	}
 	qs.PageSize = this.getNodeParameter('limit', index) as number;
 	qs.Page = 0;
-	const response = await apiRequest.call(this, 'GET', '/endpoints/v2.0/UniversalDynamicGroupsFolder', {}, qs);
+	const response = await apiRequest.call(this, 'GET', '/universaldynamicgroups/v2.0/UniversalDynamicGroupsFolder', {}, qs);
 	return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
 }
 
@@ -53,7 +53,7 @@ export async function getFolder(this: IExecuteFunctions, index: number): Promise
 	if (!_idValidation.valid) {
 		throw new NodeOperationError(this.getNode(), _idValidation.errors.join(', '), { itemIndex: index });
 	}
-	const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/UniversalDynamicGroupsFolder/${id}`);
+	const response = await apiRequest.call(this, 'GET', `/universaldynamicgroups/v2.0/UniversalDynamicGroupsFolder/${id}`);
 	return this.helpers.returnJsonArray([response as IDataObject]);
 }
 
@@ -67,12 +67,12 @@ export async function getSubFolders(this: IExecuteFunctions, index: number): Pro
 	const qs: Record<string, string | number> = {};
 
 	if (returnAll) {
-		const data = await apiRequestAllItems.call(this, 'GET', `/endpoints/v2.0/UniversalDynamicGroupsFolder/${folderId}/Folders`, {}, qs);
+		const data = await apiRequestAllItems.call(this, 'GET', `/universaldynamicgroups/v2.0/UniversalDynamicGroupsFolder/${folderId}/Folders`, {}, qs);
 		return this.helpers.returnJsonArray(data);
 	}
 	qs.PageSize = this.getNodeParameter('limit', index) as number;
 	qs.Page = 0;
-	const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/UniversalDynamicGroupsFolder/${folderId}/Folders`, {}, qs);
+	const response = await apiRequest.call(this, 'GET', `/universaldynamicgroups/v2.0/UniversalDynamicGroupsFolder/${folderId}/Folders`, {}, qs);
 	return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
 }
 
@@ -86,11 +86,11 @@ export async function getGroupsByFolder(this: IExecuteFunctions, index: number):
 	const qs: Record<string, string | number> = {};
 
 	if (returnAll) {
-		const data = await apiRequestAllItems.call(this, 'GET', `/endpoints/v2.0/Folders/${folderId}/UniversalDynamicGroups`, {}, qs);
+		const data = await apiRequestAllItems.call(this, 'GET', `/universaldynamicgroups/v2.0/Folders/${folderId}/UniversalDynamicGroups`, {}, qs);
 		return this.helpers.returnJsonArray(data);
 	}
 	qs.PageSize = this.getNodeParameter('limit', index) as number;
 	qs.Page = 0;
-	const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/Folders/${folderId}/UniversalDynamicGroups`, {}, qs);
+	const response = await apiRequest.call(this, 'GET', `/universaldynamicgroups/v2.0/Folders/${folderId}/UniversalDynamicGroups`, {}, qs);
 	return this.helpers.returnJsonArray((response.data as IDataObject[]) || []);
 }

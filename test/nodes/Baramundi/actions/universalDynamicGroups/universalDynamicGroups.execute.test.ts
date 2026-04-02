@@ -77,7 +77,7 @@ describe('Universal Dynamic Groups Operations', () => {
       const httpRequest = mock.helpers.httpRequest as ReturnType<typeof vi.fn>;
       await getMany.call(mock, 0);
       const callArgs = httpRequest.mock.calls[0][0];
-      expect(callArgs.url).toContain('/endpoints/v2.0/UniversalDynamicGroups');
+      expect(callArgs.url).toContain('/universaldynamicgroups/v2.0/UniversalDynamicGroups');
     });
   });
 
@@ -100,7 +100,7 @@ describe('Universal Dynamic Groups Operations', () => {
       const httpRequest = mock.helpers.httpRequest as ReturnType<typeof vi.fn>;
       await get.call(mock, 0);
       const callArgs = httpRequest.mock.calls[0][0];
-      expect(callArgs.url).toContain('/endpoints/v2.0/UniversalDynamicGroups/78787878-7878-7878-7878-787878787878');
+      expect(callArgs.url).toContain('/universaldynamicgroups/v2.0/UniversalDynamicGroups/78787878-7878-7878-7878-787878787878');
     });
   });
 
@@ -135,7 +135,7 @@ describe('Universal Dynamic Groups Operations', () => {
       const httpRequest = mock.helpers.httpRequest as ReturnType<typeof vi.fn>;
       await getFolder.call(mock, 0);
       const callArgs = httpRequest.mock.calls[0][0];
-      expect(callArgs.url).toContain('/endpoints/v2.0/UniversalDynamicGroupsFolder/77777777-7777-7777-7777-777777777777');
+      expect(callArgs.url).toContain('/universaldynamicgroups/v2.0/UniversalDynamicGroupsFolder/77777777-7777-7777-7777-777777777777');
     });
   });
 
@@ -157,7 +157,7 @@ describe('Universal Dynamic Groups Operations', () => {
       const httpRequest = mock.helpers.httpRequest as ReturnType<typeof vi.fn>;
       await getSubFolders.call(mock, 0);
       const callArgs = httpRequest.mock.calls[0][0];
-      expect(callArgs.url).toContain('/endpoints/v2.0/UniversalDynamicGroupsFolder/77777777-7777-7777-7777-777777777777/Folders');
+      expect(callArgs.url).toContain('/universaldynamicgroups/v2.0/UniversalDynamicGroupsFolder/77777777-7777-7777-7777-777777777777/Folders');
     });
   });
 
@@ -179,7 +179,7 @@ describe('Universal Dynamic Groups Operations', () => {
       const httpRequest = mock.helpers.httpRequest as ReturnType<typeof vi.fn>;
       await getGroupsByFolder.call(mock, 0);
       const callArgs = httpRequest.mock.calls[0][0];
-      expect(callArgs.url).toContain('/endpoints/v2.0/Folders/77777777-7777-7777-7777-777777777777/UniversalDynamicGroups');
+      expect(callArgs.url).toContain('/universaldynamicgroups/v2.0/Folders/77777777-7777-7777-7777-777777777777/UniversalDynamicGroups');
     });
   });
 });
