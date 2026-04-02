@@ -727,7 +727,11 @@ Both must be deleted and replaced.
 
 ### Done
 
-*(empty)*
+| ID | Task | Completed |
+|----|------|----------|
+| AR-01 | Replaced all 30 bare `throw new Error()` → `throw new NodeOperationError(this.getNode(), ...)` across 10 execute files. 821 tests passing. | 2026-04-02 |
+| AR-02 | Pinned all 3 GitHub Actions to immutable commit SHAs (checkout v4.2.2, setup-node v4.1.0, dependency-review v4.5.0). | 2026-04-02 |
+| AR-03 | Lowered CI npm audit threshold to `--audit-level=critical`; documented two accepted lodash HIGH advisories (GHSA-r5fr-rjxr-66jc, GHSA-f23m-r3pf-42rh) as upstream-unfixable transitive findings in n8n-workflow. | 2026-04-02 |
 
 ---
 
@@ -753,6 +757,29 @@ Both must be deleted and replaced.
 | VM.1 | Upgrade vitest 1.x → 2.x, fix breaking changes, validate all tests | Step 1 of incremental migration |
 | VM.2 | Upgrade vitest 2.x → 3.x, migrate config (workspace → projects) | Step 2 |
 | VM.3 | Upgrade vitest 3.x → 4.x, fix mock/coverage changes, re-baseline | Step 3 — resolves esbuild vuln |
+
+---
+
+## Phase 17 — Type-Filtered Endpoint Picker (REQ-UX-3)
+
+**Goal**: The endpoint `resourceLocator` picker shows only endpoints matching the selected `endpointType`. Previously, selecting e.g. `windows` still showed all platform types in the dropdown, risking 404s at execution time.
+
+**Prerequisite**: Phase 15 complete.
+
+**Reference**: `REQ-UX-3` in Requirements.md.
+
+### Backlog
+
+*(empty)*
+
+### Done
+
+| ID | Task | Completed |
+|----|------|-----------|
+| P17.1 | Added `TYPED_ENDPOINT_PATH` map and `getCurrentNodeParameter('endpointType')` call to `endpointSearch` in `loadOptions.ts` — switches API path to typed endpoint collection when type is set | 2026-04-02 |
+| P17.2 | Added `getCurrentNodeParameter` stub to `createMockLoadOptionsFunctions` (loadOptions.test.ts) and `createRealContext` (resourceLocator.e2e.test.ts) to fix test contexts | 2026-04-02 |
+| P17.3 | 10 new unit tests in `test/unit/endpointSearch.test.ts` — one per platform type + fallback + result mapping + filter passthrough. TDD: written red, then green. | 2026-04-02 |
+| P17.4 | Build 0 errors, 821 tests passing. | 2026-04-02 |
 
 ---
 
