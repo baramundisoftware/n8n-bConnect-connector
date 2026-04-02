@@ -704,6 +704,8 @@ Both must be deleted and replaced.
 | ID | Task | Completed |
 |----|------|-----------|
 | P16.0 | Audit: compared all 141 connector paths against OpenAPI specs. Found 17 mismatches. Fixed `MaintenanceWindows` → `MaintenanceWindow` (plural→singular). | 2026-04-02 |
+| P16.1 | Fixed 8 UDG CRUD paths: `/endpoints/v2.0/UniversalDynamicGroups*` → `/universaldynamicgroups/v2.0/UniversalDynamicGroups*`. Updated unit tests. | 2026-04-02 |
+| P16.2 | Fixed MW paths: `WindowsEndpoints` → `Endpoints`; removed `/{windowId}` from all PATCH/DELETE/PUT (MW is singleton); removed `windowId` field from UI + execute. BREAKING. | 2026-04-02 |
 
 ---
 
