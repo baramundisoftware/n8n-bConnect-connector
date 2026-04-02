@@ -412,7 +412,8 @@ Both are pre-Phase 8 and reference fields that no longer exist. They need to be 
 | P11E.2 | Create workflow: **Endpoint Compliance Report** — get all endpoints, check compliance status (26R1), output CSV/table for weekly review | HIGH |
 | P11E.3 | Create workflow: **Job Failure Alert** — scheduled trigger, query job instances with status=Failed, send summary notification (email/Teams/Slack) | HIGH |
 | P11E.4 | Create workflow: **New Endpoint Onboarding** — webhook trigger on enrollment, add to logical group, set standard variables, execute baseline job | HIGH |
-| P11E.5 | Create workflow: **Stale Endpoint Report** — find endpoints with no contact in 30+ days, generate report for IT review | MEDIUM |
+| P11E.5 | Create workflow: **Vulnerability Scan Cycle** — trigger VA job per group, wait, query fresh CVE detections + rule violations, deliver prioritised remediation report with escalation gate | HIGH |
+| P11E.5b | Create workflow: **Stale Endpoint Report** — find endpoints with no contact in 30+ days, generate report for IT review | MEDIUM |
 | P11E.6 | Create workflow: **Software License Audit** — get all installed software across fleet, aggregate by publisher, compare against licensed list | MEDIUM |
 | P11E.7 | Create workflow: **Security Incident Response** — scheduled scan for active Defender threats, enrich with endpoint details, create ticket / send alert | MEDIUM |
 | P11E.8 | Create workflow: **Patch Compliance Dashboard** — query update management status, group by patch level, output summary for management reporting | MEDIUM |
@@ -474,7 +475,35 @@ Key operations: `compliance.getDetectedVulnerabilities`, `compliance.getDetected
 
 ---
 
-**P11E.5 — Job Failure Alert**
+**P11E.5 — Vulnerability Scan Cycle** ⭐ (26R1 only)
+End-to-end automated vulnerability assessment: triggers the baramundi Vulnerability Assessment job across all endpoint groups, waits for completion, queries the fresh CVE results, and delivers a prioritised remediation report — all without manual console interaction.
+
+Steps:
+1. **Trigger**: Schedule node (weekly, e.g. Sunday 01:00) or manual trigger before security review
+2. **Get target groups**: `endpoint.getLogicalGroups` (returnAll) — fetch all groups in scope for scanning
+3. **Assign and start scan job**: For each group → `job.assignJobToLogicalGroup` (Vulnerability Assessment job definition ID) → `job.startJobInstance` — kick off the scan job per group
+4. **Wait for completion**: n8n Wait node (e.g. 2 hours) — allow scan to complete across fleet
+5. **Verify job results**: `job.getJobInstancesByLogicalGroup` per group — confirm all instances reached status=Succeeded or flag any failures
+6. **Query fresh CVE detections**: `compliance.getDetectedVulnerabilities` (returnAll) — all currently detected CVEs after the scan
+7. **Query rule violations**: `compliance.getDetectedRuleViolations` (returnAll) — compliance policy breaches detected alongside CVEs
+8. **Enrich with CVE details**: `compliance.getVulnerability` for each unique CVE ID — description, CVSS score, affected component, patch availability
+9. **Per-endpoint breakdown**: `compliance.getDetectedVulnerabilitiesByEndpoint` for top offenders — full exposure list per machine
+10. **Enrich with endpoint info**: `endpoint.get` — hostname, primary user, logical group, last contact
+11. **Prioritise**: Code node — rank by CVSS score desc, group by: Critical (≥9.0) / High (7.0–8.9) / Medium / Low
+12. **Report**: Send structured report to security team:
+    - Summary: total endpoints scanned, % with critical CVEs, new vs previously known
+    - Critical CVE table: CVE ID / CVSS / affected endpoints / patch available
+    - Top 10 most exposed endpoints
+    - Compliance rule violation summary
+13. **Escalation gate**: If any new Critical CVE (CVSS ≥ 9.0) detected since last run → immediate alert to security lead
+
+Key operations: `endpoint.getLogicalGroups`, `job.assignJobToLogicalGroup`, `job.startJobInstance`, `job.getJobInstancesByLogicalGroup`, `compliance.getDetectedVulnerabilities`, `compliance.getDetectedRuleViolations`, `compliance.getVulnerability`, `compliance.getDetectedVulnerabilitiesByEndpoint`, `endpoint.get`
+
+Note: Requires knowing the Vulnerability Assessment job definition ID (read once via `job.getJobs` filtered by name, store as workflow variable).
+
+---
+
+**P11E.6 — Job Failure Alert**
 Uses: `job.getAllJobInstances` (filter status=Failed, last 24h) → group by jobDefinitionId → `job.getJob` to get job names → Notification node.
 Trigger: Schedule (every 6h). Output: Teams/Slack message with failure count + job names.
 
