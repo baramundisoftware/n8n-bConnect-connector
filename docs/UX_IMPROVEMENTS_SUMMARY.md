@@ -53,19 +53,15 @@ Rather than `resourceLocator` (which requires a newer n8n API — see below), dr
 
 ## ❌ Not Implemented: Resource Locator (advanced search)
 
-The full `resourceLocator` component (type-ahead search, By URL mode, From Previous Node mode) was not implemented due to a version compatibility constraint.
+The full `resourceLocator` component (type-ahead search, By URL mode) has not been implemented yet — but there is **no technical blocker**.
 
-**Root cause:** `methods.listSearch` and `type: 'resourceLocator'` require n8n-workflow 1.x+. The project's current n8n peer dependency targets an earlier API surface.
+**Correction of earlier analysis:** Previous docs claimed this was blocked by the n8n version. That was wrong. `n8n-workflow` v2.13.1 (installed) fully supports both `listSearch` and `type: 'resourceLocator'`. The original compile error (`'methods' does not exist in type 'INodeTypeDescription'`) was caused by placing `methods` inside the `description` object instead of as a sibling class property — a structural mistake, not a version issue.
 
-**Compilation errors when attempted:**
-```
-TS2353: Object literal may only specify known properties,
-        and 'methods' does not exist in type 'INodeTypeDescription'.
-```
+**Current state:** The `methods` class property is already used correctly for `loadOptions`. Adding `listSearch` alongside it is straightforward. The `extractResourceLocatorValue()` helper in `validation.ts` is already written for backward compatibility.
 
-**Status:** Deferred until n8n peer dependency is upgraded. When it is, the `loadOptions` dropdowns can be promoted to `resourceLocator` with full search. The `extractResourceLocatorValue()` helper in `validation.ts` is already written for backward compatibility during that migration.
+**Status:** Deferred — tracked as **Phase 11** in [Tasks.md](../Tasks.md).
 
-**Reference implementation:** See `UX_IMPROVEMENTS_GUIDE.md` §1 for the full `resourceLocator` code.
+**Reference implementation:** See `UX_IMPROVEMENTS_GUIDE.md` §1–2 for the full code examples.
 
 ---
 

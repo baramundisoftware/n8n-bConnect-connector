@@ -394,6 +394,33 @@
 
 ---
 
+## Phase 11 — Resource Locator UX
+
+**Goal**: Replace plain GUID string fields with `resourceLocator` components for endpoints and jobs, and add `listSearch` methods alongside the existing `loadOptions` methods. This enables type-ahead search, GUID validation in the UI, and "By URL" mode.
+
+**No technical blockers.** `n8n-workflow` v2.13.1 (installed) fully supports `listSearch` and `type: 'resourceLocator'`. The `methods` class property pattern is already used for `loadOptions` — `listSearch` is added in the same block. The `extractResourceLocatorValue()` helper in `utils/validation.ts` is already written for backward compatibility.
+
+**Reference**: `docs/UX_IMPROVEMENTS_GUIDE.md` §1–2 for full code examples.
+
+### Backlog
+
+| ID | Task | Priority |
+|----|------|----------|
+| P11.1 | Add `endpointSearch` to `methods.listSearch` in `Baramundi.node.ts` — search Windows endpoints by name/hostname | HIGH |
+| P11.2 | Add `jobDefinitionSearch` and `jobFolderSearch` to `methods.listSearch` | HIGH |
+| P11.3 | Update `endpoint.fields.ts` — change `endpointId` fields from `type: 'string'` to `type: 'resourceLocator'` (By List / By ID / By URL modes) | HIGH |
+| P11.4 | Update `job.fields.ts` — change `jobDefinitionId` and `folderId` fields to `resourceLocator` | HIGH |
+| P11.5 | Update `endpoint.execute.ts` and `job.execute.ts` — use `extractResourceLocatorValue()` to handle both legacy string and new object format | HIGH |
+| P11.6 | Unit tests for `listSearch` methods (mock `apiRequest`) | MEDIUM |
+| P11.7 | Extend `listSearch` to other high-value resources: logical groups, variables, assets | LOW |
+| P11.8 | Build + lint + full test run — 0 errors, bump version, update CHANGELOG | MEDIUM |
+
+### Done
+
+*(empty)*
+
+---
+
 ## Notes
 
 - **System tests** (`test/system/`) require a live bMS server. They are skipped in CI unless `BMS_URL` env var is set. Do not block phases on system test results.

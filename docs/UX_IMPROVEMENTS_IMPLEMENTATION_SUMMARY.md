@@ -93,24 +93,29 @@ if (!windowResult.valid) {
    - Added `extractResourceLocatorValue()` helper
    - Prepared for both legacy string and new object formats
 
-### Why It Failed
+### Why It Was Not Implemented
 
-**Root Cause:** The `resourceLocator` type and `methods.listSearch` are not available in the current version of n8n-workflow being used by this project.
+**Correction (2026-04-02):** Earlier analysis incorrectly blamed the n8n version. The actual installed `n8n-workflow` is **v2.13.1**, which fully supports both `listSearch` and `type: 'resourceLocator'`.
 
-**Compilation Errors:**
+The original compilation error:
 ```
-TS2353: Object literal may only specify known properties, and 'methods' does not exist in type 'INodeTypeDescription'.
-TS2345: Argument of type 'ILoadOptionsFunctions' is not assignable to parameter of type 'IExecuteFunctions'.
+TS2353: Object literal may only specify known properties,
+        and 'methods' does not exist in type 'INodeTypeDescription'.
 ```
 
-**Resolution Options:**
-1. **Upgrade n8n version** - Resource locators require n8n 1.x+ (current appears to be 0.x)
-2. **Use alternative approach** - Implement loadOptions/loadOptionsMethod instead
-3. **Keep as string fields** - Add validation but maintain simple GUID input
+was caused by placing `methods` **inside** the `description` object literal, rather than as a **sibling class property**. It is a structural mistake in the attempted implementation, not a version constraint.
+
+The node already uses the correct pattern for `loadOptions` (class property `methods = { loadOptions: { ... } }`). Adding `listSearch` to the same `methods` block would compile correctly.
+
+**Status:** Deferred as Phase 11 — no technical blockers.
 
 ### Recommended Action
 
-**Option 1: Use loadOptions (Compatible with Current Version)**
+**Option 1: Implement `listSearch` + `resourceLocator` (no blockers)**
+
+Add `listSearch` to the existing `methods` class property in `Baramundi.node.ts`, alongside `loadOptions`. Change relevant `type: 'string'` fields to `type: 'resourceLocator'`. Use `extractResourceLocatorValue()` for backward compatibility. Full code in `UX_IMPROVEMENTS_GUIDE.md` §1–2. Tracked as Phase 11 in `Tasks.md`.
+
+**Option 2: Keep loadOptions (current state, already done)**
 
 ```typescript
 // In Baramundi.node.ts description
