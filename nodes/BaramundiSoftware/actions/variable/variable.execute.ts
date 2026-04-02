@@ -125,7 +125,7 @@ export async function updateVariableDefinition(
 	}
 
 	if (patchOperations.length === 0) {
-		throw new Error('No fields to update specified');
+		throw new NodeOperationError(this.getNode(), 'No fields to update specified');
 	}
 
 	await apiRequest.call(
@@ -263,7 +263,7 @@ export async function updateVariableInstance(
 	}
 
 	if (patchOperations.length === 0) {
-		throw new Error('No fields to update specified');
+		throw new NodeOperationError(this.getNode(), 'No fields to update specified');
 	}
 
 	await apiRequest.call(

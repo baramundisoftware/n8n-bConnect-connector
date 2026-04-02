@@ -116,7 +116,7 @@ export async function patchLocalAdminUserCredentials(
   }
 
   if (patchOperations.length === 0) {
-    throw new Error('No fields to update specified');
+    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
   }
 
   const response = await apiRequest.call(this, 'PATCH', `/defensecontrol/v2.0/LocalAdministrativeAccounts/WindowsEndpoints/${endpointId}`, patchOperations);
@@ -387,7 +387,7 @@ export async function patchBitLockerSecrets(
   try {
     body = JSON.parse(patchOperations) as IDataObject[];
   } catch {
-    throw new Error('patchOperations must be a valid JSON array');
+    throw new NodeOperationError(this.getNode(), 'patchOperations must be a valid JSON array');
   }
 
   const validation = validateRfc6902Patch(body);

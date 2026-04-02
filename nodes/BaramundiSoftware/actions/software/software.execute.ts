@@ -378,7 +378,7 @@ export async function replaceApplicationInBundle(
   }
 
   if (patchOperations.length === 0) {
-    throw new Error('No fields to update specified');
+    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
   }
 
   const response = await apiRequest.call(this, 'PATCH', `/software/v2.0/Bundles/${bundleId}/BundleApplications/${bundleApplicationId}`, patchOperations);
@@ -404,7 +404,7 @@ export async function updateBundleFolder(
   }
 
   if (patchOperations.length === 0) {
-    throw new Error('No fields to update specified');
+    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
   }
 
   const response = await apiRequest.call(this, 'PATCH', `/software/v2.0/Bundle/Folders/${bundleFolderId}`, patchOperations);

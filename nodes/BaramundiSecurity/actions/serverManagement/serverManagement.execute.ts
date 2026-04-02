@@ -184,7 +184,7 @@ export async function updateSecurityGroup(
   }
 
   if (patchOperations.length === 0) {
-    throw new Error('No fields to update specified');
+    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
   }
 
   await apiRequest.call(this, 'PATCH', `/servermanagement/v2.0/SecurityGroups/${securityGroupId}`, patchOperations);
@@ -306,7 +306,7 @@ export async function updateSecurityProfile(
   }
 
   if (patchOperations.length === 0) {
-    throw new Error('No fields to update specified');
+    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
   }
 
   await apiRequest.call(this, 'PATCH', `/servermanagement/v2.0/SecurityProfiles/${securityProfileId}`, patchOperations);
@@ -373,7 +373,7 @@ export async function updateObjectPermissions(
   }
 
   if (patchOperations.length === 0) {
-    throw new Error('No fields to update specified');
+    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
   }
 
   await apiRequest.call(this, 'PATCH', `/servermanagement/v2.0/Objects/${objectId}`, patchOperations);

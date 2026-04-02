@@ -166,7 +166,7 @@ export async function updateFolder(
 	}
 
 	if (patchOperations.length === 0) {
-		throw new Error('No fields to update specified');
+		throw new NodeOperationError(this.getNode(), 'No fields to update specified');
 	}
 
 	await apiRequest.call(
@@ -293,7 +293,7 @@ export async function updateWindowsEndpoint(
 	}
 
 	if (patchOperations.length === 0) {
-		throw new Error('No fields to update specified');
+		throw new NodeOperationError(this.getNode(), 'No fields to update specified');
 	}
 
 	await apiRequest.call(

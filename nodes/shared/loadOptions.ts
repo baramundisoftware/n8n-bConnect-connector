@@ -150,6 +150,15 @@ export async function getDynamicGroups(this: ILoadOptionsFunctions): Promise<INo
 
 const SEARCH_PAGE_SIZE = 50;
 
+const TYPED_ENDPOINT_PATH: Record<string, string> = {
+  windows: 'WindowsEndpoints',
+  android: 'AndroidEndpoints',
+  ios: 'IosEndpoints',
+  linux: 'LinuxEndpoints',
+  mac: 'MacEndpoints',
+  network: 'NetworkEndpoints',
+};
+
 export async function endpointSearch(
   this: ILoadOptionsFunctions,
   filter?: string,
@@ -169,10 +178,14 @@ export async function endpointSearch(
     qs.SearchQuery = `contains(DisplayName,'${filter.replace(/'/g, "''")}')`;
   }
 
+  const endpointType = this.getCurrentNodeParameter('endpointType') as string | undefined;
+  const typePath = endpointType ? TYPED_ENDPOINT_PATH[endpointType] : undefined;
+  const apiPath = typePath ? `/endpoints/v2.0/${typePath}` : '/endpoints/v2.0/Endpoints';
+
   const response = await apiRequest.call(
     this as unknown as IExecuteFunctions,
     'GET',
-    '/endpoints/v2.0/Endpoints',
+    apiPath,
     {},
     qs,
   );

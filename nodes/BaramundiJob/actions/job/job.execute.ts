@@ -373,7 +373,7 @@ export async function updateFolder(
   }
 
   if (patchOperations.length === 0) {
-    throw new Error('No fields to update specified');
+    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
   }
 
   await apiRequest.call(this, 'PATCH', `/jobs/v2.0/Folders/${folderId}`, patchOperations);
@@ -540,7 +540,7 @@ export async function update(
   }
 
   if (patchOperations.length === 0) {
-    throw new Error('No fields to update specified');
+    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
   }
 
   await apiRequest.call(this, 'PATCH', `/jobs/v2.0/JobDefinitions/${jobId}`, patchOperations);

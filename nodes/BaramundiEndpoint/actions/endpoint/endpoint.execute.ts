@@ -228,7 +228,7 @@ export async function create(
 
   const apiEndpoint = endpointMap[endpointType];
   if (!apiEndpoint) {
-    throw new Error(`Unknown endpoint type: ${endpointType}`);
+    throw new NodeOperationError(this.getNode(), `Unknown endpoint type: ${endpointType}`);
   }
 
   // Build request body based on endpoint type
@@ -333,7 +333,7 @@ export async function update(
   }
 
   if (patchOperations.length === 0) {
-    throw new Error('No fields to update specified');
+    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
   }
 
   const typePath = TYPED_ENDPOINT_PATH[endpointType] ?? 'WindowsEndpoints';
@@ -397,7 +397,7 @@ export async function startEnrollment(
     };
     const mappedEndpoint = enrollmentEndpointMap[apiType];
     if (!mappedEndpoint) {
-      throw new Error(`Enrollment not supported for endpoint type: ${apiType}`);
+      throw new NodeOperationError(this.getNode(), `Enrollment not supported for endpoint type: ${apiType}`);
     }
     enrollmentEndpoint = mappedEndpoint;
   }
@@ -543,7 +543,7 @@ export async function updateLogicalGroup(
   }
 
   if (patchOperations.length === 0) {
-    throw new Error('No fields to update specified');
+    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
   }
 
   await apiRequest.call(this, 'PATCH', `/endpoints/v2.0/LogicalGroups/${groupId}`, patchOperations);
@@ -663,7 +663,7 @@ export async function updateStaticGroup(
   }
 
   if (patchOperations.length === 0) {
-    throw new Error('No fields to update specified');
+    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
   }
 
   await apiRequest.call(this, 'PATCH', `/endpoints/v2.0/StaticGroups/${groupId}`, patchOperations);
@@ -809,7 +809,7 @@ export async function updateEndpointMaintenanceWindow(
   }
 
   if (patchOperations.length === 0) {
-    throw new Error('No fields to update specified');
+    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
   }
 
   const mwValidation = validateRfc6902Patch(patchOperations);
@@ -896,7 +896,7 @@ export async function updateGroupMaintenanceWindow(
   }
 
   if (patchOperations.length === 0) {
-    throw new Error('No fields to update specified');
+    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
   }
 
   const groupMwValidation = validateRfc6902Patch(patchOperations);
@@ -969,7 +969,7 @@ export async function putEndpointMaintenanceWindow(
   try {
     body = JSON.parse(maintenanceWindowJson) as IDataObject;
   } catch {
-    throw new Error('maintenanceWindowJson must be a valid JSON object');
+    throw new NodeOperationError(this.getNode(), 'maintenanceWindowJson must be a valid JSON object');
   }
 
   const response = await apiRequest.call(this, 'PUT', `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`, body);
@@ -999,7 +999,7 @@ export async function putGroupMaintenanceWindow(
   try {
     body = JSON.parse(maintenanceWindowJson) as IDataObject;
   } catch {
-    throw new Error('maintenanceWindowJson must be a valid JSON object');
+    throw new NodeOperationError(this.getNode(), 'maintenanceWindowJson must be a valid JSON object');
   }
 
   const groupTypePath = groupTypeMap[groupType];
@@ -1526,7 +1526,7 @@ export async function updateIndustrialEndpoint(
       patchOperations.push({ op: 'replace', path: `/${key}`, value });
     }
   }
-  if (patchOperations.length === 0) throw new Error('No fields to update specified');
+  if (patchOperations.length === 0) throw new NodeOperationError(this.getNode(), 'No fields to update specified');
 
   await apiRequest.call(this, 'PATCH', `/endpoints/v2.0/IndustrialEndpoints/${endpointId}`, patchOperations);
   const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/IndustrialEndpoints/${endpointId}`);

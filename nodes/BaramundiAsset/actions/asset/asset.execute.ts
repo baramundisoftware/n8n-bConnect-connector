@@ -113,7 +113,7 @@ export async function update(
   }
 
   if (patchOperations.length === 0) {
-    throw new Error('No fields to update specified');
+    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
   }
 
   await apiRequest.call(this, 'PATCH', `/assets/v2.0/Assets/${assetId}`, patchOperations);
@@ -470,7 +470,7 @@ export async function updateAssetStockFolder(
   }
 
   if (patchOperations.length === 0) {
-    throw new Error('No fields to update specified');
+    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
   }
 
   await apiRequest.call(this, 'PATCH', `/assets/v2.0/AssetStock/Folders/${folderId}`, patchOperations);
@@ -679,7 +679,7 @@ export async function updateAssetTypeFolder(
   }
 
   if (patchOperations.length === 0) {
-    throw new Error('No fields to update specified');
+    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
   }
 
   await apiRequest.call(this, 'PATCH', `/assets/v2.0/AssetTypes/Folders/${assetTypeFolderId}`, patchOperations);

@@ -67,7 +67,7 @@ export async function updateWindowsEndpoint(
 	}
 
 	if (patchOperations.length === 0) {
-		throw new Error('No fields to update specified');
+		throw new NodeOperationError(this.getNode(), 'No fields to update specified');
 	}
 
 	await apiRequest.call(this, 'PATCH', `/updatemanagement/v2.0/WindowsEndpoints/${endpointId}`, patchOperations);
