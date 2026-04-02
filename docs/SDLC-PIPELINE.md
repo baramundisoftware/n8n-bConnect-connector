@@ -7,6 +7,10 @@ implemented as Claude Code slash commands. The pipeline extends the inner build
 loop (`/process-start-task`) with phase-gate commands that enforce design review,
 code review, security scanning, QA validation, and release management.
 
+**Workflow model:** Trunk-based development on `master` (solo developer).
+No feature branches or pull requests. The gates enforce quality and security
+directly before pushing to `origin/master`.
+
 ---
 
 ## The Gap: What `/process-start-task` Covers
@@ -27,7 +31,7 @@ testing, UAT sign-off, versioning, or publishing.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  PHASE START  (new phase or feature branch)                  │
+│  PHASE START  (new phase begins on master)                   │
 └──────────────────────┬───────────────────────────────────────┘
                        │
                        ▼
@@ -55,26 +59,27 @@ testing, UAT sign-off, versioning, or publishing.
           │  • TDD per task            │
           │  • Lint + type-check       │
           │  • Unit tests pass         │
-          │  • Commit per task         │
+          │  • Commit to master        │
           └────────────┬───────────────┘
-                       │ ✅ All tasks committed
+                       │ ✅ All tasks committed (local)
                        ▼
           ┌────────────────────────────┐
           │   /process-pr-review       │
+          │   (push gate, not PR)      │
           │                            │
           │  Roles: security-engineer, │
           │         qa-engineer,       │
           │         lead-dev           │
           │                            │
-          │  • git push + open PR      │
           │  • npm audit (no high/crit)│
           │  • semgrep SAST scan       │
           │  • Secrets scan            │
           │  • Full unit test suite    │
           │  • AI code review summary  │
           │  • ⛔ USER SIGN-OFF        │
+          │  • git push origin master  │
           └────────────┬───────────────┘
-                       │ ✅ PR approved + merged
+                       │ ✅ Pushed to origin/master
                        ▼
           ┌────────────────────────────┐
           │   /process-qa-gate         │
@@ -117,9 +122,14 @@ testing, UAT sign-off, versioning, or publishing.
 |---|---|:---:|---|
 | `/process-design-review` | Pre-build | ✅ Required | architect, product-owner |
 | `/process-start-task` | Build loop | — | all developer roles |
-| `/process-pr-review` | Post-commit | ✅ Required | security-engineer, qa-engineer, lead-dev |
+| `/process-pr-review` | Push gate | ✅ Required | security-engineer, qa-engineer, lead-dev |
 | `/process-qa-gate` | Pre-release | ✅ Required | qa-engineer, perf-engineer |
 | `/process-release` | Release | ✅ Required | tech-writer, devops-engineer |
+
+> **Note on `/process-pr-review`:** Despite the name, this project uses trunk-based
+> development — no PRs are opened. The command runs all security and code review
+> checks locally, presents a summary, and pushes directly to `origin/master` after
+> your approval. If this project moves to a team workflow, only this step changes.
 
 ---
 
@@ -154,7 +164,7 @@ Security is not a single step — it runs at three checkpoints:
 - Review credential handling design
 - SSL/TLS strategy documented
 
-### 2. PR Review (`/process-pr-review`) — Primary security gate
+### 2. Push Gate (`/process-pr-review`) — Primary security gate
 ```bash
 # Dependency vulnerabilities
 npm audit --audit-level=high       # blocks on high/critical
@@ -170,11 +180,12 @@ npm run type-check                 # no implicit any, strict mode
 ```
 
 Findings are classified:
+
 | Severity | Action |
 |---|---|
-| Critical / High | **BLOCK** — must fix before PR merges |
-| Medium | Document + create follow-up task |
-| Low / Info | Log in security findings section of PR |
+| Critical / High | **BLOCK** — must fix before push |
+| Medium | Document + create follow-up task in `Tasks.md` |
+| Low / Info | Log in code review summary |
 
 ### 3. QA Gate (`/process-qa-gate`)
 - Live API integration tests validate no credential exposure in logs
@@ -188,7 +199,7 @@ Findings are classified:
 | SSRF | `Server URL` credential field | Validate URL format; document that only internal BMS URLs should be used |
 | Credential exposure | API request logging | Verify Basic Auth header is never logged by transport layer |
 | SSL bypass | `Ignore SSL Issues` flag | Feature intentional; must be documented as risk-accepted |
-| Dependency chain | `node_modules` | `npm audit` on every PR, Dependabot alerts enabled |
+| Dependency chain | `node_modules` | `npm audit` on every push gate, Dependabot alerts enabled |
 
 ---
 
@@ -197,7 +208,7 @@ Findings are classified:
 ### Already Available
 - `npm audit` — dependency vulnerability scan
 - `npx` — runs semgrep, secretlint without global install
-- `gh` (GitHub CLI) — PR creation, release management
+- `gh` (GitHub CLI) — release management, CI status checks
 - `git` — tagging, branching
 
 ### Install Once (recommended global)
@@ -207,24 +218,19 @@ npm install -g secretlint @secretlint/secretlint-rule-preset-recommend
 
 # CHANGELOG generation
 npm install -g conventional-changelog-cli
-
-# Local GitHub Actions runner (optional, for CI validation)
-# https://github.com/nektos/act
-brew install act   # or: apt install act
 ```
 
 ### GitHub Repository Settings
-- **Branch protection on `main`**: require PR + status checks before merge
-- **Dependabot alerts**: enable in repo Settings → Security
-- **GitHub Actions**: CI workflow (`.github/workflows/ci.yml`) must exist and pass
+- **Dependabot alerts**: enable in repo Settings → Security → Dependabot
+- **GitHub Actions**: CI workflow (`.github/workflows/ci.yml`) — runs on every push to master
 - **npm token**: stored as `NPM_TOKEN` in GitHub repo secrets for publish step
+- **No branch protection needed** — trunk-based, solo developer
 
-### CI Workflow Requirements
-The `/process-pr-review` command expects a passing CI run. The existing
-`.github/workflows/` must include at minimum:
+### CI Workflow (`.github/workflows/ci.yml`)
+Should include at minimum on every push to `master`:
 - `npm ci`
 - `npm run lint`
-- `npm run type-check`  
+- `npm run type-check`
 - `npm test`
 - `npm audit --audit-level=high`
 
@@ -257,19 +263,16 @@ The `/process-pr-review` command expects a passing CI run. The existing
 
 ## Project Setup Requirements
 
-For the full pipeline to work, the project needs:
-
 | File / Setting | Required By | Purpose |
 |---|---|---|
 | `Tasks.md` | all process commands | Task backlog and done tracking |
 | `Requirements.md` | design-review, release | Requirements and acceptance criteria |
 | `CLAUDE.md` | all commands | Project context, conventions |
-| `.github/workflows/ci.yml` | pr-review | Automated build + test on PR |
+| `.github/workflows/ci.yml` | ongoing | Automated build + test on push to master |
 | `CHANGELOG.md` | release | Release history |
 | `NPM_TOKEN` (GitHub secret) | release | npm publish authentication |
-| Branch protection on `main` | pr-review | Enforce PR workflow |
-| Dependabot enabled | ongoing | Automated dependency alerts |
+| Dependabot enabled | ongoing | Automated dependency vulnerability alerts |
 
 ---
 
-*Document version: 1.0 — 2026-04-02*
+*Document version: 1.1 — 2026-04-02 (trunk-based development, master branch)*
