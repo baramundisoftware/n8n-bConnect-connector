@@ -6,7 +6,7 @@ const requireGuidValidation = require('./eslint-rules/require-guid-validation.js
 
 export default tseslint.config(
   {
-    ignores: ['dist/**', 'node_modules/**'],
+    ignores: ['dist/**', 'node_modules/**', 'coverage/**'],
   },
   ...tseslint.configs.recommended,
   {
