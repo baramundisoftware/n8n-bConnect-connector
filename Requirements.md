@@ -1228,6 +1228,90 @@ The `bmsecurity` operations are implemented in `serverManagement.execute.ts`. Co
 
 ---
 
+## REQ-ENDPOINT-UX-1 — Merge Typed Endpoint into Endpoint Resource
+
+**Status**: OPEN
+
+**Description**: Remove the `typedEndpoint` resource from the Baramundi Endpoint node. Merge all typed endpoint operations into the `endpoint` resource by adding an `endpointType` / `platformType` dropdown (with an "All Platforms" option) to operations that can work cross-platform or platform-specific.
+
+**Rationale**: IT administrators don't think in terms of "typed endpoints" — they think "I want to manage my iOS devices" or "show me all Linux servers." The current split creates confusion:
+
+| Admin intent | Current UX problem |
+|---|---|
+| Create an iOS device | Must go to Endpoint → Create (not Typed Endpoint). Not discoverable. |
+| List all Android devices | Endpoint → Get Many returns all types mixed. Must use Typed Endpoint → Get Many instead. |
+| Update a Mac endpoint | Endpoint → Update is Windows-only. Must use Typed Endpoint → Update. |
+| Manage network devices | Network has no enrollment/jobs but shares UI with managed device types. |
+
+### Merged Operation Design
+
+After merge, the `endpoint` resource has these operations. Each operation that supports platform filtering gets an `endpointType` dropdown with options: `all`, `windows`, `android`, `ios`, `linux`, `mac`, `network`.
+
+| Operation | endpointType | Behavior |
+|---|---|---|
+| **Create** | required (no "all") | `POST /v2.0/{Type}Endpoints` — already implemented, has `endpointType` param |
+| **Get** | optional, default "all" | "all" → `GET /v2.0/Endpoints/{id}`, specific → `GET /v2.0/{Type}Endpoints/{id}` |
+| **Get Many** | optional, default "all" | "all" → `GET /v2.0/Endpoints`, specific → `GET /v2.0/{Type}Endpoints` |
+| **Search** | n/a (generic only) | `GET /v2.0/Endpoints?SearchQuery=...` — keep as-is |
+| **Update** | required (no "all") | `PATCH /v2.0/{Type}Endpoints/{id}` — now works for ALL platforms, not just Windows |
+| **Delete** | optional, default "all" | "all" → `DELETE /v2.0/Endpoints/{id}`, specific → `DELETE /v2.0/{Type}Endpoints/{id}` |
+| **Start Enrollment** | auto-detected or required | Enrollment not available for `network`. Auto-detect from endpoint type or require selection. |
+| **Trigger Intune Installation** | n/a (Windows only) | Keep as-is, no endpointType needed |
+| **Get By Group** | optional, default "all" | "all" → existing group query, specific → type-filtered group query |
+
+**Operations that stay unchanged** (no endpointType needed):
+- Entra ID: Set, Get, Delete (3 ops)
+- Unmanaged Endpoints: Get, Get Many, Delete (3 ops)
+- Maintenance Window operations (10 ops)
+- Group query operations: getEndpointsByLogicalGroup, etc. (5 ops) — merge with getTypedEndpointsByGroup via endpointType filter
+
+**Industrial Endpoints** (25R2 only): Merge into endpoint operations with `endpointType: 'industrial'` option (only shown when bmsVersion=25R2).
+
+**Network endpoint special handling**:
+- `network` excluded from Start Enrollment (network devices have no agent)
+- `network` excluded from Trigger Intune Installation
+- Create body differs: IP address/MAC fields instead of hostname
+- Document clearly: "Network endpoints are unmanaged devices (switches, printers, APs)"
+
+### UI Changes
+
+1. **Remove `typedEndpoint` from resource dropdown** (6 → 5 resources in Baramundi Endpoint)
+2. **Remove `typedEndpointOperations25R2/26R1`** field arrays entirely
+3. **Remove `typedEndpointFields`** array entirely
+4. **Add `endpointType` dropdown** to Get, Get Many, Update, Delete, Get By Group operations
+5. **Update `endpointOperations25R2/26R1`** to include former typed endpoint operations
+6. **Update operation descriptions** to make platform filtering obvious (e.g., "Get many endpoints — filter by platform type")
+
+### Router Changes
+
+1. **Remove `case 'typedEndpoint'`** from router
+2. **Merge typed operations into `case 'endpoint'`** — the execute functions already exist, just need new operation value names
+3. **Consolidate duplicate operations**: `getTypedEndpoints` becomes the implementation for `getMany` when endpointType != 'all'
+
+### Execute Function Changes
+
+1. **`get`**: Add conditional — if endpointType is specified and not 'all', use typed path
+2. **`getMany`**: Add conditional — if endpointType is specified and not 'all', use typed path
+3. **`update`**: Change from Windows-only to use `TYPED_ENDPOINT_PATH[endpointType]` (require endpointType)
+4. **`deleteEndpoint`**: Add conditional for typed path
+5. **`getEndpointsByLogicalGroup` etc.**: Add optional endpointType filter to use typed group query path
+6. **Remove** standalone `getTypedEndpoints`, `getTypedEndpoint`, `updateTypedEndpoint`, `deleteTypedEndpoint`, `startTypedEnrollment`, `getTypedEndpointsByGroup` — logic absorbed into existing operations
+
+**Quality**:
+- [ ] `typedEndpoint` resource no longer appears in resource dropdown
+- [ ] All operations formerly under Typed Endpoint accessible via Endpoint + endpointType filter
+- [ ] Create works for all 6 platform types (unchanged)
+- [ ] Get/Get Many with endpointType="all" returns cross-platform results (unchanged)
+- [ ] Get/Get Many with specific endpointType returns platform-filtered results
+- [ ] Update works for all 6 platform types (was Windows-only)
+- [ ] Network excluded from enrollment operations
+- [ ] Industrial endpoints accessible when bmsVersion=25R2
+- [ ] Sidebar action count for Baramundi Endpoint decreases (fewer duplicate operations)
+- [ ] `tsc --noEmit`: 0 errors
+- [ ] All existing endpoint tests pass (updated for new operation structure)
+
+---
+
 ## REQ-PUBLISH-1 — Distribution Package
 
 **Status**: OPEN

@@ -667,9 +667,43 @@ Trigger: Schedule (weekly, before patch Tuesday).
 
 ---
 
+## Phase 14 — Merge Typed Endpoint into Endpoint (REQ-ENDPOINT-UX-1)
+
+**Goal**: Remove the `typedEndpoint` resource. Merge all its operations into `endpoint` by adding an `endpointType` dropdown ("All Platforms", Windows, Android, iOS, Linux, Mac, Network) to operations that can filter by platform. Reduces resource count from 6 → 5 and eliminates duplicate operations.
+
+**Prerequisite**: Phase 13 complete.
+
+### Backlog
+
+| ID | Task | Priority | Notes |
+|----|------|----------|-------|
+| P14.1 | **Refactor execute functions** | HIGH | Modify `get`, `getMany`, `update`, `deleteEndpoint` to accept optional `endpointType` param. When "all" → use generic `/v2.0/Endpoints` path. When specific → use `/v2.0/{Type}Endpoints` path via `TYPED_ENDPOINT_PATH`. Fix `update` to work for all platforms (currently Windows-only). Merge `getEndpointsByX` group queries with typed group query logic. |
+| P14.2 | **Remove standalone typed functions** | HIGH | Remove `getTypedEndpoints`, `getTypedEndpoint`, `updateTypedEndpoint`, `deleteTypedEndpoint`, `startTypedEnrollment`, `getTypedEndpointsByGroup` as standalone functions. Their logic is now absorbed into the main `get`, `getMany`, `update`, `delete`, `startEnrollment`, `getEndpointsByGroup` functions. |
+| P14.3 | **Update fields — merge operations** | HIGH | Remove `typedEndpointOperations25R2/26R1` and `typedEndpointFields` arrays. Update `endpointOperations25R2/26R1` to include relevant operations. Add `endpointType` dropdown field (options: All, Windows, Android, iOS, Linux, Mac, Network) with `displayOptions` showing it for Get, Get Many, Update, Delete, Get By Group. For Create: already has endpointType. For Update: make it required (no "all"). Network excluded from enrollment ops. |
+| P14.4 | **Update router** | HIGH | Remove `case 'typedEndpoint'` block entirely. All operations now handled under `case 'endpoint'`. Remove operation names: `getTypedEndpoints`, `getTypedEndpoint`, `updateTypedEndpoint`, `deleteTypedEndpoint`, `startTypedEnrollment`, `getTypedEndpointsByGroup`. Industrial endpoint operations (25R2): merge into endpoint case with `endpointType: 'industrial'` or keep as separate ops. |
+| P14.5 | **Update node file** | MEDIUM | Remove `typedEndpoint` from resource dropdown (6 → 5 resources). Remove `typedEndpointOperations*` and `typedEndpointFields` spreads from properties. Update descriptions to mention platform filtering. |
+| P14.6 | **Update tests** | HIGH | Update endpoint.execute.test.ts: tests for typed endpoint functions become tests for endpoint functions with endpointType param. Test matrix: each consolidated operation × {all, windows, android, network}. Verify network exclusion from enrollment. Verify update works for non-Windows platforms. |
+| P14.7 | **Build, test, bump version** | HIGH | `tsc --noEmit` 0 errors. All tests pass. Rebuild and reinstall in n8n container. Verify sidebar shows 5 resources (not 6). Verify Get Many with endpointType=Windows filters correctly. Bump version to 0.7.0. Update CHANGELOG. |
+
+### Implementation Notes
+
+- **Key insight**: The execute functions `getTypedEndpoints`, `getTypedEndpoint`, etc. already use the same `TYPED_ENDPOINT_PATH` map. The merge means: the main `get`/`getMany`/`update`/`delete` functions gain a conditional branch — "if endpointType is set and not 'all', use typed path."
+- **Network is special**: No enrollment, no Intune, no agent-based operations. The `endpointType` dropdown should hide enrollment-related operations when `network` is selected (use `displayOptions`), or validate at runtime.
+- **Industrial endpoints (25R2)**: Can be added as `endpointType: 'industrial'` option visible only when `bmsVersion: ['25R2']`. Or kept as separate operations if the API shape differs significantly.
+- **Operation count reduction**: Current Endpoint has ~19 ops + Typed Endpoint has ~12 ops = ~31. After merge: ~20-22 ops (duplicates removed). Sidebar action count drops.
+- **Breaking change**: `resource: 'typedEndpoint'` no longer exists. Saved workflows using it must be updated. Document in CHANGELOG.
+
+### Done
+
+| ID | Task | Completed |
+|----|------|-----------|
+| *(none yet)* | | |
+
+---
+
 ## Notes
 
 - **System tests** (`test/system/`) require a live bMS server. They are skipped in CI unless `BMS_URL` env var is set. Do not block phases on system test results.
-- **IndustrialEndpoints** (25R2-only, not yet in connector): Deferred — implement only if explicitly requested.
+- **IndustrialEndpoints** (25R2-only): Now planned for merge into endpoint resource with `endpointType: 'industrial'` (Phase 14).
 - **Version auto-detection** from `/bconnect/v2.0/Info`: Deferred to future enhancement (see Requirements.md open questions).
 - **25R2 dropdown option**: Stays until ~2028 EOL.
