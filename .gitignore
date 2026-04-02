@@ -43,6 +43,9 @@ coverage/
 *.tar.gz
 *.zip
 
+# Product management docs — internal, not for repository
+ProductManagement/
+
 # Release artifacts — generated during /process-release
 sbom.json
 *.asc

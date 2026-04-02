@@ -825,6 +825,7 @@ Both must be deleted and replaced.
 | GH-02 | Create private GitHub repo, add remote, push `master` + tags | P0 | `git remote -v` shows GitHub origin; CI workflow runs green |
 | GH-03 | Enable branch protection on `master`: require CI status checks, disable force-push | P0 | CICD-02 resolved |
 | GH-04 | Sign git tags with GPG key going forward | P1 | CICD-05 resolved |
+| GH-05 | **Remove `ProductManagement/` from git tracking** — `git rm --cached ProductManagement/`, add `ProductManagement/` to `.gitignore`. Contains PM decision docs (PDF + MD) that should not be in the repository. | P1 | `git ls-files ProductManagement/` returns 0 files; entry exists in `.gitignore` |
 
 ### Done
 
