@@ -2283,3 +2283,117 @@ describe('Job Phase 8D - Folder/Group/Kiosk Navigation', () => {
     expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/jobs/v2.0/ADObjects/66666666-6666-6666-6666-666666666666/KioskReleases') }));
   });
 });
+
+describe('Validation error paths', () => {
+  function createMock(params: Record<string, any>) {
+    return {
+      getNodeParameter: vi.fn((name: string, _idx: number, def?: any) => params[name] ?? def),
+      getCredentials: vi.fn(async () => ({ baseUrl: 'https://bms:444/bconnect', username: 'u', password: 'test-password-do-not-use', ignoreSslIssues: false })),
+      helpers: {
+        httpRequest: vi.fn(),
+        returnJsonArray: vi.fn((data: any) => (Array.isArray(data) ? data : [data]).map((j: any) => ({ json: j }))),
+      },
+      getNode: vi.fn(() => ({ name: 'Baramundi', type: 'n8n-nodes-baramundi.baramundi', typeVersion: 1, position: [0,0], parameters: {} })),
+    } as any;
+  }
+
+  it('should throw NodeOperationError for invalid GUID in jobId (get)', async () => {
+    const mock = createMock({ jobId: 'not-a-guid' });
+    await expect(get.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in jobId (execute)', async () => {
+    const mock = createMock({ jobId: 'not-a-guid', targetId: '11111111-1111-1111-1111-111111111111', targetType: 'LogicalGroup' });
+    await expect(execute.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in jobId (getInstances)', async () => {
+    const mock = createMock({ jobId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(getInstances.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in instanceId (getJobInstance)', async () => {
+    const mock = createMock({ instanceId: 'not-a-guid' });
+    await expect(getJobInstance.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in endpointId (getEndpointJobInstances)', async () => {
+    const mock = createMock({ endpointId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(getEndpointJobInstances.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in instanceId (startJobInstance)', async () => {
+    const mock = createMock({ instanceId: 'not-a-guid' });
+    await expect(startJobInstance.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in instanceId (stopJobInstance)', async () => {
+    const mock = createMock({ instanceId: 'not-a-guid' });
+    await expect(stopJobInstance.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in instanceId (resumeJobInstance)', async () => {
+    const mock = createMock({ instanceId: 'not-a-guid' });
+    await expect(resumeJobInstance.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in instanceId (deleteJobInstance)', async () => {
+    const mock = createMock({ instanceId: 'not-a-guid' });
+    await expect(deleteJobInstance.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in folderId (getFolder)', async () => {
+    const mock = createMock({ folderId: 'not-a-guid' });
+    await expect(getFolder.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in folderId (deleteFolder)', async () => {
+    const mock = createMock({ folderId: 'not-a-guid' });
+    await expect(deleteFolder.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in releaseId (getKioskRelease)', async () => {
+    const mock = createMock({ releaseId: 'not-a-guid' });
+    await expect(getKioskRelease.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in releaseId (withdrawKioskRelease)', async () => {
+    const mock = createMock({ releaseId: 'not-a-guid' });
+    await expect(withdrawKioskRelease.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in jobId (update)', async () => {
+    const mock = createMock({ jobId: 'not-a-guid', updateFields: { name: 'x' } });
+    await expect(update.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in jobId (deleteJob)', async () => {
+    const mock = createMock({ jobId: 'not-a-guid' });
+    await expect(deleteJob.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getMany', async () => {
+    const mock = createMock({ returnAll: false, limit: 10, options: { searchQuery: 'name eq "test"' } });
+    await expect(getMany.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getMany', async () => {
+    const mock = createMock({ returnAll: false, limit: 10, options: { orderBy: 'name "desc"' } });
+    await expect(getMany.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getAllJobInstances', async () => {
+    const mock = createMock({ returnAll: false, limit: 10, options: { searchQuery: 'name eq "test"' } });
+    await expect(getAllJobInstances.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getFolders', async () => {
+    const mock = createMock({ returnAll: false, limit: 10, options: { searchQuery: 'name eq "test"' } });
+    await expect(getFolders.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getKioskReleases', async () => {
+    const mock = createMock({ returnAll: false, limit: 10, options: { searchQuery: 'name eq "test"' } });
+    await expect(getKioskReleases.call(mock, 0)).rejects.toThrow();
+  });
+});

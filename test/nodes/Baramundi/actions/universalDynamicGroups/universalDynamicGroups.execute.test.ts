@@ -183,3 +183,33 @@ describe('Universal Dynamic Groups Operations', () => {
     });
   });
 });
+
+describe('Validation error paths', () => {
+  it('should throw NodeOperationError for invalid GUID in id (get)', async () => {
+    const mock = createMockExecuteFunctions({ id: 'not-a-guid' });
+    await expect(get.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in folderId (getFolder)', async () => {
+    const mock = createMockExecuteFunctions({ folderId: 'not-a-guid' });
+    await expect(getFolder.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in folderId (getSubFolders)', async () => {
+    const mock = createMockExecuteFunctions({ folderId: 'not-a-guid', returnAll: false, limit: 10 });
+    await expect(getSubFolders.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in folderId (getGroupsByFolder)', async () => {
+    const mock = createMockExecuteFunctions({ folderId: 'not-a-guid', returnAll: false, limit: 10 });
+    await expect(getGroupsByFolder.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getMany', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(getMany.call(mock, 0)).rejects.toThrow();
+  });
+});

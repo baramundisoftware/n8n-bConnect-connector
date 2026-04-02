@@ -856,3 +856,160 @@ describe('Active Directory Operations', () => {
     });
   });
 });
+
+describe('Validation error paths', () => {
+  it('should throw NodeOperationError for invalid GUID in adGroupId (getADGroup)', async () => {
+    const mock = createMockExecuteFunctions({ adGroupId: 'not-a-guid' });
+    await expect(getADGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in adUserId (getADUser)', async () => {
+    const mock = createMockExecuteFunctions({ adUserId: 'not-a-guid' });
+    await expect(getADUser.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in adObjectId (getADObject)', async () => {
+    const mock = createMockExecuteFunctions({ adObjectId: 'not-a-guid' });
+    await expect(getADObject.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in orgUnitId (getOrgUnit)', async () => {
+    const mock = createMockExecuteFunctions({ orgUnitId: 'not-a-guid' });
+    await expect(getOrgUnit.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in orgUnitId (getADGroupsByOrgUnit)', async () => {
+    const mock = createMockExecuteFunctions({ orgUnitId: 'not-a-guid', returnAll: false, limit: 10 });
+    await expect(getADGroupsByOrgUnit.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in adGroupId (getADUsersByGroup)', async () => {
+    const mock = createMockExecuteFunctions({ adGroupId: 'not-a-guid', returnAll: false, limit: 10 });
+    await expect(getADUsersByGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in adGroupId (getADGroupsByADGroup)', async () => {
+    const mock = createMockExecuteFunctions({ adGroupId: 'not-a-guid', returnAll: false, limit: 10 });
+    await expect(getADGroupsByADGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in adGroupId (getADObjectsByADGroup)', async () => {
+    const mock = createMockExecuteFunctions({ adGroupId: 'not-a-guid', returnAll: false, limit: 10 });
+    await expect(getADObjectsByADGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in adObjectId (getADObjectMemberships)', async () => {
+    const mock = createMockExecuteFunctions({ adObjectId: 'not-a-guid', returnAll: false, limit: 10 });
+    await expect(getADObjectMemberships.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in orgUnitId (getADObjectsByOrgUnit)', async () => {
+    const mock = createMockExecuteFunctions({ orgUnitId: 'not-a-guid', returnAll: false, limit: 10 });
+    await expect(getADObjectsByOrgUnit.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in orgUnitId (getADUsersByOrgUnit)', async () => {
+    const mock = createMockExecuteFunctions({ orgUnitId: 'not-a-guid', returnAll: false, limit: 10 });
+    await expect(getADUsersByOrgUnit.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in orgUnitId (getOrgUnitsByOrgUnit)', async () => {
+    const mock = createMockExecuteFunctions({ orgUnitId: 'not-a-guid', returnAll: false, limit: 10 });
+    await expect(getOrgUnitsByOrgUnit.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getADGroups', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(getADGroups.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getADGroups', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(getADGroups.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getADUsers', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(getADUsers.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getADObjects', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(getADObjects.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getOrgUnits', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(getOrgUnits.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getOrgUnitsByOrgUnit', async () => {
+    const mock = createMockExecuteFunctions({
+      orgUnitId: '44444444-4444-4444-4444-444444444444',
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(getOrgUnitsByOrgUnit.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should fetch all sub-OUs when returnAll is true (getOrgUnitsByOrgUnit)', async () => {
+    const orgUnitId = '44444444-4444-4444-4444-444444444444';
+    const mockPage1 = {
+      currentPage: 0, pageSize: 2, totalPages: 2, totalItems: 3,
+      hasPreviousPage: false, hasNextPage: true,
+      data: [{ id: 'ou-1', name: 'Sub1' }, { id: 'ou-2', name: 'Sub2' }],
+    };
+    const mockPage2 = {
+      currentPage: 1, pageSize: 2, totalPages: 2, totalItems: 3,
+      hasPreviousPage: true, hasNextPage: false,
+      data: [{ id: 'ou-3', name: 'Sub3' }],
+    };
+    const mock = createMockExecuteFunctions(
+      { orgUnitId, returnAll: true },
+      {},
+      {},
+      [mockPage1, mockPage2],
+    );
+    const result = await getOrgUnitsByOrgUnit.call(mock, 0);
+    expect(result).toHaveLength(3);
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getADUsers', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(getADUsers.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getADObjects', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(getADObjects.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getOrgUnits', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(getOrgUnits.call(mock, 0)).rejects.toThrow();
+  });
+});

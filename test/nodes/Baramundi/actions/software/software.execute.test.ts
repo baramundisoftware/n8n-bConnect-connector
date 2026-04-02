@@ -243,3 +243,101 @@ describe('Software Phase 8E — Bundle Application / Folder Operations', () => {
     expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'DELETE', url: expect.stringContaining('/software/v2.0/BundleApplications/56565656-5656-5656-5656-565656565656') }));
   });
 });
+
+describe('Validation error paths', () => {
+  it('should throw NodeOperationError for invalid GUID in endpointId (getInstalledSoftwareByEndpoint)', async () => {
+    const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid', returnAll: false, limit: 10 });
+    await expect(software.getInstalledSoftwareByEndpoint.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in logicalGroupId (getInstalledSoftwareByLogicalGroup)', async () => {
+    const mock = createMockExecuteFunctions({ logicalGroupId: 'not-a-guid', returnAll: false, limit: 10 });
+    await expect(software.getInstalledSoftwareByLogicalGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in universalDynamicGroupId (getInstalledSoftwareByUniversalDynamicGroup)', async () => {
+    const mock = createMockExecuteFunctions({ universalDynamicGroupId: 'not-a-guid', returnAll: false, limit: 10 });
+    await expect(software.getInstalledSoftwareByUniversalDynamicGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in bundleId (getBundle)', async () => {
+    const mock = createMockExecuteFunctions({ bundleId: 'not-a-guid' });
+    await expect(software.getBundle.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getInstalledWindowsSoftware', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(software.getInstalledWindowsSoftware.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getInstalledWindowsSoftware', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(software.getInstalledWindowsSoftware.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getInstalledSoftwareByEndpoint', async () => {
+    const mock = createMockExecuteFunctions({
+      endpointId: '11111111-1111-1111-1111-111111111111',
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(software.getInstalledSoftwareByEndpoint.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getBundles', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(software.getBundles.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in bundleId (deleteBundle)', async () => {
+    const mock = createMockExecuteFunctions({ bundleId: 'not-a-guid' });
+    await expect(software.deleteBundle.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in bundleFolderId (getBundleFolder)', async () => {
+    const mock = createMockExecuteFunctions({ bundleFolderId: 'not-a-guid' });
+    await expect(software.getBundleFolder.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in bundleFolderId (getBundleSubFolders)', async () => {
+    const mock = createMockExecuteFunctions({ bundleFolderId: 'not-a-guid', returnAll: false, limit: 10 });
+    await expect(software.getBundleSubFolders.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in bundleFolderId (deleteBundleFolder)', async () => {
+    const mock = createMockExecuteFunctions({ bundleFolderId: 'not-a-guid' });
+    await expect(software.deleteBundleFolder.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in bundleId (getBundleApplicationsByBundle)', async () => {
+    const mock = createMockExecuteFunctions({ bundleId: 'not-a-guid', returnAll: false, limit: 10 });
+    await expect(software.getBundleApplicationsByBundle.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in bundleId (addApplicationToBundle)', async () => {
+    const mock = createMockExecuteFunctions({ bundleId: 'not-a-guid', applicationId: '11111111-1111-1111-1111-111111111111' });
+    await expect(software.addApplicationToBundle.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in bundleApplicationId (deleteBundleApplication)', async () => {
+    const mock = createMockExecuteFunctions({ bundleApplicationId: 'not-a-guid' });
+    await expect(software.deleteBundleApplication.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getBundles', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(software.getBundles.call(mock, 0)).rejects.toThrow();
+  });
+});

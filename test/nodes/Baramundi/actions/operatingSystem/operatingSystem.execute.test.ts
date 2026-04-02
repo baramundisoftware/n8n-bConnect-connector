@@ -296,3 +296,68 @@ describe('Credential Configuration', () => {
 		);
 	});
 });
+
+describe('Validation error paths', () => {
+	it('should throw NodeOperationError for invalid GUID in folderId (getFolder)', async () => {
+		const mock = createMockExecuteFunctions({ folderId: 'not-a-guid' });
+		await expect(operatingSystem.getFolder.call(mock, 0)).rejects.toThrow();
+	});
+
+	it('should throw NodeOperationError for invalid GUID in folderId (getFoldersByFolderId)', async () => {
+		const mock = createMockExecuteFunctions({ folderId: 'not-a-guid', returnAll: false, limit: 10 });
+		await expect(operatingSystem.getFoldersByFolderId.call(mock, 0)).rejects.toThrow();
+	});
+
+	it('should throw NodeOperationError for invalid GUID in folderId (deleteFolder)', async () => {
+		const mock = createMockExecuteFunctions({ folderId: 'not-a-guid' });
+		await expect(operatingSystem.deleteFolder.call(mock, 0)).rejects.toThrow();
+	});
+
+	it('should throw NodeOperationError for invalid OData searchQuery in getFolders', async () => {
+		const mock = createMockExecuteFunctions({
+			returnAll: false, limit: 10,
+			options: { searchQuery: 'name eq "test"' },
+		});
+		await expect(operatingSystem.getFolders.call(mock, 0)).rejects.toThrow();
+	});
+
+	it('should throw NodeOperationError for invalid OData orderBy in getFolders', async () => {
+		const mock = createMockExecuteFunctions({
+			returnAll: false, limit: 10,
+			options: { orderBy: 'name "desc"' },
+		});
+		await expect(operatingSystem.getFolders.call(mock, 0)).rejects.toThrow();
+	});
+
+	it('should throw NodeOperationError for invalid OData searchQuery in getFoldersByFolderId', async () => {
+		const mock = createMockExecuteFunctions({
+			folderId: '77777777-7777-7777-7777-777777777777',
+			returnAll: false, limit: 10,
+			options: { searchQuery: 'name eq "test"' },
+		});
+		await expect(operatingSystem.getFoldersByFolderId.call(mock, 0)).rejects.toThrow();
+	});
+
+	it('should throw NodeOperationError for invalid GUID in folderId (updateFolder)', async () => {
+		const mock = createMockExecuteFunctions({ folderId: 'not-a-guid', updateFields: { name: 'x' } });
+		await expect(operatingSystem.updateFolder.call(mock, 0)).rejects.toThrow();
+	});
+
+	it('should throw NodeOperationError for invalid GUID in endpointId (getWindowsEndpoint)', async () => {
+		const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid' });
+		await expect(operatingSystem.getWindowsEndpoint.call(mock, 0)).rejects.toThrow();
+	});
+
+	it('should throw NodeOperationError for invalid GUID in endpointId (updateWindowsEndpoint)', async () => {
+		const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid', updateFields: { name: 'x' } });
+		await expect(operatingSystem.updateWindowsEndpoint.call(mock, 0)).rejects.toThrow();
+	});
+
+	it('should throw NodeOperationError for invalid OData searchQuery in getWindowsEndpoints', async () => {
+		const mock = createMockExecuteFunctions({
+			returnAll: false, limit: 10,
+			options: { searchQuery: 'name eq "test"' },
+		});
+		await expect(operatingSystem.getWindowsEndpoints.call(mock, 0)).rejects.toThrow();
+	});
+});

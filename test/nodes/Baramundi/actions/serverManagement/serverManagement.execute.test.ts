@@ -723,3 +723,45 @@ describe('ServerManagement Phase 4 - New Operations', () => {
     });
   });
 });
+
+describe('Validation error paths', () => {
+  it('should throw NodeOperationError for invalid GUID in microserviceId (getMicroservice)', async () => {
+    const mock = createMockExecuteFunctions({ microserviceId: 'not-a-guid' });
+    await expect(getMicroservice.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in securityGroupId (getSecurityGroup)', async () => {
+    const mock = createMockExecuteFunctions({ securityGroupId: 'not-a-guid' });
+    await expect(getSecurityGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in securityGroupId (updateSecurityGroup)', async () => {
+    const mock = createMockExecuteFunctions({ securityGroupId: 'not-a-guid', updateFields: { name: 'x' } });
+    await expect(updateSecurityGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in securityGroupId (deleteSecurityGroup)', async () => {
+    const mock = createMockExecuteFunctions({ securityGroupId: 'not-a-guid' });
+    await expect(deleteSecurityGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in securityProfileId (getSecurityProfile)', async () => {
+    const mock = createMockExecuteFunctions({ securityProfileId: 'not-a-guid' });
+    await expect(getSecurityProfile.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getSecurityGroups', async () => {
+    const mock = createMockExecuteFunctions({ returnAll: false, limit: 10, options: { searchQuery: 'name eq "test"' } });
+    await expect(getSecurityGroups.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getSecurityGroups', async () => {
+    const mock = createMockExecuteFunctions({ returnAll: false, limit: 10, options: { orderBy: 'name "desc"' } });
+    await expect(getSecurityGroups.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getSecurityProfiles', async () => {
+    const mock = createMockExecuteFunctions({ returnAll: false, limit: 10, options: { searchQuery: 'name eq "test"' } });
+    await expect(getSecurityProfiles.call(mock, 0)).rejects.toThrow();
+  });
+});

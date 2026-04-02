@@ -218,3 +218,49 @@ describe('Compliance Operations', () => {
     });
   });
 });
+
+describe('Validation error paths', () => {
+  it('should throw NodeOperationError for invalid GUID in ruleId (getRule)', async () => {
+    const mock = createMockExecuteFunctions({ ruleId: 'not-a-guid' });
+    await expect(getRule.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in vulnerabilityId (getVulnerability)', async () => {
+    const mock = createMockExecuteFunctions({ vulnerabilityId: 'not-a-guid' });
+    await expect(getVulnerability.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in endpointId (getDetectedVulnerabilitiesByEndpoint)', async () => {
+    const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(getDetectedVulnerabilitiesByEndpoint.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in endpointId (getDetectedRuleViolationsByEndpoint)', async () => {
+    const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(getDetectedRuleViolationsByEndpoint.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getRules', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(getRules.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getVulnerabilities', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(getVulnerabilities.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getDetectedVulnerabilities', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(getDetectedVulnerabilities.call(mock, 0)).rejects.toThrow();
+  });
+});

@@ -26,6 +26,9 @@ function createRealContext(
     getNodeParameter: vi.fn((paramName: string, _index: number, defaultValue?: any) => {
       return params[paramName] ?? defaultValue;
     }),
+    getCurrentNodeParameter: vi.fn((paramName: string) => {
+      return params[paramName];
+    }),
     getCredentials: vi.fn(async () => ({
       baseUrl: MOCK_URL,
       username: MOCK_USER,

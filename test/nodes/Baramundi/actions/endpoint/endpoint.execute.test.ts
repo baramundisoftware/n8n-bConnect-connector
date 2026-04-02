@@ -3448,3 +3448,145 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
     });
   });
 });
+
+describe('Validation error paths', () => {
+  it('should throw NodeOperationError for invalid GUID in endpointId (get)', async () => {
+    const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid' });
+    await expect(get.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in endpointId (deleteEndpoint)', async () => {
+    const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid' });
+    await expect(deleteEndpoint.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in endpointId (update)', async () => {
+    const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid', updateFields: { displayName: 'x' } });
+    await expect(update.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in endpointId (startEnrollment)', async () => {
+    const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid' });
+    await expect(startEnrollment.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in endpointId (triggerIntuneInstallation)', async () => {
+    const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid' });
+    await expect(triggerIntuneInstallation.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in groupId (getLogicalGroup)', async () => {
+    const mock = createMockExecuteFunctions({ groupId: 'not-a-guid' });
+    await expect(getLogicalGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in groupId (deleteLogicalGroup)', async () => {
+    const mock = createMockExecuteFunctions({ groupId: 'not-a-guid' });
+    await expect(deleteLogicalGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in groupId (getStaticGroup)', async () => {
+    const mock = createMockExecuteFunctions({ groupId: 'not-a-guid' });
+    await expect(getStaticGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in groupId (deleteStaticGroup)', async () => {
+    const mock = createMockExecuteFunctions({ groupId: 'not-a-guid' });
+    await expect(deleteStaticGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in groupId (getDynamicGroup)', async () => {
+    const mock = createMockExecuteFunctions({ groupId: 'not-a-guid' });
+    await expect(getDynamicGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getMany', async () => {
+    const mock = createMockExecuteFunctions({ returnAll: false, limit: 10, options: { orderBy: 'name "desc"' } });
+    await expect(getMany.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getLogicalGroups', async () => {
+    const mock = createMockExecuteFunctions({ returnAll: false, limit: 10, options: { searchQuery: 'name eq "test"' } });
+    await expect(getLogicalGroups.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getStaticGroups', async () => {
+    const mock = createMockExecuteFunctions({ returnAll: false, limit: 10, options: { searchQuery: 'name eq "test"' } });
+    await expect(getStaticGroups.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getDynamicGroups', async () => {
+    const mock = createMockExecuteFunctions({ returnAll: false, limit: 10, options: { searchQuery: 'name eq "test"' } });
+    await expect(getDynamicGroups.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData in search', async () => {
+    const mock = createMockExecuteFunctions({ searchQuery: 'name eq "test"' });
+    await expect(search.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in groupId (updateLogicalGroup)', async () => {
+    const mock = createMockExecuteFunctions({ groupId: 'not-a-guid', updateFields: { name: 'x' } });
+    await expect(updateLogicalGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in groupId (updateStaticGroup)', async () => {
+    const mock = createMockExecuteFunctions({ groupId: 'not-a-guid', updateFields: { name: 'x' } });
+    await expect(updateStaticGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in groupId (getLogicalGroupSubGroups)', async () => {
+    const mock = createMockExecuteFunctions({ groupId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(getLogicalGroupSubGroups.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in logicalGroupId (getEndpointsByLogicalGroup)', async () => {
+    const mock = createMockExecuteFunctions({ logicalGroupId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(getEndpointsByLogicalGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in staticGroupId (getEndpointsByStaticGroup)', async () => {
+    const mock = createMockExecuteFunctions({ staticGroupId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(getEndpointsByStaticGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in dynamicGroupId (getEndpointsByDynamicGroup)', async () => {
+    const mock = createMockExecuteFunctions({ dynamicGroupId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(getEndpointsByDynamicGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in udgId (getEndpointsByUDG)', async () => {
+    const mock = createMockExecuteFunctions({ udgId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(getEndpointsByUDG.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in adUserId (getEndpointsByADUser)', async () => {
+    const mock = createMockExecuteFunctions({ adUserId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(getEndpointsByADUser.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in endpointId (getIndustrialEndpoint)', async () => {
+    const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid' });
+    await expect(getIndustrialEndpoint.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in endpointId (updateIndustrialEndpoint)', async () => {
+    const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid', updateFields: { name: 'x' } });
+    await expect(updateIndustrialEndpoint.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in endpointId (deleteIndustrialEndpoint)', async () => {
+    const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid' });
+    await expect(deleteIndustrialEndpoint.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getLogicalGroups', async () => {
+    const mock = createMockExecuteFunctions({ returnAll: false, limit: 10, options: { orderBy: 'name "desc"' } });
+    await expect(getLogicalGroups.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getStaticGroups', async () => {
+    const mock = createMockExecuteFunctions({ returnAll: false, limit: 10, options: { orderBy: 'name "desc"' } });
+    await expect(getStaticGroups.call(mock, 0)).rejects.toThrow();
+  });
+});

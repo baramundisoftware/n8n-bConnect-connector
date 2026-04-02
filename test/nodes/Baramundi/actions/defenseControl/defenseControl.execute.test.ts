@@ -530,3 +530,59 @@ describe('DefenseControl Phase 4 - BitLocker Secrets', () => {
     });
   });
 });
+
+describe('Validation error paths', () => {
+  it('should throw NodeOperationError for invalid GUID in endpointId (getBitLockerWindowsEndpoint)', async () => {
+    const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid' });
+    await expect(getBitLockerWindowsEndpoint.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in endpointId (getLocalAdministrativeAccounts)', async () => {
+    const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid' });
+    await expect(getLocalAdministrativeAccounts.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in endpointId (triggerLocalAdminAccountsUpdate)', async () => {
+    const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid' });
+    await expect(triggerLocalAdminAccountsUpdate.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in threatId (getMicrosoftDefenderThreat)', async () => {
+    const mock = createMockExecuteFunctions({ threatId: 'not-a-guid' });
+    await expect(getMicrosoftDefenderThreat.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in endpointId (getMicrosoftDefenderThreatsByEndpoint)', async () => {
+    const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(getMicrosoftDefenderThreatsByEndpoint.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in logicalGroupId (getMicrosoftDefenderThreatsByLogicalGroup)', async () => {
+    const mock = createMockExecuteFunctions({ logicalGroupId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(getMicrosoftDefenderThreatsByLogicalGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getBitLockerWindowsEndpoints', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(getBitLockerWindowsEndpoints.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getBitLockerWindowsEndpoints', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(getBitLockerWindowsEndpoints.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getMicrosoftDefenderThreats', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(getMicrosoftDefenderThreats.call(mock, 0)).rejects.toThrow();
+  });
+});

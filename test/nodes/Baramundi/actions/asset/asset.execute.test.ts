@@ -1325,3 +1325,158 @@ describe('Asset Phase 4 - AD Object and OrgUnit Operations', () => {
     });
   });
 });
+
+describe('Validation error paths', () => {
+  it('should throw NodeOperationError for invalid GUID in assetId (get)', async () => {
+    const mock = createMockExecuteFunctions({ assetId: 'not-a-guid' });
+    await expect(get.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in assetTypeId (getAssetType)', async () => {
+    const mock = createMockExecuteFunctions({ assetTypeId: 'not-a-guid' });
+    await expect(getAssetType.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in assetId (update)', async () => {
+    const mock = createMockExecuteFunctions({ assetId: 'not-a-guid', updateFields: { name: 'x' } });
+    await expect(update.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in assetId (deleteAsset)', async () => {
+    const mock = createMockExecuteFunctions({ assetId: 'not-a-guid' });
+    await expect(deleteAsset.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getMany', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(getMany.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getMany', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(getMany.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData assetTypeId filter in getMany', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { assetTypeId: 'not-a-guid' },
+    });
+    await expect(getMany.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in endpointId (getAssetsByEndpoint)', async () => {
+    const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(getAssetsByEndpoint.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getAssetsByEndpoint', async () => {
+    const mock = createMockExecuteFunctions({
+      endpointId: '11111111-1111-1111-1111-111111111111',
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(getAssetsByEndpoint.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in logicalGroupId (getAssetsByLogicalGroup)', async () => {
+    const mock = createMockExecuteFunctions({ logicalGroupId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(getAssetsByLogicalGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in assetTypeId (deleteAssetType)', async () => {
+    const mock = createMockExecuteFunctions({ assetTypeId: 'not-a-guid' });
+    await expect(deleteAssetType.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getAssetTypes', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(getAssetTypes.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in adObjectId (getAssetsByADObject)', async () => {
+    const mock = createMockExecuteFunctions({ adObjectId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(getAssetsByADObject.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in orgUnitId (getAssetsByOrgUnit)', async () => {
+    const mock = createMockExecuteFunctions({ orgUnitId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(getAssetsByOrgUnit.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getAssetStockAssets', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(getAssetStockAssets.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getAssetStockFolders', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(getAssetStockFolders.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getAssetsByEndpoint', async () => {
+    const mock = createMockExecuteFunctions({
+      endpointId: '11111111-1111-1111-1111-111111111111',
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(getAssetsByEndpoint.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getAssetsByLogicalGroup', async () => {
+    const mock = createMockExecuteFunctions({
+      logicalGroupId: '22222222-2222-2222-2222-222222222222',
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(getAssetsByLogicalGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getAssetStockAssets', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(getAssetStockAssets.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getAssetStockFolders', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(getAssetStockFolders.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getAssetTypeFolders', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(getAssetTypeFolders.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getAssetTypeFolderSubFolders', async () => {
+    const mock = createMockExecuteFunctions({
+      assetTypeFolderId: '90909090-9090-9090-9090-909090909090',
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(getAssetTypeFolderSubFolders.call(mock, 0)).rejects.toThrow();
+  });
+});

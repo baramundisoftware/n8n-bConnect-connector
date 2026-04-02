@@ -429,3 +429,87 @@ describe('Variable Phase 8F — Application/JobDefinition Instances', () => {
     expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('/variables/v2.0/WindowsJobDefinitions/88888888-8888-8888-8888-888888888888/VariableInstances') }));
   });
 });
+
+describe('Validation error paths', () => {
+  it('should throw NodeOperationError for invalid GUID in variableDefinitionId (getVariableDefinition)', async () => {
+    const mock = createMockExecuteFunctions({ variableDefinitionId: 'not-a-guid' });
+    await expect(variable.getVariableDefinition.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in variableDefinitionId (deleteVariableDefinition)', async () => {
+    const mock = createMockExecuteFunctions({ variableDefinitionId: 'not-a-guid' });
+    await expect(variable.deleteVariableDefinition.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in variableInstanceId (getVariableInstance)', async () => {
+    const mock = createMockExecuteFunctions({ variableInstanceId: 'not-a-guid' });
+    await expect(variable.getVariableInstance.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getVariableDefinitions', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(variable.getVariableDefinitions.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getVariableDefinitions', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(variable.getVariableDefinitions.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData searchQuery in getVariableInstances', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { searchQuery: 'name eq "test"' },
+    });
+    await expect(variable.getVariableInstances.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in variableDefinitionId (updateVariableDefinition)', async () => {
+    const mock = createMockExecuteFunctions({ variableDefinitionId: 'not-a-guid', updateFields: { name: 'x' } });
+    await expect(variable.updateVariableDefinition.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in variableInstanceId (updateVariableInstance)', async () => {
+    const mock = createMockExecuteFunctions({ variableInstanceId: 'not-a-guid', updateFields: { value: 'x' } });
+    await expect(variable.updateVariableInstance.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in endpointId (getVariableInstancesByEndpoint)', async () => {
+    const mock = createMockExecuteFunctions({ endpointId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(variable.getVariableInstancesByEndpoint.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in logicalGroupId (getVariableInstancesByLogicalGroup)', async () => {
+    const mock = createMockExecuteFunctions({ logicalGroupId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(variable.getVariableInstancesByLogicalGroup.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in adObjectId (getVariableInstancesByADObject)', async () => {
+    const mock = createMockExecuteFunctions({ adObjectId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(variable.getVariableInstancesByADObject.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in applicationId (getVariableInstancesByApplication)', async () => {
+    const mock = createMockExecuteFunctions({ applicationId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(variable.getVariableInstancesByApplication.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid GUID in jobDefinitionId (getVariableInstancesByJobDefinition)', async () => {
+    const mock = createMockExecuteFunctions({ jobDefinitionId: 'not-a-guid', returnAll: false, limit: 10, options: {} });
+    await expect(variable.getVariableInstancesByJobDefinition.call(mock, 0)).rejects.toThrow();
+  });
+
+  it('should throw NodeOperationError for invalid OData orderBy in getVariableInstances', async () => {
+    const mock = createMockExecuteFunctions({
+      returnAll: false, limit: 10,
+      options: { orderBy: 'name "desc"' },
+    });
+    await expect(variable.getVariableInstances.call(mock, 0)).rejects.toThrow();
+  });
+});

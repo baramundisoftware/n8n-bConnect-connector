@@ -19,6 +19,7 @@ import {
 function createMockLoadOptionsFunctions(mockResponse: any = {}): ILoadOptionsFunctions {
   return {
     getNodeParameter: vi.fn(() => ''),
+    getCurrentNodeParameter: vi.fn(() => undefined),
     getCredentials: vi.fn(async () => ({
       baseUrl: 'https://bms-win22srv:444/bconnect',
       username: 'Administrator',
