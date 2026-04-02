@@ -757,7 +757,9 @@ Both must be deleted and replaced.
 
 ### Done
 
-*(empty)*
+| ID | Task | Completed |
+|----|------|----------|
+| NV-01 | Upgraded CI to Node 22 (`node-version: '22'`). Resolves `isolated-vm` native build failure. 986 tests passing. | 2026-04-02 |
 
 ---
 
