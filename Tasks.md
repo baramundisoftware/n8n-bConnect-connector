@@ -680,6 +680,30 @@ Both must be deleted and replaced.
 
 ---
 
+## Phase 16 — API Path Audit Remediation
+
+**Goal**: Fix all API paths that don't match the OpenAPI specs. Discovered during E2E testing against bConnectMock (2026-04-02).
+
+**Audit report**: 17 mismatched paths found across 3 categories.
+
+### Backlog
+
+| ID | Task | Severity | Details |
+|----|------|----------|---------|
+| P16.1 | **Fix UDG CRUD domain prefix** — change 8 paths in `universalDynamicGroups.execute.ts` from `/endpoints/v2.0/UniversalDynamicGroups*` to `/universaldynamicgroups/v2.0/UniversalDynamicGroups*` | HIGH | Wrong domain prefix causes 404 on real bConnect. UDG sub-resource paths under `/endpoints/v2.0/.../UniversalDynamicGroups/{id}/Endpoints` are correct (stay). |
+| P16.2 | **Fix Endpoint MaintenanceWindow paths** — change `WindowsEndpoints/{id}/MaintenanceWindow` to `Endpoints/{id}/MaintenanceWindow` in create/update/delete/put operations. Verify `/{windowId}` sub-path against real API. | HIGH | OpenAPI spec only shows MW on generic `Endpoints`, not `WindowsEndpoints`. Also: spec shows no `/{windowId}` sub-path — may need to change PATCH/DELETE to operate on the window resource without ID. |
+| P16.3 | **Verify StaticGroups/DynamicGroups base CRUD** — test `GET /endpoints/v2.0/StaticGroups` and `GET /endpoints/v2.0/DynamicGroups` against real bMS server. If 404: remove or gate these operations. If working: document as undocumented API. | MEDIUM | These paths are not in any OpenAPI spec but may work in practice. Need live server verification. |
+| P16.4 | **Add automated path validation** — create a test that extracts all API paths from execute files and validates them against the OpenAPI spec JSON files. Run as part of CI. | MEDIUM | Prevents future path drift. |
+| P16.5 | Update tests + CHANGELOG for all fixes | HIGH | After P16.1–P16.3 |
+
+### Done
+
+| ID | Task | Completed |
+|----|------|-----------|
+| P16.0 | Audit: compared all 141 connector paths against OpenAPI specs. Found 17 mismatches. Fixed `MaintenanceWindows` → `MaintenanceWindow` (plural→singular). | 2026-04-02 |
+
+---
+
 ## Notes
 
 - **System tests** (`test/system/`) require a live bMS server. They are skipped in CI unless `BMS_URL` env var is set. Do not block phases on system test results.
