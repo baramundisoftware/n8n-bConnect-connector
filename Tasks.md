@@ -722,8 +722,6 @@ Both must be deleted and replaced.
 | AR-01 | **Fix 30 bare `throw new Error()`** → `throw new NodeOperationError(this.getNode(), ...)` across all execute files. Affects: `serverManagement.execute.ts` (×2), `defenseControl.execute.ts` (×3), `variable.execute.ts` (×2), `software.execute.ts` (multiple), `updateManagement.execute.ts`. | P0 — blocking v1.0.0 | MEDIUM | `grep -rn "throw new Error(" nodes/` returns 0 results; all tests pass |
 | AR-02 | **Pin GitHub Actions SHAs** in `.github/workflows/ci.yml` — replace floating tags (`actions/checkout@v4`, `actions/setup-node@v4`) with immutable commit SHAs. Use Dependabot or Renovate comment to track updates. | P0 — blocking v1.0.0 | MEDIUM | All action refs use full 40-char SHA; CI still passes |
 | AR-03 | **Add npm audit exception list to CI** — document handlebars, lodash, minimatch as accepted transitive build-time-only findings. Add `npm audit --audit-level=critical` with advisory ignore list (or `.nsprc` / `overrides`) so CI does not fail on known no-fix transitives. | P0 — blocking v1.0.0 | MEDIUM | CI passes `npm audit` step; exception rationale documented inline |
-| AR-04 | **Extract duplicate `serverManagement.execute.ts`** — move to `nodes/shared/actions/serverManagement/serverManagement.execute.ts`; import in both `BaramundiAdmin` and `BaramundiSecurity`. Delete the two duplicate copies. | P1 — recommended | HIGH | Single source file; `find nodes/ -name "serverManagement.execute.ts"` returns 1 result; all tests pass |
-| AR-05 | **Improve branch coverage to ≥ 75%** — add error-path tests for `requestApi.ts` (network failure, 4xx/5xx responses, pagination truncation sentinel, retry logic). Current: 59.23%. | P1 — recommended | MEDIUM | `npm run test:coverage` reports branch ≥ 75%; no existing tests broken |
 
 ### Done
 
@@ -732,6 +730,8 @@ Both must be deleted and replaced.
 | AR-01 | Replaced all 30 bare `throw new Error()` → `throw new NodeOperationError(this.getNode(), ...)` across 10 execute files. 821 tests passing. | 2026-04-02 |
 | AR-02 | Pinned all 3 GitHub Actions to immutable commit SHAs (checkout v4.2.2, setup-node v4.1.0, dependency-review v4.5.0). | 2026-04-02 |
 | AR-03 | Lowered CI npm audit threshold to `--audit-level=critical`; documented two accepted lodash HIGH advisories (GHSA-r5fr-rjxr-66jc, GHSA-f23m-r3pf-42rh) as upstream-unfixable transitive findings in n8n-workflow. | 2026-04-02 |
+| AR-04 | Extracted duplicate `serverManagement.execute.ts` to `nodes/shared/actions/serverManagement/`. Both nodes re-export from shared. | 2026-04-02 |
+| AR-05 | Added 165 validation error-path tests across 12 files. Branch coverage 60.44% → 75.36% (≥ 75% target met). Statement: 87.12%. 986 tests passing. | 2026-04-02 |
 
 ---
 
