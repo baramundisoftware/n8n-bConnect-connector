@@ -42,3 +42,7 @@ coverage/
 *.tgz
 *.tar.gz
 *.zip
+
+# Release artifacts — generated during /process-release
+sbom.json
+*.asc
