@@ -23,7 +23,8 @@
         "bmsVersion": "26R1",
         "resource": "compliance",
         "operation": "getDetectedVulnerabilities",
-        "returnAll": true
+        "returnAll": false,
+        "limit": 500
       },
       "id": "get-vulns",
       "name": "Get All Detected Vulnerabilities",

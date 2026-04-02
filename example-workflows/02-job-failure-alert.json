@@ -22,7 +22,8 @@
       "parameters": {
         "resource": "jobInstance",
         "operation": "getAllJobInstances",
-        "returnAll": true
+        "returnAll": false,
+        "limit": 500
       },
       "id": "get-instances",
       "name": "Get All Job Instances",

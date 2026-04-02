@@ -95,12 +95,18 @@
     },
     {
       "parameters": {
-        "resource": "jobInstance",
-        "operation": "getAllJobInstances",
-        "returnAll": true
+        "resource": "jobDefinition",
+        "operation": "getInstances",
+        "jobId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR-WINDOWS-UPDATE-JOB-DEFINITION-GUID"
+        },
+        "returnAll": false,
+        "limit": 500
       },
       "id": "get-results",
-      "name": "Get Job Results",
+      "name": "Get Job Results (by Job Def)",
       "type": "n8n-nodes-baramundi-management-solution.baramundiJob",
       "typeVersion": 1,
       "position": [1300, 300],
@@ -109,7 +115,8 @@
           "id": "1",
           "name": "baramundi bConnect API"
         }
-      }
+      },
+      "notes": "Fetches only instances of YOUR patch job — not all jobs in the system. Replace the GUID with the same job definition ID used in 'Trigger Update Job'."
     },
     {
       "parameters": {

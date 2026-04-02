@@ -24,7 +24,8 @@
         "resource": "endpoint",
         "operation": "getMany",
         "endpointType": "all",
-        "returnAll": true
+        "returnAll": false,
+        "limit": 1000
       },
       "id": "get-endpoints",
       "name": "Get All Endpoints",

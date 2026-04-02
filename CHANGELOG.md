@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-04-02
+
+### Added
+
+- 4 production-ready example workflows for IT administrators:
+  - **01-patch-cycle.json** — Patch Tuesday automation with HTML failure report (styled table with endpoint name, error, group)
+  - **02-job-failure-alert.json** — 6-hourly job failure monitor grouped by job definition
+  - **03-critical-cves.json** — Daily critical CVE scan with CVSS-ranked remediation list (26R1 only)
+  - **04-stale-endpoint-report.json** — Monthly stale device report (30+ days inactive, aggregated by group)
+- Rewritten `example-workflows/README.md` with prerequisites, import instructions, and per-workflow customisation guide
+
+### Removed
+
+- Deleted 2 broken placeholder workflows that referenced the removed monolithic `baramundi` node type
+
 ## [0.8.0] - 2026-04-02
 
 > **Semver rationale**: Minor bump. Phase 15 upgrades endpoint and job selection fields from plain string/dropdown to `resourceLocator` components with type-ahead search, GUID validation, and URL extraction. **BREAKING CHANGE** — `endpointSelection` and `jobSelection` parameters no longer exist. The `endpointId`, `jobId`, `jobDefinitionId`, and `folderId` parameters now accept `resourceLocator` objects (`{ mode, value }`). Existing workflows will still execute correctly (backward-compatible value extraction), but may need re-saving in the n8n editor.
