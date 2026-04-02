@@ -5,7 +5,7 @@ services:
       dockerfile_inline: |
         FROM n8nio/n8n:latest
         USER root
-        COPY n8n-nodes-baramundi-management-solution-0.8.1.tgz /tmp/package.tgz
+        COPY n8n-nodes-baramundi-management-solution-0.8.2.tgz /tmp/package.tgz
         RUN mkdir -p /home/node/.n8n/nodes && \
             cd /home/node/.n8n/nodes && \
             npm init -y && \
