@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-04-02
+
+> **Semver rationale**: Patch bump. Fixes incorrect API paths that caused 404 errors. **BREAKING CHANGE** — `windowId` parameter removed from maintenance window update/delete/put operations (the bConnect API treats maintenance windows as singletons per endpoint/group).
+
+### Fixed
+
+- **UniversalDynamicGroups CRUD paths** — changed domain prefix from `/endpoints/v2.0/` to `/universaldynamicgroups/v2.0/` matching the OpenAPI spec. All 6 UDG CRUD operations now reach the correct API endpoint.
+- **MaintenanceWindow paths** — changed `WindowsEndpoints/{id}/MaintenanceWindow` to `Endpoints/{id}/MaintenanceWindow` matching the OpenAPI spec. Affects all endpoint-level create/update/delete/put maintenance window operations.
+- **MaintenanceWindow singleton** — removed `/{windowId}` sub-path from PATCH/DELETE/PUT operations. The bConnect API treats MaintenanceWindow as a singleton resource per endpoint or group — there is no individual window ID.
+- **MaintenanceWindow plural** — fixed `MaintenanceWindows` (plural) to `MaintenanceWindow` (singular) across all POST/PATCH/DELETE/PUT paths.
+
+### Breaking Changes
+
+- `windowId` parameter removed from: `updateEndpointMaintenanceWindow`, `deleteEndpointMaintenanceWindow`, `putEndpointMaintenanceWindow`, `updateGroupMaintenanceWindow`, `deleteGroupMaintenanceWindow`, `putGroupMaintenanceWindow`. Saved workflows using these operations must be re-saved without the window ID field.
+
+### Added
+
+- Automated API path validation test (`test/unit/apiPaths.test.ts`) — validates all connector paths against OpenAPI spec files on every test run. Prevents future path drift.
+
 ## [0.8.1] - 2026-04-02
 
 ### Added

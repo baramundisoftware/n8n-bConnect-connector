@@ -706,6 +706,8 @@ Both must be deleted and replaced.
 | P16.0 | Audit: compared all 141 connector paths against OpenAPI specs. Found 17 mismatches. Fixed `MaintenanceWindows` → `MaintenanceWindow` (plural→singular). | 2026-04-02 |
 | P16.1 | Fixed 8 UDG CRUD paths: `/endpoints/v2.0/UniversalDynamicGroups*` → `/universaldynamicgroups/v2.0/UniversalDynamicGroups*`. Updated unit tests. | 2026-04-02 |
 | P16.2 | Fixed MW paths: `WindowsEndpoints` → `Endpoints`; removed `/{windowId}` from all PATCH/DELETE/PUT (MW is singleton); removed `windowId` field from UI + execute. BREAKING. | 2026-04-02 |
+| P16.4 | Created `test/unit/apiPaths.test.ts` — extracts all connector paths, validates against OpenAPI specs. 3 tests, runs in CI. Known exceptions documented. | 2026-04-02 |
+| P16.5 | Updated CHANGELOG (0.8.2), bumped version, documented breaking windowId removal + all path fixes. | 2026-04-02 |
 
 ---
 
