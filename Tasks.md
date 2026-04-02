@@ -741,6 +741,26 @@ Both must be deleted and replaced.
 
 ---
 
+## Maintenance — Node.js 20 / isolated-vm CI breakage
+
+**Problem**: `npm ci` fails on Node 20 with a native build error in `isolated-vm@6.1.2`, which requires Node ≥ 22. This is a new transitive dependency introduced via `@n8n/ai-node-sdk` → `@n8n/ai-utilities` → `langchain` → `isolated-vm`.
+
+**Impact**: CI `npm ci` step will fail if this is not addressed before the next push to GitHub.
+
+**Workaround in use**: `npm install --ignore-scripts` (skips native build). Not suitable for CI long-term.
+
+### Backlog
+
+| ID | Task | Priority | Acceptance Criteria |
+|----|------|----------|---------------------|
+| NV-01 | **Upgrade CI to Node 22** — change `node-version: '20'` to `'22'` in `.github/workflows/ci.yml`. Node 22 is LTS since October 2024 and satisfies `isolated-vm`'s engine requirement. Verify all tests pass on Node 22. | P0 — blocks CI | CI passes `npm ci` + build + test on Node 22; `node-version` updated in ci.yml |
+
+### Done
+
+*(empty)*
+
+---
+
 ## Maintenance — Vitest 1.x → 4.x Upgrade (optional)
 
 **Goal**: Upgrade vitest from 1.6.x to 4.x to resolve moderate esbuild vulnerability (GHSA-67mh-4wv8-2f99) in transitive dep chain vitest → vite → esbuild ≤0.24.2.
