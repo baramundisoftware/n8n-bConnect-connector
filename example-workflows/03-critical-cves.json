@@ -48,13 +48,42 @@
     },
     {
       "parameters": {
+        "bmsVersion": "26R1",
+        "resource": "compliance",
+        "operation": "getVulnerability",
+        "vulnerabilityId": "={{ $json.vulnerabilityId || $json.id }}"
+      },
+      "id": "enrich-cve",
+      "name": "Get CVE Details",
+      "type": "n8n-nodes-baramundi-management-solution.baramundiSecurity",
+      "typeVersion": 1,
+      "position": [640, 300],
+      "credentials": {
+        "bconnectApi": {
+          "id": "1",
+          "name": "baramundi bConnect API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge detection data (endpointId, endpointName, detected, ignored)\n// with CVE detail data (cvssScore, severity, description)\n// The CVE detail node replaces $json, so we need the paired input.\nconst detections = $('Get All Detected Vulnerabilities').all();\nconst details = $input.all();\n\nconst merged = details.map((detail, idx) => {\n  const det = detections[idx]?.json || {};\n  return {\n    json: {\n      ...det,\n      ...detail.json,\n      endpointId: det.endpointId || detail.json.endpointId,\n      endpointName: det.endpointName || detail.json.endpointName,\n      detected: det.detected || detail.json.detected,\n      ignored: det.ignored ?? detail.json.ignored,\n    }\n  };\n});\n\nreturn merged;"
+      },
+      "id": "merge-data",
+      "name": "Merge Detection + CVE Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 300]
+    },
+    {
+      "parameters": {
         "jsCode": "// Filter to Critical severity or CVSS >= 9.0\nconst critical = $input.all().filter(i => {\n  const sev = (i.json.severity || '').toLowerCase();\n  const cvss = parseFloat(i.json.cvssScore) || 0;\n  return sev === 'critical' || cvss >= 9.0;\n});\n\nif (critical.length === 0) {\n  return [{ json: { hasCritical: false, summary: 'No critical CVEs detected.' } }];\n}\n\nreturn critical.map(i => ({ json: { ...i.json, hasCritical: true } }));"
       },
       "id": "filter-critical",
       "name": "Filter Critical (CVSS >= 9.0)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [640, 300]
+      "position": [1080, 300]
     },
     {
       "parameters": {
@@ -75,26 +104,7 @@
       "name": "Any Critical?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [860, 300]
-    },
-    {
-      "parameters": {
-        "bmsVersion": "26R1",
-        "resource": "compliance",
-        "operation": "getVulnerability",
-        "vulnerabilityId": "={{ $json.vulnerabilityId || $json.id }}"
-      },
-      "id": "enrich-cve",
-      "name": "Get CVE Details",
-      "type": "n8n-nodes-baramundi-management-solution.baramundiSecurity",
-      "typeVersion": 1,
-      "position": [1080, 200],
-      "credentials": {
-        "bconnectApi": {
-          "id": "1",
-          "name": "baramundi bConnect API"
-        }
-      }
+      "position": [1300, 300]
     },
     {
       "parameters": {
@@ -111,7 +121,7 @@
       "name": "Get Endpoint Info",
       "type": "n8n-nodes-baramundi-management-solution.baramundiEndpoint",
       "typeVersion": 1,
-      "position": [1300, 200],
+      "position": [1520, 200],
       "credentials": {
         "bconnectApi": {
           "id": "1",
@@ -127,7 +137,7 @@
       "name": "Build Remediation Report",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1520, 200]
+      "position": [1740, 200]
     },
     {
       "parameters": {},
@@ -135,7 +145,7 @@
       "name": "No Critical CVEs — Done",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
-      "position": [1080, 400]
+      "position": [1520, 400]
     }
   ],
   "connections": {
@@ -146,6 +156,12 @@
       "main": [[{ "node": "Get All Detected Vulnerabilities", "type": "main", "index": 0 }]]
     },
     "Get All Detected Vulnerabilities": {
+      "main": [[{ "node": "Get CVE Details", "type": "main", "index": 0 }]]
+    },
+    "Get CVE Details": {
+      "main": [[{ "node": "Merge Detection + CVE Data", "type": "main", "index": 0 }]]
+    },
+    "Merge Detection + CVE Data": {
       "main": [[{ "node": "Filter Critical (CVSS >= 9.0)", "type": "main", "index": 0 }]]
     },
     "Filter Critical (CVSS >= 9.0)": {
@@ -153,12 +169,9 @@
     },
     "Any Critical?": {
       "main": [
-        [{ "node": "Get CVE Details", "type": "main", "index": 0 }],
+        [{ "node": "Get Endpoint Info", "type": "main", "index": 0 }],
         [{ "node": "No Critical CVEs — Done", "type": "main", "index": 0 }]
       ]
-    },
-    "Get CVE Details": {
-      "main": [[{ "node": "Get Endpoint Info", "type": "main", "index": 0 }]]
     },
     "Get Endpoint Info": {
       "main": [[{ "node": "Build Remediation Report", "type": "main", "index": 0 }]]
