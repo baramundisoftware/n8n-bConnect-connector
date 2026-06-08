@@ -1,0 +1,26 @@
+services:
+  n8n:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM n8nio/n8n:latest
+        USER root
+        COPY n8n-nodes-baramundi-management-suite-0.8.2.tgz /tmp/package.tgz
+        RUN mkdir -p /home/node/.n8n/nodes && \
+            cd /home/node/.n8n/nodes && \
+            npm init -y && \
+            npm install --ignore-scripts /tmp/package.tgz && \
+            rm /tmp/package.tgz && \
+            chown -R node:node /home/node/.n8n/nodes
+        USER node
+    container_name: n8n-baramundi-test
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_VERSION_NOTIFICATIONS_ENABLED=false
+    volumes:
+      - n8n_test_data:/home/node/.n8n/data
+
+volumes:
+  n8n_test_data:

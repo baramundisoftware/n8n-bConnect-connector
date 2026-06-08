@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Run tests
+        run: npm test
+
+      - name: Create npm tarball
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          npm pack
+          TARBALL=$(ls *.tgz)
+
+          sha256sum "${TARBALL}" > "${TARBALL}.sha256"
+
+          echo "TARBALL=${TARBALL}" >> $GITHUB_ENV
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+
+      - name: Extract release notes from CHANGELOG
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          awk "/^## \[${VERSION}\]/{found=1; next} /^## \[/{if(found) exit} found{print}" CHANGELOG.md > release-notes.md
+
+          if [ ! -s release-notes.md ]; then
+            echo "Release ${VERSION}" > release-notes.md
+          fi
+
+          # Add install instructions to release notes
+          cat >> release-notes.md << 'EOF'
+
+          ## Installation
+
+          ### Via n8n UI (when published to npm)
+          Settings > Community Nodes > Install: `n8n-nodes-baramundi-management-suite`
+
+          ### Via file transfer
+          1. Download the `.tgz` file from this release
+          2. Copy it to your n8n server
+          3. In your n8n custom nodes directory: `npm install <path-to-tgz>`
+          4. Restart n8n
+          EOF
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: release-notes.md
+          files: |
+            ${{ env.TARBALL }}
+            ${{ env.TARBALL }}.sha256
+          draft: false
+          prerelease: true

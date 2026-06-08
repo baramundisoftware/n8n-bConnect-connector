@@ -1,0 +1,95 @@
+{
+  "name": "n8n-nodes-baramundi-management-suite",
+  "version": "0.9.0",
+  "description": "n8n community node for baramundi Management Suite - Automate endpoint management, job execution, software deployment, and MDM operations via bConnect API",
+  "keywords": [
+    "n8n-community-node-package",
+    "n8n",
+    "baramundi",
+    "bconnect",
+    "endpoint-management",
+    "uem",
+    "unified-endpoint-management",
+    "it-automation",
+    "device-management",
+    "software-deployment",
+    "patch-management",
+    "mdm",
+    "mobile-device-management"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/baramundisoftware/n8n-bConnect-connector#readme",
+  "bugs": {
+    "url": "https://github.com/baramundisoftware/n8n-bConnect-connector/issues"
+  },
+  "author": {
+    "name": "baramundi software GmbH",
+    "email": "support@baramundi.com",
+    "url": "https://www.baramundi.com"
+  },
+  "contributors": [
+    {
+      "name": "Bernd Wiedemann",
+      "email": "wiedemann.bernd@gmx.de"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/baramundisoftware/n8n-bConnect-connector.git"
+  },
+  "engines": {
+    "node": ">=22.16.0"
+  },
+  "main": "dist/nodes/BaramundiEndpoint/BaramundiEndpoint.node.js",
+  "scripts": {
+    "dev": "n8n-node dev",
+    "build": "n8n-node build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,json}\"",
+    "test": "vitest run",
+    "test:unit": "vitest run --exclude 'test/system/**'",
+    "test:system": "vitest run test/system",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "sbom": "npx @cyclonedx/cyclonedx-npm --output-file sbom.json --spec-version 1.5",
+    "license-check": "npx license-checker --production --failOn 'GPL-3.0-only;GPL-3.0-or-later;AGPL-3.0-only;AGPL-3.0-or-later;SSPL-1.0' --excludePackages '@n8n/errors@0.6.0'",
+    "prepublishOnly": "npm run build"
+  },
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "nodes": [
+      "dist/nodes/BaramundiEndpoint/BaramundiEndpoint.node.js",
+      "dist/nodes/BaramundiAsset/BaramundiAsset.node.js",
+      "dist/nodes/BaramundiJob/BaramundiJob.node.js",
+      "dist/nodes/BaramundiSoftware/BaramundiSoftware.node.js",
+      "dist/nodes/BaramundiAdmin/BaramundiAdmin.node.js",
+      "dist/nodes/BaramundiSecurity/BaramundiSecurity.node.js"
+    ],
+    "credentials": [
+      "dist/credentials/BconnectApi.credentials.js"
+    ]
+  },
+  "files": [
+    "dist",
+    "!dist/coverage",
+    "LICENSE.md",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "devDependencies": {
+    "@n8n/node-cli": ">=0.17.0 <0.23.0",
+    "@types/node": "^20.0.0",
+    "@vitest/coverage-v8": "^1.6.0",
+    "axios": "^1.13.2",
+    "eslint": "^9.0.0",
+    "eslint-plugin-n8n-nodes-base": "^1.16.0",
+    "prettier": "^3.2.0",
+    "typescript": "^5.4.0",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^1.6.0"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
+}

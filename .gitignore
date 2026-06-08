@@ -1,0 +1,75 @@
+# API keys and secrets
+bconnect*.txt
+
+# One-off scripts and unused configs
+analyze_coverage_v2.py
+.whitesource
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# IDE
+.idea/
+*.swp
+*.swo
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test coverage
+coverage/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# n8n
+.n8n/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Distribution archives — produced by npm pack, never committed
+*.tgz
+*.tar.gz
+*.zip
+
+# Product management docs — internal, not for repository
+ProductManagement/
+
+# Release artifacts — generated during /process-release
+sbom.json
+*.asc
+
+# Source logo — processed versions live in nodes/*/baramundi.png
+/baramundi_logo.png
+
+# Claude Code
+.claude/
+CLAUDE.md
+
+# Internal docs — not for repository
+Tasks.md
+tasks_history.md
+Requirements.md
+reports/
+docs/adr/
+docs/SDLC-PIPELINE.md
+docs/AUDIT-*
+docs/THREAT-MODEL-*
