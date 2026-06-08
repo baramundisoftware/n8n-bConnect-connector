@@ -1,0 +1,255 @@
+{
+  "name": "Baramundi \u2014 Patch Tuesday Cycle",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Test Workflow",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 22 8-14 * 2"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Patch Tuesday 22:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        200,
+        460
+      ],
+      "notes": "Fires on the 2nd Tuesday of each month at 22:00. Adjust the cron expression for your patch window."
+    },
+    {
+      "parameters": {
+        "resource": "logicalGroup",
+        "operation": "getLogicalGroups",
+        "returnAll": true
+      },
+      "id": "get-groups",
+      "name": "Get Logical Groups",
+      "type": "n8n-nodes-baramundi-management-suite.baramundiEndpoint",
+      "typeVersion": 1,
+      "position": [
+        420,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "maintenanceWindow",
+        "operation": "createGroupMaintenanceWindow",
+        "groupId": "={{ $json.id }}",
+        "startTime": "={{ $now.toISO() }}",
+        "endTime": "={{ $now.plus({ hours: 6 }).toISO() }}"
+      },
+      "id": "set-mw",
+      "name": "Set Maintenance Window",
+      "type": "n8n-nodes-baramundi-management-suite.baramundiEndpoint",
+      "typeVersion": 1,
+      "position": [
+        640,
+        300
+      ],
+      "notes": "Sets a 6-hour maintenance window per group. Adjust startTime/endTime for your schedule."
+    },
+    {
+      "parameters": {
+        "resource": "jobDefinition",
+        "operation": "execute",
+        "jobId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "bb000001-0001-0001-0001-000000000002"
+        },
+        "endpointIds": "={{ $json.id }}"
+      },
+      "id": "start-patch-job",
+      "name": "Trigger Update Job",
+      "type": "n8n-nodes-baramundi-management-suite.baramundiJob",
+      "typeVersion": 1,
+      "position": [
+        860,
+        300
+      ],
+      "notes": "Executes 'Windows Update - Critical Patches' job on each group's endpoints. Replace the Job ID with your actual Windows Update job definition GUID."
+    },
+    {
+      "parameters": {
+        "amount": 4,
+        "unit": "hours"
+      },
+      "id": "wait-node",
+      "name": "Wait 4 Hours",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1080,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "jobInstance",
+        "operation": "getInstances",
+        "jobId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "bb000001-0001-0001-0001-000000000002"
+        },
+        "returnAll": false,
+        "limit": 500
+      },
+      "id": "get-results",
+      "name": "Get Job Results (by Job Def)",
+      "type": "n8n-nodes-baramundi-management-suite.baramundiJob",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        300
+      ],
+      "notes": "Fetches only instances of YOUR patch job \u2014 not all jobs in the system. Replace the GUID with the same job definition ID used in 'Trigger Update Job'."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build HTML patch cycle report\nconst items = $input.all();\nconst succeeded = items.filter(i => i.json.state === 'Succeeded');\nconst failed = items.filter(i => i.json.state === 'Failed');\nconst pending = items.filter(i => !['Succeeded','Failed'].includes(i.json.state));\n\nconst total = items.length;\nconst pctOk = total ? Math.round(succeeded.length / total * 100) : 0;\nconst statusColor = failed.length === 0 ? '#27ae60' : '#e74c3c';\nconst statusText = failed.length === 0 ? 'ALL PATCHES SUCCEEDED' : `${failed.length} FAILURE(S) DETECTED`;\n\nlet failureRows = '';\nfor (const f of failed) {\n  const name = f.json.endpointName || f.json.endpointId || 'Unknown';\n  const error = (f.json.errorMessage || f.json.statusDetail || 'No detail available').replace(/</g, '&lt;');\n  const group = f.json.logicalGroupName || f.json.logicalGroupId || '-';\n  failureRows += `<tr><td style=\"padding:8px;border:1px solid #ddd\">${name}</td><td style=\"padding:8px;border:1px solid #ddd\">${error}</td><td style=\"padding:8px;border:1px solid #ddd\">${group}</td></tr>`;\n}\n\nconst failureTable = failed.length > 0\n  ? `<h3 style=\"color:#e74c3c;margin-top:24px\">Failed Endpoints</h3>\n<table style=\"border-collapse:collapse;width:100%;font-size:14px\">\n<thead><tr style=\"background:#f8f9fa\">\n<th style=\"padding:8px;border:1px solid #ddd;text-align:left\">Endpoint</th>\n<th style=\"padding:8px;border:1px solid #ddd;text-align:left\">Error</th>\n<th style=\"padding:8px;border:1px solid #ddd;text-align:left\">Group</th>\n</tr></thead>\n<tbody>${failureRows}</tbody></table>`\n  : '';\n\nconst html = `<!DOCTYPE html>\n<html><head><meta charset=\"utf-8\"></head><body style=\"font-family:Segoe UI,Arial,sans-serif;max-width:700px;margin:0 auto;padding:20px\">\n<h2 style=\"margin-bottom:4px\">Patch Tuesday Report</h2>\n<p style=\"color:#666;margin-top:0\">${new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</p>\n<div style=\"background:${statusColor};color:#fff;padding:16px 20px;border-radius:6px;font-size:18px;font-weight:600;margin:16px 0\">${statusText}</div>\n<table style=\"border-collapse:collapse;width:100%;font-size:14px;margin:12px 0\">\n<tr><td style=\"padding:8px;border:1px solid #ddd;font-weight:600;background:#f8f9fa;width:160px\">Total endpoints</td><td style=\"padding:8px;border:1px solid #ddd\">${total}</td></tr>\n<tr><td style=\"padding:8px;border:1px solid #ddd;font-weight:600;background:#f8f9fa\">Succeeded</td><td style=\"padding:8px;border:1px solid #ddd;color:#27ae60;font-weight:600\">${succeeded.length} (${pctOk}%)</td></tr>\n<tr><td style=\"padding:8px;border:1px solid #ddd;font-weight:600;background:#f8f9fa\">Failed</td><td style=\"padding:8px;border:1px solid #ddd;color:${failed.length?'#e74c3c':'#27ae60'};font-weight:600\">${failed.length}</td></tr>\n<tr><td style=\"padding:8px;border:1px solid #ddd;font-weight:600;background:#f8f9fa\">Pending / Running</td><td style=\"padding:8px;border:1px solid #ddd;color:#f39c12\">${pending.length}</td></tr>\n</table>\n${failureTable}\n<p style=\"color:#999;font-size:12px;margin-top:24px\">Generated by n8n + baramundi bConnect connector</p>\n</body></html>`;\n\nreturn [{ json: { html, total, succeeded: succeeded.length, failed: failed.length, pending: pending.length } }];"
+      },
+      "id": "build-report",
+      "name": "Build HTML Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "n8n@company.com",
+        "toEmail": "it-ops@company.com",
+        "subject": "=Patch Tuesday Report \u2014 {{ $json.failed > 0 ? $json.failed + ' failures' : 'All succeeded' }}",
+        "html": "={{ $json.html }}"
+      },
+      "id": "send-email",
+      "name": "Send Report Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1740,
+        300
+      ],
+      "notes": "Configure your SMTP credentials. Or replace with Microsoft Teams / Slack node.",
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "Test Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Logical Groups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Patch Tuesday 22:00": {
+      "main": [
+        [
+          {
+            "node": "Get Logical Groups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Logical Groups": {
+      "main": [
+        [
+          {
+            "node": "Set Maintenance Window",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Maintenance Window": {
+      "main": [
+        [
+          {
+            "node": "Trigger Update Job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Update Job": {
+      "main": [
+        [
+          {
+            "node": "Wait 4 Hours",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 4 Hours": {
+      "main": [
+        [
+          {
+            "node": "Get Job Results (by Job Def)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Job Results (by Job Def)": {
+      "main": [
+        [
+          {
+            "node": "Build HTML Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build HTML Report": {
+      "main": [
+        [
+          {
+            "node": "Send Report Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateId": "baramundi-patch-cycle",
+    "instanceId": ""
+  }
+}
