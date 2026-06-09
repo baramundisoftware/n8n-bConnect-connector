@@ -73,7 +73,7 @@
   "files": [
     "dist",
     "!dist/coverage",
-    "LICENSE.md",
+    "LICENSE",
     "README.md",
     "CHANGELOG.md"
   ],
