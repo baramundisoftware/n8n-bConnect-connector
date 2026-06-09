@@ -244,7 +244,7 @@ npm run lint               # ESLint
 
 ## License
 
-[MIT](LICENSE.md)
+[MIT](LICENSE)
 
 ## Resources
 
