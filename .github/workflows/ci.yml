@@ -10,6 +10,9 @@ permissions:
   contents: read
   id-token: write    # Required for npm provenance (Sigstore OIDC)
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   dependency-review:
     name: Dependency Review (SCA)
