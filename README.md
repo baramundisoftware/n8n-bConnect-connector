@@ -199,7 +199,7 @@ Import any workflow via **n8n > Workflows > Import from File**.
 
 **Runtime package has zero known vulnerabilities.** `npm audit` may report issues from build tools (`@n8n/node-cli`, `vitest`) and peer dependencies (`n8n-workflow`) — these are not present in the published `dist/` package.
 
-Report security issues to **bernd.wiedemann@baramundi.com** (not via public GitHub issues).
+Report security issues to **bernd.wiedemann@baramundi.de** (not via public GitHub issues).
 
 ---
 
