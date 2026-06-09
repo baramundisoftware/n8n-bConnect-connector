@@ -80,7 +80,7 @@
   "devDependencies": {
     "@n8n/node-cli": ">=0.17.0 <0.23.0",
     "@types/node": "^20.0.0",
-    "@vitest/coverage-v8": "^1.6.0",
+    "@vitest/coverage-v8": "^4.1.8",
     "axios": "^1.13.2",
     "eslint": "^9.0.0",
     "eslint-plugin-n8n-nodes-base": "^1.16.0",
