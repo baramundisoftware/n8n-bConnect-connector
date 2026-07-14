@@ -52,6 +52,7 @@
     "test:system": "vitest run test/system",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "ci": "npm run lint && npm run build && npm run test:unit && npm audit --omit=dev --audit-level=critical",
     "sbom": "npx @cyclonedx/cyclonedx-npm --output-file sbom.json --spec-version 1.6 --omit dev --ignore-npm-errors",
     "license-check": "npx license-checker --production --failOn 'GPL-3.0-only;GPL-3.0-or-later;AGPL-3.0-only;AGPL-3.0-or-later;SSPL-1.0' --excludePackages '@n8n/errors@0.6.0'",
     "prepublishOnly": "npm run build"

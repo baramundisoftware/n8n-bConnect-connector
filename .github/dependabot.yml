@@ -1,21 +1,44 @@
 version: 2
+# No github-actions ecosystem: there are no workflow files for Dependabot to
+# keep pinned. CI and release run locally on a maintainer machine
+# (make ci / make release), not via GitHub Actions — this repo deliberately
+# avoids the Actions billing requirement (matches the bConnect-MCP setup).
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    commit-message:
-      prefix: "ci(deps)"
-    labels:
-      - "dependencies"
-      - "github-actions"
-
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
+    open-pull-requests-limit: 10
+    # Group updates so a routine week produces a couple of green-and-mergeable
+    # PRs instead of one per dependency. Groups are restricted to minor/patch;
+    # breaking majors arrive separately and only for deps not ignored below.
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+        update-types: ["minor", "patch"]
+      development-dependencies:
+        dependency-type: "development"
+        update-types: ["minor", "patch"]
+    ignore:
+      # Breaking majors handled as deliberate migration tasks, not auto-PRs.
+      # (These are exactly the bumps that broke the build/tests: see the
+      #  declined PRs #10 typescript, #11 eslint, #14 vitest.)
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript-eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "vitest"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@vitest/coverage-v8"
+        update-types: ["version-update:semver-major"]
+      # @n8n/node-cli is the build toolchain — upgrade it as a deliberate task.
+      - dependency-name: "@n8n/node-cli"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: "chore(deps)"
     labels:
