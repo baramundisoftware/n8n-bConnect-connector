@@ -34,9 +34,13 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "@vitest/coverage-v8"
         update-types: ["version-update:semver-major"]
-      # @n8n/node-cli is the build toolchain — upgrade it as a deliberate task.
+      # @n8n/node-cli is the build toolchain — upgrade it as a deliberate,
+      # locally-verified task. It is a 0.x package, so its meaningful bumps are
+      # semver-minor; ignore both minor and major so Dependabot never auto-PRs it.
       - dependency-name: "@n8n/node-cli"
-        update-types: ["version-update:semver-major"]
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
     commit-message:
