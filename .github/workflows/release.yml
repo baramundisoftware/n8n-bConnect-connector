@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write    # Required for npm provenance (Sigstore OIDC)
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -18,12 +19,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af  # v4.1.0
         with:
           node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: npm ci
@@ -36,6 +38,12 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+      - name: Generate SBOM (CycloneDX 1.6)
+        run: npm run sbom
+
+      - name: License compliance check
+        run: npm run license-check
 
       - name: Create npm tarball
         run: |
@@ -57,7 +65,6 @@ jobs:
             echo "Release ${VERSION}" > release-notes.md
           fi
 
-          # Add install instructions to release notes
           cat >> release-notes.md << 'EOF'
 
           ## Installation
@@ -67,17 +74,22 @@ jobs:
 
           ### Via file transfer
           1. Download the `.tgz` file from this release
-          2. Copy it to your n8n server
-          3. In your n8n custom nodes directory: `npm install <path-to-tgz>`
-          4. Restart n8n
+          2. Verify the SHA-256 checksum: `sha256sum -c <tarball>.tgz.sha256`
+          3. Copy it to your n8n server
+          4. In your n8n custom nodes directory: `npm install <path-to-tgz>`
+          5. Restart n8n
+
+          ## Verification
+          The SBOM (`sbom.json`) lists all 88 runtime dependencies with their licenses and checksums.
           EOF
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65  # v2
         with:
           body_path: release-notes.md
           files: |
             ${{ env.TARBALL }}
             ${{ env.TARBALL }}.sha256
+            sbom.json
           draft: false
           prerelease: true
