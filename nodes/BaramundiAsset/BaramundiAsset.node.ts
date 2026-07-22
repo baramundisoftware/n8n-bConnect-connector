@@ -19,7 +19,7 @@ import { endpointSearch } from '../shared/loadOptions';
 
 export class BaramundiAsset implements INodeType {
   description: INodeTypeDescription = {
-    displayName: 'Baramundi Asset',
+    displayName: 'baramundi Asset',
     name: 'baramundiAsset',
     icon: 'file:baramundi.png',
     group: ['transform'],
@@ -27,7 +27,7 @@ export class BaramundiAsset implements INodeType {
     subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
     description: 'Manage assets, asset types, and folders via bConnect API',
     defaults: {
-      name: 'Baramundi Asset',
+      name: 'baramundi Asset',
     },
     inputs: ['main'],
     outputs: ['main'],
@@ -47,7 +47,7 @@ export class BaramundiAsset implements INodeType {
     },
     properties: [
       {
-        displayName: 'Baramundi Management Suite Version',
+        displayName: 'baramundi Management Suite Version',
         name: 'bmsVersion',
         type: 'options',
         required: true,
@@ -55,8 +55,8 @@ export class BaramundiAsset implements INodeType {
         default: '26R1',
         description: 'Select the version of your baramundi Management Suite installation. Only operations supported by this version are shown.',
         options: [
-          { name: '25R2', value: '25R2' },
-          { name: '26R1', value: '26R1' },
+          { name: '25 R2', value: '25R2' },
+          { name: '26 R1', value: '26R1' },
         ],
       },
       {

@@ -199,8 +199,8 @@ After installation, verify the node is available:
 1. Open n8n in your browser: `http://your-server:5678`
 2. Create a new workflow
 3. Click **+** to add a node
-4. Search for **"Baramundi"**
-5. You should see 6 nodes: Baramundi Endpoint, Asset, Job, Software, Admin, Security
+4. Search for **"baramundi"**
+5. You should see 6 nodes: baramundi Endpoint, Asset, Job, Software, Admin, Security
 
 ### Via npm
 

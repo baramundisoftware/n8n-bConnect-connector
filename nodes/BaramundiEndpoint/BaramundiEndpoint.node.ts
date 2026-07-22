@@ -31,7 +31,7 @@ import {
 
 export class BaramundiEndpoint implements INodeType {
   description: INodeTypeDescription = {
-    displayName: 'Baramundi Endpoint',
+    displayName: 'baramundi Endpoint',
     name: 'baramundiEndpoint',
     icon: 'file:baramundi.png',
     group: ['transform'],
@@ -39,7 +39,7 @@ export class BaramundiEndpoint implements INodeType {
     subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
     description: 'Manage endpoints, groups, and maintenance windows via bConnect API',
     defaults: {
-      name: 'Baramundi Endpoint',
+      name: 'baramundi Endpoint',
     },
     inputs: ['main'],
     outputs: ['main'],
@@ -59,7 +59,7 @@ export class BaramundiEndpoint implements INodeType {
     },
     properties: [
       {
-        displayName: 'Baramundi Management Suite Version',
+        displayName: 'baramundi Management Suite Version',
         name: 'bmsVersion',
         type: 'options',
         required: true,
@@ -67,8 +67,8 @@ export class BaramundiEndpoint implements INodeType {
         default: '26R1',
         description: 'Select the version of your baramundi Management Suite installation. Only operations supported by this version are shown.',
         options: [
-          { name: '25R2', value: '25R2' },
-          { name: '26R1', value: '26R1' },
+          { name: '25 R2', value: '25R2' },
+          { name: '26 R1', value: '26R1' },
         ],
       },
       {

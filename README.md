@@ -56,8 +56,8 @@ npm install n8n-nodes-baramundi-management-suite
 
 1. Click **"+ Create new workflow"** > **"Add first step"**
 2. Add a **Manual Trigger**
-3. Click **"+"** after the trigger > search **"Baramundi"** > add it
-4. In the Baramundi node:
+3. Click **"+"** after the trigger > search **"baramundi"** > add it
+4. In the baramundi node:
    - **Credential**: select your baramundi credential
    - **bMS Version**: select `26R1` or `25R2` (matching your server)
    - **Resource**: `Endpoint`
@@ -145,7 +145,7 @@ volumes:
 
 ## bMS Version Targeting
 
-Every Baramundi node has a **bMS Version** dropdown as its first parameter. Selecting your version filters operations to only what your server supports.
+Every baramundi node has a **bMS Version** dropdown as its first parameter. Selecting your version filters operations to only what your server supports.
 
 | Setting | Shows |
 |---------|-------|
@@ -158,12 +158,12 @@ Every Baramundi node has a **bMS Version** dropdown as its first parameter. Sele
 
 | Node | Operations | What it does |
 |------|-----------|--------------|
-| **Baramundi Endpoint** | 49 | Endpoints (all types), logical/static/dynamic groups, maintenance windows |
-| **Baramundi Admin** | 43 | Active Directory, server management, microservices, OS config |
-| **Baramundi Software** | 41 | Software inventory, bundles, updates, variables, Universal Dynamic Groups |
-| **Baramundi Job** | 37 | Job definitions, execution, instances, folders, kiosk releases |
-| **Baramundi Security** | 33 | Compliance, BitLocker, Defender, local admin accounts |
-| **Baramundi Asset** | 26 | Asset inventory, asset types, stock/type folders |
+| **baramundi Endpoint** | 49 | Endpoints (all types), logical/static/dynamic groups, maintenance windows |
+| **baramundi Admin** | 43 | Active Directory, server management, microservices, OS config |
+| **baramundi Software** | 41 | Software inventory, bundles, updates, variables, Universal Dynamic Groups |
+| **baramundi Job** | 37 | Job definitions, execution, instances, folders, kiosk releases |
+| **baramundi Security** | 33 | Compliance, BitLocker, Defender, local admin accounts |
+| **baramundi Asset** | 26 | Asset inventory, asset types, stock/type folders |
 
 ---
 

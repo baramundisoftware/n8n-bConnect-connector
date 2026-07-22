@@ -24,7 +24,7 @@ import type {
  */
 export class BconnectApi implements ICredentialType {
   name = 'bconnectApi';
-  displayName = 'Baramundi bConnect API';
+  displayName = 'baramundi bConnect API';
   // eslint-disable-next-line n8n-nodes-base/cred-class-field-documentation-url-miscased
   documentationUrl = 'https://docs.baramundi.com/';
 

@@ -28,7 +28,7 @@ Production-ready n8n workflow templates for the baramundi Management Suite conne
 
 **Trigger**: Schedule (2nd Tuesday of month, 22:00)
 
-**Nodes**: Baramundi Endpoint (Logical Group, Maintenance Window) + Baramundi Job (Job Instance) + Code + Email
+**Nodes**: baramundi Endpoint (Logical Group, Maintenance Window) + baramundi Job (Job Instance) + Code + Email
 
 **What to customise**:
 - Replace `YOUR-WINDOWS-UPDATE-JOB-DEFINITION-GUID` with your Windows Update job definition ID
@@ -46,7 +46,7 @@ Production-ready n8n workflow templates for the baramundi Management Suite conne
 
 **Trigger**: Schedule (every 6 hours)
 
-**Nodes**: Baramundi Job (Job Instance, Job Definition) + Code + If
+**Nodes**: baramundi Job (Job Instance, Job Definition) + Code + If
 
 **What to customise**:
 - Add a Slack, Teams, or Email node after "Format Notification" to deliver the alert
@@ -63,7 +63,7 @@ Production-ready n8n workflow templates for the baramundi Management Suite conne
 
 **Trigger**: Schedule (daily 06:00)
 
-**Nodes**: Baramundi Security (Compliance) + Baramundi Endpoint + Code + If
+**Nodes**: baramundi Security (Compliance) + baramundi Endpoint + Code + If
 
 **What to customise**:
 - Adjust the CVSS threshold in the Filter Critical code node (default: 9.0)
@@ -79,7 +79,7 @@ Production-ready n8n workflow templates for the baramundi Management Suite conne
 
 **Trigger**: Schedule (1st Monday of month, 08:00)
 
-**Nodes**: Baramundi Endpoint + Code + If
+**Nodes**: baramundi Endpoint + Code + If
 
 **What to customise**:
 - Change `STALE_DAYS` in the Code node (default: 30)

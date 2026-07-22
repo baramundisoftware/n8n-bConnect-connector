@@ -21,7 +21,7 @@ import { getOrgUnits, endpointSearch } from '../shared/loadOptions';
 
 export class BaramundiAdmin implements INodeType {
   description: INodeTypeDescription = {
-    displayName: 'Baramundi Admin',
+    displayName: 'baramundi Admin',
     name: 'baramundiAdmin',
     icon: 'file:baramundi.png',
     group: ['transform'],
@@ -29,7 +29,7 @@ export class BaramundiAdmin implements INodeType {
     subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
     description: 'Manage Active Directory, server infrastructure, and operating systems via bConnect API',
     defaults: {
-      name: 'Baramundi Admin',
+      name: 'baramundi Admin',
     },
     inputs: ['main'],
     outputs: ['main'],
@@ -49,7 +49,7 @@ export class BaramundiAdmin implements INodeType {
     },
     properties: [
       {
-        displayName: 'Baramundi Management Suite Version',
+        displayName: 'baramundi Management Suite Version',
         name: 'bmsVersion',
         type: 'options',
         required: true,
@@ -57,8 +57,8 @@ export class BaramundiAdmin implements INodeType {
         default: '26R1',
         description: 'Select the version of your baramundi Management Suite installation. Only operations supported by this version are shown.',
         options: [
-          { name: '25R2', value: '25R2' },
-          { name: '26R1', value: '26R1' },
+          { name: '25 R2', value: '25R2' },
+          { name: '26 R1', value: '26R1' },
         ],
       },
       {
