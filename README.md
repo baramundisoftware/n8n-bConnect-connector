@@ -8,8 +8,6 @@
 > Please perform thorough testing before deployment and use at your own risk.
 > Keep an eye on AI token usage, especially during testing, as costs can add up quickly depending on the model and workload.
 
-[![CI](https://github.com/baramundisoftware/n8n-bConnect-connector/actions/workflows/ci.yml/badge.svg)](https://github.com/baramundisoftware/n8n-bConnect-connector/actions/workflows/ci.yml)
-
 Automate your **baramundi Management Suite** (bMS) from [n8n](https://n8n.io/) workflows. This community node connects n8n to your bMS via the bConnect REST API — manage endpoints, run jobs, deploy software, check compliance, and more.
 
 **229 operations** across **6 nodes**, compatible with **baramundi 25R2 and 26R1**.
