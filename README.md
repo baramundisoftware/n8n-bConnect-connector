@@ -1,5 +1,7 @@
 # n8n-nodes-baramundi-management-suite
 
+Automate your **baramundi Management Suite** (bMS) from [n8n](https://n8n.io/) workflows. This community node connects n8n to your bMS via the bConnect REST API — manage endpoints, run jobs, deploy software, check compliance, and more.
+
 > [!WARNING] 
 > 🧪 This project is currently in **Technical Preview**.
 > 
@@ -13,17 +15,14 @@
 >  
 > Keep an eye on AI token usage, especially during testing, as costs can add up quickly depending on the model and workload.
 
-
-Automate your **baramundi Management Suite** (bMS) from [n8n](https://n8n.io/) workflows. This community node connects n8n to your bMS via the bConnect REST API — manage endpoints, run jobs, deploy software, check compliance, and more.
-
-**229 operations** across **6 nodes**, compatible with **baramundi 25R2 and 26R1**.
+**229 operations** across **6 nodes**, compatible with **baramundi Management Suite 2025 R2 and 2026 R1**.
 
 ---
 
 ## What You Need
 
 - An **n8n instance** (version 2.9.0 or later) — [install n8n](https://docs.n8n.io/hosting/)
-- A **baramundi Management Suite** (25R2 or 26R1) with bConnect API enabled
+- A **baramundi Management Suite** (2025 R2 or 2026 R1) with bConnect API enabled
 - Your **bMS server address** (e.g. `https://bms.company.com:444/bconnect`)
 - A **bMS user account** with API access, or an **API key**
   (generate one in the baramundi management console under **Server Management > API Keys**)
