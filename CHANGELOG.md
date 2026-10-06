@@ -7,24 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-- Lint passes again: the lowercase "baramundi" display names are exempted from n8n's title-case rule
-- Runtime dependency audit is clean: axios 1.20 (also forced under `n8n-workflow` via `overrides`)
+## [0.9.2] - 2026-10-06
+
+Maintenance release. No operation, parameter or credential changes: existing workflows keep working.
 
 ### Changed
-- GitHub Actions CI restored for the public repository (lint, build, unit tests, license check; audit reported)
-- Dependabot also keeps the GitHub Actions in `ci.yml` up to date
-- Dev dependencies: prettier 3.9.9, typescript-eslint 8.71 (supersedes Dependabot PR #20)
-- Test toolchain: vitest and @vitest/coverage-v8 1.6 → 5.0, @types/node 20 → 22 (matches the Node ≥ 22.16 engines floor); clears the critical dev-only advisories (supersedes #23, #24)
-- Build toolchain: @n8n/node-cli 0.34 → 0.51 (compiled output unchanged); axios override now applies tree-wide (also pinned by @n8n/backend-network); top-level `dist/*.png` excluded from the package because the new build copies untracked root images (supersedes #27, #28)
-- eslint-plugin-n8n-nodes-base 1.16 → 2.0 (only breaking change: ESLint ≥ 8.40; we use 9.29) (supersedes #31)
-- CI runs npm 11 on every job (as Dependabot does): npm 10 on Node 22 rejected Dependabot's lockfiles, so every Dependabot PR failed `npm ci` there; CONTRIBUTING now asks for npm ≥ 11
+- Node names and labels use the lowercase brand ("baramundi Endpoint", "baramundi Management Suite Version", …) and the version options read "25 R2" / "26 R1". Display only — internal node names and option values (`25R2`, `26R1`) are unchanged
+- Build toolchain moved to @n8n/node-cli 0.51; it produces byte-identical compiled output (#30)
+
+### Security
+- Runtime dependency audit is clean: axios 1.20 is enforced for the n8n packages that pin 1.18 (#22, #30)
+- Development toolchain upgraded to clear critical and high advisories: vitest 5, @n8n/node-cli 0.51, eslint-plugin-n8n-nodes-base 2.0 (#26, #30, #32)
+- Vulnerabilities can be reported privately through GitHub's private vulnerability reporting (see SECURITY.md) (#25)
+- Repository hardening: CodeQL code scanning, secret scanning with push protection, protected `main` branch and release tags
 
 ### Documentation
-- README and INSTALLATION.md: install from the GitHub release `.tgz` until the package is on npm (Community Nodes install fails with "Package version does not exist", #21); INSTALLATION.md updated to 0.9.1, SHA-256 verification instead of the GPG steps releases don't ship, prerequisites aligned (n8n ≥ 2.9, Node ≥ 22.16), API key credentials, upgrade section
+- Installation instructions corrected: the package is not on npm yet, so install the release `.tgz` (Community Nodes install failed with "Package version does not exist") (#21, #29)
+- INSTALLATION.md: SHA-256 verification, Docker and Docker Compose recipes, upgrade section, API key credentials, prerequisites aligned with the package (n8n ≥ 2.9, Node.js ≥ 22.16) (#29)
+- README: Technical Preview notice and guidance on AI services, data privacy and token usage
 
-### Added
-- CODEOWNERS, issue forms (bug report, change proposal) and a pull request template
+### For contributors
+- GitHub Actions CI on every pull request: lint, build, unit tests on Node 22.16 and 24, license check, dependency audit (#22)
+- npm ≥ 11 required (matches CI and Dependabot) (#32)
+- CODEOWNERS, issue forms (bug report, change proposal) and a pull request template (#22)
 
 ## [0.9.1] - 2026-06-09
 

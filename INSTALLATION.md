@@ -46,7 +46,7 @@ contains two files:
 - `n8n-nodes-baramundi-management-suite-<version>.tgz` — the package
 - `n8n-nodes-baramundi-management-suite-<version>.tgz.sha256` — its SHA-256 checksum
 
-The examples below use version `0.9.1`; replace it with the version you downloaded.
+The examples below use version `0.9.2`; replace it with the version you downloaded.
 
 #### Step 1: Download
 
@@ -55,7 +55,7 @@ Download both files from the
 or on the n8n server:
 
 ```bash
-VERSION=0.9.1
+VERSION=0.9.2
 BASE=https://github.com/baramundisoftware/n8n-bConnect-connector/releases/download/v$VERSION
 curl -fLO "$BASE/n8n-nodes-baramundi-management-suite-$VERSION.tgz"
 curl -fLO "$BASE/n8n-nodes-baramundi-management-suite-$VERSION.tgz.sha256"
@@ -67,7 +67,7 @@ If the n8n server has no internet access, download the files elsewhere and copy 
 #### Step 2: Verify the Checksum
 
 ```bash
-sha256sum -c n8n-nodes-baramundi-management-suite-0.9.1.tgz.sha256
+sha256sum -c n8n-nodes-baramundi-management-suite-0.9.2.tgz.sha256
 ```
 
 See [Verify Package Integrity](#verify-package-integrity).
@@ -77,7 +77,7 @@ See [Verify Package Integrity](#verify-package-integrity).
 ```bash
 mkdir -p ~/.n8n/nodes
 cd ~/.n8n/nodes
-npm install /path/to/n8n-nodes-baramundi-management-suite-0.9.1.tgz
+npm install /path/to/n8n-nodes-baramundi-management-suite-0.9.2.tgz
 ```
 
 `~/.n8n` is the n8n user folder of the account that runs n8n (or the folder set in `N8N_USER_FOLDER`).
@@ -104,7 +104,7 @@ Put the downloaded `.tgz` next to your `Dockerfile` or `docker-compose.yml`.
 FROM n8nio/n8n:latest
 
 USER root
-COPY n8n-nodes-baramundi-management-suite-0.9.1.tgz /tmp/package.tgz
+COPY n8n-nodes-baramundi-management-suite-0.9.2.tgz /tmp/package.tgz
 RUN mkdir -p /home/node/.n8n/nodes && \
     cd /home/node/.n8n/nodes && \
     npm init -y && \
@@ -139,7 +139,7 @@ services:
       dockerfile_inline: |
         FROM n8nio/n8n:latest
         USER root
-        COPY n8n-nodes-baramundi-management-suite-0.9.1.tgz /tmp/package.tgz
+        COPY n8n-nodes-baramundi-management-suite-0.9.2.tgz /tmp/package.tgz
         RUN mkdir -p /home/node/.n8n/nodes && \
             cd /home/node/.n8n/nodes && \
             npm init -y && \
@@ -182,18 +182,18 @@ docker compose up -d --build
 Every release includes a SHA-256 checksum file. Run the check in the folder that contains both files:
 
 ```bash
-sha256sum -c n8n-nodes-baramundi-management-suite-0.9.1.tgz.sha256
+sha256sum -c n8n-nodes-baramundi-management-suite-0.9.2.tgz.sha256
 ```
 
 Expected output:
 ```
-n8n-nodes-baramundi-management-suite-0.9.1.tgz: OK
+n8n-nodes-baramundi-management-suite-0.9.2.tgz: OK
 ```
 
 On Windows (PowerShell), compare the hash with the value in the `.sha256` file:
 
 ```powershell
-Get-FileHash .\n8n-nodes-baramundi-management-suite-0.9.1.tgz -Algorithm SHA256
+Get-FileHash .\n8n-nodes-baramundi-management-suite-0.9.2.tgz -Algorithm SHA256
 ```
 
 If the checksum does not match, do **not** install the package. Download it again from the
@@ -223,7 +223,7 @@ npm list n8n-nodes-baramundi-management-suite
 Expected output:
 ```
 nodes
-└── n8n-nodes-baramundi-management-suite@0.9.1
+└── n8n-nodes-baramundi-management-suite@0.9.2
 ```
 
 ---
