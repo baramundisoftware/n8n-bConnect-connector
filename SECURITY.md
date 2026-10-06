@@ -9,7 +9,7 @@
 
 ## Reporting a Vulnerability
 
-Please report security vulnerabilities to **support@baramundi.com** rather than opening a public issue. Include:
+Please do not open a public issue for a vulnerability. Report it privately through [GitHub's private vulnerability reporting](https://github.com/baramundisoftware/n8n-bConnect-connector/security/advisories/new), or by email to **support@baramundi.com**. Include:
 
 - Description of the vulnerability and its potential impact
 - Steps to reproduce
