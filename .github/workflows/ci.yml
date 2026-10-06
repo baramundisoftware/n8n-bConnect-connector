@@ -1,0 +1,95 @@
+# Continuous integration.
+#
+# ── Why this exists again ───────────────────────────────────────────────────
+# GitHub Actions was removed on 2026-07-14 (e1c49fb) because Actions billing
+# was disabled while the repository was private, and every run failed before
+# starting. The repository is public now: GitHub-hosted runners are free, and
+# a contributor's pull request needs a gate that runs without asking them to
+# trust — or reproduce — a maintainer's local shell. This follows bConnect-MCP,
+# which restored its CI for the same reason.
+#
+# `make ci` / `npm run ci` stays the local equivalent of the `gate` job.
+#
+# ── Two jobs ───────────────────────────────────────────────────────────────
+# `gate` blocks: lint, build, unit tests, license check. The ruleset that
+# protects `main` should require its checks by name — renaming the job or
+# changing the matrix changes those names, so update the ruleset in the same PR.
+#
+# `audit` reports and does not block. `npm audit` queries the live advisory
+# database, so a new advisory published overnight would turn every open pull
+# request red for a reason no contributor introduced. What blocks instead is
+# `npm ci` in `gate`, which fails if package.json and the lockfile diverge, so
+# the dependency graph cannot change without review.
+#
+# Only GitHub-owned actions are used (organisation policy).
+
+name: CI
+
+# `push` on `main` only: a PR commit is covered by `pull_request`.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: build + test (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 22.16 is the `engines` floor (.nvmrc); 24 is the forward check.
+        node: ["22.16", "24"]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install from the lockfile
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      # System tests (test/system/) need a live bMS server and are excluded.
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: License check (runtime dependencies)
+        run: npm run license-check
+
+  audit:
+    name: dependency audit (reported, not blocking)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22.16"
+          cache: npm
+      - run: npm ci
+
+      - name: Dependency audit
+        run: |
+          if npm audit --omit=dev --audit-level=high; then
+            echo "✅ npm audit (runtime): no high or critical advisories." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::npm audit reports high/critical runtime advisories (reported, not blocking). See this job's log."
+            echo "⚠️ npm audit (runtime): high/critical advisories (reported, not blocking). See the log." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "Dev dependencies (not shipped in the package):"
+          npm audit --audit-level=critical || true

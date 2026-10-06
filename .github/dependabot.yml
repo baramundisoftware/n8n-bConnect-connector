@@ -1,9 +1,19 @@
 version: 2
-# No github-actions ecosystem: there are no workflow files for Dependabot to
-# keep pinned. CI and release run locally on a maintainer machine
-# (make ci / make release), not via GitHub Actions — this repo deliberately
-# avoids the Actions billing requirement (matches the bConnect-MCP setup).
 updates:
+  - package-ecosystem: "github-actions"
+    # .github/workflows/*.yml; only GitHub-owned actions are allowed in this org.
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    groups:
+      github-actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "chore(ci)"
+    labels:
+      - "dependencies"
   - package-ecosystem: "npm"
     directory: "/"
     schedule:

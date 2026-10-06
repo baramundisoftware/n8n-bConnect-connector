@@ -5,6 +5,20 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- Lint passes again: the lowercase "baramundi" display names are exempted from n8n's title-case rule
+- Runtime dependency audit is clean: axios 1.20 (also forced under `n8n-workflow` via `overrides`)
+
+### Changed
+- GitHub Actions CI restored for the public repository (lint, build, unit tests, license check; audit reported)
+- Dependabot also keeps the GitHub Actions in `ci.yml` up to date
+- Dev dependencies: prettier 3.9.9, typescript-eslint 8.71 (supersedes Dependabot PR #20)
+
+### Added
+- CODEOWNERS, issue forms (bug report, change proposal) and a pull request template
+
 ## [0.9.1] - 2026-06-09
 
 ### Fixed

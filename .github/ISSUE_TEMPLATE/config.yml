@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability (private)
+    url: https://github.com/baramundisoftware/n8n-bConnect-connector/blob/main/SECURITY.md
+    about: Never open a public issue for a vulnerability. Report it privately as described in SECURITY.md.
+  - name: Installation and usage
+    url: https://github.com/baramundisoftware/n8n-bConnect-connector/blob/main/INSTALLATION.md
+    about: This community node is not supported through baramundi Support. Check INSTALLATION.md and the README first.
