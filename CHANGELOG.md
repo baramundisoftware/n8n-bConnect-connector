@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions CI restored for the public repository (lint, build, unit tests, license check; audit reported)
 - Dependabot also keeps the GitHub Actions in `ci.yml` up to date
 - Dev dependencies: prettier 3.9.9, typescript-eslint 8.71 (supersedes Dependabot PR #20)
+- Test toolchain: vitest and @vitest/coverage-v8 1.6 → 5.0, @types/node 20 → 22 (matches the Node ≥ 22.16 engines floor); clears the critical dev-only advisories (supersedes #23, #24)
 
 ### Added
 - CODEOWNERS, issue forms (bug report, change proposal) and a pull request template
