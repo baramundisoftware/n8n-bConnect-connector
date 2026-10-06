@@ -1,9 +1,9 @@
 # Convenience targets. The canonical tooling is npm scripts (see package.json).
-# CI and release run LOCALLY on a maintainer machine — this repo has no GitHub
-# Actions workflows (avoids the Actions billing requirement; matches bConnect-MCP).
+# `make ci` is the local equivalent of the `gate` job in .github/workflows/ci.yml.
+# Release artifacts are still built locally (`make release`).
 .PHONY: ci build lint test audit release release-dry publish clean
 
-# Full local CI — mirrors the old ci.yml build-and-test job.
+# Full local CI — mirrors the ci.yml `gate` job, plus the runtime audit.
 ci:
 	npm ci
 	npm run lint
@@ -23,7 +23,7 @@ test:
 audit:
 	npm audit --omit=dev --audit-level=critical
 
-# Local release artifact — mirrors the old release.yml. Produces the npm tarball,
+# Local release artifact. Produces the npm tarball,
 # its SHA-256 checksum, and the CycloneDX SBOM. Attach the .tgz + .sha256 + sbom.json
 # to the GitHub Release by hand (create it with: gh release create vX.Y.Z ...).
 release: ci

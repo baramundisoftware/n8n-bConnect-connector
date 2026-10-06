@@ -73,3 +73,8 @@ docs/adr/
 docs/SDLC-PIPELINE.md
 docs/AUDIT-*
 docs/THREAT-MODEL-*
+
+# Release artifacts (built by `make release`, attached to GitHub Releases by hand)
+*.tgz
+*.tgz.sha256
+*.tgz.asc

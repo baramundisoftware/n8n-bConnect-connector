@@ -1,0 +1,58 @@
+name: Bug report
+description: Something in the baramundi n8n nodes does not work as documented.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not paste estate data** (endpoint, group or job names, server URLs, credentials, API keys). Redact them.
+        Security problems go through the private report link, not here.
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      description: Release tag or commit (e.g. v0.9.1).
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How did you install it?
+      options:
+        - n8n Community Nodes (UI)
+        - npm install in the n8n data directory
+        - Release .tgz
+        - Built from source (Docker / custom extensions)
+        - other
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: n8n version, hosting (Docker, npm, n8n Cloud), bMS release (e.g. n8n 2.41.4, Docker, 26R1).
+    validations:
+      required: true
+  - type: input
+    id: operation
+    attributes:
+      label: Node, resource and operation
+      description: e.g. baramundi Endpoint / Endpoint / Get Many
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps. A redacted workflow JSON helps.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error output (redacted)
+      render: text
