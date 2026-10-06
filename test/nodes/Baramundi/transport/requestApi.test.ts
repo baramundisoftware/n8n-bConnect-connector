@@ -168,7 +168,7 @@ describe('Request API Transport Layer', () => {
       const endpointGuid = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
       await expect(
         apiRequest.call(mockContext, 'GET', `/endpoints/v2.0/Endpoints/${endpointGuid}`)
-      ).rejects.toThrow(/https:\/\/bms\.example\.com:444\/bconnect\/\.\.\.\/Endpoints/);
+      ).rejects.toThrow(/^URL: https:\/\/bms\.example\.com:444\/bconnect\/\.\.\.\/Endpoints$/m);
     });
 
     it('should not include GUID in the URL portion of the error message', async () => {
@@ -187,7 +187,7 @@ describe('Request API Transport Layer', () => {
         // The URL: line should not contain the GUID
         const urlLine = (err.message as string).split('\n').find((l: string) => l.startsWith('URL:')) ?? '';
         expect(urlLine).not.toMatch(guid);
-        expect(urlLine).toMatch(/bms\.example\.com.*\/\.\.\.\/Endpoints/);
+        expect(urlLine).toMatch(/^URL: https:\/\/bms\.example\.com:444\/bconnect\/\.\.\.\/Endpoints$/);
       }
     });
   });
