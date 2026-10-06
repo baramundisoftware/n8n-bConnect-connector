@@ -2,17 +2,25 @@
 
 This guide provides detailed instructions for installing the baramundi community node for n8n.
 
+> [!IMPORTANT]
+> The package is **not published to the npm registry yet**. Installing it from
+> **Settings > Community Nodes** in n8n, or with `npm install n8n-nodes-baramundi-management-suite`,
+> fails with *"Package version does not exist"*. The n8n Community Nodes screen can only install
+> packages from npm, so until the package is published, install it from the release file
+> (Method 1 or Method 2 below).
+
 ## Table of Contents
 
 1. [Prerequisites](#prerequisites)
 2. [Installation Methods](#installation-methods)
-   - [Method 1: File Transfer Installation (Recommended)](#method-1-file-transfer-installation-recommended)
-   - [Method 2: npm Registry (when available)](#method-2-npm-registry-when-available)
-   - [Method 3: Docker Installation](#method-3-docker-installation)
+   - [Method 1: Install from the Release File (Recommended)](#method-1-install-from-the-release-file-recommended)
+   - [Method 2: Docker Installation](#method-2-docker-installation)
+   - [Method 3: npm Registry (not available yet)](#method-3-npm-registry-not-available-yet)
 3. [Verify Package Integrity](#verify-package-integrity)
 4. [Verify Installation](#verify-installation)
-5. [Configure Credentials](#configure-credentials)
-6. [Troubleshooting](#troubleshooting)
+5. [Upgrade](#upgrade)
+6. [Configure Credentials](#configure-credentials)
+7. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -20,39 +28,59 @@ This guide provides detailed instructions for installing the baramundi community
 
 Before installing, ensure you have:
 
-- **n8n**: Version 1.0.0 or higher
-- **Node.js**: Version 18.0.0 or higher (Node.js 22 recommended)
-- **baramundi Management Suite**: With bConnect API enabled (V2.0, bMS 25R2 or 26R1)
-- **Network Access**: Connection to baramundi Management Server on port 444
+- **n8n**: Version 2.9.0 or higher (self-hosted — n8n Cloud only allows verified community nodes)
+- **Node.js**: Version 22.16 or higher on the n8n host (already included in the official n8n Docker image)
+- **npm**: To install the release file
+- **baramundi Management Suite**: With bConnect API enabled (V2.0, bMS 2025 R2 or 2026 R1)
+- **Network Access**: Connection to the baramundi Management Server on port 444
 
 ---
 
 ## Installation Methods
 
-### Method 1: File Transfer Installation (Recommended)
+### Method 1: Install from the Release File (Recommended)
 
-The package is distributed as a tarball file (`n8n-nodes-baramundi-management-suite-<version>.tgz`).
+Each [GitHub release](https://github.com/baramundisoftware/n8n-bConnect-connector/releases)
+contains two files:
 
-#### Step 1: Verify Package Integrity
+- `n8n-nodes-baramundi-management-suite-<version>.tgz` — the package
+- `n8n-nodes-baramundi-management-suite-<version>.tgz.sha256` — its SHA-256 checksum
 
-Before installing, verify the GPG signature to ensure the package has not been tampered with. See [Verify Package Integrity](#verify-package-integrity) below.
+The examples below use version `0.9.1`; replace it with the version you downloaded.
 
-#### Step 2: Transfer the File
+#### Step 1: Download
 
-Transfer the `.tgz` file to your n8n server using your preferred method:
-- SCP/SFTP
-- Network share
-- USB drive
-
-#### Step 3: Install from Tarball
+Download both files from the
+[latest release](https://github.com/baramundisoftware/n8n-bConnect-connector/releases/latest),
+or on the n8n server:
 
 ```bash
-# Navigate to your n8n custom nodes directory
-cd ~/.n8n/custom
-
-# Install from the tarball
-npm install /path/to/n8n-nodes-baramundi-management-suite-0.8.4.tgz
+VERSION=0.9.1
+BASE=https://github.com/baramundisoftware/n8n-bConnect-connector/releases/download/v$VERSION
+curl -fLO "$BASE/n8n-nodes-baramundi-management-suite-$VERSION.tgz"
+curl -fLO "$BASE/n8n-nodes-baramundi-management-suite-$VERSION.tgz.sha256"
 ```
+
+If the n8n server has no internet access, download the files elsewhere and copy them over
+(SCP/SFTP, network share).
+
+#### Step 2: Verify the Checksum
+
+```bash
+sha256sum -c n8n-nodes-baramundi-management-suite-0.9.1.tgz.sha256
+```
+
+See [Verify Package Integrity](#verify-package-integrity).
+
+#### Step 3: Install into the n8n Nodes Folder
+
+```bash
+mkdir -p ~/.n8n/nodes
+cd ~/.n8n/nodes
+npm install /path/to/n8n-nodes-baramundi-management-suite-0.9.1.tgz
+```
+
+`~/.n8n` is the n8n user folder of the account that runs n8n (or the folder set in `N8N_USER_FOLDER`).
 
 #### Step 4: Restart n8n
 
@@ -60,31 +88,15 @@ npm install /path/to/n8n-nodes-baramundi-management-suite-0.8.4.tgz
 # If running n8n as a service
 sudo systemctl restart n8n
 
-# If running n8n manually
-pkill -f "n8n start"
+# If running n8n manually: stop it (Ctrl+C) and start it again
 n8n start
 ```
 
 ---
 
-### Method 2: npm Registry (when available)
+### Method 2: Docker Installation
 
-> **Note**: npm registry publishing is pending approval. This method will be available in a future release.
-
-```bash
-cd ~/.n8n/custom
-npm install n8n-nodes-baramundi-management-suite
-n8n restart
-```
-
-If you don't have a `custom` directory, create it first:
-```bash
-mkdir -p ~/.n8n/custom
-```
-
----
-
-### Method 3: Docker Installation
+Put the downloaded `.tgz` next to your `Dockerfile` or `docker-compose.yml`.
 
 #### Option A: Custom Dockerfile
 
@@ -92,13 +104,13 @@ mkdir -p ~/.n8n/custom
 FROM n8nio/n8n:latest
 
 USER root
-
-# Install from tarball
-COPY n8n-nodes-baramundi-management-suite-0.8.4.tgz /tmp/
-RUN cd /usr/local/lib/node_modules/n8n && \
-    npm install /tmp/n8n-nodes-baramundi-management-suite-0.8.4.tgz && \
-    rm /tmp/*.tgz
-
+COPY n8n-nodes-baramundi-management-suite-0.9.1.tgz /tmp/package.tgz
+RUN mkdir -p /home/node/.n8n/nodes && \
+    cd /home/node/.n8n/nodes && \
+    npm init -y && \
+    npm install --ignore-scripts /tmp/package.tgz && \
+    rm /tmp/package.tgz && \
+    chown -R node:node /home/node/.n8n/nodes
 USER node
 ```
 
@@ -113,80 +125,79 @@ docker run -d \
   n8n-baramundi
 ```
 
-#### Option B: Docker Compose with Volume Mount
+> **Note**: If `/home/node/.n8n` is a volume, Docker copies the image's `nodes` folder into the
+> volume only when the volume is first created. To upgrade later, see [Upgrade](#upgrade).
+
+#### Option B: Docker Compose
 
 **docker-compose.yml**:
 ```yaml
-version: '3.8'
-
 services:
   n8n:
-    image: n8nio/n8n:latest
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM n8nio/n8n:latest
+        USER root
+        COPY n8n-nodes-baramundi-management-suite-0.9.1.tgz /tmp/package.tgz
+        RUN mkdir -p /home/node/.n8n/nodes && \
+            cd /home/node/.n8n/nodes && \
+            npm init -y && \
+            npm install --ignore-scripts /tmp/package.tgz && \
+            rm /tmp/package.tgz && \
+            chown -R node:node /home/node/.n8n/nodes
+        USER node
     ports:
       - "5678:5678"
-    environment:
-      - N8N_CUSTOM_EXTENSIONS=/home/node/custom
     volumes:
       - n8n_data:/home/node/.n8n
-      - ./n8n-nodes-baramundi-management-suite-0.8.4.tgz:/tmp/package.tgz:ro
-    command: >
-      sh -c "
-        mkdir -p /home/node/custom &&
-        cd /home/node/custom &&
-        npm install /tmp/package.tgz &&
-        n8n start
-      "
 
 volumes:
   n8n_data:
 ```
 
 ```bash
-docker-compose up -d
+docker compose up -d --build
 ```
+
+---
+
+### Method 3: npm Registry (not available yet)
+
+> **Note**: npm registry publishing is pending approval. Once the package is published, you can
+> install it from **Settings > Community Nodes** in n8n by entering
+> `n8n-nodes-baramundi-management-suite`, or with:
+>
+> ```bash
+> cd ~/.n8n/nodes
+> npm install n8n-nodes-baramundi-management-suite
+> ```
+>
+> Until then, these commands fail with *"Package version does not exist"* / `404 Not Found`.
 
 ---
 
 ## Verify Package Integrity
 
-Distribution tarballs are GPG-signed. Each release includes two files:
-
-- `n8n-nodes-baramundi-management-suite-<version>.tgz` — the package
-- `n8n-nodes-baramundi-management-suite-<version>.tgz.asc` — the detached GPG signature
-
-### Step 1: Import the Signing Key (first time only)
+Every release includes a SHA-256 checksum file. Run the check in the folder that contains both files:
 
 ```bash
-# Import the baramundi signing key
-gpg --import baramundi-signing-key.asc
-```
-
-The signing key fingerprint is:
-- **Key**: RSA 4096-bit
-- **Identity**: `bernd.wiedemann@baramundi.com`
-- **Expires**: 2028-04-01
-
-### Step 2: Verify the Signature
-
-```bash
-gpg --verify n8n-nodes-baramundi-management-suite-0.8.4.tgz.asc \
-             n8n-nodes-baramundi-management-suite-0.8.4.tgz
+sha256sum -c n8n-nodes-baramundi-management-suite-0.9.1.tgz.sha256
 ```
 
 Expected output:
 ```
-gpg: Good signature from "Bernd Wiedemann <bernd.wiedemann@baramundi.com>"
+n8n-nodes-baramundi-management-suite-0.9.1.tgz: OK
 ```
 
-If you see `BAD signature`, do **not** install the package — contact support@baramundi.com.
+On Windows (PowerShell), compare the hash with the value in the `.sha256` file:
 
-### Step 3: Verify the SHA checksum (alternative)
-
-Each release also includes a SHA-256 checksum. Verify with:
-
-```bash
-sha256sum -c n8n-nodes-baramundi-management-suite-0.8.4.tgz.sha256
+```powershell
+Get-FileHash .\n8n-nodes-baramundi-management-suite-0.9.1.tgz -Algorithm SHA256
 ```
+
+If the checksum does not match, do **not** install the package. Download it again from the
+GitHub release page, and report a persistent mismatch as described in [SECURITY.md](SECURITY.md).
 
 ---
 
@@ -205,14 +216,40 @@ After installation, verify the node is available:
 ### Via npm
 
 ```bash
-cd ~/.n8n/custom
+cd ~/.n8n/nodes
 npm list n8n-nodes-baramundi-management-suite
 ```
 
 Expected output:
 ```
-custom
-└── n8n-nodes-baramundi-management-suite@0.8.4
+nodes
+└── n8n-nodes-baramundi-management-suite@0.9.1
+```
+
+---
+
+## Upgrade
+
+### Host installation
+
+Download the new release file, verify it, and install it over the old version:
+
+```bash
+cd ~/.n8n/nodes
+npm install /path/to/n8n-nodes-baramundi-management-suite-<new-version>.tgz
+```
+
+Then restart n8n.
+
+### Docker
+
+Rebuild the image with the new `.tgz`. If `/home/node/.n8n` is a volume, the volume still holds the
+old version; install the new one inside the running container and restart it:
+
+```bash
+docker cp n8n-nodes-baramundi-management-suite-<new-version>.tgz n8n:/tmp/package.tgz
+docker exec -it n8n sh -c "cd /home/node/.n8n/nodes && npm install --ignore-scripts /tmp/package.tgz"
+docker restart n8n
 ```
 
 ---
@@ -232,16 +269,17 @@ custom
 | Field | Description | Example |
 |-------|-------------|---------|
 | **Server URL** | Base URL of your bConnect API | `https://bms-server:444/bconnect` |
-| **Username** | bConnect API username | `Administrator` |
-| **Password** | bConnect API password | `your-password` |
-| **Ignore SSL Issues** | Enable for self-signed certificates | ✅ (for self-signed certs) |
+| **Authentication Method** | **API Key** (recommended) or **Basic Auth** | `API Key` |
+| **API Key** | Generated in the bMS console under **Server Management > API Keys** | — |
+| **Username** / **Password** | For Basic Auth: a Windows/AD account with bConnect access | `DOMAIN\svc-n8n` |
+| **Ignore SSL Issues** | Enable only for self-signed certificates in test environments | ☐ |
 
 > **Security Note**: Enabling "Ignore SSL Issues" disables TLS certificate validation for this connection, which exposes API traffic to man-in-the-middle attacks. Use only in isolated test environments. The recommended approach is to import your bMS server's CA certificate into the n8n host's trust store.
 
 ### Step 3: Test Credential
 
 1. Click **Test Credential** button
-2. Wait for validation (calls `/v2.0/endpoints?PageSize=1`)
+2. Wait for validation
 3. If successful, you'll see a green checkmark
 4. Click **Save**
 
@@ -251,20 +289,26 @@ custom
 |-------|----------|
 | `ECONNREFUSED` | Check server URL and ensure bConnect API is running |
 | `ENOTFOUND` | Verify server hostname/IP is correct |
-| `401 Unauthorized` | Check username and password |
-| `SSL certificate problem` | Enable "Ignore SSL Issues" or install CA cert |
+| `401 Unauthorized` | Check API key, or username and password |
+| `SSL certificate problem` | Install the CA certificate (see below), or enable "Ignore SSL Issues" for testing only |
 | `Network timeout` | Check firewall rules for port 444 |
 
 ---
 
 ## Troubleshooting
 
+### "Package version does not exist" in Community Nodes
+
+The package is not on the npm registry yet. Install it from the release file
+([Method 1](#method-1-install-from-the-release-file-recommended) or
+[Method 2](#method-2-docker-installation)).
+
 ### Node Not Appearing in n8n
 
-1. Verify installation: `cd ~/.n8n/custom && npm list n8n-nodes-baramundi-management-suite`
-2. Check n8n version: `n8n --version` (must be 1.0.0+)
-3. Restart n8n completely: `pkill -9 -f "n8n" && n8n start`
-4. Check logs: `tail -f ~/.n8n/logs/n8n.log | grep -i baramundi`
+1. Verify installation: `cd ~/.n8n/nodes && npm list n8n-nodes-baramundi-management-suite`
+2. Check n8n version: `n8n --version` (must be 2.9.0 or higher)
+3. Restart n8n completely
+4. Check the n8n log output for errors mentioning `baramundi`
 
 ### Permission Errors During Installation
 
@@ -274,13 +318,13 @@ sudo chown -R $USER ~/.n8n
 
 ### SSL Certificate Errors
 
-Install the baramundi CA certificate in the system trust store:
+Install the CA certificate that signed your bMS server certificate in the system trust store:
 
 ```bash
 # Linux (Ubuntu/Debian)
-sudo cp baramundi-cert.crt /usr/local/share/ca-certificates/
+sudo cp your-bms-ca.crt /usr/local/share/ca-certificates/
 sudo update-ca-certificates
-n8n restart
+# then restart n8n
 ```
 
 ### Docker Issues
@@ -290,7 +334,7 @@ n8n restart
 docker logs n8n
 
 # Verify package inside container
-docker exec -it n8n sh -c "cd /usr/local/lib/node_modules/n8n && npm list n8n-nodes-baramundi-management-suite"
+docker exec -it n8n sh -c "cd /home/node/.n8n/nodes && npm list n8n-nodes-baramundi-management-suite"
 ```
 
 ---
@@ -298,7 +342,7 @@ docker exec -it n8n sh -c "cd /usr/local/lib/node_modules/n8n && npm list n8n-no
 ## Uninstallation
 
 ```bash
-cd ~/.n8n/custom
+cd ~/.n8n/nodes
 npm uninstall n8n-nodes-baramundi-management-suite
 # Restart n8n
 ```
@@ -308,13 +352,11 @@ npm uninstall n8n-nodes-baramundi-management-suite
 ## Getting Help
 
 - **Documentation**: See [README.md](README.md) for usage guide
-- **Security Issues**: Report to support@baramundi.com (not public issues)
-- **baramundi Support**: support@baramundi.com
+- **Bugs and feature requests**: [GitHub issues](https://github.com/baramundisoftware/n8n-bConnect-connector/issues)
+- **Security issues**: Report privately as described in [SECURITY.md](SECURITY.md) (not public issues)
 - **n8n Community**: https://community.n8n.io
 
 ---
 
 **Package**: `n8n-nodes-baramundi-management-suite`
-**Version**: 0.8.4
-**Last Updated**: 2026-04-02
 **License**: MIT

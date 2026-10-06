@@ -37,17 +37,26 @@ Automate your **baramundi Management Suite** (bMS) from [n8n](https://n8n.io/) w
 
 ### Step 1: Install the Node
 
-In your n8n instance, go to **Settings > Community Nodes** and install:
+> [!IMPORTANT]
+> The package is **not on the npm registry yet**, so installing it from
+> **Settings > Community Nodes** or with `npm install n8n-nodes-baramundi-management-suite`
+> does not work at the moment (it fails with *"Package version does not exist"*).
+> Install it from the release file instead, as shown below.
 
-```
-n8n-nodes-baramundi-management-suite
-```
-
-Or via CLI in your n8n data directory:
+1. Download `n8n-nodes-baramundi-management-suite-<version>.tgz` and its `.sha256` file from the
+   [latest GitHub release](https://github.com/baramundisoftware/n8n-bConnect-connector/releases/latest).
+2. On your n8n server, check the file and install it into n8n's nodes folder:
 
 ```bash
-npm install n8n-nodes-baramundi-management-suite
+sha256sum -c n8n-nodes-baramundi-management-suite-0.9.1.tgz.sha256
+mkdir -p ~/.n8n/nodes && cd ~/.n8n/nodes
+npm install /path/to/n8n-nodes-baramundi-management-suite-0.9.1.tgz
 ```
+
+3. Restart n8n.
+
+For Docker, see [Docker Installation](#docker-installation) below. Once the package is
+published to npm, installing from **Settings > Community Nodes** will work as well.
 
 ### Step 2: Add Your bMS Credentials
 
@@ -93,17 +102,22 @@ See the [example workflows](example-workflows/) for ready-to-use templates.
 
 ## Docker Installation
 
-If running n8n in Docker, install the node into a custom image:
+If running n8n in Docker, build a custom image with the release file next to your `Dockerfile`:
 
 ```dockerfile
 FROM n8nio/n8n:latest
 USER root
-RUN cd /usr/local/lib/node_modules/n8n && \
-    npm install n8n-nodes-baramundi-management-suite
+COPY n8n-nodes-baramundi-management-suite-0.9.1.tgz /tmp/package.tgz
+RUN mkdir -p /home/node/.n8n/nodes && \
+    cd /home/node/.n8n/nodes && \
+    npm init -y && \
+    npm install --ignore-scripts /tmp/package.tgz && \
+    rm /tmp/package.tgz && \
+    chown -R node:node /home/node/.n8n/nodes
 USER node
 ```
 
-See [INSTALLATION.md](INSTALLATION.md) for detailed Docker and file-transfer install options.
+See [INSTALLATION.md](INSTALLATION.md) for details, Docker Compose, upgrades and troubleshooting.
 
 ---
 
