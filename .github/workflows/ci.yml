@@ -56,6 +56,13 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: npm
 
+      # Dependabot writes package-lock.json with npm 11, which omits optional
+      # peer entries that npm 10 (bundled with Node 22) insists on, so `npm ci`
+      # failed on the Node 22 leg of every Dependabot PR. Lockfiles from npm 10
+      # still install under npm 11, so one npm for every leg fixes both.
+      - name: Use npm 11 (same as Dependabot)
+        run: npm install -g npm@11
+
       - name: Install from the lockfile
         run: npm ci
 
@@ -81,6 +88,13 @@ jobs:
         with:
           node-version: "22.16"
           cache: npm
+
+      # Dependabot writes package-lock.json with npm 11, which omits optional
+      # peer entries that npm 10 (bundled with Node 22) insists on, so `npm ci`
+      # failed on the Node 22 leg of every Dependabot PR. Lockfiles from npm 10
+      # still install under npm 11, so one npm for every leg fixes both.
+      - name: Use npm 11 (same as Dependabot)
+        run: npm install -g npm@11
       - run: npm ci
 
       - name: Dependency audit

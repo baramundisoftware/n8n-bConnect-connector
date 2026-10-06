@@ -7,7 +7,7 @@ Thank you for your interest in contributing! This document provides guidelines f
 ### Prerequisites
 
 - **Node.js:** >= 22.16.0
-- **npm:** >= 9.0.0
+- **npm:** >= 11 (`npm install -g npm@11`; Node 22 ships npm 10, which rejects lockfiles written by npm 11 — the version CI and Dependabot use)
 - **n8n:** >= 2.9.0 (for local testing)
 
 ### Initial Setup
