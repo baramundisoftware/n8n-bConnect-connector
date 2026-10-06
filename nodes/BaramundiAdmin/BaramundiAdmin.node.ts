@@ -49,6 +49,7 @@ export class BaramundiAdmin implements INodeType {
     },
     properties: [
       {
+        // eslint-disable-next-line n8n-nodes-base/node-param-display-name-miscased -- baramundi is a lowercase brand name
         displayName: 'baramundi Management Suite Version',
         name: 'bmsVersion',
         type: 'options',
