@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dev dependencies: prettier 3.9.9, typescript-eslint 8.71 (supersedes Dependabot PR #20)
 - Test toolchain: vitest and @vitest/coverage-v8 1.6 → 5.0, @types/node 20 → 22 (matches the Node ≥ 22.16 engines floor); clears the critical dev-only advisories (supersedes #23, #24)
 
+### Documentation
+- README and INSTALLATION.md: install from the GitHub release `.tgz` until the package is on npm (Community Nodes install fails with "Package version does not exist", #21); INSTALLATION.md updated to 0.9.1, SHA-256 verification instead of the GPG steps releases don't ship, prerequisites aligned (n8n ≥ 2.9, Node ≥ 22.16), API key credentials, upgrade section
+
 ### Added
 - CODEOWNERS, issue forms (bug report, change proposal) and a pull request template
 
