@@ -74,12 +74,13 @@
   "files": [
     "dist",
     "!dist/coverage",
+    "!dist/*.png",
     "LICENSE",
     "README.md",
     "CHANGELOG.md"
   ],
   "devDependencies": {
-    "@n8n/node-cli": "^0.34.0",
+    "@n8n/node-cli": "^0.51.3",
     "@types/node": "^22.19.0",
     "@vitest/coverage-v8": "^5.0.3",
     "axios": "^1.20.0",
@@ -94,8 +95,6 @@
     "n8n-workflow": "*"
   },
   "overrides": {
-    "n8n-workflow": {
-      "axios": "$axios"
-    }
+    "axios": "$axios"
   }
 }

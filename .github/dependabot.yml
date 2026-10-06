@@ -37,7 +37,7 @@ updates:
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
       # eslint is peer-pinned to an EXACT version by @n8n/node-cli
-      # (0.34 pins eslint 9.29.0), so any eslint bump breaks `npm ci`.
+      # (0.51 still pins eslint 9.29.0), so any eslint bump breaks `npm ci`.
       # It is governed by node-cli — ignore all updates; it moves only when
       # node-cli is upgraded as a deliberate task.
       - dependency-name: "eslint"
