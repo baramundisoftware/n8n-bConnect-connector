@@ -85,7 +85,7 @@
     "@vitest/coverage-v8": "^5.0.3",
     "axios": "^1.20.0",
     "eslint": "^9.0.0",
-    "eslint-plugin-n8n-nodes-base": "^1.16.7",
+    "eslint-plugin-n8n-nodes-base": "^2.0.0",
     "prettier": "^3.9.9",
     "typescript": "^5.4.0",
     "typescript-eslint": "^8.71.1",
