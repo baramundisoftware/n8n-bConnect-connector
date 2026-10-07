@@ -300,6 +300,260 @@ describe('E2E: Dynamic Group', () => {
 
 // ─── Maintenance Window ───────────────────────────────────────────────────────
 
+// Strict: the schedule body follows the spec (#44) — failures are real, not mock quirks.
+const MW_FORM = {
+  maintenanceWindowDefinitionType: 'Everyday',
+  intervals: { interval: [{ maintenancePeriod: 'Everyday', start: '22:00', end: '24:00' }] },
+};
+
+describe('E2E: Maintenance Window — endpoint lifecycle', () => {
+  it('createEndpointMaintenanceWindow → get → update → delete', async () => {
+    if (!available || !firstEndpointId) return;
+    await ep.createEndpointMaintenanceWindow.call(createRealContext({ endpointId: firstEndpointId, ...MW_FORM }), 0);
+    const got = await ep.getEndpointMaintenanceWindow.call(createRealContext({ endpointId: firstEndpointId }), 0);
+    expect(got[0].json).toBeDefined();
+    await ep.updateEndpointMaintenanceWindow.call(
+      createRealContext({
+        endpointId: firstEndpointId,
+        maintenanceWindowDefinitionType: 'WorkdayWeekend',
+        intervals: { interval: [{ maintenancePeriod: 'Workdays', start: '18:00', end: '24:00' }, { maintenancePeriod: 'Weekends', start: '0:00', end: '24:00' }] },
+      }),
+      0,
+    );
+    await ep.deleteEndpointMaintenanceWindow.call(createRealContext({ endpointId: firstEndpointId }), 0);
+  });
+});
+
+describe('E2E: Maintenance Window — logical group lifecycle', () => {
+  it('createGroupMaintenanceWindow → get → update → delete', async () => {
+    if (!available || !firstLogicalGroupId) return;
+    await ep.createGroupMaintenanceWindow.call(createRealContext({ groupId: firstLogicalGroupId, ...MW_FORM }), 0);
+    const got = await ep.getGroupMaintenanceWindow.call(createRealContext({ groupId: firstLogicalGroupId }), 0);
+    expect(got[0].json).toBeDefined();
+    await ep.updateGroupMaintenanceWindow.call(createRealContext({ groupId: firstLogicalGroupId, maintenanceWindowDefinitionType: 'Unrestricted' }), 0);
+    await ep.deleteGroupMaintenanceWindow.call(createRealContext({ groupId: firstLogicalGroupId }), 0);
+  });
+
+  // PUT exists in 25R2 only; against a 26R1 mock the route is absent (404/405 accepted)
+  it('putEndpointMaintenanceWindow (25R2)', async () => {
+    if (!available || !firstEndpointId) return;
+    await tryOp(() => ep.putEndpointMaintenanceWindow.call(createRealContext({ endpointId: firstEndpointId, ...MW_FORM }), 0));
+  });
+
+  it('putGroupMaintenanceWindow (25R2)', async () => {
+    if (!available || !firstLogicalGroupId) return;
+    await tryOp(() => ep.putGroupMaintenanceWindow.call(createRealContext({ groupId: firstLogicalGroupId, ...MW_FORM }), 0));
+  });
+});
+
+describe('E2E: Endpoint — getEndpointsByGroup', () => {
+  it('returns endpoints for a typed endpoint group query (accepts 404)', async () => {
+    if (!available || !firstLogicalGroupId) return;
+    const ctx = createRealContext({
+      groupId: firstLogicalGroupId,
+      groupType: 'logical',
+      endpointType: 'all',
+      returnAll: false,
+      limit: 5,
+    });
+    const result = await tryOp(() => ep.getEndpointsByGroup.call(ctx, 0));
+    if (result !== null) expect(Array.isArray(result)).toBe(true);
+  });
+});
+
+describe('E2E: Endpoint — getEndpointsByLogicalGroup', () => {
+  it('returns endpoints for a logical group', async () => {
+    if (!available || !firstLogicalGroupId) return;
+    const ctx = createRealContext({ logicalGroupId: firstLogicalGroupId, returnAll: false, limit: 5 });
+    const result = await tryOp(() => ep.getEndpointsByLogicalGroup.call(ctx, 0));
+    if (result !== null) expect(Array.isArray(result)).toBe(true);
+  });
+});
+
+describe('E2E: Endpoint — getEndpointsByStaticGroup', () => {
+  it('returns endpoints for a static group (accepts 404)', async () => {
+    if (!available || !firstStaticGroupId) return;
+    const ctx = createRealContext({ staticGroupId: firstStaticGroupId, returnAll: false, limit: 5 });
+    const result = await tryOp(() => ep.getEndpointsByStaticGroup.call(ctx, 0));
+    if (result !== null) expect(Array.isArray(result)).toBe(true);
+  });
+});
+
+describe('E2E: Endpoint — getEndpointsByDynamicGroup', () => {
+  it('returns endpoints for a dynamic group (accepts 404)', async () => {
+    if (!available || !firstDynamicGroupId) return;
+    const ctx = createRealContext({ dynamicGroupId: firstDynamicGroupId, returnAll: false, limit: 5 });
+    const result = await tryOp(() => ep.getEndpointsByDynamicGroup.call(ctx, 0));
+    if (result !== null) expect(Array.isArray(result)).toBe(true);
+  });
+});
+
+describe('E2E: Endpoint — getEndpointsByUDG', () => {
+  it('accepts response or 404', async () => {
+    if (!available) return;
+    const ctx = createRealContext({ universalDynamicGroupId: NONEXISTENT_GUID, returnAll: false, limit: 5 });
+    await tryOp(() => ep.getEndpointsByUDG.call(ctx, 0));
+  });
+});
+
+describe('E2E: Endpoint — getEndpointsByADUser', () => {
+  it('accepts response or 404', async () => {
+    if (!available) return;
+    const ctx = createRealContext({ adUserId: NONEXISTENT_GUID, returnAll: false, limit: 5 });
+    await tryOp(() => ep.getEndpointsByADUser.call(ctx, 0));
+  });
+});
+
+describe('E2E: Endpoint — unmanaged', () => {
+  it('getUnmanagedEndpoints returns array or 404', async () => {
+    if (!available) return;
+    const ctx = createRealContext({ returnAll: false, limit: 5, additionalFields: {} });
+    const result = await tryOp(() => ep.getUnmanagedEndpoints.call(ctx, 0));
+    if (result !== null) expect(Array.isArray(result)).toBe(true);
+  });
+
+  it('getUnmanagedEndpoint accepts 404', async () => {
+    if (!available) return;
+    const ctx = createRealContext({ endpointId: NONEXISTENT_GUID });
+    await tryOp(() => ep.getUnmanagedEndpoint.call(ctx, 0));
+  });
+
+  it('deleteUnmanagedEndpoint accepts 404', async () => {
+    if (!available) return;
+    const ctx = createRealContext({ endpointId: NONEXISTENT_GUID });
+    await tryOp(() => ep.deleteUnmanagedEndpoint.call(ctx, 0));
+  });
+});
+
+describe('E2E: Endpoint — EntraId (accepts 404)', () => {
+  it('getEntraIdDataByDeviceId accepts 404', async () => {
+    if (!available) return;
+    const ctx = createRealContext({ deviceId: NONEXISTENT_GUID });
+    await tryOp(() => ep.getEntraIdDataByDeviceId.call(ctx, 0));
+  });
+
+  it('setEntraIdData accepts 404', async () => {
+    if (!available) return;
+    const ctx = createRealContext({ endpointId: firstEndpointId || NONEXISTENT_GUID, entraIdData: {} });
+    await tryOp(() => ep.setEntraIdData.call(ctx, 0));
+  });
+
+  it('deleteEntraIdData accepts 404', async () => {
+    if (!available) return;
+    const ctx = createRealContext({ endpointId: firstEndpointId || NONEXISTENT_GUID });
+    await tryOp(() => ep.deleteEntraIdData.call(ctx, 0));
+  });
+});
+
+describe('E2E: Endpoint — industrial (25R2-only, accepts 404)', () => {
+  it('getIndustrialEndpoints accepts 404', async () => {
+    if (!available) return;
+    const ctx = createRealContext({ returnAll: false, limit: 5, additionalFields: {} });
+    await tryOp(() => ep.getIndustrialEndpoints.call(ctx, 0));
+  });
+
+  it('getIndustrialEndpoint accepts 404', async () => {
+    if (!available) return;
+    const ctx = createRealContext({ endpointId: NONEXISTENT_GUID });
+    await tryOp(() => ep.getIndustrialEndpoint.call(ctx, 0));
+  });
+
+  it('getIndustrialEndpointsByGroup accepts 404', async () => {
+    if (!available) return;
+    const ctx = createRealContext({ groupId: NONEXISTENT_GUID, groupType: 'logical', returnAll: false, limit: 5 });
+    await tryOp(() => ep.getIndustrialEndpointsByGroup.call(ctx, 0));
+  });
+});
+
+// ─── Logical Group ────────────────────────────────────────────────────────────
+
+describe('E2E: Logical Group — CRUD lifecycle', () => {
+  it('getLogicalGroups returns array', async () => {
+    if (!available) return;
+    const ctx = createRealContext({ returnAll: false, limit: 5 });
+    const result = await ep.getLogicalGroups.call(ctx, 0);
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it('getLogicalGroup returns object', async () => {
+    if (!available || !firstLogicalGroupId) return;
+    const ctx = createRealContext({ groupId: firstLogicalGroupId });
+    const result = await ep.getLogicalGroup.call(ctx, 0);
+    expect(result[0].json).toHaveProperty('id', firstLogicalGroupId);
+  });
+
+  it('getLogicalGroupSubGroups returns array or 404', async () => {
+    if (!available || !firstLogicalGroupId) return;
+    const ctx = createRealContext({ logicalGroupId: firstLogicalGroupId, returnAll: false, limit: 5 });
+    const result = await tryOp(() => ep.getLogicalGroupSubGroups.call(ctx, 0));
+    if (result !== null) expect(Array.isArray(result)).toBe(true);
+  });
+
+  it('createLogicalGroup → updateLogicalGroup → deleteLogicalGroup', async () => {
+    if (!available) return;
+    const createCtx = createRealContext({ name: 'E2E-Test-LG', additionalFields: {} });
+    const created = await tryOp(() => ep.createLogicalGroup.call(createCtx, 0));
+    if (!created || created.length === 0) return;
+
+    createdLogicalGroupId = created[0].json.id as string;
+
+    const updateCtx = createRealContext({ logicalGroupId: createdLogicalGroupId, updateFields: { name: 'E2E-Test-LG-Updated' } });
+    await tryOp(() => ep.updateLogicalGroup.call(updateCtx, 0));
+
+    const deleteCtx = createRealContext({ logicalGroupId: createdLogicalGroupId });
+    await tryOp(() => ep.deleteLogicalGroup.call(deleteCtx, 0));
+  });
+});
+
+// ─── Static Group ─────────────────────────────────────────────────────────────
+
+describe('E2E: Static Group', () => {
+  it('getStaticGroups returns array', async () => {
+    if (!available) return;
+    const ctx = createRealContext({ returnAll: false, limit: 5 });
+    const result = await ep.getStaticGroups.call(ctx, 0);
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it('getStaticGroup returns object', async () => {
+    if (!available || !firstStaticGroupId) return;
+    const ctx = createRealContext({ groupId: firstStaticGroupId });
+    const result = await ep.getStaticGroup.call(ctx, 0);
+    expect(result[0].json).toHaveProperty('id', firstStaticGroupId);
+  });
+
+  it('createStaticGroup → updateStaticGroup → deleteStaticGroup', async () => {
+    if (!available) return;
+    const createCtx = createRealContext({ name: 'E2E-Static-Group', additionalFields: {} });
+    const created = await tryOp(() => ep.createStaticGroup.call(createCtx, 0));
+    if (!created || created.length === 0) return;
+    const id = created[0].json.id as string;
+
+    await tryOp(() => ep.updateStaticGroup.call(createRealContext({ staticGroupId: id, updateFields: { name: 'E2E-Static-Updated' } }), 0));
+    await tryOp(() => ep.deleteStaticGroup.call(createRealContext({ staticGroupId: id }), 0));
+  });
+});
+
+// ─── Dynamic Group ────────────────────────────────────────────────────────────
+
+describe('E2E: Dynamic Group', () => {
+  it('getDynamicGroups returns array', async () => {
+    if (!available) return;
+    const ctx = createRealContext({ returnAll: false, limit: 5 });
+    const result = await ep.getDynamicGroups.call(ctx, 0);
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it('getDynamicGroup returns object', async () => {
+    if (!available || !firstDynamicGroupId) return;
+    const ctx = createRealContext({ groupId: firstDynamicGroupId });
+    const result = await ep.getDynamicGroup.call(ctx, 0);
+    expect(result[0].json).toHaveProperty('id', firstDynamicGroupId);
+  });
+});
+
+// ─── Maintenance Window ───────────────────────────────────────────────────────
+
 describe('E2E: Maintenance Window — endpoint lifecycle', () => {
   it('createEndpointMaintenanceWindow → get → update → delete (accepts 404)', async () => {
     if (!available || !firstEndpointId) return;

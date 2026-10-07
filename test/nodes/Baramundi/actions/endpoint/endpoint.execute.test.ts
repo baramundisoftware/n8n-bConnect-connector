@@ -6,7 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
-import { get, getMany, search, deleteEndpoint, create, update, startEnrollment, triggerIntuneInstallation, getLogicalGroup, getLogicalGroups, createLogicalGroup, updateLogicalGroup, deleteLogicalGroup, getStaticGroup, getStaticGroups, createStaticGroup, updateStaticGroup, deleteStaticGroup, getDynamicGroup, getDynamicGroups, setEntraIdData, deleteEntraIdData, getEntraIdDataByDeviceId, getUnmanagedEndpoints, getUnmanagedEndpoint, deleteUnmanagedEndpoint, putEndpointMaintenanceWindow, putGroupMaintenanceWindow, updateEndpointMaintenanceWindow, updateGroupMaintenanceWindow, getEndpointMaintenanceWindow, getGroupMaintenanceWindow, getLogicalGroupSubGroups, getEndpointsByLogicalGroup, getEndpointsByStaticGroup, getEndpointsByDynamicGroup, getEndpointsByUDG, getEndpointsByADUser, getEndpointsByGroup, getIndustrialEndpoints, getIndustrialEndpoint, createIndustrialEndpoint, updateIndustrialEndpoint, deleteIndustrialEndpoint, getIndustrialEndpointsByGroup } from '../../../../../nodes/BaramundiEndpoint/actions/endpoint/endpoint.execute';
+import { get, getMany, search, deleteEndpoint, create, update, startEnrollment, triggerIntuneInstallation, getLogicalGroup, getLogicalGroups, createLogicalGroup, updateLogicalGroup, deleteLogicalGroup, getStaticGroup, getStaticGroups, createStaticGroup, updateStaticGroup, deleteStaticGroup, getDynamicGroup, getDynamicGroups, setEntraIdData, deleteEntraIdData, getEntraIdDataByDeviceId, getUnmanagedEndpoints, getUnmanagedEndpoint, deleteUnmanagedEndpoint, createEndpointMaintenanceWindow, createGroupMaintenanceWindow, deleteEndpointMaintenanceWindow, deleteGroupMaintenanceWindow, putEndpointMaintenanceWindow, putGroupMaintenanceWindow, updateEndpointMaintenanceWindow, updateGroupMaintenanceWindow, getEndpointMaintenanceWindow, getGroupMaintenanceWindow, getLogicalGroupSubGroups, getEndpointsByLogicalGroup, getEndpointsByStaticGroup, getEndpointsByDynamicGroup, getEndpointsByUDG, getEndpointsByADUser, getEndpointsByGroup, getIndustrialEndpoints, getIndustrialEndpoint, createIndustrialEndpoint, updateIndustrialEndpoint, deleteIndustrialEndpoint, getIndustrialEndpointsByGroup } from '../../../../../nodes/BaramundiEndpoint/actions/endpoint/endpoint.execute';
 
 /**
  * Create a mock IExecuteFunctions instance for testing
@@ -2883,140 +2883,89 @@ describe('Endpoint Phase 4 - UnmanagedEndpoints Operations', () => {
   });
 });
 
-describe('Endpoint Phase 4 - MaintenanceWindow PUT Operations', () => {
-  describe('putEndpointMaintenanceWindow()', () => {
-    it('should call httpRequest with method PUT', async () => {
-      const mockContext = createMockExecuteFunctions(
-        {
-                    endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-          maintenanceWindowJson: '{"maintenanceWindowDefinitionType":"daily","intervals":[]}',
-        },
-        {},
-        { id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901' },
-      );
-      await putEndpointMaintenanceWindow.call(mockContext, 0);
-      const httpRequest = mockContext.helpers.httpRequest as ReturnType<typeof vi.fn>;
-      expect(httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'PUT' }));
-    });
+// Maintenance windows follow MaintenanceWindow / MaintenanceWindowForCreation (#44):
+// a definition type plus intervals; endpoints and logical groups only.
+describe('Maintenance windows (spec schema)', () => {
+  const endpointId = 'a1b2c3d4-e5f6-4789-abcd-ef1234567890';
+  const groupId = '22222222-2222-4222-8222-222222222222';
+  const form = {
+    maintenanceWindowDefinitionType: 'WorkdayWeekend',
+    intervals: {
+      interval: [
+        { maintenancePeriod: 'Workdays', start: '18:30', end: '24:00' },
+        { maintenancePeriod: 'Weekends', start: '0:00', end: '24:00' },
+      ],
+    },
+  };
+  const body = {
+    maintenanceWindowDefinitionType: 'WorkdayWeekend',
+    intervals: [
+      { maintenancePeriod: 'Workdays', start: { hour: 18, minute: 30 }, end: { hour: 24, minute: 0 } },
+      { maintenancePeriod: 'Weekends', start: { hour: 0, minute: 0 }, end: { hour: 24, minute: 0 } },
+    ],
+  };
+
+  it.each([
+    ['createEndpointMaintenanceWindow', createEndpointMaintenanceWindow, 'POST', `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`],
+    ['putEndpointMaintenanceWindow', putEndpointMaintenanceWindow, 'PUT', `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`],
+    ['createGroupMaintenanceWindow', createGroupMaintenanceWindow, 'POST', `/endpoints/v2.0/LogicalGroups/${groupId}/MaintenanceWindow`],
+    ['putGroupMaintenanceWindow', putGroupMaintenanceWindow, 'PUT', `/endpoints/v2.0/LogicalGroups/${groupId}/MaintenanceWindow`],
+  ] as const)('%s sends the schedule body', async (_name, fn, method, url) => {
+    const ctx = createMockExecuteFunctions({ endpointId, groupId, ...form }, {}, { id: 'mw' });
+    await fn.call(ctx, 0);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method, url, body }));
   });
 
-  describe('putGroupMaintenanceWindow()', () => {
-    it('should call httpRequest with method PUT', async () => {
-      const mockContext = createMockExecuteFunctions(
-        {
-          groupId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-          groupType: 'logical',
-          maintenanceWindowJson: '{"maintenanceWindowDefinitionType":"daily","intervals":[]}',
-        },
-        {},
-        { id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901' },
-      );
-      await putGroupMaintenanceWindow.call(mockContext, 0);
-      const httpRequest = mockContext.helpers.httpRequest as ReturnType<typeof vi.fn>;
-      expect(httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'PUT' }));
-    });
-  });
-});
-
-describe('Endpoint Phase 6 - MaintenanceWindow PATCH Operations (26R1)', () => {
-  describe('updateEndpointMaintenanceWindow()', () => {
-    it('should call PATCH with JSON Patch operations', async () => {
-      const endpointId = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
-      
-      const mockContext = createMockExecuteFunctions(
-        {
-                    endpointId,
-          updateFields: { enabled: true },
-        },
-        {},
-        {},
-      );
-      await updateEndpointMaintenanceWindow.call(mockContext, 0);
-      const httpRequest = mockContext.helpers.httpRequest as ReturnType<typeof vi.fn>;
-      expect(httpRequest).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'PATCH',
-          url: `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`,
-          body: [{ op: 'replace', path: '/enabled', value: true }],
-        }),
-      );
-    });
-
-    it('should throw when no fields to update', async () => {
-      const mockContext = createMockExecuteFunctions(
-        {
-                    endpointId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-          updateFields: {},
-        },
-        {},
-        {},
-      );
-      await expect(updateEndpointMaintenanceWindow.call(mockContext, 0)).rejects.toThrow(
-        'No fields to update specified',
-      );
-    });
+  it.each([
+    ['updateEndpointMaintenanceWindow', updateEndpointMaintenanceWindow, `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`],
+    ['updateGroupMaintenanceWindow', updateGroupMaintenanceWindow, `/endpoints/v2.0/LogicalGroups/${groupId}/MaintenanceWindow`],
+  ] as const)('%s replaces definition type and intervals (26R1 PATCH)', async (_name, fn, url) => {
+    const ctx = createMockExecuteFunctions({ endpointId, groupId, ...form }, {}, { id: 'mw' });
+    await fn.call(ctx, 0);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        method: 'PATCH',
+        url,
+        body: [
+          { op: 'replace', path: '/maintenanceWindowDefinitionType', value: 'WorkdayWeekend' },
+          { op: 'replace', path: '/intervals', value: body.intervals },
+        ],
+      }),
+    );
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'GET', url }));
   });
 
-  describe('updateGroupMaintenanceWindow()', () => {
-    it('should call PATCH with correct group type path for logical group', async () => {
-      const groupId = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
-      
-      const mockContext = createMockExecuteFunctions(
-        {
-          groupId,
-          groupType: 'logical',
-          updateFields: { enabled: false },
-        },
-        {},
-        {},
-      );
-      await updateGroupMaintenanceWindow.call(mockContext, 0);
-      const httpRequest = mockContext.helpers.httpRequest as ReturnType<typeof vi.fn>;
-      expect(httpRequest).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'PATCH',
-          url: `/endpoints/v2.0/LogicalGroups/${groupId}/MaintenanceWindow`,
-          body: [{ op: 'replace', path: '/enabled', value: false }],
-        }),
-      );
-    });
+  it('sends no intervals for a type without them (Unrestricted)', async () => {
+    const ctx = createMockExecuteFunctions({ endpointId, maintenanceWindowDefinitionType: 'Unrestricted' }, {}, {});
+    await createEndpointMaintenanceWindow.call(ctx, 0);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
+      expect.objectContaining({ body: { maintenanceWindowDefinitionType: 'Unrestricted', intervals: [] } }),
+    );
+  });
 
-    it('should use StaticGroups path when groupType is static', async () => {
-      const groupId = 'c3d4e5f6-a7b8-9012-cdef-123456789012';
-      
-      const mockContext = createMockExecuteFunctions(
-        {
-          groupId,
-          groupType: 'static',
-          updateFields: { enabled: true },
-        },
-        {},
-        {},
-      );
-      await updateGroupMaintenanceWindow.call(mockContext, 0);
-      const httpRequest = mockContext.helpers.httpRequest as ReturnType<typeof vi.fn>;
-      expect(httpRequest).toHaveBeenCalledWith(
-        expect.objectContaining({
-          method: 'PATCH',
-          url: `/endpoints/v2.0/StaticGroups/${groupId}/MaintenanceWindow`,
-        }),
-      );
-    });
+  it.each(['25:00', '12:60', '24:30', 'noon', ''])('rejects the time of day "%s"', async (bad) => {
+    const ctx = createMockExecuteFunctions(
+      { endpointId, maintenanceWindowDefinitionType: 'Everyday', intervals: { interval: [{ maintenancePeriod: 'Everyday', start: bad, end: '24:00' }] } },
+      {},
+      {},
+    );
+    await expect(createEndpointMaintenanceWindow.call(ctx, 0)).rejects.toThrow(/Interval 1 start must be a time of day/);
+    expect(ctx.helpers.httpRequest).not.toHaveBeenCalled();
+  });
 
-    it('should throw when no fields to update', async () => {
-      const mockContext = createMockExecuteFunctions(
-        {
-          groupId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-          groupType: 'logical',
-          updateFields: {},
-        },
-        {},
-        {},
-      );
-      await expect(updateGroupMaintenanceWindow.call(mockContext, 0)).rejects.toThrow(
-        'No fields to update specified',
-      );
-    });
+  it('deletes endpoint and logical group maintenance windows', async () => {
+    const ctx = createMockExecuteFunctions({ endpointId, groupId }, {}, {});
+    await deleteEndpointMaintenanceWindow.call(ctx, 0);
+    await deleteGroupMaintenanceWindow.call(ctx, 0);
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'DELETE', url: `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow` }));
+    expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(expect.objectContaining({ method: 'DELETE', url: `/endpoints/v2.0/LogicalGroups/${groupId}/MaintenanceWindow` }));
+  });
+
+  it('rejects an invalid endpoint or group ID before sending anything', async () => {
+    const ctx = createMockExecuteFunctions({ endpointId: 'nope', groupId: 'nope', ...form }, {}, {});
+    await expect(createEndpointMaintenanceWindow.call(ctx, 0)).rejects.toThrow(/Invalid endpoint ID/);
+    await expect(createGroupMaintenanceWindow.call(ctx, 0)).rejects.toThrow(/Invalid group ID/);
+    expect(ctx.helpers.httpRequest).not.toHaveBeenCalled();
   });
 });
 
@@ -3043,11 +2992,11 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
   });
 
   describe('getGroupMaintenanceWindow()', () => {
-    // Reads the form's groupId + groupType, like the other group maintenance-window operations (#43)
+    // Reads the form's groupId (#43); maintenance windows exist for logical groups only (#44)
     it('should fetch the maintenance window for a logical group', async () => {
       const logicalGroupId = '22222222-2222-2222-2222-222222222222';
-      const mockMW = { id: 'mw-2', startTime: '09:00', endTime: '11:00' };
-      const ctx = createMockExecuteFunctions({ groupId: logicalGroupId, groupType: 'logical' }, {}, mockMW);
+      const mockMW = { id: 'mw-2', maintenanceWindowDefinitionType: 'Everyday', intervals: [] };
+      const ctx = createMockExecuteFunctions({ groupId: logicalGroupId }, {}, mockMW);
 
       const result = await getGroupMaintenanceWindow.call(ctx, 0);
 
@@ -3060,7 +3009,7 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
 
   describe('getGroupMaintenanceWindow() input', () => {
     it('should reject an invalid group ID', async () => {
-      const ctx = createMockExecuteFunctions({ groupId: 'not-a-guid', groupType: 'logical' }, {}, {});
+      const ctx = createMockExecuteFunctions({ groupId: 'not-a-guid' }, {}, {});
       await expect(getGroupMaintenanceWindow.call(ctx, 0)).rejects.toThrow(/Invalid group ID/);
     });
   });

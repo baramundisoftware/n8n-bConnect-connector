@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Maintenance windows now match bConnect** (#44). bConnect maintenance windows are recurring schedules, not one-off time ranges; the old *Start Time / End Time / Description / Comment* fields and the *Replace (PUT)* JSON default (`"daily"`) were rejected or ignored. Create, Replace (25 R2) and Update (26 R1) now share the same fields:
+  - **Definition Type**: Everyday, Workday / Weekend, Individual Weekday, Unrestricted (26 R1 adds Anytime and Never)
+  - **Intervals**: period (Everyday, Workdays, Weekends or a weekday) with start and end as `HH:MM` (24:00 = end of day), validated before sending
+  - Group maintenance windows exist for **logical groups** only — the *Group Type* field (static/dynamic, routes bConnect does not have) was removed
+  - Saved workflows using maintenance window operations need the new fields filled in
+- **Example workflow 01 (Patch Tuesday)**: sets a nightly 22:00–04:00 window and starts the update job **on each endpoint** of the groups. Before, it passed maintenance-window IDs as endpoint IDs, so no job was assigned on a real bMS
 - **Security → bMS Security**: *Create Security Group* offers **Security Profile IDs** (sent as `profiles`) instead of a *Description* bConnect does not have; *Update Security Group* no longer sends a description. **Update Object Permissions** now changes **Inherit Rights** and **Security Profile Permissions** — the old *Security Profile Access Rights* patched a property that does not exist (#45)
 - **Security → Defense Control → Patch Local Admin User Credentials**: *Expiry Date* is now **Requested Expiration Date** and patches `/LocalAdminAccount/RequestedExpirationDate` — before, the change was not applied (#45)
 - **Admin → Operating System → Update Windows Endpoint**: offers the properties bConnect can change — Boot Environment ID, Hardware Profile ID, Is OS Install Allowed, Inherits Auto Installation — instead of a non-existent *OS Install Folder ID* (#45)
