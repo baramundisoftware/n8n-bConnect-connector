@@ -24,8 +24,6 @@ import { router } from './actions/router';
 import {
   getEndpoints,
   getLogicalGroups,
-  getStaticGroups,
-  getDynamicGroups,
   endpointSearch,
 } from '../shared/loadOptions';
 
@@ -128,8 +126,6 @@ export class BaramundiEndpoint implements INodeType {
     loadOptions: {
       getEndpoints,
       getLogicalGroups,
-      getStaticGroups,
-      getDynamicGroups,
     },
     listSearch: {
       endpointSearch,

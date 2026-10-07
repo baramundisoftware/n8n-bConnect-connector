@@ -150,14 +150,6 @@ export async function getLogicalGroups(this: ILoadOptionsFunctions): Promise<INo
   return getNamedItems.call(this, '/endpoints/v2.0/LogicalGroups', 'logical groups');
 }
 
-export async function getStaticGroups(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-  return getNamedItems.call(this, '/endpoints/v2.0/StaticGroups', 'static groups');
-}
-
-export async function getDynamicGroups(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-  return getNamedItems.call(this, '/endpoints/v2.0/DynamicGroups', 'dynamic groups');
-}
-
 // ─── listSearch methods (for resourceLocator components) ────────────────────
 
 const SEARCH_PAGE_SIZE = 50;

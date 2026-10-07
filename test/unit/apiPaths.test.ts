@@ -84,11 +84,8 @@ function stripDomainPrefix(connectorPath: string): string {
 // sub-resource paths that combine specs). Document why each is accepted.
 
 const KNOWN_EXCEPTIONS = new Set([
-  // StaticGroups/DynamicGroups base CRUD — undocumented but works on real bMS (P16.3)
-  '/v2.0/StaticGroups',
-  '/v2.0/StaticGroups/{id}',
-  '/v2.0/DynamicGroups',
-  '/v2.0/DynamicGroups/{id}',
+  // (StaticGroups/DynamicGroups base CRUD was listed here as "works on real bMS"; a live 26R1
+  //  probe returned 404 and the operations were removed — #60)
   // Cross-spec sub-resource paths (endpoint spec references job/AD/UDG entities)
   '/v2.0/UniversalDynamicGroups/{id}/Endpoints',
   '/v2.0/ADUsers/{id}/Endpoints',

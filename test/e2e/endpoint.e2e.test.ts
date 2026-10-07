@@ -11,8 +11,6 @@ import * as ep from '../../nodes/BaramundiEndpoint/actions/endpoint/endpoint.exe
 let available = false;
 let firstEndpointId = '';
 let firstLogicalGroupId = '';
-let firstStaticGroupId = '';
-let firstDynamicGroupId = '';
 let createdLogicalGroupId = '';
 
 beforeAll(async () => {
@@ -29,14 +27,6 @@ beforeAll(async () => {
   const lgCtx = createRealContext({ returnAll: false, limit: 5 });
   const groups = await tryOp(() => ep.getLogicalGroups.call(lgCtx, 0));
   if (groups && groups.length > 0) firstLogicalGroupId = groups[0].json.id as string;
-
-  const sgCtx = createRealContext({ returnAll: false, limit: 5 });
-  const sgroups = await tryOp(() => ep.getStaticGroups.call(sgCtx, 0));
-  if (sgroups && sgroups.length > 0) firstStaticGroupId = sgroups[0].json.id as string;
-
-  const dgCtx = createRealContext({ returnAll: false, limit: 5 });
-  const dgroups = await tryOp(() => ep.getDynamicGroups.call(dgCtx, 0));
-  if (dgroups && dgroups.length > 0) firstDynamicGroupId = dgroups[0].json.id as string;
 });
 
 // ─── Endpoint CRUD ───────────────────────────────────────────────────────────
@@ -118,8 +108,9 @@ describe('E2E: Endpoint — getEndpointsByLogicalGroup', () => {
 
 describe('E2E: Endpoint — getEndpointsByStaticGroup', () => {
   it('returns endpoints for a static group (accepts 404)', async () => {
-    if (!available || !firstStaticGroupId) return;
-    const ctx = createRealContext({ staticGroupId: firstStaticGroupId, returnAll: false, limit: 5 });
+    // bConnect has no route to list static groups (#60): exercise the sub-route with a placeholder ID
+    if (!available) return;
+    const ctx = createRealContext({ staticGroupId: NONEXISTENT_GUID, returnAll: false, limit: 5 });
     const result = await tryOp(() => ep.getEndpointsByStaticGroup.call(ctx, 0));
     if (result !== null) expect(Array.isArray(result)).toBe(true);
   });
@@ -127,8 +118,9 @@ describe('E2E: Endpoint — getEndpointsByStaticGroup', () => {
 
 describe('E2E: Endpoint — getEndpointsByDynamicGroup', () => {
   it('returns endpoints for a dynamic group (accepts 404)', async () => {
-    if (!available || !firstDynamicGroupId) return;
-    const ctx = createRealContext({ dynamicGroupId: firstDynamicGroupId, returnAll: false, limit: 5 });
+    // bConnect has no route to list dynamic groups (#60): exercise the sub-route with a placeholder ID
+    if (!available) return;
+    const ctx = createRealContext({ dynamicGroupId: NONEXISTENT_GUID, returnAll: false, limit: 5 });
     const result = await tryOp(() => ep.getEndpointsByDynamicGroup.call(ctx, 0));
     if (result !== null) expect(Array.isArray(result)).toBe(true);
   });
@@ -248,55 +240,6 @@ describe('E2E: Logical Group — CRUD lifecycle', () => {
 
     const deleteCtx = createRealContext({ logicalGroupId: createdLogicalGroupId });
     await tryOp(() => ep.deleteLogicalGroup.call(deleteCtx, 0));
-  });
-});
-
-// ─── Static Group ─────────────────────────────────────────────────────────────
-
-describe('E2E: Static Group', () => {
-  // bConnect-Mock has no static/dynamic group routes yet (bConnect-Mock#65); they work on a real bMS
-  it.skip('getStaticGroups returns array', async () => {
-    if (!available) return;
-    const ctx = createRealContext({ returnAll: false, limit: 5 });
-    const result = await ep.getStaticGroups.call(ctx, 0);
-    expect(Array.isArray(result)).toBe(true);
-  });
-
-  it('getStaticGroup returns object', async () => {
-    if (!available || !firstStaticGroupId) return;
-    const ctx = createRealContext({ groupId: firstStaticGroupId });
-    const result = await ep.getStaticGroup.call(ctx, 0);
-    expect(result[0].json).toHaveProperty('id', firstStaticGroupId);
-  });
-
-  it('createStaticGroup → updateStaticGroup → deleteStaticGroup', async () => {
-    if (!available) return;
-    const createCtx = createRealContext({ name: 'E2E-Static-Group', additionalFields: {} });
-    const created = await tryOp(() => ep.createStaticGroup.call(createCtx, 0));
-    if (!created || created.length === 0) return;
-    const id = created[0].json.id as string;
-
-    await tryOp(() => ep.updateStaticGroup.call(createRealContext({ staticGroupId: id, updateFields: { name: 'E2E-Static-Updated' } }), 0));
-    await tryOp(() => ep.deleteStaticGroup.call(createRealContext({ staticGroupId: id }), 0));
-  });
-});
-
-// ─── Dynamic Group ────────────────────────────────────────────────────────────
-
-describe('E2E: Dynamic Group', () => {
-  // bConnect-Mock has no static/dynamic group routes yet (bConnect-Mock#65); they work on a real bMS
-  it.skip('getDynamicGroups returns array', async () => {
-    if (!available) return;
-    const ctx = createRealContext({ returnAll: false, limit: 5 });
-    const result = await ep.getDynamicGroups.call(ctx, 0);
-    expect(Array.isArray(result)).toBe(true);
-  });
-
-  it('getDynamicGroup returns object', async () => {
-    if (!available || !firstDynamicGroupId) return;
-    const ctx = createRealContext({ groupId: firstDynamicGroupId });
-    const result = await ep.getDynamicGroup.call(ctx, 0);
-    expect(result[0].json).toHaveProperty('id', firstDynamicGroupId);
   });
 });
 

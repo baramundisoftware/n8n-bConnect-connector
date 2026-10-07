@@ -104,15 +104,12 @@ export const staticGroupOperations: INodeProperties[] = [
     type: 'options',
     noDataExpression: true,
     displayOptions: { show: { resource: ['staticGroup'] } },
+    // bConnect exposes static groups only through sub-routes (/StaticGroups/{id}/Endpoints, …);
+    // list/get/create/update/delete routes do not exist (#60)
     options: [
-      { name: 'Create', value: 'createStaticGroup', description: 'Create a new static group', action: 'Create a static group' },
-      { name: 'Delete', value: 'deleteStaticGroup', description: 'Delete a static group', action: 'Delete a static group' },
-      { name: 'Get', value: 'getStaticGroup', description: 'Get a static group by ID', action: 'Get a static group' },
       { name: 'Get Endpoints by Static Group', value: 'getEndpointsByStaticGroup', description: 'Get endpoints in a static group', action: 'Get endpoints by static group' },
-      { name: 'Get Many', value: 'getStaticGroups', description: 'Get many static groups', action: 'Get many static groups' },
-      { name: 'Update', value: 'updateStaticGroup', description: 'Update a static group', action: 'Update a static group' },
     ],
-    default: 'getStaticGroups',
+    default: 'getEndpointsByStaticGroup',
   },
 ];
 
@@ -127,12 +124,11 @@ export const dynamicGroupOperations: INodeProperties[] = [
     type: 'options',
     noDataExpression: true,
     displayOptions: { show: { resource: ['dynamicGroup'] } },
+    // bConnect exposes dynamic groups only through sub-routes (/DynamicGroups/{id}/Endpoints, …) (#60)
     options: [
-      { name: 'Get', value: 'getDynamicGroup', description: 'Get a dynamic group by ID', action: 'Get a dynamic group' },
       { name: 'Get Endpoints by Dynamic Group', value: 'getEndpointsByDynamicGroup', description: 'Get endpoints in a dynamic group', action: 'Get endpoints by dynamic group' },
-      { name: 'Get Many', value: 'getDynamicGroups', description: 'Get many dynamic groups', action: 'Get many dynamic groups' },
     ],
-    default: 'getDynamicGroups',
+    default: 'getEndpointsByDynamicGroup',
   },
 ];
 
@@ -1323,176 +1319,6 @@ export const logicalGroupFields: INodeProperties[] = [
 
 export const staticGroupFields: INodeProperties[] = [
   // ----------------------------------
-  //         staticGroup: Group ID (get, update, delete)
-  // ----------------------------------
-  {
-    displayName: 'Group ID',
-    name: 'groupId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['staticGroup'],
-        operation: ['getStaticGroup', 'updateStaticGroup', 'deleteStaticGroup'],
-      },
-    },
-    description: 'The GUID of the group',
-  },
-
-  // ----------------------------------
-  //         staticGroup:getStaticGroups
-  // ----------------------------------
-  {
-    displayName: 'Return All',
-    name: 'returnAll',
-    type: 'boolean',
-    default: false,
-    displayOptions: {
-      show: {
-        resource: ['staticGroup'],
-        operation: ['getStaticGroups'],
-      },
-    },
-    description: 'Whether to return all results or only up to a given limit',
-    hint: 'Results are capped at 5,000 items regardless of this setting',
-  },
-  {
-    displayName: 'Limit',
-    name: 'limit',
-    type: 'number',
-    typeOptions: {
-      minValue: 1,
-    },
-    default: 50,
-    displayOptions: {
-      show: {
-        resource: ['staticGroup'],
-        operation: ['getStaticGroups'],
-        returnAll: [false],
-      },
-    },
-    description: 'Max number of results to return',
-  },
-  {
-    displayName: 'Options',
-    name: 'options',
-    type: 'collection',
-    placeholder: 'Add Option',
-    default: {},
-    displayOptions: {
-      show: {
-        resource: ['staticGroup'],
-        operation: ['getStaticGroups'],
-      },
-    },
-    options: [
-      {
-        displayName: 'Search Query',
-        name: 'searchQuery',
-        type: 'string',
-        default: '',
-        description: 'Search query to filter groups',
-      },
-      {
-        displayName: 'Order By',
-        name: 'orderBy',
-        type: 'string',
-        default: '',
-        placeholder: 'Name asc',
-        description: 'Sort order (e.g., "Name asc", "Name desc")',
-      },
-    ],
-  },
-
-  // ----------------------------------
-  //         staticGroup:createStaticGroup
-  // ----------------------------------
-  {
-    displayName: 'Name',
-    name: 'name',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['staticGroup'],
-        operation: ['createStaticGroup'],
-      },
-    },
-    description: 'Name of the group',
-  },
-  {
-    displayName: 'Additional Fields',
-    name: 'additionalFields',
-    type: 'collection',
-    placeholder: 'Add Field',
-    default: {},
-    displayOptions: {
-      show: {
-        resource: ['staticGroup'],
-        operation: ['createStaticGroup'],
-      },
-    },
-    options: [
-      {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'Description of the group',
-      },
-      {
-        displayName: 'Comment',
-        name: 'comment',
-        type: 'string',
-        default: '',
-        description: 'Comment for the group',
-      },
-    ],
-  },
-
-  // ----------------------------------
-  //         staticGroup:updateStaticGroup
-  // ----------------------------------
-  {
-    displayName: 'Update Fields',
-    name: 'updateFields',
-    type: 'collection',
-    placeholder: 'Add Field',
-    default: {},
-    displayOptions: {
-      show: {
-        resource: ['staticGroup'],
-        operation: ['updateStaticGroup'],
-      },
-    },
-    options: [
-      {
-        displayName: 'Name',
-        name: 'name',
-        type: 'string',
-        default: '',
-        description: 'Name of the group',
-      },
-      {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'Description of the group',
-      },
-      {
-        displayName: 'Comment',
-        name: 'comment',
-        type: 'string',
-        default: '',
-        description: 'Comment for the group',
-      },
-    ],
-  },
-
-  // ----------------------------------
   //         staticGroup: getEndpointsByStaticGroup
   // ----------------------------------
   {
@@ -1541,89 +1367,6 @@ export const staticGroupFields: INodeProperties[] = [
 // ============================================================
 
 export const dynamicGroupFields: INodeProperties[] = [
-  // ----------------------------------
-  //         dynamicGroup: Group ID (get)
-  // ----------------------------------
-  {
-    displayName: 'Group ID',
-    name: 'groupId',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['dynamicGroup'],
-        operation: ['getDynamicGroup'],
-      },
-    },
-    description: 'The GUID of the group',
-  },
-
-  // ----------------------------------
-  //         dynamicGroup:getDynamicGroups
-  // ----------------------------------
-  {
-    displayName: 'Return All',
-    name: 'returnAll',
-    type: 'boolean',
-    default: false,
-    displayOptions: {
-      show: {
-        resource: ['dynamicGroup'],
-        operation: ['getDynamicGroups'],
-      },
-    },
-    description: 'Whether to return all results or only up to a given limit',
-    hint: 'Results are capped at 5,000 items regardless of this setting',
-  },
-  {
-    displayName: 'Limit',
-    name: 'limit',
-    type: 'number',
-    typeOptions: {
-      minValue: 1,
-    },
-    default: 50,
-    displayOptions: {
-      show: {
-        resource: ['dynamicGroup'],
-        operation: ['getDynamicGroups'],
-        returnAll: [false],
-      },
-    },
-    description: 'Max number of results to return',
-  },
-  {
-    displayName: 'Options',
-    name: 'options',
-    type: 'collection',
-    placeholder: 'Add Option',
-    default: {},
-    displayOptions: {
-      show: {
-        resource: ['dynamicGroup'],
-        operation: ['getDynamicGroups'],
-      },
-    },
-    options: [
-      {
-        displayName: 'Search Query',
-        name: 'searchQuery',
-        type: 'string',
-        default: '',
-        description: 'Search query to filter groups',
-      },
-      {
-        displayName: 'Order By',
-        name: 'orderBy',
-        type: 'string',
-        default: '',
-        placeholder: 'Name asc',
-        description: 'Sort order (e.g., "Name asc", "Name desc")',
-      },
-    ],
-  },
-
   // ----------------------------------
   //         dynamicGroup: getEndpointsByDynamicGroup
   // ----------------------------------
