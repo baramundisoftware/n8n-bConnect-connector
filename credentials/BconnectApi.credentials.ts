@@ -136,17 +136,46 @@ export class BconnectApi implements ICredentialType {
     },
   };
 
+  // Lists one endpoint: a cheap read that exists in 25R2 and 26R1. bConnect routes carry a
+  // module prefix (`/bconnect/endpoints/v2.0/...`), so the path must include `/endpoints`.
+  // HTTP errors are NOT ignored: n8n's credential tester then fails on any non-2xx status,
+  // and the rules below turn the common ones into actionable messages.
   test: ICredentialTestRequest = {
     request: {
-      baseURL: '={{$credentials.baseUrl}}',
-      url: '/v2.0/WindowsEndpoints',
+      // Same normalisation as normalizeBaseUrl() in nodes/shared/utils/validation.ts
+      baseURL: '={{ String($credentials.baseUrl).trim().replace(/\\/+$/, "") }}',
+      url: '/endpoints/v2.0/Endpoints',
+      qs: { PageSize: 1 },
       skipSslCertificateValidation: '={{$credentials.ignoreSslIssues}}',
-      ignoreHttpStatusErrors: true,
       // For API Key auth, the X-Api-Key header is injected here.
       // For Basic Auth, the `authenticate` property above handles it.
       headers: {
         'X-Api-Key': '={{$credentials.authMethod === "apiKey" ? $credentials.apiKey : ""}}',
       },
     },
+    rules: [
+      {
+        type: 'responseCode',
+        properties: {
+          value: 401,
+          message: 'Authentication failed. Check the username and password, or the API key.',
+        },
+      },
+      {
+        type: 'responseCode',
+        properties: {
+          value: 403,
+          message: 'Access denied. The account or API key has no permission to read endpoints in bConnect.',
+        },
+      },
+      {
+        type: 'responseCode',
+        properties: {
+          value: 404,
+          message:
+            'bConnect API not found. Check the Server URL — it should end in /bconnect, e.g. https://bms-server:444/bconnect',
+        },
+      },
+    ],
   };
 }

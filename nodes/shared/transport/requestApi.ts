@@ -14,6 +14,7 @@ import {
   isNetworkError,
   isSslError,
 } from '../utils/errorMessages';
+import { normalizeBaseUrl } from '../utils/validation';
 
 const GUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -84,7 +85,7 @@ export async function apiRequest(
 
   const options: IHttpRequestOptions = {
     method,
-    baseURL: credentials.baseUrl as string,
+    baseURL: normalizeBaseUrl(credentials.baseUrl),
     url: endpoint,
     qs,
     body,

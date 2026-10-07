@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- A Server URL with a trailing space or slash no longer breaks every request with 404; the URL is trimmed before use (#34)
+- The credential **Test** button now really checks the connection: it requests `/endpoints/v2.0/Endpoints` (the old path did not exist) and fails on HTTP errors, with clear messages for 401 (credentials), 403 (permissions) and 404 (Server URL). Before, it reported success even with a wrong URL or password (#35)
+
 ## [0.9.2] - 2026-10-06
 
 Maintenance release. No operation, parameter or credential changes: existing workflows keep working.

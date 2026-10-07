@@ -437,6 +437,28 @@ describe('Request API Transport Layer', () => {
     });
   });
 
+  describe('Server URL normalisation (#34)', () => {
+    it.each([
+      ['trailing space', 'https://bms.example.com:444/bconnect '],
+      ['trailing slash', 'https://bms.example.com:444/bconnect/'],
+      ['surrounding whitespace and slash', '  https://bms.example.com:444/bconnect/ '],
+    ])('should normalise a Server URL with a %s', async (_label, baseUrl) => {
+      const mockContext = createMockExecuteFunctions({ data: [] });
+      mockContext.getCredentials = vi.fn(async () => ({
+        baseUrl,
+        username: 'Administrator',
+        password: 'test-password-do-not-use',
+        ignoreSslIssues: false,
+      }));
+
+      await apiRequest.call(mockContext, 'GET', '/endpoints/v2.0/Endpoints');
+
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ baseURL: 'https://bms.example.com:444/bconnect' })
+      );
+    });
+  });
+
   describe('pagination cap and maxItems', () => {
     it('should export MAX_PAGE_CAP constant equal to 50', () => {
       expect(MAX_PAGE_CAP).toBe(50);

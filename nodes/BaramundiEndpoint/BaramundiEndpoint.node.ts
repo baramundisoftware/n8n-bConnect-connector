@@ -54,7 +54,7 @@ export class BaramundiEndpoint implements INodeType {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      baseURL: '={{$credentials.baseUrl}}',
+      baseURL: '={{ String($credentials.baseUrl).trim().replace(/\\/+$/, "") }}',
       skipSslCertificateValidation: '={{$credentials.ignoreSslIssues}}',
     },
     properties: [

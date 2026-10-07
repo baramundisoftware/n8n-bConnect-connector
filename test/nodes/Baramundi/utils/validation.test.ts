@@ -17,6 +17,7 @@ import {
 	validateMaintenanceWindow,
 	extractResourceLocatorValue,
 	validateRfc6902Patch,
+	normalizeBaseUrl,
 	type ValidationResult,
 } from '../../../../nodes/shared/utils/validation';
 
@@ -654,5 +655,29 @@ describe('validateRfc6902Patch()', () => {
 		const result = validateRfc6902Patch(['not-an-object']);
 		expect(result.valid).toBe(false);
 		expect(result.errors[0]).toMatch(/must be an object/);
+	});
+
+	describe('normalizeBaseUrl', () => {
+		it('should leave a clean URL unchanged', () => {
+			expect(normalizeBaseUrl('https://bms:444/bconnect')).toBe('https://bms:444/bconnect');
+		});
+
+		it('should trim surrounding whitespace (#34)', () => {
+			expect(normalizeBaseUrl('  https://bms:444/bconnect \t\n')).toBe('https://bms:444/bconnect');
+		});
+
+		it('should drop trailing slashes', () => {
+			expect(normalizeBaseUrl('https://bms:444/bconnect/')).toBe('https://bms:444/bconnect');
+			expect(normalizeBaseUrl('https://bms:444/bconnect///')).toBe('https://bms:444/bconnect');
+		});
+
+		it('should handle whitespace and a trailing slash together', () => {
+			expect(normalizeBaseUrl('https://bms:444/bconnect/ ')).toBe('https://bms:444/bconnect');
+		});
+
+		it('should return an empty string for missing values', () => {
+			expect(normalizeBaseUrl(undefined)).toBe('');
+			expect(normalizeBaseUrl(null)).toBe('');
+		});
 	});
 });
