@@ -15,7 +15,7 @@ Automate your **baramundi Management Suite** (bMS) from [n8n](https://n8n.io/) w
 >  
 > Keep an eye on AI token usage, especially during testing, as costs can add up quickly depending on the model and workload.
 
-**229 operations** across **6 nodes**, compatible with **baramundi Management Suite 2025 R2 and 2026 R1**.
+**219 operations** across **6 nodes**, compatible with **baramundi Management Suite 2025 R2 and 2026 R1**.
 
 ---
 
@@ -174,8 +174,8 @@ Every baramundi node has a **bMS Version** dropdown as its first parameter. Sele
 
 | Setting | Shows |
 |---------|-------|
-| `26R1` (default) | All 229 operations including compliance, UDGs, bundles |
-| `25R2` | 180 operations — excludes 26R1-only features |
+| `26 R1` (default) | 211 operations, including compliance, Universal Dynamic Groups and software bundles |
+| `25 R2` | 171 operations, including industrial endpoints and *Replace (PUT)* maintenance windows, which exist in 25 R2 only |
 
 ---
 
@@ -183,12 +183,14 @@ Every baramundi node has a **bMS Version** dropdown as its first parameter. Sele
 
 | Node | Operations | What it does |
 |------|-----------|--------------|
-| **baramundi Endpoint** | 49 | Endpoints (all types), logical/static/dynamic groups, maintenance windows |
 | **baramundi Admin** | 43 | Active Directory, server management, microservices, OS config |
+| **baramundi Endpoint** | 42 | Endpoints (all types), logical groups, endpoints by static/dynamic group, maintenance windows |
 | **baramundi Software** | 41 | Software inventory, bundles, updates, variables, Universal Dynamic Groups |
-| **baramundi Job** | 37 | Job definitions, execution, instances, folders, kiosk releases |
+| **baramundi Job** | 34 | Job definitions (read and execute), instances, folders, kiosk releases |
 | **baramundi Security** | 33 | Compliance, BitLocker, Defender, local admin accounts |
 | **baramundi Asset** | 26 | Asset inventory, asset types, stock/type folders |
+
+Counts are the operations each node offers across both bMS versions; the editor shows only those your selected version supports.
 
 ---
 

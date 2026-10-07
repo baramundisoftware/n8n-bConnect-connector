@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Documentation
+- README: operation counts updated to the current nodes (219 in total; 211 for 26 R1, 171 for 25 R2 — some operations exist in 25 R2 only)
+
 ### Removed
 - **Endpoint → Static Group**: *Get*, *Get Many*, *Create*, *Update*, *Delete*, and **Dynamic Group**: *Get*, *Get Many*. bConnect exposes these groups only through sub-routes; `/endpoints/v2.0/StaticGroups` and `/DynamicGroups` are in neither spec and return *404* on a live bMS 26R1 — the operations could never succeed. *Get Endpoints by Static/Dynamic Group*, *Assign Job to Static/Dynamic Group* and job instances by group remain (#60)
 - **Job → Job Definition → Create / Update / Delete**: job definitions are read-only in bConnect. A live bMS 26R1 answers `POST`/`PATCH`/`DELETE /jobs/v2.0/JobDefinitions` with *405 Method Not Allowed*, and neither the 25R2 nor the 26R1 spec has these methods — the operations could never succeed (#42)
