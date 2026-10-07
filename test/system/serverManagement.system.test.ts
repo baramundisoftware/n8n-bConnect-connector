@@ -218,23 +218,27 @@ describe.skipIf(skipConfig.skip)('Server Management API - System Tests', () => {
       // CREATE
       const createContext = createSystemTestContext({
         name: `SystemTest_SecurityGroup_${Date.now()}`,
-        additionalFields: {
-          comment: 'System test security group',
-        },
       }, config!);
 
       const created = await server.createSecurityGroup.call(createContext, 0);
       expect(created).toBeDefined();
       expect(created[0].json).toHaveProperty('id');
-      expect(created[0].json.name).toContain('SystemTest_SecurityGroup_');
       const groupId = created[0].json.id as string;
       createdSecurityGroupIds.push(groupId);
+
+      // The create answer may carry only the id; read the group back. bConnect-Mock 0.8.0
+      // drops groupName from every security group (bConnect-Mock#86), so check it on a real bMS only.
+      const read = await server.getSecurityGroup.call(createSystemTestContext({ securityGroupId: groupId }, config!), 0);
+      expect(read[0].json.id).toBe(groupId);
+      if (process.env.BCONNECT_IS_MOCK !== 'true') {
+        expect(read[0].json.groupName).toContain('SystemTest_SecurityGroup_');
+      }
 
       // UPDATE
       const updateContext = createSystemTestContext({
         securityGroupId: groupId,
         updateFields: {
-          comment: 'Updated security group comment',
+          name: `SystemTest_SecurityGroup_${Date.now()}_renamed`,
         },
       }, config!);
 

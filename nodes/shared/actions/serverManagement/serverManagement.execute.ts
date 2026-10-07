@@ -47,11 +47,9 @@ export async function getMicroservices(
   this: IExecuteFunctions,
   _index: number,
 ): Promise<INodeExecutionData[]> {
+  // A plain array, not a paged list (both specs; confirmed on a live bMS 26.1.161.0)
   const response = await apiRequest.call(this, 'GET', '/servermanagement/v2.0/Microservices');
-  // A plain array (both specs; confirmed on a live bMS 26.1.161.0). bConnect-Mock 0.4.0
-  // answers with a paged list (bConnect-Mock#80): read `data` until the mock is fixed.
-  const data = ((response as IDataObject).data ?? response) as IDataObject[];
-  return this.helpers.returnJsonArray(data);
+  return this.helpers.returnJsonArray(response as unknown as IDataObject[]);
 }
 
 export async function getMicroservice(

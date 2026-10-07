@@ -175,7 +175,7 @@ describe.skipIf(skipConfig.skip)('Operating Systems API - System Tests', () => {
       expect(Array.isArray(result)).toBe(true);
 
       if (result.length > 0) {
-        expect(result[0].json).toHaveProperty('id');
+        expect(result[0].json).toHaveProperty('endpointId');
       }
     });
 
@@ -192,7 +192,7 @@ describe.skipIf(skipConfig.skip)('Operating Systems API - System Tests', () => {
         return;
       }
 
-      const endpointId = endpoints[0].json.id as string;
+      const endpointId = endpoints[0].json.endpointId as string;
 
       const context = createSystemTestContext({
         endpointId,
@@ -201,7 +201,7 @@ describe.skipIf(skipConfig.skip)('Operating Systems API - System Tests', () => {
       const result = await os.getWindowsEndpoint.call(context, 0);
 
       expect(result).toBeDefined();
-      expect(result[0].json.id).toBe(endpointId);
+      expect(result[0].json.endpointId).toBe(endpointId);
     });
 
     it('should support pagination', async () => {
@@ -230,19 +230,21 @@ describe.skipIf(skipConfig.skip)('Operating Systems API - System Tests', () => {
         return;
       }
 
-      const endpointId = endpoints[0].json.id as string;
+      const endpointId = endpoints[0].json.endpointId as string;
 
       const updateContext = createSystemTestContext({
         endpointId,
+        // Only bootEnvironmentId, hardwareProfileId, isOSInstallAllowed and
+        // inheritsAutoInstallation can be changed
         updateFields: {
-          comment: `SystemTest_${Date.now()}`,
+          isOSInstallAllowed: true,
         },
       }, config!);
 
       const result = await os.updateWindowsEndpoint.call(updateContext, 0);
 
       expect(result).toBeDefined();
-      expect(result[0].json.id).toBe(endpointId);
+      expect(result[0].json.endpointId).toBe(endpointId);
     });
   });
 

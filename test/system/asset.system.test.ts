@@ -70,8 +70,8 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
       expect(Array.isArray(result)).toBe(true);
 
       if (result.length > 0) {
-        expect(result[0].json).toHaveProperty('id');
-        expect(result[0].json).toHaveProperty('assetTag');
+        expect(result[0].json).toHaveProperty('assetId');
+        expect(result[0].json).toHaveProperty('name');
       }
     });
 
@@ -89,7 +89,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
         return;
       }
 
-      const assetId = assets[0].json.id as string;
+      const assetId = assets[0].json.assetId as string;
 
       const context = createSystemTestContext({
         assetId,
@@ -98,7 +98,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
       const result = await asset.get.call(context, 0);
 
       expect(result).toBeDefined();
-      expect(result[0].json.id).toBe(assetId);
+      expect(result[0].json.assetId).toBe(assetId);
     });
 
     it('should support search and orderBy options', async () => {
@@ -134,7 +134,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
         console.warn('No existing asset types available, cannot create asset without asset type');
         return;
       } else {
-        assetTypeId = types[0].json.id as string;
+        assetTypeId = types[0].json.guid as string;
       }
 
       // AssetForCreation requires an owner (#37): the endpoint from BCONNECT_TEST_ENDPOINT_ID,
@@ -166,8 +166,8 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
 
       const created = await asset.create.call(createContext, 0);
       expect(created).toBeDefined();
-      expect(created[0].json).toHaveProperty('id');
-      createdAssetId = created[0].json.id as string;
+      expect(created[0].json).toHaveProperty('assetId');
+      createdAssetId = created[0].json.assetId as string;
       createdAssetIds.push(createdAssetId);
 
       // READ
@@ -177,7 +177,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
 
       const read = await asset.get.call(readContext, 0);
       expect(read).toBeDefined();
-      expect(read[0].json.id).toBe(createdAssetId);
+      expect(read[0].json.assetId).toBe(createdAssetId);
 
       // UPDATE
       const updateContext = createSystemTestContext({
@@ -189,7 +189,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
 
       const updated = await asset.update.call(updateContext, 0);
       expect(updated).toBeDefined();
-      expect(updated[0].json.id).toBe(createdAssetId);
+      expect(updated[0].json.assetId).toBe(createdAssetId);
 
       // DELETE
       const deleteContext = createSystemTestContext({
@@ -218,7 +218,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
       expect(Array.isArray(result)).toBe(true);
 
       if (result.length > 0) {
-        expect(result[0].json).toHaveProperty('id');
+        expect(result[0].json).toHaveProperty('guid');
         expect(result[0].json).toHaveProperty('name');
       }
     });
@@ -236,7 +236,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
         return;
       }
 
-      const typeId = types[0].json.id as string;
+      const typeId = types[0].json.guid as string;
 
       const context = createSystemTestContext({
         assetTypeId: typeId,
@@ -245,7 +245,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
       const result = await asset.getAssetType.call(context, 0);
 
       expect(result).toBeDefined();
-      expect(result[0].json.id).toBe(typeId);
+      expect(result[0].json.guid).toBe(typeId);
     });
 
     // Skip this test - creating asset types requires valid parent hierarchy configuration

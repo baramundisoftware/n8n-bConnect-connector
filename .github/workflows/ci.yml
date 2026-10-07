@@ -117,7 +117,7 @@ jobs:
     # with read-write data; not a required check (the mock is a separate project).
     services:
       bconnect-mock:
-        image: ghcr.io/baramundisoftware/bconnect-mock:0.4.0
+        image: ghcr.io/baramundisoftware/bconnect-mock:0.8.0
         ports:
           - 8765:3433
         env:
