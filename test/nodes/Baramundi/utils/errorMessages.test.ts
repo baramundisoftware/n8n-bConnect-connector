@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getNetworkErrorInfo, isSslError, getSslErrorInfo } from '../../../../nodes/shared/utils/errorMessages';
+import { getNetworkErrorInfo, isNetworkError, isSslError, getSslErrorInfo } from '../../../../nodes/shared/utils/errorMessages';
 
 describe('getNetworkErrorInfo()', () => {
   it('should return ECONNREFUSED message', () => {
@@ -33,6 +33,19 @@ describe('getNetworkErrorInfo()', () => {
   it('should handle null/undefined error', () => {
     const info = getNetworkErrorInfo(null, 'https://bms:444');
     expect(info.message).toContain('Network error');
+  });
+});
+
+describe('isNetworkError()', () => {
+  it.each(['ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT', 'ECONNRESET', 'ECONNABORTED', 'EHOSTUNREACH', 'EAI_AGAIN'])(
+    'returns true for code %s',
+    (code) => {
+      expect(isNetworkError({ code, message: 'socket failure' })).toBe(true);
+    },
+  );
+
+  it('returns false for an HTTP error', () => {
+    expect(isNetworkError({ message: 'Request failed with status code 404', response: { status: 404 } })).toBe(false);
   });
 });
 

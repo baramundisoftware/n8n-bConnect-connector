@@ -1,5 +1,6 @@
 import type {
   IExecuteFunctions,
+  INode,
   IHttpRequestMethods,
   IHttpRequestOptions,
   JsonObject,
@@ -21,6 +22,31 @@ const GUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 /** Safely coerce an unknown caught value to the JsonObject shape required by NodeApiError. */
 function toJsonObject(e: unknown): JsonObject {
   return (typeof e === 'object' && e !== null ? e : { message: String(e) }) as JsonObject;
+}
+
+/**
+ * Build the NodeApiError thrown to the workflow, keeping our message.
+ *
+ * NodeApiError replaces the message with n8n's generic text when the error carries a
+ * well-known code (ECONNREFUSED, ENOTFOUND, ETIMEDOUT, …), e.g. "The service refused the
+ * connection - perhaps it is offline". Ours names the server and how to fix it, and with
+ * "Continue on Fail" the message is all that reaches the output item, so restore it.
+ */
+function toNodeApiError(
+  node: INode,
+  error: unknown,
+  message: string,
+  httpCode?: number,
+): NodeApiError {
+  const apiError = new NodeApiError(node, toJsonObject(error), {
+    message,
+    ...(httpCode ? { httpCode: String(httpCode) } : {}),
+  });
+  if (apiError.message !== message) {
+    apiError.messages = apiError.messages.filter((m) => m !== message);
+    apiError.message = message;
+  }
+  return apiError;
 }
 
 const RETRY_STATUS_CODES = new Set([429, 503]);
@@ -131,9 +157,11 @@ export async function apiRequest(
       const networkErrorInfo = getNetworkErrorInfo(error, options.baseURL as string);
       const troubleshooting = formatTroubleshootingHints(networkErrorInfo.troubleshooting);
 
-      throw new NodeApiError(this.getNode(), toJsonObject(error), {
-        message: `${networkErrorInfo.message}${troubleshooting}\n\nURL: ${safeUrl}`,
-      });
+      throw toNodeApiError(
+        this.getNode(),
+        error,
+        `${networkErrorInfo.message}${troubleshooting}\n\nURL: ${safeUrl}`,
+      );
     }
 
     // Check for SSL errors
@@ -141,9 +169,11 @@ export async function apiRequest(
       const sslErrorInfo = getSslErrorInfo(error);
       const troubleshooting = formatTroubleshootingHints(sslErrorInfo.troubleshooting);
 
-      throw new NodeApiError(this.getNode(), toJsonObject(error), {
-        message: `${sslErrorInfo.message}${troubleshooting}\n\nURL: ${safeUrl}`,
-      });
+      throw toNodeApiError(
+        this.getNode(),
+        error,
+        `${sslErrorInfo.message}${troubleshooting}\n\nURL: ${safeUrl}`,
+      );
     }
 
     // Handle HTTP status code errors
@@ -153,16 +183,20 @@ export async function apiRequest(
       const enhancedError = getEnhancedErrorInfo(statusCode, errorMessage, operation);
       const troubleshooting = formatTroubleshootingHints(enhancedError.troubleshooting);
 
-      throw new NodeApiError(this.getNode(), toJsonObject(error), {
-        message: `${enhancedError.message}${troubleshooting}\n\nURL: ${safeUrl}`,
-        httpCode: String(statusCode),
-      });
+      throw toNodeApiError(
+        this.getNode(),
+        error,
+        `${enhancedError.message}${troubleshooting}\n\nURL: ${safeUrl}`,
+        statusCode,
+      );
     }
 
     // Fallback for unknown errors
-    throw new NodeApiError(this.getNode(), toJsonObject(error), {
-      message: `bConnect API Error: ${errorMessage}\n\nURL: ${safeUrl}\n\nTroubleshooting:\n1. Check the error message above for details\n2. Verify your credentials and permissions\n3. Review baramundi server logs`,
-    });
+    throw toNodeApiError(
+      this.getNode(),
+      error,
+      `bConnect API Error: ${errorMessage}\n\nURL: ${safeUrl}\n\nTroubleshooting:\n1. Check the error message above for details\n2. Verify your credentials and permissions\n3. Review baramundi server logs`,
+    );
   }
 }
 

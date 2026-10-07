@@ -222,6 +222,17 @@ export function extractStatusCode(error: unknown): number {
 	return 0;
 }
 
+/** Node.js socket/DNS error codes that mean the server could not be reached. */
+const NETWORK_ERROR_CODES = new Set([
+	'ECONNREFUSED',
+	'ENOTFOUND',
+	'ETIMEDOUT',
+	'ECONNRESET',
+	'ECONNABORTED',
+	'EHOSTUNREACH',
+	'EAI_AGAIN',
+]);
+
 /**
  * Check if error is a network/connectivity error
  * @param error - Error object
@@ -237,9 +248,7 @@ export function isNetworkError(error: unknown): boolean {
 		message.includes('enotfound') ||
 		message.includes('etimedout') ||
 		message.includes('network') ||
-		code === 'ECONNREFUSED' ||
-		code === 'ENOTFOUND' ||
-		code === 'ETIMEDOUT'
+		NETWORK_ERROR_CODES.has(code)
 	);
 }
 
