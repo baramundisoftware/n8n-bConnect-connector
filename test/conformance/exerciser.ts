@@ -274,3 +274,57 @@ export async function exercise(
   }
   return { node: node.description.name, release, resource, operation, pass, requests, error, variant: variant?.label };
 }
+
+/**
+ * Dropdown and search functions (methods.loadOptions / methods.listSearch) of a node.
+ * They run in the editor, not in execute(), so the passes above never reach them.
+ * listSearch is called with and without a filter; endpointSearch once per platform type.
+ */
+export async function exerciseMethods(node: INodeType, release: Release): Promise<Exercise[]> {
+  const out: Exercise[] = [];
+  const kinds = ['loadOptions', 'listSearch'] as const;
+  for (const kind of kinds) {
+    const methods = (node.methods?.[kind] ?? {}) as Record<string, (...args: unknown[]) => Promise<unknown>>;
+    for (const [name, fn] of Object.entries(methods)) {
+      const variants: Array<{ endpointType?: string; filter?: string }> =
+        kind === 'listSearch' ? [{}, { filter: 'abc' }] : [{}];
+      if (name === 'endpointSearch') {
+        for (const endpointType of ['windows', 'android', 'ios', 'linux', 'mac', 'network']) variants.push({ endpointType, filter: 'abc' });
+      }
+      for (const v of variants) {
+        const requests: RecordedRequest[] = [];
+        const params: Params = { bmsVersion: release, endpointType: v.endpointType };
+        const ctx = {
+          getNodeParameter: (n: string, ...fallback: unknown[]) => (n in params ? params[n] : fallback[0]),
+          getCurrentNodeParameter: (n: string) => params[n],
+          getNode: () => ({ name: node.description.displayName, type: node.description.name, typeVersion: 1, position: [0, 0], parameters: params }),
+          getCredentials: async () => ({ baseUrl: BASE_URL, authMethod: 'basicAuth', username: 'u', password: 'p', ignoreSslIssues: false }),
+          helpers: {
+            httpRequest: async (o: IHttpRequestOptions) => {
+              requests.push({
+                method: String(o.method ?? 'GET').toUpperCase(),
+                path: String(o.url ?? '').split('?')[0],
+                qs: { ...((o.qs as Record<string, unknown>) ?? {}) },
+                body: o.body,
+              });
+              return fakeResponse();
+            },
+          },
+          logger: { debug() {}, info() {}, warn() {}, error() {} },
+        };
+        let error: string | undefined;
+        try {
+          await fn.call(ctx, ...(kind === 'listSearch' ? [v.filter] : []));
+        } catch (e) {
+          if (requests.length === 0) error = (e as Error).message.split('\n')[0];
+        }
+        out.push({
+          node: node.description.name, release, resource: kind, operation: name, pass: 'all', requests, error,
+          variant: v.endpointType ? `endpointType=${v.endpointType}` : undefined,
+        });
+      }
+    }
+  }
+  return out;
+}
+

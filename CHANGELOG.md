@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Org Unit dropdown** (Admin) listed nothing: it requested a path bConnect does not have. It now loads org units from `/activedirectory/v2.0/OrgUnits` (#38)
+- **Dropdowns show why they are empty**: when loading fails (wrong Server URL, missing permissions, unreachable server), the dropdown now shows *Could not load …* with the reason instead of an empty list. An empty list now means bConnect returned no data (#41)
 - **bMS 25 R2 no longer offers what only exists in 26 R1** (#39): the resources *Compliance* (Security), *Software Bundle* and *Universal Dynamic Groups* (Software), and the operations *Get API Keys*, *MSW Cleanup*, *Simulate MSW Cleanup*, *Get Download Job(s)* (Admin → Server Management) and *Get / Patch BitLocker Secrets* (Security → Defense Control). Before, they showed an empty form or failed with "Could not get parameter"
 - **Endpoint → Get Many**: the *Organizational Unit ID* filter was silently ignored by bConnect (no such parameter) and was replaced by **Display Name** and **Host Name** filters (Host Name is not available for Android/iOS). **Get Unmanaged Endpoints** no longer sends paging parameters the route does not define; *Limit* is applied to the result (#46)
 - **Maintenance windows now match bConnect** (#44). bConnect maintenance windows are recurring schedules, not one-off time ranges; the old *Start Time / End Time / Description / Comment* fields and the *Replace (PUT)* JSON default (`"daily"`) were rejected or ignored. Create, Replace (25 R2) and Update (26 R1) now share the same fields:
@@ -43,7 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The credential **Test** button now really checks the connection: it requests `/endpoints/v2.0/Endpoints` (the old path did not exist) and fails on HTTP errors, with clear messages for 401 (credentials), 403 (permissions) and 404 (Server URL). Before, it reported success even with a wrong URL or password (#35)
 
 ### Added
-- Spec-conformance check (`npm run check:spec`, part of the unit tests): calls every operation the editor offers, per bMS release and for every value of every option field, and checks the HTTP requests against the 25R2/26R1 OpenAPI specs — route and module prefix, query parameters, body fields, required fields, enum values, JSON Patch paths. Known violations are baselined against their issues (#37, #39, #42–#46). JSON Patch paths are also accepted when the spec's own PATCH example uses them
+- Spec-conformance check (`npm run check:spec`, part of the unit tests): calls every operation the editor offers, per bMS release and for every value of every option field, plus every dropdown and search function, and checks the HTTP requests against the 25R2/26R1 OpenAPI specs — route and module prefix, query parameters, body fields, required fields, enum values, JSON Patch paths. Known violations are baselined against their issues (#37, #39, #42–#46). JSON Patch paths are also accepted when the spec's own PATCH example uses them
 
 ## [0.9.2] - 2026-10-06
 

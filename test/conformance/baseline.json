@@ -10,6 +10,8 @@
   "25R2 baramundiJob/jobDefinition.create route: POST /jobs/v2.0/JobDefinitions - path exists, but not for POST": 42,
   "25R2 baramundiJob/jobDefinition.delete route: DELETE /jobs/v2.0/JobDefinitions/{id} - path exists, but not for DELETE": 42,
   "25R2 baramundiJob/jobDefinition.update route: PATCH /jobs/v2.0/JobDefinitions/{id} - path exists, but not for PATCH": 42,
+  "25R2 methods/loadOptions.getDynamicGroups route: GET /endpoints/v2.0/DynamicGroups - not in spec": "accepted: undocumented static/dynamic group routes, verified on a real bMS (P16.3); bConnect-Mock#65",
+  "25R2 methods/loadOptions.getStaticGroups route: GET /endpoints/v2.0/StaticGroups - not in spec": "accepted: undocumented static/dynamic group routes, verified on a real bMS (P16.3); bConnect-Mock#65",
   "26R1 baramundiEndpoint/dynamicGroup.getDynamicGroup route: GET /endpoints/v2.0/DynamicGroups/{id} - not in spec": "accepted: undocumented static/dynamic group routes, verified on a real bMS (P16.3); bConnect-Mock#65",
   "26R1 baramundiEndpoint/dynamicGroup.getDynamicGroups route: GET /endpoints/v2.0/DynamicGroups - not in spec": "accepted: undocumented static/dynamic group routes, verified on a real bMS (P16.3); bConnect-Mock#65",
   "26R1 baramundiEndpoint/staticGroup.createStaticGroup route: POST /endpoints/v2.0/StaticGroups - not in spec": "accepted: undocumented static/dynamic group routes, verified on a real bMS (P16.3); bConnect-Mock#65",
@@ -20,5 +22,7 @@
   "26R1 baramundiEndpoint/staticGroup.updateStaticGroup route: PATCH /endpoints/v2.0/StaticGroups/{id} - not in spec": "accepted: undocumented static/dynamic group routes, verified on a real bMS (P16.3); bConnect-Mock#65",
   "26R1 baramundiJob/jobDefinition.create route: POST /jobs/v2.0/JobDefinitions - path exists, but not for POST": 42,
   "26R1 baramundiJob/jobDefinition.delete route: DELETE /jobs/v2.0/JobDefinitions/{id} - path exists, but not for DELETE": 42,
-  "26R1 baramundiJob/jobDefinition.update route: PATCH /jobs/v2.0/JobDefinitions/{id} - path exists, but not for PATCH": 42
+  "26R1 baramundiJob/jobDefinition.update route: PATCH /jobs/v2.0/JobDefinitions/{id} - path exists, but not for PATCH": 42,
+  "26R1 methods/loadOptions.getDynamicGroups route: GET /endpoints/v2.0/DynamicGroups - not in spec": "accepted: undocumented static/dynamic group routes, verified on a real bMS (P16.3); bConnect-Mock#65",
+  "26R1 methods/loadOptions.getStaticGroups route: GET /endpoints/v2.0/StaticGroups - not in spec": "accepted: undocumented static/dynamic group routes, verified on a real bMS (P16.3); bConnect-Mock#65"
 }
