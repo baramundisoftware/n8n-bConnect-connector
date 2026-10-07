@@ -107,3 +107,48 @@ jobs:
           fi
           echo "Dev dependencies (not shipped in the package):"
           npm audit --audit-level=critical || true
+
+  integration:
+    name: integration (bConnect-Mock)
+    runs-on: ubuntu-latest
+    # E2E and system tests against a live bConnect-Mock, so they cannot silently go stale
+    # again (#40: the system suite could not even load after the node split). Uses 26R1
+    # with read-write data; not a required check (the mock is a separate project).
+    services:
+      bconnect-mock:
+        image: ghcr.io/baramundisoftware/bconnect-mock:0.4.0
+        ports:
+          - 8765:3433
+        env:
+          BCONNECT_PROFILE: standard-readwrite
+          BCONNECT_BMS_VERSION: 26r1
+          RATE_LIMIT_ENABLED: "false"
+    env:
+      BCONNECT_BASE_URL: http://localhost:8765/bconnect
+      BCONNECT_USERNAME: ci
+      BCONNECT_PASSWORD: ci
+      BCONNECT_IGNORE_SSL: "false"
+      BCONNECT_IS_MOCK: "true"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22.16"
+          cache: npm
+      - name: Use npm 11 (same as Dependabot)
+        run: npm install -g npm@11
+      - run: npm ci
+
+      - name: Wait for bConnect-Mock
+        run: |
+          for i in $(seq 1 30); do
+            curl -fsS http://localhost:8765/health && exit 0
+            sleep 2
+          done
+          echo "bConnect-Mock did not become healthy"; exit 1
+
+      - name: E2E tests
+        run: npm run test:e2e
+
+      - name: System tests
+        run: npm run test:system

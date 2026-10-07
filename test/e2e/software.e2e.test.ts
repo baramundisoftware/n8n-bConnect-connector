@@ -205,19 +205,20 @@ describe('E2E: Variable — getVariableDefinitions', () => {
 });
 
 describe('E2E: Variable — CRUD lifecycle', () => {
+  // Strict: VariableDefinitionForCreation requires name, category and scopes (#45)
   it('createVariableDefinition → updateVariableDefinition → deleteVariableDefinition', async () => {
     if (!available) return;
-    const created = await tryOp(() => vrbl.createVariableDefinition.call(
-      createRealContext({ name: 'E2ETestVar', additionalFields: {} }), 0
-    ));
-    if (!created || created.length === 0) return;
+    const created = await vrbl.createVariableDefinition.call(
+      createRealContext({ name: 'E2ETestVar', category: 'E2E', scopes: ['Endpoint'], type: 'String', additionalFields: {} }), 0
+    );
     const id = created[0].json.id as string;
+    expect(id).toBeTruthy();
 
-    await tryOp(() => vrbl.getVariableDefinition.call(createRealContext({ variableDefinitionId: id }), 0));
-    await tryOp(() => vrbl.updateVariableDefinition.call(
-      createRealContext({ variableDefinitionId: id, updateFields: { description: 'updated' } }), 0
-    ));
-    await tryOp(() => vrbl.deleteVariableDefinition.call(createRealContext({ variableDefinitionId: id }), 0));
+    await vrbl.getVariableDefinition.call(createRealContext({ variableDefinitionId: id }), 0);
+    await vrbl.updateVariableDefinition.call(
+      createRealContext({ variableDefinitionId: id, updateFields: { comment: 'updated' } }), 0
+    );
+    await vrbl.deleteVariableDefinition.call(createRealContext({ variableDefinitionId: id }), 0);
   });
 });
 

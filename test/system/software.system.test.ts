@@ -83,7 +83,7 @@ describe.skipIf(skipConfig.skip)('Software API - System Tests', () => {
         limit: 1,
       }, config!);
 
-      const endpoints = await (await import('../../nodes/Baramundi/actions/endpoint/endpoint.execute')).getMany.call(endpointsContext, 0);
+      const endpoints = await (await import('../../nodes/BaramundiEndpoint/actions/endpoint/endpoint.execute')).getMany.call(endpointsContext, 0);
 
       if (endpoints.length === 0) {
         console.warn('No endpoints available for testing');
@@ -119,7 +119,7 @@ describe.skipIf(skipConfig.skip)('Software API - System Tests', () => {
         limit: 1,
       }, config!);
 
-      const groups = await (await import('../../nodes/Baramundi/actions/endpoint/endpoint.execute')).getLogicalGroups.call(groupsContext, 0);
+      const groups = await (await import('../../nodes/BaramundiEndpoint/actions/endpoint/endpoint.execute')).getLogicalGroups.call(groupsContext, 0);
 
       if (groups.length === 0) {
         console.warn('No logical groups available for testing');
@@ -155,7 +155,7 @@ describe.skipIf(skipConfig.skip)('Software API - System Tests', () => {
         limit: 1,
       }, config!);
 
-      const groups = await (await import('../../nodes/Baramundi/actions/universalDynamicGroups/universalDynamicGroups.execute')).getMany.call(groupsContext, 0);
+      const groups = await (await import('../../nodes/BaramundiSoftware/actions/universalDynamicGroups/universalDynamicGroups.execute')).getMany.call(groupsContext, 0);
 
       if (groups.length === 0) {
         console.warn('No universal dynamic groups available for testing');
