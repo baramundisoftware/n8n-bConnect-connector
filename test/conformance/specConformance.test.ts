@@ -57,7 +57,8 @@ beforeAll(async () => {
     const next: Record<string, number | string> = {};
     for (const [k, issue] of Object.entries(baseline)) if (mode === 'add-new' || found.has(k)) next[k] = issue;
     if (mode === 'add-new') for (const k of found.keys()) if (!(k in next)) next[k] = 0;
-    const sorted = Object.fromEntries(Object.entries(next).sort(([a], [b]) => a.localeCompare(b)));
+    // Code-point order (not localeCompare): stable across machines, minimal diffs
+    const sorted = Object.fromEntries(Object.entries(next).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
     writeFileSync(BASELINE_PATH, JSON.stringify(sorted, null, 2) + '\n');
   }
   if (process.env.SPEC_REPORT) {

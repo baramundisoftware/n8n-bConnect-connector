@@ -3043,10 +3043,11 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
   });
 
   describe('getGroupMaintenanceWindow()', () => {
+    // Reads the form's groupId + groupType, like the other group maintenance-window operations (#43)
     it('should fetch the maintenance window for a logical group', async () => {
       const logicalGroupId = '22222222-2222-2222-2222-222222222222';
       const mockMW = { id: 'mw-2', startTime: '09:00', endTime: '11:00' };
-      const ctx = createMockExecuteFunctions({ logicalGroupId }, {}, mockMW);
+      const ctx = createMockExecuteFunctions({ groupId: logicalGroupId, groupType: 'logical' }, {}, mockMW);
 
       const result = await getGroupMaintenanceWindow.call(ctx, 0);
 
@@ -3054,6 +3055,13 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
       expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({ url: expect.stringContaining(`/endpoints/v2.0/LogicalGroups/${logicalGroupId}/MaintenanceWindow`) }),
       );
+    });
+  });
+
+  describe('getGroupMaintenanceWindow() input', () => {
+    it('should reject an invalid group ID', async () => {
+      const ctx = createMockExecuteFunctions({ groupId: 'not-a-guid', groupType: 'logical' }, {}, {});
+      await expect(getGroupMaintenanceWindow.call(ctx, 0)).rejects.toThrow(/Invalid group ID/);
     });
   });
 

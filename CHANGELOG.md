@@ -7,12 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- Spec-conformance check (`npm run check:spec`, part of the unit tests): calls every operation the editor offers, per bMS release, and checks the HTTP requests against the 25R2/26R1 OpenAPI specs — route and module prefix, query parameters, body fields, required fields, enum values, JSON Patch paths. Known violations are baselined against their issues (#37, #39, #42–#46)
-
 ### Fixed
+- Endpoint → Maintenance Window → **Get Group Maintenance Window** works again: it read a parameter the form does not have and failed on every run (#43)
 - A Server URL with a trailing space or slash no longer breaks every request with 404; the URL is trimmed before use (#34)
 - The credential **Test** button now really checks the connection: it requests `/endpoints/v2.0/Endpoints` (the old path did not exist) and fails on HTTP errors, with clear messages for 401 (credentials), 403 (permissions) and 404 (Server URL). Before, it reported success even with a wrong URL or password (#35)
+
+### Added
+- Spec-conformance check (`npm run check:spec`, part of the unit tests): calls every operation the editor offers, per bMS release, and checks the HTTP requests against the 25R2/26R1 OpenAPI specs — route and module prefix, query parameters, body fields, required fields, enum values, JSON Patch paths. Known violations are baselined against their issues (#37, #39, #42–#46)
 
 ## [0.9.2] - 2026-10-06
 
