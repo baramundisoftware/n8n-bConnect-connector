@@ -66,7 +66,8 @@ export async function getMany(
   const limit = this.getNodeParameter('limit', index, 50) as number;
   const options = this.getNodeParameter('options', index, {}) as {
     orderBy?: string;
-    orgUnitId?: string;
+    displayName?: string;
+    hostName?: string;
   };
 
   const qs: Record<string, string | number> = {};
@@ -79,8 +80,13 @@ export async function getMany(
     qs.OrderBy = options.orderBy;
   }
 
-  if (options.orgUnitId) {
-    qs.OrgUnitId = options.orgUnitId;
+  // DisplayName is a query parameter of every endpoint list route; HostName of all but Android/iOS
+  if (options.displayName) qs.DisplayName = options.displayName;
+  if (options.hostName) {
+    if (endpointType === 'android' || endpointType === 'ios') {
+      throw new NodeOperationError(this.getNode(), 'The Host Name filter is not available for Android and iOS endpoints', { itemIndex: index });
+    }
+    qs.HostName = options.hostName;
   }
 
   const typePath = endpointType !== 'all' ? TYPED_ENDPOINT_PATH[endpointType] : null;
@@ -961,15 +967,11 @@ export async function getUnmanagedEndpoints(
   const returnAll = this.getNodeParameter('returnAll', index) as boolean;
   const limit = this.getNodeParameter('limit', index, 50) as number;
 
-  if (returnAll) {
-    const data = await apiRequestAllItems.call(this, 'GET', '/endpoints/v2.0/UnmanagedEndpoints', {}, {});
-    return this.helpers.returnJsonArray(data as IDataObject[]);
-  }
-
-  const qs: Record<string, number> = { PageSize: limit, Page: 0 };
-  const response = await apiRequest.call(this, 'GET', '/endpoints/v2.0/UnmanagedEndpoints', {}, qs);
+  // GET /UnmanagedEndpoints defines no query parameters (no Page/PageSize): one request,
+  // and Limit is applied to what bConnect returns.
+  const response = await apiRequest.call(this, 'GET', '/endpoints/v2.0/UnmanagedEndpoints');
   const data = (response.data as IDataObject[]) || [];
-  return this.helpers.returnJsonArray(data);
+  return this.helpers.returnJsonArray(returnAll ? data : data.slice(0, limit));
 }
 
 export async function getUnmanagedEndpoint(

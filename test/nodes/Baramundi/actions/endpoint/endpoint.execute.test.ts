@@ -231,35 +231,31 @@ describe('Endpoint Operations - Unit Tests', () => {
       );
     });
 
-    it('should support orgUnitId filter', async () => {
-      // Arrange
-      const orgUnitId = '11111111-1111-1111-1111-111111111111';
-      const mockResponse = {
-        data: [{ id: '1', displayName: 'endpoint-01' }],
-        hasNextPage: false,
-      };
-
+    // OrgUnitId is not a query parameter of any endpoint list route; DisplayName/HostName are (#46)
+    it('should send the DisplayName and HostName filters', async () => {
       const mockContext = createMockExecuteFunctions(
-        {
-          returnAll: false,
-          limit: 50,
-          options: { orgUnitId },
-        },
+        { returnAll: false, limit: 50, options: { displayName: 'PC-01', hostName: 'pc01' } },
         {},
-        mockResponse
+        { data: [{ id: '1', displayName: 'PC-01' }], hasNextPage: false }
       );
 
-      // Act
       await getMany.call(mockContext, 0);
 
-      // Assert
       expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
-        expect.objectContaining({
-          qs: expect.objectContaining({
-            OrgUnitId: orgUnitId,
-          }),
-        })
+        expect.objectContaining({ qs: expect.objectContaining({ DisplayName: 'PC-01', HostName: 'pc01' }) })
       );
+      const qs = (mockContext.helpers.httpRequest as any).mock.calls[0][0].qs;
+      expect(qs).not.toHaveProperty('OrgUnitId');
+    });
+
+    it.each(['android', 'ios'])('should reject the HostName filter for %s endpoints', async (endpointType) => {
+      const mockContext = createMockExecuteFunctions(
+        { endpointType, returnAll: false, limit: 50, options: { hostName: 'x' } },
+        {},
+        {}
+      );
+      await expect(getMany.call(mockContext, 0)).rejects.toThrow(/not available for Android and iOS/);
+      expect(mockContext.helpers.httpRequest).not.toHaveBeenCalled();
     });
 
     it('should handle empty result', async () => {
@@ -2834,15 +2830,18 @@ describe('Endpoint Phase 4 - EntraId Operations', () => {
 });
 
 describe('Endpoint Phase 4 - UnmanagedEndpoints Operations', () => {
+  // GET /UnmanagedEndpoints defines no query parameters (#46)
   describe('getUnmanagedEndpoints()', () => {
-    it('should return paginated results when returnAll is false', async () => {
+    it('should apply Limit to the returned page without sending paging parameters', async () => {
       const mockContext = createMockExecuteFunctions(
-        { returnAll: false, limit: 5 },
+        { returnAll: false, limit: 2 },
         {},
-        pageResponse([{ id: 'u1' }, { id: 'u2' }]),
+        pageResponse([{ id: 'u1' }, { id: 'u2' }, { id: 'u3' }]),
       );
       const result = await getUnmanagedEndpoints.call(mockContext, 0);
       expect(result).toHaveLength(2);
+      const opts = (mockContext.helpers.httpRequest as any).mock.calls[0][0];
+      expect(opts.qs ?? {}).toEqual({});
     });
 
     it('should return all results when returnAll is true', async () => {
