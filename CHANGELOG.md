@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Job → Execute** assigned the job **only to the first** of several comma-separated endpoint IDs and silently dropped the rest. It now creates one job instance per endpoint and validates every ID first. The *Comment* and *Priority* options (not supported by bConnect, ignored) were replaced by **Start If Already Assigned** (#45)
+- **Job → Kiosk Release → Create** now sends what bConnect expects: a single **Assignment Target ID** (user, endpoint or group). *Target Type*, *Valid From/Until* and *Comment* were removed — bConnect has no such fields, and the required `assignmentTargetId` was missing (#45)
+- **Job → Folder Create / Update**: *Description* is now **Comment** (#45)
 - **Endpoint node fields follow the bConnect schemas** (#45, Endpoint part):
   - **Create Endpoint**: each platform shows only the fields bConnect accepts for it — *Owner* is now **Company / Private** (was *Corporate / Personal*, rejected); Android and iOS no longer offer *Host Name*; Linux no longer offers *Domain*, *Primary Subnet Mask* and *UUID* (Windows only)
   - **Update Endpoint**: *Domain* is only offered for Windows endpoints
