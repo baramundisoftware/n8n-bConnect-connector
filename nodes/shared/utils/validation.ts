@@ -354,3 +354,16 @@ export function extractResourceLocatorValue(value: unknown): string {
 
 	return '';
 }
+
+/**
+ * Normalise the credential's Server URL: trim surrounding whitespace and drop trailing slashes.
+ * A pasted `https://bms:444/bconnect ` or `…/bconnect/` would otherwise end up inside every
+ * request path (`/bconnect%20/endpoints/…`, `/bconnect//endpoints/…`) and fail with 404.
+ * @param value - The baseUrl credential value
+ * @returns The URL without surrounding whitespace or trailing slashes
+ */
+export function normalizeBaseUrl(value: unknown): string {
+	return String(value ?? '')
+		.trim()
+		.replace(/\/+$/, '');
+}
