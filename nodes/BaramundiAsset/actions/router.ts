@@ -1,6 +1,8 @@
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 
+import { toItemError } from '../../shared/utils/nodeError';
+
 import { asset } from './asset';
 
 export async function router(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
@@ -72,7 +74,7 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
         returnData.push({ json: { error: (error as Error).message }, pairedItem: { item: i } });
         continue;
       }
-      throw error;
+      throw toItemError(this.getNode(), error, i);
     }
   }
 

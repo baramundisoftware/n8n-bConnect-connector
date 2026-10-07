@@ -119,6 +119,14 @@ jobs:
       - name: License check (runtime dependencies)
         run: npm run license-check
 
+      # `overrides` pins a patched axios in the dev tree only; n8n does not allow the field in
+      # a published community package. Drop it from the manifest that gets packed, then check
+      # that manifest with n8n's rule.
+      - name: Remove dev-only overrides from the published package.json
+        run: |
+          npm pkg delete overrides
+          npx eslint --rule '{"@n8n/community-nodes/no-overrides-field": "error"}' package.json
+
       # Shows the tarball contents in the log and fails on a broken package.json.
       - name: Publish dry run
         env:
@@ -161,6 +169,9 @@ jobs:
 
       - name: Install from the lockfile
         run: npm ci
+
+      - name: Remove dev-only overrides from the published package.json
+        run: npm pkg delete overrides
 
       # prepublishOnly builds dist/ from this checkout. Without NPM_TOKEN, npm
       # authenticates through trusted publishing (OIDC).

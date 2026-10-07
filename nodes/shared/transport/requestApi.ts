@@ -5,7 +5,7 @@ import type {
   IHttpRequestOptions,
   JsonObject,
 } from 'n8n-workflow';
-import { NodeApiError } from 'n8n-workflow';
+import { NodeApiError, sleep } from 'n8n-workflow';
 import {
   extractStatusCode,
   formatTroubleshootingHints,
@@ -140,7 +140,7 @@ export async function apiRequest(
       lastError = error;
       if (attempt < MAX_RETRIES && isRetryableError(error)) {
         const wait = retryAfterMs(error) ?? backoffMs(attempt);
-        await new Promise((resolve) => setTimeout(resolve, wait));
+        await sleep(wait);
         continue;
       }
       break;
