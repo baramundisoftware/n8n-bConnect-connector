@@ -97,8 +97,9 @@ const endpointId = extractResourceLocatorValue(
 ```bash
 npm run lint           # Check code style
 npm run build          # TypeScript compilation
-npm test               # Run unit tests (1072 tests)
+npm test               # Run unit tests
 npm run test:coverage  # With coverage report
+npm run check:spec     # Spec-conformance check only (also part of npm test)
 ```
 
 ### Coverage Target
@@ -150,3 +151,22 @@ docs(readme): update installation instructions
 ## License
 
 By contributing, you agree that your contributions will be licensed under the [MIT License](LICENSE).
+
+## Spec conformance
+
+`test/conformance/` calls every operation the editor offers, for bMS 25R2 and 26R1, and
+checks the HTTP requests against `docs/openapi/<release>`: route and module prefix, query
+parameters, request body fields, required fields, enum values and JSON Patch paths.
+
+Known violations are listed in `test/conformance/baseline.json`, each with the issue that
+fixes it (or `"accepted: <reason>"` for a verified, deliberate deviation). The check fails on
+a **new** violation, and on a baseline entry that **no longer occurs**: when your change fixes
+one, remove its entry.
+
+```bash
+npm run check:spec                                   # run
+SPEC_BASELINE=prune npm run check:spec               # remove entries your fix resolved
+SPEC_BASELINE=add-new npm run check:spec             # add new violations (issue 0) to triage
+SPEC_REPORT=report.md npm run check:spec             # write all violations, grouped
+```
+
