@@ -332,83 +332,55 @@ describe('Job Operations', () => {
       );
     });
 
-    it('should include optional comment in request', async () => {
+    // JobInstanceForCreation: jobDefinitionId, endpointId, startIfAlreadyAssigned (#45)
+    it('should send startIfAlreadyAssigned when set', async () => {
       const jobId = '12345678-1234-1234-1234-123456789abc';
       const endpointId = '11111111-1111-1111-1111-111111111111';
-      const mockResponse = { jobInstanceId: 'instance-123' };
-
       const mockContext = createMockExecuteFunctions(
-        { jobId,
-          endpointIds: endpointId,
-          options: { comment: 'Urgent deployment for security patch' },
-        },
+        { jobId, endpointIds: endpointId, options: { startIfAlreadyAssigned: true } },
         {},
-        mockResponse
+        { id: 'instance-123' }
       );
 
       await execute.call(mockContext, 0);
 
       expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
-          body: expect.objectContaining({
-            comment: 'Urgent deployment for security patch',
-          }),
+          body: { jobDefinitionId: jobId, endpointId, startIfAlreadyAssigned: true },
         })
       );
     });
 
-    it('should include optional priority in request', async () => {
+    it('should create one job instance per endpoint', async () => {
       const jobId = '12345678-1234-1234-1234-123456789abc';
-      const endpointId = '11111111-1111-1111-1111-111111111111';
-      const mockResponse = { jobInstanceId: 'instance-123' };
-
+      const ids = ['11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222', '33333333-3333-3333-3333-333333333333'];
       const mockContext = createMockExecuteFunctions(
-        { jobId,
-          endpointIds: endpointId,
-          options: { priority: 'High' },
-        },
+        { jobId, endpointIds: ` ${ids.join(' , ')} `, options: {} },
         {},
-        mockResponse
+        { id: 'instance' }
       );
 
-      await execute.call(mockContext, 0);
+      const result = await execute.call(mockContext, 0);
 
-      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
-        expect.objectContaining({
-          body: expect.objectContaining({
-            priority: 'High',
-          }),
-        })
-      );
+      expect(result).toHaveLength(3);
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledTimes(3);
+      ids.forEach((endpointId, n) => {
+        expect(mockContext.helpers.httpRequest).toHaveBeenNthCalledWith(
+          n + 1,
+          expect.objectContaining({ method: 'POST', body: { jobDefinitionId: jobId, endpointId } }),
+        );
+      });
     });
 
-    it('should include both comment and priority when provided', async () => {
-      const jobId = '12345678-1234-1234-1234-123456789abc';
-      const endpointId = '11111111-1111-1111-1111-111111111111';
-      const mockResponse = { jobInstanceId: 'instance-123' };
-
+    it('should reject invalid endpoint IDs before sending anything', async () => {
       const mockContext = createMockExecuteFunctions(
-        { jobId,
-          endpointIds: endpointId,
-          options: {
-            comment: 'Emergency patch',
-            priority: 'High',
-          },
-        },
+        { jobId: '12345678-1234-1234-1234-123456789abc', endpointIds: '11111111-1111-1111-1111-111111111111, nope', options: {} },
         {},
-        mockResponse
+        {}
       );
 
-      await execute.call(mockContext, 0);
-
-      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
-        expect.objectContaining({
-          body: expect.objectContaining({
-            comment: 'Emergency patch',
-            priority: 'High',
-          }),
-        })
-      );
+      await expect(execute.call(mockContext, 0)).rejects.toThrow(/Invalid endpoint ID\(s\): nope/);
+      expect(mockContext.helpers.httpRequest).not.toHaveBeenCalled();
     });
 
     it('should handle errors when executing job', async () => {
@@ -1754,87 +1726,41 @@ describe('Job Operations', () => {
     });
   });
 
+  // KioskReleaseForCreation: assignmentTargetId and jobDefinitionId, both required (#45)
   describe('createKioskRelease()', () => {
     it('should create a new kiosk release', async () => {
       const jobDefinitionId = '88888888-8888-8888-8888-888888888888';
-      const targetType = 'Endpoint';
-      const targetId = '80808080-8080-8080-8080-808080808080';
-      const mockResponse = {
-        id: 'release-new',
-        jobDefinitionId,
-        targetType,
-        targetId,
-      };
-
+      const assignmentTargetId = '80808080-8080-8080-8080-808080808080';
       const mockContext = createMockExecuteFunctions(
-        { jobDefinitionId,
-          targetType,
-          targetId,
-        },
+        { jobDefinitionId, assignmentTargetId },
         {},
-        mockResponse
+        { id: 'release-new', jobDefinitionId, assignmentTargetId }
       );
 
       const result = await createKioskRelease.call(mockContext, 0);
 
-      expect(result).toBeDefined();
       expect(result[0].json.jobDefinitionId).toBe(jobDefinitionId);
       expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
           method: 'POST',
           url: expect.stringContaining('/jobs/v2.0/KioskReleases'),
-          body: expect.objectContaining({
-            jobDefinitionId,
-            targetType,
-            targetId,
-          }),
+          body: { jobDefinitionId, assignmentTargetId },
         })
       );
     });
 
-    it('should create kiosk release with additional fields', async () => {
-      const mockResponse = {
-        id: 'release-new',
+    it('should reject an invalid assignment target ID', async () => {
+      const mockContext = createMockExecuteFunctions({
         jobDefinitionId: '88888888-8888-8888-8888-888888888888',
-        targetType: 'LogicalGroup',
-        targetId: '22222222-2222-2222-2222-222222222222',
-        displayName: 'Self-Service Update',
-        description: 'User can install updates',
-      };
-
-      const mockContext = createMockExecuteFunctions(
-        {
-          jobDefinitionId: '88888888-8888-8888-8888-888888888888',
-          jobDefinitionId: '88888888-8888-8888-8888-888888888888',
-          targetType: 'LogicalGroup',
-          targetId: '22222222-2222-2222-2222-222222222222',
-          additionalFields: {
-            displayName: 'Self-Service Update',
-            description: 'User can install updates',
-          },
-        },
-        {},
-        mockResponse
-      );
-
-      const result = await createKioskRelease.call(mockContext, 0);
-
-      expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
-        expect.objectContaining({
-          body: expect.objectContaining({
-            displayName: 'Self-Service Update',
-            description: 'User can install updates',
-          }),
-        })
-      );
+        assignmentTargetId: 'not-a-guid',
+      });
+      await expect(createKioskRelease.call(mockContext, 0)).rejects.toThrow(/GUID/i);
     });
 
     it('should handle 409 errors when creating duplicate kiosk release', async () => {
       const mockContext = createMockExecuteFunctions({
         jobDefinitionId: '88888888-8888-8888-8888-888888888888',
-        jobDefinitionId: '88888888-8888-8888-8888-888888888888',
-        targetType: 'Endpoint',
-        targetId: '80808080-8080-8080-8080-808080808080',
+        assignmentTargetId: '80808080-8080-8080-8080-808080808080',
       });
 
       mockContext.helpers.httpRequest = vi.fn(async () => {

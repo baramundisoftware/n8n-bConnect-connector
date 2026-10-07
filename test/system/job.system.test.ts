@@ -391,7 +391,7 @@ describe.skipIf(skipConfig.skip)('Jobs API - System Tests', () => {
       const createContext = createSystemTestContext({
         name: `SystemTest_${Date.now()}`,
         additionalFields: {
-          description: 'System test folder',
+          comment: 'System test folder',
         },
       }, config!);
 

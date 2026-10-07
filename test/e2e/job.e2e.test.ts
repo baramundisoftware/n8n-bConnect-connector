@@ -307,9 +307,7 @@ describe('E2E: Kiosk Release — createKioskRelease → withdrawKioskRelease', (
     if (!available || !firstJobId) return;
     const createCtx = createRealContext({
       jobDefinitionId: firstJobId,
-      targetType: 'Endpoint',
-      targetId: NONEXISTENT_GUID,
-      additionalFields: {},
+      assignmentTargetId: NONEXISTENT_GUID,
     });
     const created = await tryOp(() => job.createKioskRelease.call(createCtx, 0));
     if (!created || created.length === 0) return;

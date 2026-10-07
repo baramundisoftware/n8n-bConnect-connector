@@ -67,28 +67,28 @@ export async function execute(
     throw new NodeOperationError(this.getNode(), _jobIdValidation.errors.join(', '), { itemIndex: index });
   }
   const endpointIdsString = this.getNodeParameter('endpointIds', index) as string;
-  const options = this.getNodeParameter('options', index, {}) as {
-    comment?: string;
-    priority?: string;
-  };
+  const options = this.getNodeParameter('options', index, {}) as { startIfAlreadyAssigned?: boolean };
 
-  const endpointIds = endpointIdsString.split(',').map((id) => id.trim());
-
-  const body: Record<string, unknown> = {
-    jobDefinitionId: jobId,
-    endpointId: endpointIds[0],  // API accepts one endpoint at a time
-  };
-
-  if (options.comment) {
-    body.comment = options.comment;
+  const endpointIds = endpointIdsString
+    .split(',')
+    .map((id) => id.trim())
+    .filter(Boolean);
+  if (endpointIds.length === 0) {
+    throw new NodeOperationError(this.getNode(), 'At least one endpoint ID is required', { itemIndex: index });
+  }
+  const invalid = endpointIds.filter((id) => !validateGuid(id).valid);
+  if (invalid.length > 0) {
+    throw new NodeOperationError(this.getNode(), `Invalid endpoint ID(s): ${invalid.join(', ')}`, { itemIndex: index });
   }
 
-  if (options.priority) {
-    body.priority = options.priority;
+  // JobInstanceForCreation takes one endpoint: create one job instance per endpoint
+  const results: IDataObject[] = [];
+  for (const endpointId of endpointIds) {
+    const body: IDataObject = { jobDefinitionId: jobId, endpointId };
+    if (options.startIfAlreadyAssigned) body.startIfAlreadyAssigned = true;
+    results.push((await apiRequest.call(this, 'POST', `/jobs/v2.0/JobInstances`, body)) as IDataObject);
   }
-
-  const response = await apiRequest.call(this, 'POST', `/jobs/v2.0/JobInstances`, body);
-  return this.helpers.returnJsonArray(response as IDataObject);
+  return this.helpers.returnJsonArray(results);
 }
 
 export async function getInstances(
@@ -462,20 +462,14 @@ export async function createKioskRelease(
   if (!_jobDefinitionIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _jobDefinitionIdValidation.errors.join(', '), { itemIndex: index });
   }
-  const targetType = this.getNodeParameter('targetType', index) as string;
-  const targetId = this.getNodeParameter('targetId', index) as string;
-  const _targetIdValidation = validateGuid(targetId);
+  const assignmentTargetId = this.getNodeParameter('assignmentTargetId', index) as string;
+  const _targetIdValidation = validateGuid(assignmentTargetId);
   if (!_targetIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _targetIdValidation.errors.join(', '), { itemIndex: index });
   }
-  const additionalFields = this.getNodeParameter('additionalFields', index, {}) as IDataObject;
 
-  const body: IDataObject = {
-    jobDefinitionId,
-    targetType,
-    targetId,
-    ...additionalFields,
-  };
+  // KioskReleaseForCreation: assignmentTargetId and jobDefinitionId (both required)
+  const body: IDataObject = { jobDefinitionId, assignmentTargetId };
 
   const response = await apiRequest.call(this, 'POST', '/jobs/v2.0/KioskReleases', body);
   return this.helpers.returnJsonArray(response as IDataObject);
