@@ -10,7 +10,10 @@
  * - `required`: defaults everywhere, sample values only where the default is
  *   empty (what a user must enter);
  * - `all`: every optional field filled too — collections completely, booleans
- *   true — so request bodies and query strings built from options show up.
+ *   true — so request bodies and query strings built from options show up;
+ * - `variant`: the `all` pass once per value of every option field (top level
+ *   and inside collections), so routes and bodies chosen by an option — e.g.
+ *   Group Type = static — are checked too, not only the default.
  */
 import type { IExecuteFunctions, IHttpRequestOptions, INodeProperties, INodeType } from 'n8n-workflow';
 
@@ -31,7 +34,8 @@ export const NODES: INodeType[] = [
   new BaramundiSecurity(),
 ];
 
-export type Pass = 'required' | 'all';
+/** `variant` = the `all` pass with one option field set to a non-default value */
+export type Pass = 'required' | 'all' | 'variant';
 export const GUID = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d';
 const BASE_URL = 'https://bms.example.com:444/bconnect';
 
@@ -51,6 +55,15 @@ export interface Exercise {
   requests: RecordedRequest[];
   /** Error thrown before any request was sent (validation, missing parameter, …) */
   error?: string;
+  /** For `variant`: the option that was changed, e.g. `groupType=static` */
+  variant?: string;
+}
+
+/** One option value to try: a top-level options field, or one inside a collection. */
+export interface OptionVariant {
+  path: [string] | [string, string];
+  value: unknown;
+  label: string;
 }
 
 type Params = Record<string, unknown>;
@@ -139,16 +152,51 @@ export function buildParams(
   resource: string,
   operation: string,
   pass: Pass,
+  variant?: OptionVariant,
 ): Params {
+  const fill: Pass = pass === 'variant' ? 'all' : pass;
   const params: Params = { bmsVersion: release, resource, operation };
+  if (variant?.path.length === 1) params[variant.path[0]] = variant.value;
   // Visibility can depend on other non-core parameters (returnAll → limit), so iterate.
   for (let round = 0; round < 4; round++) {
     for (const p of node.description.properties) {
       if (p.name in params || p.type === 'notice' || !isVisible(p, params)) continue;
-      params[p.name] = sampleValue(p, pass);
+      params[p.name] = sampleValue(p, fill);
     }
   }
+  if (variant?.path.length === 2) {
+    const [coll, field] = variant.path;
+    if (params[coll] && typeof params[coll] === 'object') params[coll] = { ...(params[coll] as Params), [field]: variant.value };
+  }
   return params;
+}
+
+const CORE = new Set(['bmsVersion', 'resource', 'operation']);
+
+/** Every non-default option value of the fields visible for this operation. */
+export function optionVariants(node: INodeType, release: Release, resource: string, operation: string): OptionVariant[] {
+  const params = buildParams(node, release, resource, operation, 'all');
+  const visible = node.description.properties.filter(
+    (p) => !CORE.has(p.name) && p.name in params && isVisible(p, params),
+  );
+  const out: OptionVariant[] = [];
+  const valuesOf = (p: INodeProperties) => (p.options ?? []).map((o) => (o as { value: unknown }).value);
+  for (const p of visible) {
+    if (p.type === 'options') {
+      for (const value of valuesOf(p)) {
+        if (value !== params[p.name]) out.push({ path: [p.name], value, label: `${p.name}=${String(value)}` });
+      }
+    } else if (p.type === 'collection') {
+      const current = (params[p.name] ?? {}) as Params;
+      for (const sub of (p.options ?? []) as INodeProperties[]) {
+        if (sub.type !== 'options') continue;
+        for (const value of valuesOf(sub)) {
+          if (value !== current[sub.name]) out.push({ path: [p.name, sub.name], value, label: `${p.name}.${sub.name}=${String(value)}` });
+        }
+      }
+    }
+  }
+  return out;
 }
 
 /** Resources, and per resource the operations the editor offers for a release. */
@@ -183,8 +231,9 @@ export async function exercise(
   resource: string,
   operation: string,
   pass: Pass,
+  variant?: OptionVariant,
 ): Promise<Exercise> {
-  const params = buildParams(node, release, resource, operation, pass);
+  const params = buildParams(node, release, resource, operation, pass, variant);
   const requests: RecordedRequest[] = [];
   const ctx = {
     getInputData: () => [{ json: {} }],
@@ -223,5 +272,5 @@ export async function exercise(
     // Errors after a request was sent come from the fake response shape — not a spec question.
     if (requests.length === 0) error = (e as Error).message.split('\n')[0];
   }
-  return { node: node.description.name, release, resource, operation, pass, requests, error };
+  return { node: node.description.name, release, resource, operation, pass, requests, error, variant: variant?.label };
 }
