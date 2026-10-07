@@ -3,7 +3,7 @@ import type { INodeProperties } from 'n8n-workflow';
 import { only26R1Options } from '../../nodes/shared/utils/versionGating';
 
 const ops = (values: string[], dflt = values[0]): INodeProperties => ({
-  displayName: 'Operation', name: 'operation', type: 'options', default: dflt,
+  displayName: 'Operation', name: 'operation', type: 'options', noDataExpression: true, default: dflt,
   displayOptions: { show: { resource: ['x'] } },
   options: values.map((v) => ({ name: v, value: v })),
 });

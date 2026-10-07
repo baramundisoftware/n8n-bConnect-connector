@@ -453,7 +453,6 @@ export const endpointFields: INodeProperties[] = [
         type: 'string',
         default: '',
         placeholder: '255.255.255.0',
-        description: 'Primary subnet mask',
       },
       {
         displayName: 'Registered User',
