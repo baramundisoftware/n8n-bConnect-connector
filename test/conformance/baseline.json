@@ -1,1 +1,4 @@
-{}
+{
+  "25R2 baramundiAdmin/microservice.getMicroservices response-field: GET /servermanagement/v2.0/Microservices data": "accepted: both specs return a plain array, bConnect-Mock 0.4.0 a paged list; the code reads data and falls back to the array, so both work",
+  "26R1 baramundiAdmin/microservice.getMicroservices response-field: GET /servermanagement/v2.0/Microservices data": "accepted: both specs return a plain array, bConnect-Mock 0.4.0 a paged list; the code reads data and falls back to the array, so both work"
+}

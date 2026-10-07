@@ -48,6 +48,7 @@ export async function getMicroservices(
   _index: number,
 ): Promise<INodeExecutionData[]> {
   const response = await apiRequest.call(this, 'GET', '/servermanagement/v2.0/Microservices');
+  // Both specs: a plain array. bConnect-Mock answers with a paged list; accept both.
   const data = ((response as IDataObject).data ?? response) as IDataObject[];
   return this.helpers.returnJsonArray(data);
 }

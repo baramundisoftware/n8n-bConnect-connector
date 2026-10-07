@@ -44,6 +44,8 @@ export interface RecordedRequest {
   path: string;
   qs: Record<string, unknown>;
   body: unknown;
+  /** Response fields the code read, e.g. `hasNextPage`, `data[].displayName` (see trackReads) */
+  reads: Set<string>;
 }
 
 export interface Exercise {
@@ -219,10 +221,65 @@ function getPath(obj: Params, path: string): unknown {
   return path.split('.').reduce<unknown>((o, k) => (o && typeof o === 'object' ? (o as Params)[k] : undefined), obj);
 }
 
+/** Keys read by the language or tooling (await, coercion, inspection), not by code that wants a field. */
+const NOT_FIELDS = new Set([
+  'then', 'toJSON', 'toString', 'toLocaleString', 'valueOf', 'constructor', 'hasOwnProperty', 'isPrototypeOf',
+  'propertyIsEnumerable', 'inspect', 'nodeType', 'asymmetricMatch', '$$typeof', '_isMockFunction',
+]);
+
+/**
+ * Wrap a fake response object so every field the code reads by name lands in `reads`
+ * (`prefix` + key). Copying the object — spread, Object.assign, JSON.stringify,
+ * Object.entries — is not a read of a particular field: those first ask for the property
+ * descriptor, which marks the following get as part of a copy.
+ */
+export function trackReads<T extends object>(target: T, prefix: string, reads: Set<string>): T {
+  const copying = new Set<PropertyKey>();
+  const record = (key: PropertyKey) => {
+    if (typeof key === 'string' && !NOT_FIELDS.has(key)) reads.add(prefix + key);
+  };
+  return new Proxy(target, {
+    get(t, key, receiver) {
+      if (!copying.delete(key)) record(key);
+      return Reflect.get(t, key, receiver);
+    },
+    has(t, key) {
+      record(key);
+      return Reflect.has(t, key);
+    },
+    getOwnPropertyDescriptor(t, key) {
+      copying.add(key);
+      return Reflect.getOwnPropertyDescriptor(t, key);
+    },
+  });
+}
+
 /** Generic response: a page with one item, plus the fields single-object reads look for. */
-function fakeResponse(): Record<string, unknown> {
-  const item = { id: GUID, name: 'zzSample', displayName: 'zzSample', guid: GUID };
-  return { ...item, data: [item], hasNextPage: false, totalCount: 1, value: [item] };
+function fakeResponse(reads: Set<string>): Record<string, unknown> {
+  const item = () => ({ id: GUID, name: 'zzSample', displayName: 'zzSample', guid: GUID });
+  return trackReads(
+    {
+      ...item(),
+      data: [trackReads(item(), 'data[].', reads)],
+      hasNextPage: false,
+      totalCount: 1,
+      value: [trackReads(item(), 'value[].', reads)],
+    },
+    '',
+    reads,
+  );
+}
+
+function record(requests: RecordedRequest[], o: IHttpRequestOptions): Record<string, unknown> {
+  const reads = new Set<string>();
+  requests.push({
+    method: String(o.method ?? 'GET').toUpperCase(),
+    path: String(o.url ?? '').split('?')[0],
+    qs: { ...((o.qs as Record<string, unknown>) ?? {}) },
+    body: o.body,
+    reads,
+  });
+  return fakeResponse(reads);
 }
 
 export async function exercise(
@@ -251,15 +308,7 @@ export async function exercise(
     }),
     continueOnFail: () => false,
     helpers: {
-      httpRequest: async (o: IHttpRequestOptions) => {
-        requests.push({
-          method: String(o.method ?? 'GET').toUpperCase(),
-          path: String(o.url ?? '').split('?')[0],
-          qs: { ...((o.qs as Record<string, unknown>) ?? {}) },
-          body: o.body,
-        });
-        return fakeResponse();
-      },
+      httpRequest: async (o: IHttpRequestOptions) => record(requests, o),
       returnJsonArray: (d: unknown) => (Array.isArray(d) ? d : [d]).map((json) => ({ json })),
     },
     logger: { debug() {}, info() {}, warn() {}, error() {} },
@@ -300,15 +349,7 @@ export async function exerciseMethods(node: INodeType, release: Release): Promis
           getNode: () => ({ name: node.description.displayName, type: node.description.name, typeVersion: 1, position: [0, 0], parameters: params }),
           getCredentials: async () => ({ baseUrl: BASE_URL, authMethod: 'basicAuth', username: 'u', password: 'p', ignoreSslIssues: false }),
           helpers: {
-            httpRequest: async (o: IHttpRequestOptions) => {
-              requests.push({
-                method: String(o.method ?? 'GET').toUpperCase(),
-                path: String(o.url ?? '').split('?')[0],
-                qs: { ...((o.qs as Record<string, unknown>) ?? {}) },
-                body: o.body,
-              });
-              return fakeResponse();
-            },
+            httpRequest: async (o: IHttpRequestOptions) => record(requests, o),
           },
           logger: { debug() {}, info() {}, warn() {}, error() {} },
         };

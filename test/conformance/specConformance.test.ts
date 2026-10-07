@@ -6,7 +6,8 @@
  * once per value of every option field — plus every dropdown/search function
  * (loadOptions, listSearch) — records the HTTP requests and checks them against that release's OpenAPI
  * spec (docs/openapi/<release>): route incl. module prefix, query parameters,
- * request body fields / required fields / enum values, JSON Patch paths.
+ * request body fields / required fields / enum values, JSON Patch paths, and
+ * the response fields the code reads (e.g. `data[].displayName` in a dropdown).
  *
  * Known violations live in baseline.json as { "<key>": <issue number> }, or
  * { "<key>": "accepted: <reason>" } for a deliberate, verified deviation
@@ -24,7 +25,7 @@ import { join } from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { checkExercise, checkRequest, keyOf } from './checks';
-import { NODES, exercise, exerciseMethods, operationsOf, optionVariants, type Exercise } from './exerciser';
+import { NODES, exercise, exerciseMethods, operationsOf, optionVariants, trackReads, type Exercise } from './exerciser';
 import { RELEASES, SPEC } from './spec';
 
 const BASELINE_PATH = join(__dirname, 'baseline.json');
@@ -126,7 +127,9 @@ describe('spec conformance', () => {
 
 // The checks themselves, on known-bad requests.
 describe('spec conformance checks', () => {
-  const req = (method: string, path: string, body?: unknown, qs: Record<string, unknown> = {}) => ({ method, path, qs, body });
+  const req = (method: string, path: string, body?: unknown, qs: Record<string, unknown> = {}, reads: string[] = []) => ({
+    method, path, qs, body, reads: new Set(reads),
+  });
 
   it('accepts a correct request', () => {
     expect(checkRequest('26R1', req('GET', '/endpoints/v2.0/Endpoints', undefined, { PageSize: 1 }))).toEqual([]);
@@ -165,6 +168,40 @@ describe('spec conformance checks', () => {
     // SecurityGroup GET has groupName; the spec's PATCH example uses /Name
     const v = checkRequest('26R1', req('PATCH', '/servermanagement/v2.0/SecurityGroups/a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', [{ op: 'replace', path: '/name', value: 'x' }]));
     expect(v).toEqual([]);
+  });
+
+  it('accepts response fields the schema has, in paged items too', () => {
+    const v = checkRequest('26R1', req('GET', '/endpoints/v2.0/Endpoints', undefined, {}, ['data', 'hasNextPage', 'data[].id', 'data[].displayName', 'data[].hostName']));
+    expect(v).toEqual([]);
+  });
+
+  it('flags response fields the schema does not have, with the spec spelling for a case mismatch', () => {
+    const v = checkRequest('26R1', req('GET', '/endpoints/v2.0/Endpoints', undefined, {}, ['totalCount', 'data[].DisplayName']));
+    expect(v.map((x) => x.detail)).toEqual([
+      'GET /endpoints/v2.0/Endpoints data[].DisplayName (spec: displayName)',
+      'GET /endpoints/v2.0/Endpoints totalCount',
+    ]);
+  });
+
+  it('flags reading a paged-list field from a plain array response', () => {
+    const v = checkRequest('26R1', req('GET', '/servermanagement/v2.0/Microservices', undefined, {}, ['data']));
+    expect(v.map((x) => x.kind)).toEqual(['response-field']);
+  });
+
+  it('records field reads but not copies of the response', async () => {
+    const reads = new Set<string>();
+    const res = trackReads({ id: 'x', name: 'n', other: 1, data: [] as unknown[] }, '', reads);
+    // Copies and awaiting are not reads of a particular field
+    void { ...res };
+    Object.assign({}, res);
+    JSON.stringify(res);
+    Object.entries(res);
+    await Promise.resolve(res);
+    expect([...reads]).toEqual([]);
+    // Reads by name and `in` checks are
+    void res.id;
+    void ('name' in res);
+    expect([...reads].sort()).toEqual(['id', 'name']);
   });
 
   it('flags JSON Patch paths the target resource does not have', () => {
