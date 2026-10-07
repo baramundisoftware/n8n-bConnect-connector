@@ -1,4 +1,4 @@
 {
-  "25R2 baramundiAdmin/microservice.getMicroservices response-field: GET /servermanagement/v2.0/Microservices data": "accepted: both specs return a plain array, bConnect-Mock 0.4.0 a paged list; the code reads data and falls back to the array, so both work",
-  "26R1 baramundiAdmin/microservice.getMicroservices response-field: GET /servermanagement/v2.0/Microservices data": "accepted: both specs return a plain array, bConnect-Mock 0.4.0 a paged list; the code reads data and falls back to the array, so both work"
+  "25R2 baramundiAdmin/microservice.getMicroservices response-field: GET /servermanagement/v2.0/Microservices data": "accepted: a plain array per both specs and a live bMS 26.1.161.0; bConnect-Mock 0.4.0 returns a paged list (bConnect-Mock#80), so the code reads data and falls back to the array until the mock is fixed",
+  "26R1 baramundiAdmin/microservice.getMicroservices response-field: GET /servermanagement/v2.0/Microservices data": "accepted: a plain array per both specs and a live bMS 26.1.161.0; bConnect-Mock 0.4.0 returns a paged list (bConnect-Mock#80), so the code reads data and falls back to the array until the mock is fixed"
 }
