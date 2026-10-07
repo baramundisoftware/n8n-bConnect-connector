@@ -8,7 +8,7 @@ ci:
 	npm ci
 	npm run lint
 	npm run build
-	npm run test:unit
+	npm run test:coverage
 	npm audit --omit=dev --audit-level=critical
 
 build:

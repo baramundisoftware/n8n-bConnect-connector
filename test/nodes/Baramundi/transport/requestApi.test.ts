@@ -4,7 +4,7 @@
  * Tests the apiRequest and apiRequestAllItems functions
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { IExecuteFunctions, IHttpRequestOptions } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems, MAX_PAGE_CAP } from '../../../../nodes/shared/transport/requestApi';
 
@@ -673,6 +673,189 @@ describe('Request API Transport Layer', () => {
       const result = await apiRequest.call(mockContext, 'GET', '/endpoints/v2.0/Endpoints');
       expect(calls).toBe(2);
       expect(result).toEqual({ id: 'ok' });
+    });
+  });
+
+  describe('API key authentication', () => {
+    it('should send X-Api-Key and no basic auth when authMethod is apiKey', async () => {
+      const mockContext = createMockExecuteFunctions({ ok: true });
+      mockContext.getCredentials = vi.fn(async () => ({
+        baseUrl: 'https://bms.example.com:444/bconnect',
+        authMethod: 'apiKey',
+        apiKey: 'test-key-do-not-use',
+        ignoreSslIssues: true,
+      })) as any;
+
+      await apiRequest.call(mockContext, 'GET', '/v2.0/Endpoints');
+
+      const options = (mockContext.helpers.httpRequest as any).mock.calls[0][0];
+      expect(options.headers).toEqual({ 'X-Api-Key': 'test-key-do-not-use' });
+      expect(options.auth).toBeUndefined();
+      expect(options.skipSslCertificateValidation).toBe(true);
+    });
+  });
+
+  describe('retry wait time', () => {
+    /** Run the retry loop without real waiting; returns the delays passed to setTimeout. */
+    function captureDelays(): number[] {
+      const delays: number[] = [];
+      vi.spyOn(globalThis, 'setTimeout').mockImplementation(((fn: () => void, ms?: number) => {
+        delays.push(ms ?? 0);
+        fn();
+        return 0;
+      }) as any);
+      return delays;
+    }
+
+    function failOnceWith(error: unknown): IExecuteFunctions {
+      const mockContext = createMockExecuteFunctions();
+      let calls = 0;
+      mockContext.helpers.httpRequest = vi.fn(async () => {
+        if (calls++ === 0) throw error;
+        return { id: 'ok' };
+      });
+      return mockContext;
+    }
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('should wait for Retry-After given in seconds', async () => {
+      const delays = captureDelays();
+      const mockContext = failOnceWith(
+        Object.assign(new Error('Too Many Requests'), {
+          response: { status: 429, headers: { 'retry-after': '2' } },
+        }),
+      );
+
+      await expect(apiRequest.call(mockContext, 'GET', '/v2.0/Endpoints')).resolves.toEqual({ id: 'ok' });
+      expect(delays).toEqual([2000]);
+    });
+
+    it('should wait until a Retry-After HTTP date (0 when already past)', async () => {
+      const delays = captureDelays();
+      const mockContext = failOnceWith(
+        Object.assign(new Error('Service Unavailable'), {
+          response: { status: 503, headers: { 'retry-after': 'Wed, 21 Oct 2015 07:28:00 GMT' } },
+        }),
+      );
+
+      await apiRequest.call(mockContext, 'GET', '/v2.0/Endpoints');
+      expect(delays).toEqual([0]);
+    });
+
+    it('should fall back to exponential backoff for an unparsable Retry-After', async () => {
+      const delays = captureDelays();
+      const mockContext = failOnceWith(
+        Object.assign(new Error('Too Many Requests'), {
+          response: { status: 429, headers: { 'retry-after': 'soon' } },
+        }),
+      );
+
+      await apiRequest.call(mockContext, 'GET', '/v2.0/Endpoints');
+      expect(delays).toHaveLength(1);
+      expect(delays[0]).toBeGreaterThanOrEqual(100);
+      expect(delays[0]).toBeLessThan(200);
+    });
+
+    it('should retry when the status is reported as response.statusCode', async () => {
+      const delays = captureDelays();
+      const mockContext = failOnceWith(
+        Object.assign(new Error('Service Unavailable'), { response: { statusCode: 503 } }),
+      );
+
+      await expect(apiRequest.call(mockContext, 'GET', '/v2.0/Endpoints')).resolves.toEqual({ id: 'ok' });
+      expect(delays).toHaveLength(1);
+    });
+  });
+
+  describe('error classification', () => {
+    function failWith(error: unknown): IExecuteFunctions {
+      const mockContext = createMockExecuteFunctions();
+      mockContext.helpers.httpRequest = vi.fn(async () => {
+        throw error;
+      });
+      return mockContext;
+    }
+
+    it('should report a refused connection as a network error without retrying', async () => {
+      const mockContext = failWith(Object.assign(new Error('connect ECONNREFUSED'), { code: 'ECONNREFUSED' }));
+
+      // NodeApiError swaps the message for n8n's generic text on well-known error codes;
+      // our troubleshooting text is kept in `messages`.
+      const error = await apiRequest.call(mockContext, 'GET', '/v2.0/Endpoints').catch((e) => e);
+      expect(error.messages.join('\n')).toMatch(
+        /Cannot connect to baramundi server at https:\/\/bms\.example\.com:444\/bconnect/,
+      );
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledTimes(1);
+    });
+
+    it('should report a certificate problem as an SSL error', async () => {
+      const mockContext = failWith(
+        Object.assign(new Error('self-signed certificate'), { code: 'DEPTH_ZERO_SELF_SIGNED_CERT' }),
+      );
+
+      await expect(apiRequest.call(mockContext, 'GET', '/v2.0/Endpoints')).rejects.toThrow(
+        /^SSL Certificate Error: self-signed certificate/,
+      );
+    });
+
+    it('should set httpCode for HTTP status errors', async () => {
+      const mockContext = failWith(Object.assign(new Error('Forbidden'), { response: { status: 403 } }));
+
+      await expect(apiRequest.call(mockContext, 'GET', '/v2.0/Endpoints')).rejects.toMatchObject({
+        httpCode: '403',
+      });
+    });
+
+    it('should fall back to a generic bConnect API error when nothing matches', async () => {
+      const mockContext = failWith(new Error('Something odd'));
+
+      await expect(apiRequest.call(mockContext, 'GET', '/v2.0/Endpoints')).rejects.toThrow(
+        /^bConnect API Error: Something odd\n\nURL: https:\/\/bms\.example\.com:444\/bconnect\/\.\.\.\/Endpoints/,
+      );
+    });
+
+    it('should cope with a thrown non-Error value', async () => {
+      const mockContext = failWith('boom');
+
+      await expect(apiRequest.call(mockContext, 'GET', '/v2.0/Endpoints')).rejects.toThrow(
+        /^bConnect API Error: Unknown error/,
+      );
+    });
+
+    it('should keep the last segment in the URL when every segment is a GUID', async () => {
+      const guid = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
+      const mockContext = failWith(new Error('Something odd'));
+
+      await expect(apiRequest.call(mockContext, 'GET', `/${guid}`)).rejects.toThrow(
+        new RegExp(`URL: https://bms\\.example\\.com:444/bconnect/\\.\\.\\./${guid}$`, 'm'),
+      );
+    });
+  });
+
+  describe('apiRequestAllItems() edge cases', () => {
+    it('should treat a response without data/hasNextPage as an empty last page', async () => {
+      const mockContext = createMockExecuteFunctions({});
+
+      const result = await apiRequestAllItems.call(mockContext, 'GET', '/v2.0/Endpoints');
+
+      expect(result).toEqual([]);
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not append a truncation sentinel when the last page coincides with the page cap', async () => {
+      const pages = Array.from({ length: MAX_PAGE_CAP }, (_, i) => ({
+        data: [{ id: String(i) }],
+        hasNextPage: i < MAX_PAGE_CAP - 1,
+      }));
+      const mockContext = createMockExecuteFunctions({}, pages);
+
+      const result = await apiRequestAllItems.call(mockContext, 'GET', '/v2.0/Endpoints');
+
+      expect(result).toHaveLength(MAX_PAGE_CAP);
+      expect(result.some((r) => r._truncated)).toBe(false);
     });
   });
 });

@@ -106,7 +106,10 @@ npm run test:system    # System tests against BCONNECT_BASE_URL (a real bMS, or 
 
 ### Coverage Target
 
-Minimum **80% branch coverage**. CI enforces this.
+Minimum **80% branch coverage**. CI enforces a stricter ratchet: the thresholds in
+`vitest.config.ts` sit just below the current numbers, and `npm run test:coverage` (run by
+the CI `gate` job and `npm run ci`) fails when coverage drops below them. Raise them when
+coverage goes up.
 
 ---
 
