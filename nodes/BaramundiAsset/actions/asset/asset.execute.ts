@@ -25,7 +25,7 @@ export async function getMany(
   const options = this.getNodeParameter('options', index, {}) as {
     searchQuery?: string;
     orderBy?: string;
-    assetTypeId?: string;
+    displayName?: string;
   };
 
   const qs: Record<string, string | number> = {};
@@ -46,12 +46,8 @@ export async function getMany(
     qs.OrderBy = options.orderBy;
   }
 
-  if (options.assetTypeId) {
-    const atIdValidation = validateGuid(options.assetTypeId);
-    if (!atIdValidation.valid) {
-      throw new NodeOperationError(this.getNode(), `Invalid asset type ID:\n${atIdValidation.errors.join('\n')}`, { itemIndex: index });
-    }
-    qs.AssetTypeId = options.assetTypeId;
+  if (options.displayName) {
+    qs.DisplayName = options.displayName;
   }
 
   if (returnAll) {
@@ -75,12 +71,21 @@ export async function create(
   if (!assetTypeIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), `Invalid asset type ID:\n${assetTypeIdValidation.errors.join('\n')}`, { itemIndex: index });
   }
-  const displayName = this.getNodeParameter('displayName', index) as string;
+  const name = this.getNodeParameter('name', index) as string;
+  const ownerType = this.getNodeParameter('ownerType', index) as string;
+  const ownerId = this.getNodeParameter('ownerId', index) as string;
+  const ownerIdValidation = validateGuid(ownerId);
+  if (!ownerIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid owner ID:\n${ownerIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const additionalFields = this.getNodeParameter('additionalFields', index, {}) as IDataObject;
 
+  // AssetForCreation: assetTypeId, name, ownerId and ownerType are required
   const body: IDataObject = {
     assetTypeId,
-    displayName,
+    name,
+    ownerId,
+    ownerType,
     ...additionalFields,
   };
 
@@ -199,10 +204,17 @@ export async function createAssetType(
   index: number,
 ): Promise<INodeExecutionData[]> {
   const name = this.getNodeParameter('name', index) as string;
+  const ownerId = this.getNodeParameter('ownerId', index) as string;
+  const ownerIdValidation = validateGuid(ownerId);
+  if (!ownerIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid owner ID:\n${ownerIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
   const additionalFields = this.getNodeParameter('additionalFields', index, {}) as IDataObject;
 
+  // AssetTypeForCreation: name and ownerId are required
   const body: IDataObject = {
     name,
+    ownerId,
     ...additionalFields,
   };
 

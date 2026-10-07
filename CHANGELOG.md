@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Asset node now sends what bConnect accepts** (#37). Before, Asset → Create always failed with 400 and several fields were silently ignored:
+  - **Create Asset**: *Display Name* is now **Name**, and the required **Owner Type** and **Owner ID** were added (AD Object and Org Unit owners need bMS 26 R1). Additional fields follow the bConnect schema: Comments, Contact, Cost Center, Inventory Number, URL, Purchase Date/Price, Operating Cost, Energy On/Off. *Serial Number, Manufacturer, Model, Location* were removed — bConnect has no such asset fields
+  - **Update Asset**: the same fields (plus Name, Owner); the old ones produced JSON Patch paths bConnect does not know
+  - **Create Asset Type**: the required **Owner ID** was added; *Description* replaced by the schema's fields
+  - **Asset stock / asset type folders**: *Description* is now **Comment**, *Parent Folder ID* sends `parentId`
+  - **Get Many Assets**: the *Asset Type ID* filter (ignored by bConnect) was replaced by **Display Name**, which bConnect supports
+  - Saved workflows using these operations need the new fields filled in
 - Endpoint → Maintenance Window → **Get Group Maintenance Window** works again: it read a parameter the form does not have and failed on every run (#43)
 - A Server URL with a trailing space or slash no longer breaks every request with 404; the URL is trimmed before use (#34)
 - The credential **Test** button now really checks the connection: it requests `/endpoints/v2.0/Endpoints` (the old path did not exist) and fails on HTTP errors, with clear messages for 401 (credentials), 403 (permissions) and 404 (Server URL). Before, it reported success even with a wrong URL or password (#35)

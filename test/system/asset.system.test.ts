@@ -142,9 +142,12 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
       const ts = Date.now();
       const createContext = createSystemTestContext({
         assetTypeId,
-        displayName: `SystemTest_Asset_${ts}`,
+        name: `SystemTest_Asset_${ts}`,
+        // AssetForCreation requires an owner (#37); set BCONNECT_TEST_ENDPOINT_ID to a real endpoint
+        ownerType: 'Machine',
+        ownerId: process.env.BCONNECT_TEST_ENDPOINT_ID ?? '',
         additionalFields: {
-          assetTag: `TEST-${ts}`,
+          inventoryNumber: `TEST-${ts}`,
           comments: 'System test asset',
         },
       }, config!);

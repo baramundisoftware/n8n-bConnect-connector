@@ -1,6 +1,47 @@
 import type { INodeProperties } from 'n8n-workflow';
 import { endpointLocator } from '../../../shared/resourceLocators';
 
+// Field lists follow the bConnect schemas (identical in 25R2 and 26R1):
+// AssetForCreation / Asset, AssetTypeForCreation, AssetStockFolderForCreation, AssetTypeFolderForCreation.
+
+/** Optional asset properties shared by Create (AssetForCreation) and Update (JSON Patch on Asset). */
+const ASSET_PROPERTY_FIELDS: INodeProperties[] = [
+  { displayName: 'Comments', name: 'comments', type: 'string', default: '', description: 'Free text' },
+  { displayName: 'Contact', name: 'contact', type: 'string', default: '' },
+  { displayName: 'Cost Center', name: 'costCenter', type: 'string', default: '' },
+  { displayName: 'Energy Off State', name: 'energyOff', type: 'number', default: 0, description: 'Power consumption when off' },
+  { displayName: 'Energy On State', name: 'energyOn', type: 'number', default: 0, description: 'Power consumption when on' },
+  { displayName: 'Inventory Number', name: 'inventoryNumber', type: 'string', default: '' },
+  { displayName: 'Operating Cost', name: 'operatingCost', type: 'number', default: 0 },
+  { displayName: 'Purchase Date', name: 'purchaseDate', type: 'dateTime', default: '' },
+  { displayName: 'Purchase Price', name: 'purchasePrice', type: 'number', default: 0 },
+  { displayName: 'URL', name: 'url', type: 'string', default: '', description: 'Web address' },
+];
+
+/** Owner types an asset can be assigned to (OwnerTypeEnum without "Undefined"). AD Object and Org Unit are 26R1+. */
+const ASSET_OWNER_TYPES_25R2 = [
+  { name: 'Asset Stock', value: 'AssetStock' },
+  { name: 'Logical Group', value: 'LogicalGroup' },
+  { name: 'Machine (Endpoint)', value: 'Machine' },
+];
+const ASSET_OWNER_TYPES = [
+  { name: 'AD Object (User or Group)', value: 'ADObject' },
+  ...ASSET_OWNER_TYPES_25R2,
+  { name: 'Org Unit', value: 'OrgUnit' },
+];
+
+/** Optional asset type properties (AssetTypeForCreation). */
+const ASSET_TYPE_ICON_FIELD: INodeProperties = { displayName: 'Icon', name: 'icon', type: 'string', default: '' };
+const ASSET_TYPE_PROPERTY_FIELDS: INodeProperties[] = [...ASSET_PROPERTY_FIELDS, ASSET_TYPE_ICON_FIELD].sort((a, b) =>
+  a.displayName.localeCompare(b.displayName),
+);
+
+/** Optional folder properties (AssetStockFolderForCreation / AssetTypeFolderForCreation, and their PATCH). */
+const ASSET_FOLDER_FIELDS: INodeProperties[] = [
+  { displayName: 'Comment', name: 'comment', type: 'string', default: '' },
+  { displayName: 'Parent Folder ID', name: 'parentId', type: 'string', default: '', description: 'The GUID of the parent folder' },
+];
+
 const COMMON_ASSET_OPTIONS = [
   { name: 'Get', value: 'get', description: 'Get an asset by ID', action: 'Get an asset' },
   { name: 'Get Many', value: 'getMany', description: 'Get many assets', action: 'Get many assets' },
@@ -135,11 +176,11 @@ export const assetFields: INodeProperties[] = [
         description: 'Sort order (e.g., "DisplayName asc", "AssetType desc")',
       },
       {
-        displayName: 'Asset Type ID',
-        name: 'assetTypeId',
+        displayName: 'Display Name',
+        name: 'displayName',
         type: 'string',
         default: '',
-        description: 'Filter by asset type GUID',
+        description: 'Filter by display name',
       },
     ],
   },
@@ -162,8 +203,8 @@ export const assetFields: INodeProperties[] = [
     description: 'The GUID of the asset type',
   },
   {
-    displayName: 'Display Name',
-    name: 'displayName',
+    displayName: 'Name',
+    name: 'name',
     type: 'string',
     required: true,
     default: '',
@@ -173,7 +214,53 @@ export const assetFields: INodeProperties[] = [
         operation: ['create'],
       },
     },
-    description: 'The display name of the asset',
+    description: 'The name of the asset',
+  },
+  {
+    displayName: 'Owner Type',
+    name: 'ownerType',
+    type: 'options',
+    required: true,
+    default: 'Machine',
+    displayOptions: {
+      show: {
+        bmsVersion: ['25R2'],
+        resource: ['asset'],
+        operation: ['create'],
+      },
+    },
+    options: ASSET_OWNER_TYPES_25R2,
+    description: 'What the asset is assigned to',
+  },
+  {
+    displayName: 'Owner Type',
+    name: 'ownerType',
+    type: 'options',
+    required: true,
+    default: 'Machine',
+    displayOptions: {
+      show: {
+        bmsVersion: ['26R1'],
+        resource: ['asset'],
+        operation: ['create'],
+      },
+    },
+    options: ASSET_OWNER_TYPES,
+    description: 'What the asset is assigned to',
+  },
+  {
+    displayName: 'Owner ID',
+    name: 'ownerId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['asset'],
+        operation: ['create'],
+      },
+    },
+    description: 'The GUID of the owner: endpoint, logical group, asset stock folder, AD object or org unit',
   },
   {
     displayName: 'Additional Fields',
@@ -187,64 +274,7 @@ export const assetFields: INodeProperties[] = [
         operation: ['create'],
       },
     },
-    options: [
-      {
-        displayName: 'Comment',
-        name: 'comment',
-        type: 'string',
-        default: '',
-        description: 'Optional comment about the asset',
-      },
-      {
-        displayName: 'Inventory Number',
-        name: 'inventoryNumber',
-        type: 'string',
-        default: '',
-        description: 'Inventory tracking number',
-      },
-      {
-        displayName: 'Serial Number',
-        name: 'serialNumber',
-        type: 'string',
-        default: '',
-        description: 'Serial number of the asset',
-      },
-      {
-        displayName: 'Manufacturer',
-        name: 'manufacturer',
-        type: 'string',
-        default: '',
-        description: 'Manufacturer name',
-      },
-      {
-        displayName: 'Model',
-        name: 'model',
-        type: 'string',
-        default: '',
-        description: 'Model name or number',
-      },
-      {
-        displayName: 'Location',
-        name: 'location',
-        type: 'string',
-        default: '',
-        description: 'Physical location of the asset',
-      },
-      {
-        displayName: 'Purchase Date',
-        name: 'purchaseDate',
-        type: 'dateTime',
-        default: '',
-        description: 'Date when the asset was purchased',
-      },
-      {
-        displayName: 'Purchase Price',
-        name: 'purchasePrice',
-        type: 'number',
-        default: 0,
-        description: 'Purchase price of the asset',
-      },
-    ],
+    options: ASSET_PROPERTY_FIELDS,
   },
 
   // ----------------------------------
@@ -263,70 +293,14 @@ export const assetFields: INodeProperties[] = [
       },
     },
     options: [
+      { displayName: 'Name', name: 'name', type: 'string', default: '', description: 'The name of the asset' },
+      { displayName: 'Owner ID', name: 'ownerId', type: 'string', default: '', description: 'The GUID of the new owner (set Owner Type too)' },
       {
-        displayName: 'Display Name',
-        name: 'displayName',
-        type: 'string',
-        default: '',
-        description: 'The display name of the asset',
+        displayName: 'Owner Type', name: 'ownerType', type: 'options', default: 'Machine', options: ASSET_OWNER_TYPES,
+        description: 'AD Object and Org Unit require bMS 26 R1',
       },
-      {
-        displayName: 'Comment',
-        name: 'comment',
-        type: 'string',
-        default: '',
-        description: 'Comment about the asset',
-      },
-      {
-        displayName: 'Inventory Number',
-        name: 'inventoryNumber',
-        type: 'string',
-        default: '',
-        description: 'Inventory tracking number',
-      },
-      {
-        displayName: 'Serial Number',
-        name: 'serialNumber',
-        type: 'string',
-        default: '',
-        description: 'Serial number of the asset',
-      },
-      {
-        displayName: 'Manufacturer',
-        name: 'manufacturer',
-        type: 'string',
-        default: '',
-        description: 'Manufacturer name',
-      },
-      {
-        displayName: 'Model',
-        name: 'model',
-        type: 'string',
-        default: '',
-        description: 'Model name or number',
-      },
-      {
-        displayName: 'Location',
-        name: 'location',
-        type: 'string',
-        default: '',
-        description: 'Physical location of the asset',
-      },
-      {
-        displayName: 'Purchase Date',
-        name: 'purchaseDate',
-        type: 'dateTime',
-        default: '',
-        description: 'Date when the asset was purchased',
-      },
-      {
-        displayName: 'Purchase Price',
-        name: 'purchasePrice',
-        type: 'number',
-        default: 0,
-        description: 'Purchase price of the asset',
-      },
-    ],
+      ...ASSET_PROPERTY_FIELDS,
+    ].sort((a, b) => a.displayName.localeCompare(b.displayName)) as INodeProperties[],
   },
 
   // ============================================================================
@@ -417,7 +391,7 @@ export const assetFields: INodeProperties[] = [
   },
 
   // ----------------------------------
-  //         asset:createAssetType
+  //         asset:createAssetType / asset:createAssetStockFolder
   // ----------------------------------
   {
     displayName: 'Name',
@@ -434,6 +408,20 @@ export const assetFields: INodeProperties[] = [
     description: 'The name of the asset type or folder',
   },
   {
+    displayName: 'Owner ID',
+    name: 'ownerId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['asset'],
+        operation: ['createAssetType'],
+      },
+    },
+    description: 'The GUID of the owner of the asset type',
+  },
+  {
     displayName: 'Additional Fields',
     name: 'additionalFields',
     type: 'collection',
@@ -442,25 +430,24 @@ export const assetFields: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ['asset'],
-        operation: ['createAssetType', 'createAssetStockFolder'],
+        operation: ['createAssetType'],
       },
     },
-    options: [
-      {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'Description of the asset type or folder',
+    options: ASSET_TYPE_PROPERTY_FIELDS,
+  },
+  {
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['asset'],
+        operation: ['createAssetStockFolder'],
       },
-      {
-        displayName: 'Parent ID',
-        name: 'parentId',
-        type: 'string',
-        default: '',
-        description: 'GUID of the parent folder (for stock folders)',
-      },
-    ],
+    },
+    options: ASSET_FOLDER_FIELDS,
   },
 
   // ============================================================================
@@ -536,13 +523,7 @@ export const assetFields: INodeProperties[] = [
         default: '',
         description: 'The name of the folder',
       },
-      {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'Description of the folder',
-      },
+      ...ASSET_FOLDER_FIELDS,
       {
         displayName: 'Parent ID',
         name: 'parentId',
@@ -741,9 +722,7 @@ export const assetFields: INodeProperties[] = [
     placeholder: 'Add Field',
     default: {},
     displayOptions: { show: { resource: ['asset'], operation: ['createAssetTypeFolder'] } },
-    options: [
-      { displayName: 'Parent Folder ID', name: 'parentFolderId', type: 'string', default: '', description: 'The GUID of the parent folder' },
-    ],
+    options: ASSET_FOLDER_FIELDS,
   },
 
   // ----------------------------------
@@ -767,6 +746,7 @@ export const assetFields: INodeProperties[] = [
     displayOptions: { show: { resource: ['asset'], operation: ['updateAssetTypeFolder'] } },
     options: [
       { displayName: 'Name', name: 'name', type: 'string', default: '', description: 'New name for the folder' },
+      ...ASSET_FOLDER_FIELDS,
     ],
   },
 
@@ -876,11 +856,14 @@ export const assetTypeFields: INodeProperties[] = [
     description: 'The name of the asset type',
   },
   {
+    displayName: 'Owner ID', name: 'ownerId', type: 'string', required: true, default: '',
+    displayOptions: { show: { resource: ['assetType'], operation: ['createAssetType'] } },
+    description: 'The GUID of the owner of the asset type',
+  },
+  {
     displayName: 'Additional Fields', name: 'additionalFields', type: 'collection', placeholder: 'Add Field', default: {},
     displayOptions: { show: { resource: ['assetType'], operation: ['createAssetType'] } },
-    options: [
-      { displayName: 'Description', name: 'description', type: 'string', default: '', description: 'Description of the asset type' },
-    ],
+    options: ASSET_TYPE_PROPERTY_FIELDS,
   },
 ];
 
@@ -941,10 +924,7 @@ export const assetFolderFields: INodeProperties[] = [
   {
     displayName: 'Additional Fields', name: 'additionalFields', type: 'collection', placeholder: 'Add Field', default: {},
     displayOptions: { show: { resource: ['assetFolder'], operation: ['createAssetStockFolder'] } },
-    options: [
-      { displayName: 'Description', name: 'description', type: 'string', default: '', description: 'Description of the folder' },
-      { displayName: 'Parent ID', name: 'parentId', type: 'string', default: '', description: 'GUID of the parent folder' },
-    ],
+    options: ASSET_FOLDER_FIELDS,
   },
   // updateAssetStockFolder / deleteAssetStockFolder
   {
@@ -957,7 +937,7 @@ export const assetFolderFields: INodeProperties[] = [
     displayOptions: { show: { resource: ['assetFolder'], operation: ['updateAssetStockFolder'] } },
     options: [
       { displayName: 'Name', name: 'name', type: 'string', default: '', description: 'The name of the folder' },
-      { displayName: 'Description', name: 'description', type: 'string', default: '', description: 'Description of the folder' },
+      ...ASSET_FOLDER_FIELDS,
       { displayName: 'Parent ID', name: 'parentId', type: 'string', default: '', description: 'GUID of the parent folder' },
     ],
   },
@@ -1027,9 +1007,7 @@ export const assetFolderFields: INodeProperties[] = [
   {
     displayName: 'Additional Fields', name: 'additionalFields', type: 'collection', placeholder: 'Add Field', default: {},
     displayOptions: { show: { resource: ['assetFolder'], operation: ['createAssetTypeFolder'] } },
-    options: [
-      { displayName: 'Parent Folder ID', name: 'parentFolderId', type: 'string', default: '', description: 'The GUID of the parent folder' },
-    ],
+    options: ASSET_FOLDER_FIELDS,
   },
   // updateAssetTypeFolder
   {
@@ -1042,6 +1020,7 @@ export const assetFolderFields: INodeProperties[] = [
     displayOptions: { show: { resource: ['assetFolder'], operation: ['updateAssetTypeFolder'] } },
     options: [
       { displayName: 'Name', name: 'name', type: 'string', default: '', description: 'New name for the folder' },
+      ...ASSET_FOLDER_FIELDS,
     ],
   },
   // deleteAssetTypeFolder
