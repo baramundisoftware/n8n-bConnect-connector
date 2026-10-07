@@ -782,13 +782,43 @@ describe('Request API Transport Layer', () => {
     it('should report a refused connection as a network error without retrying', async () => {
       const mockContext = failWith(Object.assign(new Error('connect ECONNREFUSED'), { code: 'ECONNREFUSED' }));
 
-      // NodeApiError swaps the message for n8n's generic text on well-known error codes;
-      // our troubleshooting text is kept in `messages`.
+      // NodeApiError would replace this with n8n's generic "The service refused the connection";
+      // ours names the server and must survive.
       const error = await apiRequest.call(mockContext, 'GET', '/v2.0/Endpoints').catch((e) => e);
-      expect(error.messages.join('\n')).toMatch(
-        /Cannot connect to baramundi server at https:\/\/bms\.example\.com:444\/bconnect/,
+      expect(error.message).toMatch(
+        /^Cannot connect to baramundi server at https:\/\/bms\.example\.com:444\/bconnect/,
       );
+      expect(error.message).toMatch(/Troubleshooting/);
+      expect(error.message).toMatch(/^URL: https:\/\/bms\.example\.com:444\/bconnect\/\.\.\.\/Endpoints$/m);
+      expect(error.messages).not.toContain(error.message);
       expect(mockContext.helpers.httpRequest).toHaveBeenCalledTimes(1);
+    });
+
+    it.each([
+      ['ENOTFOUND', /^Cannot resolve hostname: https:\/\/bms\.example\.com:444\/bconnect/],
+      ['ECONNRESET', /^Network error: socket failure/],
+      ['ECONNABORTED', /^Network error: socket failure/],
+      ['EHOSTUNREACH', /^Network error: socket failure/],
+      ['EAI_AGAIN', /^Network error: socket failure/],
+    ])('should keep our network error message for %s', async (code, expected) => {
+      const mockContext = failWith(Object.assign(new Error('socket failure'), { code }));
+
+      const error = await apiRequest.call(mockContext, 'GET', '/v2.0/Endpoints').catch((e) => e);
+      expect(error.message).toMatch(expected);
+      expect(error.message).toMatch(/^URL: /m);
+    });
+
+    it('should keep our message for a timeout after the retries are exhausted', async () => {
+      vi.spyOn(globalThis, 'setTimeout').mockImplementation(((fn: () => void) => {
+        fn();
+        return 0;
+      }) as any);
+      const mockContext = failWith(Object.assign(new Error('socket failure'), { code: 'ETIMEDOUT' }));
+
+      const error = await apiRequest.call(mockContext, 'GET', '/v2.0/Endpoints').catch((e) => e);
+      vi.restoreAllMocks();
+      expect(error.message).toMatch(/^Connection to https:\/\/bms\.example\.com:444\/bconnect timed out/);
+      expect(mockContext.helpers.httpRequest).toHaveBeenCalledTimes(4);
     });
 
     it('should report a certificate problem as an SSL error', async () => {
