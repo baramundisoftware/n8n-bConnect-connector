@@ -1,5 +1,5 @@
 {
-  "name": "baramundi \u2014 Patch Tuesday Cycle",
+  "name": "baramundi — Patch Tuesday Cycle",
   "nodes": [
     {
       "parameters": {},
@@ -53,8 +53,21 @@
         "resource": "maintenanceWindow",
         "operation": "createGroupMaintenanceWindow",
         "groupId": "={{ $json.id }}",
-        "startTime": "={{ $now.toISO() }}",
-        "endTime": "={{ $now.plus({ hours: 6 }).toISO() }}"
+        "maintenanceWindowDefinitionType": "Everyday",
+        "intervals": {
+          "interval": [
+            {
+              "maintenancePeriod": "Everyday",
+              "start": "22:00",
+              "end": "24:00"
+            },
+            {
+              "maintenancePeriod": "Everyday",
+              "start": "00:00",
+              "end": "04:00"
+            }
+          ]
+        }
       },
       "id": "set-mw",
       "name": "Set Maintenance Window",
@@ -65,6 +78,22 @@
         300
       ],
       "notes": "Sets a 6-hour maintenance window per group. Adjust startTime/endTime for your schedule."
+    },
+    {
+      "parameters": {
+        "resource": "logicalGroup",
+        "operation": "getEndpointsByLogicalGroup",
+        "logicalGroupId": "={{ $('Get Logical Groups').item.json.id }}",
+        "returnAll": true
+      },
+      "name": "Get Endpoints in Group",
+      "type": "n8n-nodes-baramundi-management-suite.baramundiEndpoint",
+      "typeVersion": 1,
+      "position": [
+        750,
+        480
+      ],
+      "id": "92417ca8-f3a7-497a-81fb-ee79dae9fa07"
     },
     {
       "parameters": {
@@ -121,7 +150,7 @@
         1300,
         300
       ],
-      "notes": "Fetches only instances of YOUR patch job \u2014 not all jobs in the system. Replace the GUID with the same job definition ID used in 'Trigger Update Job'."
+      "notes": "Fetches only instances of YOUR patch job — not all jobs in the system. Replace the GUID with the same job definition ID used in 'Trigger Update Job'."
     },
     {
       "parameters": {
@@ -140,7 +169,7 @@
       "parameters": {
         "fromEmail": "n8n@company.com",
         "toEmail": "it-ops@company.com",
-        "subject": "=Patch Tuesday Report \u2014 {{ $json.failed > 0 ? $json.failed + ' failures' : 'All succeeded' }}",
+        "subject": "=Patch Tuesday Report — {{ $json.failed > 0 ? $json.failed + ' failures' : 'All succeeded' }}",
         "html": "={{ $json.html }}"
       },
       "id": "send-email",
@@ -193,7 +222,7 @@
       "main": [
         [
           {
-            "node": "Trigger Update Job",
+            "node": "Get Endpoints in Group",
             "type": "main",
             "index": 0
           }
@@ -238,6 +267,17 @@
         [
           {
             "node": "Send Report Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Endpoints in Group": {
+      "main": [
+        [
+          {
+            "node": "Trigger Update Job",
             "type": "main",
             "index": 0
           }

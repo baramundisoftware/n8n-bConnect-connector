@@ -24,7 +24,7 @@ Production-ready n8n workflow templates for the baramundi Management Suite conne
 
 ### 01-patch-cycle.json — Patch Tuesday Cycle
 
-**Purpose**: End-to-end monthly patching — sets maintenance windows, triggers the Windows Update job, waits for completion, and sends an HTML report with a styled failure table.
+**Purpose**: End-to-end monthly patching — sets a nightly maintenance window (22:00–04:00) on every logical group, starts the Windows Update job on each endpoint of those groups, waits for completion, and sends an HTML report with a styled failure table.
 
 **Trigger**: Schedule (2nd Tuesday of month, 22:00)
 
@@ -32,7 +32,7 @@ Production-ready n8n workflow templates for the baramundi Management Suite conne
 
 **What to customise**:
 - Replace `YOUR-WINDOWS-UPDATE-JOB-DEFINITION-GUID` with your Windows Update job definition ID
-- Adjust the cron expression for your patch window
+- Adjust the cron expression and the maintenance window intervals for your patch window
 - Adjust the wait duration (default: 4 hours)
 - Configure the Send Report Email node with your SMTP credentials (disabled by default)
 

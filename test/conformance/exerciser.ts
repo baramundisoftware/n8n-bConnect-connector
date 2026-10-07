@@ -139,8 +139,8 @@ function sampleValue(p: INodeProperties, pass: Pass): unknown {
     }
     case 'string':
     default:
-      if (pass === 'required' && !empty) return d;
-      if (pass === 'all' && !empty && typeof d === 'string' && /^[[{]/.test(d)) return d;
+      // A non-empty default is a valid example value (e.g. "22:00", a JSON template): use it
+      if (!empty) return d;
       return sampleString(p.name);
   }
 }

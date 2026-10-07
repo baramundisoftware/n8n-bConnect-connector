@@ -7,8 +7,6 @@ import {
 	validateEmail,
 	validateMacAddress,
 	validateIpv4Address,
-	validateMaintenanceWindow,
-	validateRfc6902Patch,
 	validateODataString,
 	extractResourceLocatorValue,
 } from '../../../shared/utils/validation';
@@ -747,43 +745,72 @@ export async function getDynamicGroups(
 // MAINTENANCE WINDOW OPERATIONS
 // ============================================================================
 
+// bConnect maintenance windows are schedules: a definition type plus intervals (period + start/end
+// time of day). MaintenanceWindow (25R2) / MaintenanceWindowForCreation (26R1); 26R1 adds the
+// types Anytime and Never. They exist for endpoints and logical groups only.
+
+const TIME_OF_DAY = /^(\d{1,2}):(\d{2})$/;
+
+function parseTimeOfDay(this: IExecuteFunctions, value: string, label: string, index: number): { hour: number; minute: number } {
+  const m = TIME_OF_DAY.exec(String(value ?? '').trim());
+  const hour = m ? Number(m[1]) : NaN;
+  const minute = m ? Number(m[2]) : NaN;
+  // 24:00 is the end of the day
+  const valid = m && minute <= 59 && (hour < 24 || (hour === 24 && minute === 0));
+  if (!valid) {
+    throw new NodeOperationError(this.getNode(), `${label} must be a time of day as HH:MM (00:00–24:00), got "${value}"`, { itemIndex: index });
+  }
+  return { hour, minute };
+}
+
+/** The maintenance window body from the form: { maintenanceWindowDefinitionType, intervals }. */
+function buildMaintenanceWindow(this: IExecuteFunctions, index: number): IDataObject {
+  const maintenanceWindowDefinitionType = this.getNodeParameter('maintenanceWindowDefinitionType', index) as string;
+  const raw = this.getNodeParameter('intervals', index, {}) as { interval?: Array<{ maintenancePeriod: string; start: string; end: string }> };
+  const intervals = (raw.interval ?? []).map((iv, n) => ({
+    maintenancePeriod: iv.maintenancePeriod,
+    start: parseTimeOfDay.call(this, iv.start, `Interval ${n + 1} start`, index),
+    end: parseTimeOfDay.call(this, iv.end, `Interval ${n + 1} end`, index),
+  }));
+  return { maintenanceWindowDefinitionType, intervals };
+}
+
+function endpointMaintenanceWindowPath(this: IExecuteFunctions, index: number): string {
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
+  const guidValidation = validateGuid(endpointId);
+  if (!guidValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid endpoint ID:\n${guidValidation.errors.join('\n')}`, { itemIndex: index });
+  }
+  return `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`;
+}
+
+function groupMaintenanceWindowPath(this: IExecuteFunctions, index: number): string {
+  const groupId = this.getNodeParameter('groupId', index) as string;
+  const groupIdValidation = validateGuid(groupId);
+  if (!groupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  }
+  return `/endpoints/v2.0/LogicalGroups/${groupId}/MaintenanceWindow`;
+}
+
+/** 26R1 PATCH: replace the definition type and the intervals (paths from the spec example). */
+async function patchMaintenanceWindow(this: IExecuteFunctions, index: number, path: string): Promise<INodeExecutionData[]> {
+  const mw = buildMaintenanceWindow.call(this, index);
+  const patchOperations = [
+    { op: 'replace', path: '/maintenanceWindowDefinitionType', value: mw.maintenanceWindowDefinitionType },
+    { op: 'replace', path: '/intervals', value: mw.intervals },
+  ];
+  await apiRequest.call(this, 'PATCH', path, patchOperations);
+  const response = await apiRequest.call(this, 'GET', path);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
 export async function createEndpointMaintenanceWindow(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  // Get endpoint ID from either dropdown selection or custom GUID input
-  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
-  const startTime = this.getNodeParameter('startTime', index) as string;
-  const endTime = this.getNodeParameter('endTime', index) as string;
-  const additionalFields = this.getNodeParameter('additionalFields', index, {}) as IDataObject;
-
-  // Validate endpoint ID
-  const guidValidation = validateGuid(endpointId);
-  if (!guidValidation.valid) {
-    throw new NodeOperationError(
-      this.getNode(),
-      `Invalid endpoint ID:\n${guidValidation.errors.join('\n')}`,
-      { itemIndex: index },
-    );
-  }
-
-  // Validate maintenance window times
-  const windowValidation = validateMaintenanceWindow(startTime, endTime);
-  if (!windowValidation.valid) {
-    throw new NodeOperationError(
-      this.getNode(),
-      `Invalid maintenance window:\n${windowValidation.errors.join('\n')}`,
-      { itemIndex: index },
-    );
-  }
-
-  const body: IDataObject = {
-    startTime,
-    endTime,
-    ...additionalFields,
-  };
-
-  const response = await apiRequest.call(this, 'POST', `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`, body);
+  const path = endpointMaintenanceWindowPath.call(this, index);
+  const response = await apiRequest.call(this, 'POST', path, buildMaintenanceWindow.call(this, index));
   return this.helpers.returnJsonArray(response as IDataObject);
 }
 
@@ -791,51 +818,14 @@ export async function updateEndpointMaintenanceWindow(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  // Get endpoint ID from either dropdown selection or custom GUID input
-  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
-  // MaintenanceWindow is a singleton per endpoint/group — no windowId needed
-  const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
-
-  const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
-
-  for (const [key, value] of Object.entries(updateFields)) {
-    if (value !== undefined && value !== null && value !== '') {
-      patchOperations.push({
-        op: 'replace',
-        path: `/${key}`,
-        value,
-      });
-    }
-  }
-
-  if (patchOperations.length === 0) {
-    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
-  }
-
-  const mwValidation = validateRfc6902Patch(patchOperations);
-  if (!mwValidation.valid) {
-    throw new NodeOperationError(
-      this.getNode(),
-      `Invalid RFC 6902 patch document:\n${mwValidation.errors.join('\n')}`,
-      { itemIndex: index },
-    );
-  }
-
-  await apiRequest.call(this, 'PATCH', `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`, patchOperations);
-
-  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`);
-  return this.helpers.returnJsonArray(response as IDataObject);
+  return patchMaintenanceWindow.call(this, index, endpointMaintenanceWindowPath.call(this, index));
 }
 
 export async function deleteEndpointMaintenanceWindow(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  // Get endpoint ID from either dropdown selection or custom GUID input
-  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
-  // MaintenanceWindow is a singleton per endpoint/group — no windowId needed
-
-  await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`);
+  await apiRequest.call(this, 'DELETE', endpointMaintenanceWindowPath.call(this, index));
   return this.helpers.returnJsonArray({ success: true });
 }
 
@@ -843,30 +833,8 @@ export async function createGroupMaintenanceWindow(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const groupId = this.getNodeParameter('groupId', index) as string;
-  const groupIdValidation = validateGuid(groupId);
-  if (!groupIdValidation.valid) {
-    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
-  }
-  const groupType = this.getNodeParameter('groupType', index) as string;
-  const startTime = this.getNodeParameter('startTime', index) as string;
-  const endTime = this.getNodeParameter('endTime', index) as string;
-  const additionalFields = this.getNodeParameter('additionalFields', index, {}) as IDataObject;
-
-  const body: IDataObject = {
-    startTime,
-    endTime,
-    ...additionalFields,
-  };
-
-  const groupTypeMap: Record<string, string> = {
-    logical: 'LogicalGroups',
-    static: 'StaticGroups',
-    dynamic: 'DynamicGroups',
-  };
-
-  const groupTypePath = groupTypeMap[groupType];
-  const response = await apiRequest.call(this, 'POST', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow`, body);
+  const path = groupMaintenanceWindowPath.call(this, index);
+  const response = await apiRequest.call(this, 'POST', path, buildMaintenanceWindow.call(this, index));
   return this.helpers.returnJsonArray(response as IDataObject);
 }
 
@@ -874,73 +842,14 @@ export async function updateGroupMaintenanceWindow(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const groupId = this.getNodeParameter('groupId', index) as string;
-  const groupIdValidation = validateGuid(groupId);
-  if (!groupIdValidation.valid) {
-    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
-  }
-  const groupType = this.getNodeParameter('groupType', index) as string;
-  // MaintenanceWindow is a singleton per endpoint/group — no windowId needed
-  const updateFields = this.getNodeParameter('updateFields', index, {}) as IDataObject;
-
-  const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
-
-  for (const [key, value] of Object.entries(updateFields)) {
-    if (value !== undefined && value !== null && value !== '') {
-      patchOperations.push({
-        op: 'replace',
-        path: `/${key}`,
-        value,
-      });
-    }
-  }
-
-  if (patchOperations.length === 0) {
-    throw new NodeOperationError(this.getNode(), 'No fields to update specified');
-  }
-
-  const groupMwValidation = validateRfc6902Patch(patchOperations);
-  if (!groupMwValidation.valid) {
-    throw new NodeOperationError(
-      this.getNode(),
-      `Invalid RFC 6902 patch document:\n${groupMwValidation.errors.join('\n')}`,
-      { itemIndex: index },
-    );
-  }
-
-  const groupTypeMap: Record<string, string> = {
-    logical: 'LogicalGroups',
-    static: 'StaticGroups',
-    dynamic: 'DynamicGroups',
-  };
-
-  const groupTypePath = groupTypeMap[groupType];
-  await apiRequest.call(this, 'PATCH', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow`, patchOperations);
-
-  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow`);
-  return this.helpers.returnJsonArray(response as IDataObject);
+  return patchMaintenanceWindow.call(this, index, groupMaintenanceWindowPath.call(this, index));
 }
 
 export async function deleteGroupMaintenanceWindow(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const groupId = this.getNodeParameter('groupId', index) as string;
-  const groupIdValidation = validateGuid(groupId);
-  if (!groupIdValidation.valid) {
-    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
-  }
-  const groupType = this.getNodeParameter('groupType', index) as string;
-  // MaintenanceWindow is a singleton per endpoint/group — no windowId needed
-
-  const groupTypeMap: Record<string, string> = {
-    logical: 'LogicalGroups',
-    static: 'StaticGroups',
-    dynamic: 'DynamicGroups',
-  };
-
-  const groupTypePath = groupTypeMap[groupType];
-  await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow`);
+  await apiRequest.call(this, 'DELETE', groupMaintenanceWindowPath.call(this, index));
   return this.helpers.returnJsonArray({ success: true });
 }
 
@@ -952,27 +861,8 @@ export async function putEndpointMaintenanceWindow(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
-  // MaintenanceWindow is a singleton per endpoint — no windowId needed
-  const maintenanceWindowJson = this.getNodeParameter('maintenanceWindowJson', index) as string;
-
-  const validation = validateGuid(endpointId);
-  if (!validation.valid) {
-    throw new NodeOperationError(
-      this.getNode(),
-      `Invalid endpoint ID:\n${validation.errors.join('\n')}`,
-      { itemIndex: index },
-    );
-  }
-
-  let body: IDataObject;
-  try {
-    body = JSON.parse(maintenanceWindowJson) as IDataObject;
-  } catch {
-    throw new NodeOperationError(this.getNode(), 'maintenanceWindowJson must be a valid JSON object');
-  }
-
-  const response = await apiRequest.call(this, 'PUT', `/endpoints/v2.0/Endpoints/${endpointId}/MaintenanceWindow`, body);
+  const path = endpointMaintenanceWindowPath.call(this, index);
+  const response = await apiRequest.call(this, 'PUT', path, buildMaintenanceWindow.call(this, index));
   return this.helpers.returnJsonArray(response as IDataObject);
 }
 
@@ -980,30 +870,8 @@ export async function putGroupMaintenanceWindow(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const groupId = this.getNodeParameter('groupId', index) as string;
-  const groupIdValidation = validateGuid(groupId);
-  if (!groupIdValidation.valid) {
-    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
-  }
-  const groupType = this.getNodeParameter('groupType', index) as string;
-  // MaintenanceWindow is a singleton per endpoint/group — no windowId needed
-  const maintenanceWindowJson = this.getNodeParameter('maintenanceWindowJson', index) as string;
-
-  const groupTypeMap: Record<string, string> = {
-    logical: 'LogicalGroups',
-    static: 'StaticGroups',
-    dynamic: 'DynamicGroups',
-  };
-
-  let body: IDataObject;
-  try {
-    body = JSON.parse(maintenanceWindowJson) as IDataObject;
-  } catch {
-    throw new NodeOperationError(this.getNode(), 'maintenanceWindowJson must be a valid JSON object');
-  }
-
-  const groupTypePath = groupTypeMap[groupType];
-  const response = await apiRequest.call(this, 'PUT', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow`, body);
+  const path = groupMaintenanceWindowPath.call(this, index);
+  const response = await apiRequest.call(this, 'PUT', path, buildMaintenanceWindow.call(this, index));
   return this.helpers.returnJsonArray(response as IDataObject);
 }
 
@@ -1163,22 +1031,7 @@ export async function getGroupMaintenanceWindow(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  // Same fields as the other group maintenance-window operations (groupId + groupType)
-  const groupId = this.getNodeParameter('groupId', index) as string;
-  const groupIdValidation = validateGuid(groupId);
-  if (!groupIdValidation.valid) {
-    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
-  }
-  const groupType = this.getNodeParameter('groupType', index) as string;
-
-  const groupTypeMap: Record<string, string> = {
-    logical: 'LogicalGroups',
-    static: 'StaticGroups',
-    dynamic: 'DynamicGroups',
-  };
-
-  const groupTypePath = groupTypeMap[groupType];
-  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow`);
+  const response = await apiRequest.call(this, 'GET', groupMaintenanceWindowPath.call(this, index));
   return this.helpers.returnJsonArray(response as IDataObject);
 }
 

@@ -1666,290 +1666,98 @@ export const dynamicGroupFields: INodeProperties[] = [
 // Maintenance Window Fields
 // ============================================================
 
+const MW_ENDPOINT_OPS = ['createEndpointMaintenanceWindow', 'updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow', 'putEndpointMaintenanceWindow', 'getEndpointMaintenanceWindow'];
+const MW_GROUP_OPS = ['createGroupMaintenanceWindow', 'updateGroupMaintenanceWindow', 'deleteGroupMaintenanceWindow', 'putGroupMaintenanceWindow', 'getGroupMaintenanceWindow'];
+/** Operations that send a maintenance window body (POST, PUT 25R2, PATCH 26R1). */
+const MW_WRITE_OPS = [
+  'createEndpointMaintenanceWindow', 'updateEndpointMaintenanceWindow', 'putEndpointMaintenanceWindow',
+  'createGroupMaintenanceWindow', 'updateGroupMaintenanceWindow', 'putGroupMaintenanceWindow',
+];
+
+const MW_DEFINITION_TYPES_25R2 = [
+  { name: 'Everyday', value: 'Everyday', description: 'The same intervals every day' },
+  { name: 'Individual Weekday', value: 'IndividualWeekday', description: 'Separate intervals per weekday' },
+  { name: 'Unrestricted', value: 'Unrestricted', description: 'No restriction' },
+  { name: 'Workday / Weekend', value: 'WorkdayWeekend', description: 'Separate intervals for workdays and weekends' },
+];
+const MW_DEFINITION_TYPES_26R1 = [
+  { name: 'Anytime', value: 'Anytime' },
+  ...MW_DEFINITION_TYPES_25R2,
+  { name: 'Never', value: 'Never' },
+];
+
+function mwDefinitionType(version: '25R2' | '26R1'): INodeProperties {
+  return {
+    displayName: 'Definition Type',
+    name: 'maintenanceWindowDefinitionType',
+    type: 'options',
+    required: true,
+    default: 'Everyday',
+    displayOptions: { show: { bmsVersion: [version], resource: ['maintenanceWindow'], operation: MW_WRITE_OPS } },
+    options: version === '25R2' ? MW_DEFINITION_TYPES_25R2 : MW_DEFINITION_TYPES_26R1,
+    description: 'How the maintenance window is defined',
+  };
+}
+
 export const maintenanceWindowFields: INodeProperties[] = [
-  // ----------------------------------
-  //         maintenanceWindow: endpoint selection
-  // ----------------------------------
+  // Maintenance windows follow MaintenanceWindow / MaintenanceWindowForCreation: a definition
+  // type plus intervals. They exist for endpoints and logical groups only.
   endpointLocator({
     show: {
       resource: ['maintenanceWindow'],
-      operation: ['createEndpointMaintenanceWindow', 'updateEndpointMaintenanceWindow', 'deleteEndpointMaintenanceWindow', 'putEndpointMaintenanceWindow', 'getEndpointMaintenanceWindow'],
+      operation: MW_ENDPOINT_OPS,
     },
   }),
   {
-    displayName: 'Maintenance Window (JSON)',
-    name: 'maintenanceWindowJson',
-    type: 'json',
-    required: true,
-    default: '{"maintenanceWindowDefinitionType":"daily","intervals":[]}',
-    displayOptions: {
-      show: {
-        resource: ['maintenanceWindow'],
-        operation: ['putEndpointMaintenanceWindow'],
-        bmsVersion: ['25R2'],
-      },
-    },
-    description: 'Full MaintenanceWindow JSON body for PUT replacement (bMS 25R2). See API docs for schema.',
-  },
-  {
-    displayName: 'Start Time',
-    name: 'startTime',
-    type: 'string',
-    required: true,
-    default: '',
-    placeholder: '2026-01-20T08:00:00Z',
-    displayOptions: {
-      show: {
-        resource: ['maintenanceWindow'],
-        operation: ['createEndpointMaintenanceWindow'],
-      },
-    },
-    description: 'Start time of the maintenance window (ISO 8601 format)',
-  },
-  {
-    displayName: 'End Time',
-    name: 'endTime',
-    type: 'string',
-    required: true,
-    default: '',
-    placeholder: '2026-01-20T18:00:00Z',
-    displayOptions: {
-      show: {
-        resource: ['maintenanceWindow'],
-        operation: ['createEndpointMaintenanceWindow'],
-      },
-    },
-    description: 'End time of the maintenance window (ISO 8601 format)',
-  },
-  {
-    displayName: 'Additional Fields',
-    name: 'additionalFields',
-    type: 'collection',
-    placeholder: 'Add Field',
-    default: {},
-    displayOptions: {
-      show: {
-        resource: ['maintenanceWindow'],
-        operation: ['createEndpointMaintenanceWindow'],
-      },
-    },
-    options: [
-      {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'Description of the maintenance window',
-      },
-      {
-        displayName: 'Comment',
-        name: 'comment',
-        type: 'string',
-        default: '',
-        description: 'Comment for the maintenance window',
-      },
-    ],
-  },
-  {
-    displayName: 'Update Fields',
-    name: 'updateFields',
-    type: 'collection',
-    placeholder: 'Add Field',
-    default: {},
-    displayOptions: {
-      show: {
-        resource: ['maintenanceWindow'],
-        operation: ['updateEndpointMaintenanceWindow'],
-        bmsVersion: ['26R1'],
-      },
-    },
-    options: [
-      {
-        displayName: 'Start Time',
-        name: 'startTime',
-        type: 'string',
-        default: '',
-        placeholder: '2026-01-20T08:00:00Z',
-        description: 'Start time of the maintenance window (ISO 8601 format)',
-      },
-      {
-        displayName: 'End Time',
-        name: 'endTime',
-        type: 'string',
-        default: '',
-        placeholder: '2026-01-20T18:00:00Z',
-        description: 'End time of the maintenance window (ISO 8601 format)',
-      },
-      {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'Description of the maintenance window',
-      },
-      {
-        displayName: 'Comment',
-        name: 'comment',
-        type: 'string',
-        default: '',
-        description: 'Comment for the maintenance window',
-      },
-    ],
-  },
-
-  // ----------------------------------
-  //         maintenanceWindow: group maintenance windows
-  // ----------------------------------
-  {
-    displayName: 'Group ID',
+    displayName: 'Logical Group ID',
     name: 'groupId',
     type: 'string',
     required: true,
     default: '',
-    displayOptions: {
-      show: {
-        resource: ['maintenanceWindow'],
-        operation: ['createGroupMaintenanceWindow', 'updateGroupMaintenanceWindow', 'deleteGroupMaintenanceWindow', 'putGroupMaintenanceWindow', 'getGroupMaintenanceWindow'],
-      },
-    },
-    description: 'The GUID of the group',
+    displayOptions: { show: { resource: ['maintenanceWindow'], operation: MW_GROUP_OPS } },
+    description: 'The GUID of the logical group (maintenance windows exist for logical groups only)',
   },
+  mwDefinitionType('25R2'),
+  mwDefinitionType('26R1'),
   {
-    displayName: 'Group Type',
-    name: 'groupType',
-    type: 'options',
-    required: true,
-    default: 'logical',
-    displayOptions: {
-      show: {
-        resource: ['maintenanceWindow'],
-        operation: ['createGroupMaintenanceWindow', 'updateGroupMaintenanceWindow', 'deleteGroupMaintenanceWindow', 'putGroupMaintenanceWindow', 'getGroupMaintenanceWindow'],
-      },
-    },
-    options: [
-      { name: 'Logical', value: 'logical' },
-      { name: 'Static', value: 'static' },
-      { name: 'Dynamic', value: 'dynamic' },
-    ],
-    description: 'Type of the group',
-  },
-  {
-    displayName: 'Maintenance Window (JSON)',
-    name: 'maintenanceWindowJson',
-    type: 'json',
-    required: true,
-    default: '{"maintenanceWindowDefinitionType":"daily","intervals":[]}',
-    displayOptions: {
-      show: {
-        resource: ['maintenanceWindow'],
-        operation: ['putGroupMaintenanceWindow'],
-        bmsVersion: ['25R2'],
-      },
-    },
-    description: 'Full MaintenanceWindow JSON body for PUT replacement (bMS 25R2). See API docs for schema.',
-  },
-  {
-    displayName: 'Start Time',
-    name: 'startTime',
-    type: 'string',
-    required: true,
-    default: '',
-    placeholder: '2026-01-20T08:00:00Z',
-    displayOptions: {
-      show: {
-        resource: ['maintenanceWindow'],
-        operation: ['createGroupMaintenanceWindow'],
-      },
-    },
-    description: 'Start time of the maintenance window (ISO 8601 format)',
-  },
-  {
-    displayName: 'End Time',
-    name: 'endTime',
-    type: 'string',
-    required: true,
-    default: '',
-    placeholder: '2026-01-20T18:00:00Z',
-    displayOptions: {
-      show: {
-        resource: ['maintenanceWindow'],
-        operation: ['createGroupMaintenanceWindow'],
-      },
-    },
-    description: 'End time of the maintenance window (ISO 8601 format)',
-  },
-  {
-    displayName: 'Additional Fields',
-    name: 'additionalFields',
-    type: 'collection',
-    placeholder: 'Add Field',
+    displayName: 'Intervals',
+    name: 'intervals',
+    type: 'fixedCollection',
+    typeOptions: { multipleValues: true },
+    placeholder: 'Add Interval',
     default: {},
     displayOptions: {
-      show: {
-        resource: ['maintenanceWindow'],
-        operation: ['createGroupMaintenanceWindow'],
-      },
+      show: { resource: ['maintenanceWindow'], operation: MW_WRITE_OPS },
+      hide: { maintenanceWindowDefinitionType: ['Unrestricted', 'Anytime', 'Never'] },
     },
+    description: 'When maintenance is allowed. Times are HH:MM; use 24:00 for the end of the day.',
     options: [
       {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'Description of the maintenance window',
-      },
-      {
-        displayName: 'Comment',
-        name: 'comment',
-        type: 'string',
-        default: '',
-        description: 'Comment for the maintenance window',
-      },
-    ],
-  },
-  {
-    displayName: 'Update Fields',
-    name: 'updateFields',
-    type: 'collection',
-    placeholder: 'Add Field',
-    default: {},
-    displayOptions: {
-      show: {
-        resource: ['maintenanceWindow'],
-        operation: ['updateGroupMaintenanceWindow'],
-        bmsVersion: ['26R1'],
-      },
-    },
-    options: [
-      {
-        displayName: 'Start Time',
-        name: 'startTime',
-        type: 'string',
-        default: '',
-        placeholder: '2026-01-20T08:00:00Z',
-        description: 'Start time of the maintenance window (ISO 8601 format)',
-      },
-      {
-        displayName: 'End Time',
-        name: 'endTime',
-        type: 'string',
-        default: '',
-        placeholder: '2026-01-20T18:00:00Z',
-        description: 'End time of the maintenance window (ISO 8601 format)',
-      },
-      {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'Description of the maintenance window',
-      },
-      {
-        displayName: 'Comment',
-        name: 'comment',
-        type: 'string',
-        default: '',
-        description: 'Comment for the maintenance window',
+        displayName: 'Interval',
+        name: 'interval',
+        values: [
+          {
+            displayName: 'Period',
+            name: 'maintenancePeriod',
+            type: 'options',
+            default: 'Everyday',
+            options: [
+              { name: 'Everyday', value: 'Everyday' },
+              { name: 'Friday', value: 'Friday' },
+              { name: 'Monday', value: 'Monday' },
+              { name: 'Saturday', value: 'Saturday' },
+              { name: 'Sunday', value: 'Sunday' },
+              { name: 'Thursday', value: 'Thursday' },
+              { name: 'Tuesday', value: 'Tuesday' },
+              { name: 'Wednesday', value: 'Wednesday' },
+              { name: 'Weekends', value: 'Weekends' },
+              { name: 'Workdays', value: 'Workdays' },
+            ],
+            description: 'Everyday for "Everyday", Workdays/Weekends for "Workday / Weekend", a weekday for "Individual Weekday"',
+          },
+          { displayName: 'Start', name: 'start', type: 'string', default: '22:00', placeholder: 'HH:MM' },
+          { displayName: 'End', name: 'end', type: 'string', default: '24:00', placeholder: 'HH:MM' },
+        ],
       },
     ],
   },
