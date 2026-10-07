@@ -44,8 +44,12 @@ release-dry: ci
 	npm pack --dry-run
 
 # Publish to the npm registry (requires `npm login`). Runs prepublishOnly (build).
-publish: ci
-	npm publish
+# npm publishing runs only in GitHub Actions (.github/workflows/publish.yml): n8n accepts
+# community nodes only with an npm provenance statement, which a local publish lacks.
+publish:
+	@echo "Publishing runs in GitHub Actions on a version tag (.github/workflows/publish.yml)."
+	@echo "Use 'make release-dry' to check the package locally."
+	@exit 1
 
 clean:
 	rm -f *.tgz *.tgz.sha256 sbom.json
