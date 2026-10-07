@@ -192,6 +192,12 @@ Every baramundi node has a **bMS Version** dropdown as its first parameter. Sele
 
 Counts are the operations each node offers across both bMS versions; the editor shows only those your selected version supports.
 
+### Use with AI agents
+
+All six nodes can be attached to n8n's **AI Agent** node as tools, so an agent can look up endpoints, jobs or vulnerabilities on its own. On self-hosted n8n, community nodes are only offered as tools when the environment variable `N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true` is set.
+
+Each tool runs exactly the resource and operation you configure on it. Give an agent read operations unless it really should change your bMS: a tool set to *Delete* or *Execute* does that whenever the agent decides to call it.
+
 ---
 
 ## Troubleshooting

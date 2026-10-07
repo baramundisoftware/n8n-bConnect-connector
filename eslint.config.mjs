@@ -1,5 +1,6 @@
 import tseslint from 'typescript-eslint';
 import n8nNodesBase from 'eslint-plugin-n8n-nodes-base';
+import { n8nCommunityNodesPlugin } from '@n8n/eslint-plugin-community-nodes';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const requireGuidValidation = require('./eslint-rules/require-guid-validation.js');
@@ -37,9 +38,11 @@ export default tseslint.config(
       'n8n-nodes-base/node-class-description-credentials-name-unsuffixed': 'error',
       'n8n-nodes-base/node-class-description-display-name-unsuffixed-trigger-node': 'error',
       'n8n-nodes-base/node-class-description-icon-not-svg': 'warn',
-      'n8n-nodes-base/node-class-description-inputs-wrong-regular-node': 'error',
+      // Off, as in @n8n/node-cli's config: they demand ['main'], while the community-node
+      // rule node-connection-type-literal demands NodeConnectionTypes.Main.
+      'n8n-nodes-base/node-class-description-inputs-wrong-regular-node': 'off',
       'n8n-nodes-base/node-class-description-missing-subtitle': 'warn',
-      'n8n-nodes-base/node-class-description-outputs-wrong': 'error',
+      'n8n-nodes-base/node-class-description-outputs-wrong': 'off',
       'n8n-nodes-base/node-execute-block-missing-continue-on-fail': 'warn',
       'n8n-nodes-base/node-param-default-wrong-for-boolean': 'error',
       'n8n-nodes-base/node-param-default-wrong-for-collection': 'error',
@@ -82,6 +85,40 @@ export default tseslint.config(
       'n8n-nodes-base/node-param-resource-with-plural-option': 'error',
       'n8n-nodes-base/node-param-resource-without-no-data-expression': 'error',
       'n8n-nodes-base/node-param-type-options-missing-from-limit': 'error',
+    },
+  },
+  // n8n's community-node rules: the set its verification scanner applies to a published
+  // package (the same as `@n8n/node-cli`'s own lint config). Shipped code and package.json
+  // only — tests and tooling may use timers, raw errors and so on.
+  {
+    files: ['nodes/**/*.ts', 'credentials/**/*.ts'],
+    ...n8nCommunityNodesPlugin.configs.recommended,
+  },
+  {
+    files: ['package.json'],
+    ...n8nCommunityNodesPlugin.configs.recommended,
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: { extraFileExtensions: ['.json'] },
+    },
+    rules: {
+      ...n8nCommunityNodesPlugin.configs.recommended.rules,
+      // The TypeScript rules above are meant for code; a JSON document is one bare expression.
+      '@typescript-eslint/no-unused-expressions': 'off',
+    },
+  },
+  {
+    files: ['nodes/**/*.ts', 'credentials/**/*.ts', 'package.json'],
+    rules: {
+      // Known gaps, kept visible as warnings until fixed:
+      // - icons: SVG with light/dark variants, waiting for the official logo
+      '@n8n/community-nodes/icon-validation': 'warn',
+      '@n8n/community-nodes/cred-class-field-icon-missing': 'warn',
+      // - auth: moving Basic/API-key auth into the credential (httpRequestWithAuthentication)
+      '@n8n/community-nodes/no-http-request-with-manual-auth': 'warn',
+      // `overrides` pins a patched axios in the dev tree only; publish.yml removes the field
+      // from the published package.json, which is what n8n checks.
+      '@n8n/community-nodes/no-overrides-field': 'off',
     },
   },
   {

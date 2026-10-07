@@ -4,6 +4,7 @@ import type {
   INodeType,
   INodeTypeDescription,
 } from 'n8n-workflow';
+import { NodeConnectionTypes } from 'n8n-workflow';
 
 import {
   adUserOperations, adUserFields,
@@ -32,8 +33,9 @@ export class BaramundiAdmin implements INodeType {
     defaults: {
       name: 'baramundi Admin',
     },
-    inputs: ['main'],
-    outputs: ['main'],
+    inputs: [NodeConnectionTypes.Main],
+    outputs: [NodeConnectionTypes.Main],
+    usableAsTool: true,
     credentials: [
       {
         name: 'bconnectApi',

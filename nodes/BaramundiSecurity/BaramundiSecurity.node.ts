@@ -4,6 +4,7 @@ import type {
   INodeType,
   INodeTypeDescription,
 } from 'n8n-workflow';
+import { NodeConnectionTypes } from 'n8n-workflow';
 
 import {
   bmsecurityOperations, bmsecurityFields,
@@ -26,8 +27,9 @@ export class BaramundiSecurity implements INodeType {
     defaults: {
       name: 'baramundi Security',
     },
-    inputs: ['main'],
-    outputs: ['main'],
+    inputs: [NodeConnectionTypes.Main],
+    outputs: [NodeConnectionTypes.Main],
+    usableAsTool: true,
     credentials: [
       {
         name: 'bconnectApi',
