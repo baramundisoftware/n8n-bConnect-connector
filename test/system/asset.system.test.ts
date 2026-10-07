@@ -121,7 +121,6 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
     let createdAssetId: string;
     let assetTypeId: string;
 
-    // Skip this test - creating assets requires valid assetTypeId and proper parent hierarchy setup
     it('should create, read, update, and delete an asset', async () => {
       // First, get or create an asset type
       const typesContext = createSystemTestContext({
@@ -138,14 +137,27 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
         assetTypeId = types[0].json.id as string;
       }
 
+      // AssetForCreation requires an owner (#37): the endpoint from BCONNECT_TEST_ENDPOINT_ID,
+      // otherwise the first asset stock folder
+      let ownerType = 'Machine';
+      let ownerId = process.env.BCONNECT_TEST_ENDPOINT_ID ?? '';
+      if (!ownerId) {
+        const folders = await asset.getAssetStockFolders.call(createSystemTestContext({ returnAll: false, limit: 1, options: {} }, config!), 0);
+        if (folders.length === 0) {
+          console.warn('Set BCONNECT_TEST_ENDPOINT_ID or create an asset stock folder to run this test');
+          return;
+        }
+        ownerType = 'AssetStock';
+        ownerId = folders[0].json.id as string;
+      }
+
       // CREATE
       const ts = Date.now();
       const createContext = createSystemTestContext({
         assetTypeId,
         name: `SystemTest_Asset_${ts}`,
-        // AssetForCreation requires an owner (#37); set BCONNECT_TEST_ENDPOINT_ID to a real endpoint
-        ownerType: 'Machine',
-        ownerId: process.env.BCONNECT_TEST_ENDPOINT_ID ?? '',
+        ownerType,
+        ownerId,
         additionalFields: {
           inventoryNumber: `TEST-${ts}`,
           comments: 'System test asset',
@@ -293,7 +305,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
         limit: 1,
       }, config!);
 
-      const endpoints = await (await import('../../nodes/Baramundi/actions/endpoint/endpoint.execute')).getMany.call(endpointsContext, 0);
+      const endpoints = await (await import('../../nodes/BaramundiEndpoint/actions/endpoint/endpoint.execute')).getMany.call(endpointsContext, 0);
 
       if (endpoints.length === 0) {
         console.warn('No endpoints available for testing');
@@ -321,7 +333,7 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
         limit: 1,
       }, config!);
 
-      const groups = await (await import('../../nodes/Baramundi/actions/endpoint/endpoint.execute')).getLogicalGroups.call(groupsContext, 0);
+      const groups = await (await import('../../nodes/BaramundiEndpoint/actions/endpoint/endpoint.execute')).getLogicalGroups.call(groupsContext, 0);
 
       if (groups.length === 0) {
         console.warn('No logical groups available for testing');

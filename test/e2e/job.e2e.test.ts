@@ -5,6 +5,7 @@
 
 import { describe, it, expect, beforeAll } from 'vitest';
 import { createRealContext, checkMockAvailable, tryOp, NONEXISTENT_GUID } from './helpers';
+import * as ep from '../../nodes/BaramundiEndpoint/actions/endpoint/endpoint.execute';
 import * as job from '../../nodes/BaramundiJob/actions/job/job.execute';
 
 let available = false;
@@ -85,10 +86,13 @@ describe('E2E: Job — CRUD lifecycle', () => {
 });
 
 describe('E2E: Job — execute (accepts 404)', () => {
-  it('execute job definition', async () => {
+  // Strict: one job instance per endpoint (#45)
+  it('execute job definition on two endpoints', async () => {
     if (!available || !firstJobId) return;
-    const ctx = createRealContext({ jobId: firstJobId, endpointIds: '', options: {} });
-    await tryOp(() => job.execute.call(ctx, 0));
+    const eps = await ep.getMany.call(createRealContext({ endpointType: 'windows', returnAll: false, limit: 2, options: {} }), 0);
+    const ids = eps.map((e) => e.json.id as string);
+    const result = await job.execute.call(createRealContext({ jobId: firstJobId, endpointIds: ids.join(','), options: {} }), 0);
+    expect(result).toHaveLength(ids.length);
   });
 });
 

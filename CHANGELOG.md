@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The credential **Test** button now really checks the connection: it requests `/endpoints/v2.0/Endpoints` (the old path did not exist) and fails on HTTP errors, with clear messages for 401 (credentials), 403 (permissions) and 404 (Server URL). Before, it reported success even with a wrong URL or password (#35)
 
 ### Added
+- CI job **integration (bConnect-Mock)**: runs the E2E and system tests against a live bConnect-Mock container on every pull request, so they cannot silently go stale again (#40)
 - Spec-conformance check (`npm run check:spec`, part of the unit tests): calls every operation the editor offers, per bMS release and for every value of every option field, plus every dropdown and search function, and checks the HTTP requests against the 25R2/26R1 OpenAPI specs — route and module prefix, query parameters, body fields, required fields, enum values, JSON Patch paths. Known violations are baselined against their issues (#37, #39, #42–#46). JSON Patch paths are also accepted when the spec's own PATCH example uses them
 
 ## [0.9.2] - 2026-10-06

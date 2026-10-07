@@ -32,9 +32,10 @@ describe.skipIf(skipConfig.skip)('Update Management API - System Tests', () => {
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBe(true);
 
+      // Update-management WindowsEndpoint carries endpointId/endpointName (spec), not id/displayName
       if (result.length > 0) {
-        expect(result[0].json).toHaveProperty('id');
-        expect(result[0].json).toHaveProperty('displayName');
+        expect(result[0].json).toHaveProperty('endpointId');
+        expect(result[0].json).toHaveProperty('endpointName');
       }
     });
 
@@ -51,7 +52,7 @@ describe.skipIf(skipConfig.skip)('Update Management API - System Tests', () => {
         return;
       }
 
-      const endpointId = endpoints[0].json.id as string;
+      const endpointId = endpoints[0].json.endpointId as string;
 
       const context = createSystemTestContext({
         endpointId,
@@ -60,8 +61,7 @@ describe.skipIf(skipConfig.skip)('Update Management API - System Tests', () => {
       const result = await updateManagement.getWindowsEndpoint.call(context, 0);
 
       expect(result).toBeDefined();
-      expect(result[0].json).toHaveProperty('id');
-      expect(result[0].json.id).toBe(endpointId);
+      expect(result[0].json.endpointId).toBe(endpointId);
     });
   });
 });

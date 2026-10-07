@@ -229,7 +229,8 @@ describe.skipIf(skipConfig.skip)('Endpoint API - System Tests', () => {
     });
   });
 
-  describe('Static Groups Operations', () => {
+  // Undocumented routes that work on a real bMS; bConnect-Mock lacks them (bConnect-Mock#65)
+  describe.skipIf(process.env.BCONNECT_IS_MOCK === 'true')('Static Groups Operations', () => {
     let createdGroupId: string;
 
     it('should create, read, update, and delete a static group', async () => {
@@ -291,7 +292,8 @@ describe.skipIf(skipConfig.skip)('Endpoint API - System Tests', () => {
     });
   });
 
-  describe('Dynamic Groups Operations', () => {
+  // Undocumented routes that work on a real bMS; bConnect-Mock lacks them (bConnect-Mock#65)
+  describe.skipIf(process.env.BCONNECT_IS_MOCK === 'true')('Dynamic Groups Operations', () => {
     it('should get a specific dynamic group', async () => {
       // First get a dynamic group ID
       const listContext = createSystemTestContext({

@@ -100,6 +100,8 @@ npm run build          # TypeScript compilation
 npm test               # Run unit tests
 npm run test:coverage  # With coverage report
 npm run check:spec     # Spec-conformance check only (also part of npm test)
+npm run test:e2e       # E2E tests against bConnect-Mock on localhost:8765 (skipped if not running)
+npm run test:system    # System tests against BCONNECT_BASE_URL (a real bMS, or bConnect-Mock with BCONNECT_IS_MOCK=true)
 ```
 
 ### Coverage Target
