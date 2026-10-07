@@ -35,6 +35,8 @@ export interface SpecOperation {
   queryParams: Set<string>;
   /** Resolved request body schema, if any */
   body?: Schema;
+  /** Resolved success response schema of this operation (200, else the first 2xx with a body) */
+  response?: Schema;
   /** Resolved 200 response schema of the GET on the same path (JSON Patch targets) */
   getResponse?: Schema;
   /** First path segments used in the spec's own JSON Patch examples (lower-case) */
@@ -70,6 +72,11 @@ function jsonSchemaOf(content: Record<string, { schema?: Schema }> | undefined):
   if (!content) return undefined;
   const entry = content['application/json'] ?? content['application/json-patch+json'] ?? Object.values(content)[0];
   return entry?.schema;
+}
+
+function successContent(responses: Record<string, { content?: Record<string, { schema?: Schema }> }> | undefined) {
+  const codes = Object.keys(responses ?? {}).filter((c) => /^2\d\d$/.test(c) && responses![c].content).sort();
+  return responses?.[codes.includes('200') ? '200' : codes[0]]?.content;
 }
 
 function loadRelease(release: Release): SpecOperation[] {
@@ -113,6 +120,7 @@ function loadRelease(release: Release): SpecOperation[] {
           matcher,
           queryParams: new Set(params.filter((p) => p.in === 'query').map((p) => p.name.toLowerCase())),
           body: resolve(jsonSchemaOf(op.requestBody?.content)),
+          response: resolve(jsonSchemaOf(successContent(op.responses))),
           getResponse,
           patchExamplePaths,
           resolve,

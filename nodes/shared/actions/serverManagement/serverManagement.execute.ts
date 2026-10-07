@@ -47,9 +47,9 @@ export async function getMicroservices(
   this: IExecuteFunctions,
   _index: number,
 ): Promise<INodeExecutionData[]> {
+  // A plain array, not a paged list (both specs)
   const response = await apiRequest.call(this, 'GET', '/servermanagement/v2.0/Microservices');
-  const data = ((response as IDataObject).data ?? response) as IDataObject[];
-  return this.helpers.returnJsonArray(data);
+  return this.helpers.returnJsonArray(response as unknown as IDataObject[]);
 }
 
 export async function getMicroservice(

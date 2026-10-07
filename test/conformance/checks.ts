@@ -7,7 +7,7 @@ import { explainMissingRoute, findOperation, type Release, type Schema, type Spe
 import type { Exercise, RecordedRequest } from './exerciser';
 
 export interface Violation {
-  kind: 'route' | 'query' | 'body-field' | 'body-required' | 'body-enum' | 'patch-path' | 'no-request';
+  kind: 'route' | 'query' | 'body-field' | 'body-required' | 'body-enum' | 'patch-path' | 'response-field' | 'no-request';
   detail: string;
 }
 
@@ -56,6 +56,58 @@ function checkPatch(op: SpecOperation, body: unknown[]): Violation[] {
   return out;
 }
 
+/**
+ * The properties of a response schema, with oneOf/anyOf variants merged (polymorphic
+ * endpoints). Undefined when the schema does not list properties — a free-form object or
+ * a dictionary — so nothing can be checked.
+ */
+function responseProperties(op: SpecOperation, schema: Schema | undefined): Map<string, Schema> | undefined {
+  const s = op.resolve(schema);
+  if (!s) return undefined;
+  const variants = s.oneOf ?? s.anyOf;
+  if (variants) {
+    const merged = new Map<string, Schema>();
+    for (const v of variants) {
+      const props = responseProperties(op, v);
+      if (!props) return undefined;
+      for (const [k, p] of props) merged.set(k, p);
+    }
+    return merged;
+  }
+  if (s.type === 'array') return new Map();
+  if (!s.properties || Object.keys(s.properties).length === 0) return undefined;
+  return new Map(Object.entries(s.properties));
+}
+
+/**
+ * Response fields the code read, against the operation's response schema. JavaScript
+ * property access is case-sensitive, so unlike request fields the case must match.
+ * `data[].name` is `name` in the items of the `data` array.
+ */
+function checkResponseReads(op: SpecOperation, req: RecordedRequest): Violation[] {
+  const out: Violation[] = [];
+  const where = `${req.method} ${normalisePath(req.path)}`;
+  for (const read of [...req.reads].sort()) {
+    let props = responseProperties(op, op.response);
+    let missing: string | undefined;
+    const parts = read.split('.');
+    for (const [i, part] of parts.entries()) {
+      if (!props) break;
+      const key = part.replace(/\[\]$/, '');
+      const prop = props.get(key);
+      if (!prop) {
+        missing = key;
+        break;
+      }
+      if (i < parts.length - 1) props = responseProperties(op, op.resolve(prop)?.items);
+    }
+    if (missing === undefined) continue;
+    const other = [...props!.keys()].find((k) => k.toLowerCase() === missing!.toLowerCase());
+    out.push({ kind: 'response-field', detail: `${where} ${read}${other ? ` (spec: ${other})` : ''}` });
+  }
+  return out;
+}
+
 export function checkRequest(release: Release, req: RecordedRequest): Violation[] {
   const path = normalisePath(req.path);
   const op = findOperation(release, req.method, req.path);
@@ -66,6 +118,7 @@ export function checkRequest(release: Release, req: RecordedRequest): Violation[
   for (const key of Object.keys(req.qs)) {
     if (!op.queryParams.has(key.toLowerCase())) out.push({ kind: 'query', detail: `${req.method} ${path} ?${key}` });
   }
+  if (req.reads) out.push(...checkResponseReads(op, req));
   if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body !== undefined) {
     const where = `${req.method} ${path}`;
     const tag = (v: Violation): Violation => ({ ...v, detail: `${where} ${v.detail}` });
