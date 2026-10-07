@@ -153,6 +153,20 @@ docs(readme): update installation instructions
 
 ---
 
+## Releases (maintainers)
+
+Releases are cut on request only. A release PR bumps `package.json` and moves the
+`[Unreleased]` CHANGELOG entries under `## [X.Y.Z]`; an admin then pushes the tag `vX.Y.Z`.
+
+`make release` builds the `.tgz`, its `.sha256` and the SBOM for the GitHub Release.
+npm publishing happens only in GitHub Actions (`.github/workflows/publish.yml`), with an
+npm provenance statement, which n8n requires for verified community nodes. The workflow
+checks that the tag, `package.json` and the CHANGELOG agree, runs the full gate, and
+publishes only when the repository variable `NPM_PUBLISH_ENABLED` is `true` and a
+maintainer approves the `npm` environment. The setup steps are in the workflow's header.
+
+---
+
 ## License
 
 By contributing, you agree that your contributions will be licensed under the [MIT License](LICENSE).

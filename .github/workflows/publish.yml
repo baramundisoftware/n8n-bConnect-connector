@@ -1,0 +1,171 @@
+# Publish to npm with provenance on a version tag (#21).
+#
+# ── What it does ────────────────────────────────────────────────────────────
+# A tag `vX.Y.Z` runs the full gate (lint, build, tests with the coverage
+# floor, license check), checks that the tag, package.json and CHANGELOG agree,
+# and publishes the package to npm with a provenance statement. n8n requires
+# GitHub Actions publishing with provenance for verified community nodes
+# (since May 2026); `@n8n/node-cli` looks for this file under this name.
+#
+# A pull request that touches this file or package.json, and a manual run, do
+# the same checks and `npm publish --dry-run`. Nothing is published.
+#
+# ── Publishing is off until it is switched on ───────────────────────────────
+# The `publish` job runs only when the repository variable
+# NPM_PUBLISH_ENABLED is `true`. Until then a version tag runs the checks,
+# warns, and stops, so cutting a GitHub release does not publish by accident.
+# The job also runs in the `npm` environment; give that environment required
+# reviewers so every publish waits for a maintainer's approval.
+#
+# ── One-time setup (when publishing is approved) ───────────────────────────
+# 1. npm auth, one of:
+#    a) Trusted publishing (preferred, no secret): on npmjs.com, package
+#       settings → Trusted Publisher → GitHub Actions, owner
+#       `baramundisoftware`, repository `n8n-bConnect-connector`, workflow
+#       `publish.yml`, environment `npm`. npm only offers this for a package
+#       that already exists, so the very first version may need option b.
+#    b) Token: a granular npm access token with publish rights, stored as the
+#       secret NPM_TOKEN in the `npm` environment. Remove it once trusted
+#       publishing is set up.
+# 2. Settings → Environments → `npm`: required reviewers, deployment tags `v*`.
+# 3. Settings → Variables → Actions: NPM_PUBLISH_ENABLED = true.
+#
+# ── Tag rules ───────────────────────────────────────────────────────────────
+# - Only `v<major>.<minor>.<patch>` (optionally `-<pre>`) triggers a publish.
+# - The tag must equal the version in package.json, and CHANGELOG.md must have
+#   a `## [X.Y.Z]` section for it.
+# - A pre-release (`v1.0.0-rc.1`) goes to the `next` dist-tag, so
+#   `npm install` and n8n's Community Nodes keep installing the last stable one.
+# - Only admins may push `v*` tags (repository ruleset "release tags").
+#
+# Only GitHub-owned actions are allowed in this organisation.
+
+name: Publish
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+', 'v[0-9]+.[0-9]+.[0-9]+-*']
+  pull_request:
+    paths:
+      - .github/workflows/publish.yml
+      - package.json
+  workflow_dispatch:
+
+# Two runs for the same tag must not race each other to the registry.
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  IS_TAG: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+
+jobs:
+  verify:
+    name: verify package
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      dist-tag: ${{ steps.version.outputs.dist-tag }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22.16"
+          cache: npm
+
+      - name: Use npm 11 (same as CI)
+        run: npm install -g npm@11
+
+      - name: Version, tag and CHANGELOG agree
+        id: version
+        shell: bash
+        run: |
+          version=$(jq -r .version package.json)
+          if [ "$IS_TAG" = "true" ] && [ "${GITHUB_REF_NAME#v}" != "$version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME doesn't match package.json ($version). Bump the version in the release PR, then tag again."
+            exit 1
+          fi
+          if [ "$IS_TAG" = "true" ] && ! grep -qF "## [$version]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no '## [$version]' section."
+            exit 1
+          fi
+          case "$version" in
+            *-*) dist_tag=next ;;
+            *)   dist_tag=latest ;;
+          esac
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "dist-tag=$dist_tag" >> "$GITHUB_OUTPUT"
+          echo "Version $version → npm dist-tag '$dist_tag'"
+
+      - name: Install from the lockfile
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Unit tests + coverage floor
+        run: npm run test:coverage
+
+      - name: License check (runtime dependencies)
+        run: npm run license-check
+
+      # Shows the tarball contents in the log and fails on a broken package.json.
+      - name: Publish dry run
+        env:
+          DIST_TAG: ${{ steps.version.outputs.dist-tag }}
+        run: npm publish --dry-run --tag "$DIST_TAG"
+
+      - name: Publishing disabled
+        if: env.IS_TAG == 'true' && vars.NPM_PUBLISH_ENABLED != 'true'
+        run: echo "::warning::Not published. NPM_PUBLISH_ENABLED is not 'true' (see the setup notes in publish.yml)."
+
+  publish:
+    name: publish to npm
+    needs: verify
+    if: >-
+      github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') &&
+      vars.NPM_PUBLISH_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/n8n-nodes-baramundi-management-suite/v/${{ needs.verify.outputs.version }}
+    permissions:
+      contents: read
+      # OIDC token for trusted publishing and the provenance statement.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22.16"
+          registry-url: https://registry.npmjs.org
+          # No dependency cache in the job that holds publish rights.
+
+      # Trusted publishing needs npm >= 11.5.1.
+      - name: Use npm 11 (same as CI)
+        run: npm install -g npm@11
+
+      - name: Install from the lockfile
+        run: npm ci
+
+      # prepublishOnly builds dist/ from this checkout. Without NPM_TOKEN, npm
+      # authenticates through trusted publishing (OIDC).
+      - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          DIST_TAG: ${{ needs.verify.outputs.dist-tag }}
+        run: npm publish --provenance --access public --tag "$DIST_TAG"
