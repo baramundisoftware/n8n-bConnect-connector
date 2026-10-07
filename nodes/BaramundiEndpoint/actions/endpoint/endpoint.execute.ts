@@ -1163,12 +1163,22 @@ export async function getGroupMaintenanceWindow(
   this: IExecuteFunctions,
   index: number,
 ): Promise<INodeExecutionData[]> {
-  const logicalGroupId = this.getNodeParameter('logicalGroupId', index) as string;
-  const logicalGroupIdValidation = validateGuid(logicalGroupId);
-  if (!logicalGroupIdValidation.valid) {
-    throw new NodeOperationError(this.getNode(), `Invalid logical group ID:\n${logicalGroupIdValidation.errors.join('\n')}`, { itemIndex: index });
+  // Same fields as the other group maintenance-window operations (groupId + groupType)
+  const groupId = this.getNodeParameter('groupId', index) as string;
+  const groupIdValidation = validateGuid(groupId);
+  if (!groupIdValidation.valid) {
+    throw new NodeOperationError(this.getNode(), `Invalid group ID:\n${groupIdValidation.errors.join('\n')}`, { itemIndex: index });
   }
-  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/LogicalGroups/${logicalGroupId}/MaintenanceWindow`);
+  const groupType = this.getNodeParameter('groupType', index) as string;
+
+  const groupTypeMap: Record<string, string> = {
+    logical: 'LogicalGroups',
+    static: 'StaticGroups',
+    dynamic: 'DynamicGroups',
+  };
+
+  const groupTypePath = groupTypeMap[groupType];
+  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/${groupTypePath}/${groupId}/MaintenanceWindow`);
   return this.helpers.returnJsonArray(response as IDataObject);
 }
 

@@ -59,7 +59,7 @@ export function checkRequest(release: Release, req: RecordedRequest): Violation[
   const path = normalisePath(req.path);
   const op = findOperation(release, req.method, req.path);
   if (!op) {
-    return [{ kind: 'route', detail: `${req.method} ${path} — ${explainMissingRoute(release, req.method, req.path)}` }];
+    return [{ kind: 'route', detail: `${req.method} ${path} - ${explainMissingRoute(release, req.method, req.path)}` }];
   }
   const out: Violation[] = [];
   for (const key of Object.keys(req.qs)) {
