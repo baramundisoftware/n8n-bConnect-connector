@@ -82,12 +82,21 @@ export async function createVariableDefinition(
 	index: number,
 ): Promise<INodeExecutionData[]> {
 	const name = this.getNodeParameter('name', index) as string;
-	const dataType = this.getNodeParameter('dataType', index) as string;
+	const category = this.getNodeParameter('category', index) as string;
+	const scopes = this.getNodeParameter('scopes', index) as string[];
+	const type = this.getNodeParameter('type', index) as string;
 	const additionalFields = this.getNodeParameter('additionalFields', index, {}) as IDataObject;
 
+	if (!Array.isArray(scopes) || scopes.length === 0) {
+		throw new NodeOperationError(this.getNode(), 'At least one scope is required', { itemIndex: index });
+	}
+
+	// VariableDefinitionForCreation: name, category and scopes are required
 	const body: IDataObject = {
 		name,
-		dataType,
+		category,
+		scopes,
+		type,
 		...additionalFields,
 	};
 

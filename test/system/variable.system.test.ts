@@ -88,11 +88,11 @@ describe.skipIf(skipConfig.skip)('Variables API - System Tests', () => {
       // CREATE
       const createContext = createSystemTestContext({
         name: `SystemTest_VarDef_${Date.now()}`,
-        dataType: 'String',
+        category: 'Client',
+        scopes: ['Endpoint'],
+        type: 'String',
         additionalFields: {
           comment: 'System test variable definition',
-          category: 'Client',  // Required field
-          scopes: ['Endpoint'],  // Required: at least one scope
         },
       }, config!);
 

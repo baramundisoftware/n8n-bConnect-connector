@@ -128,11 +128,14 @@ describe('Variable Definitions Operations', () => {
 				defaultValue: 'test',
 			};
 
+			// VariableDefinitionForCreation: name, category, scopes required; type is the spec enum (#45)
 			const mockContext = createMockExecuteFunctions(
 				{
 					name: 'CustomVar',
-					dataType: 'String',
-					additionalFields: { defaultValue: 'test' },
+					category: 'Client',
+					scopes: ['Endpoint'],
+					type: 'String',
+					additionalFields: { defaultValue: 'test', comment: 'c' },
 				},
 				{},
 				mockCreated,
@@ -146,8 +149,25 @@ describe('Variable Definitions Operations', () => {
 				expect.objectContaining({
 					method: 'POST',
 					url: expect.stringContaining('/variables/v2.0/VariableDefinitions'),
+					body: {
+						name: 'CustomVar',
+						category: 'Client',
+						scopes: ['Endpoint'],
+						type: 'String',
+						defaultValue: 'test',
+						comment: 'c',
+					},
 				}),
 			);
+		});
+
+		it('should reject an empty scope list', async () => {
+			const mockContext = createMockExecuteFunctions(
+				{ name: 'CustomVar', category: 'Client', scopes: [], type: 'String', additionalFields: {} },
+				{},
+				{},
+			);
+			await expect(variable.createVariableDefinition.call(mockContext, 0)).rejects.toThrow(/At least one scope/);
 		});
 	});
 
