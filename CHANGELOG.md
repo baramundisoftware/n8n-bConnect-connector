@@ -7,8 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Documentation
-- README: operation counts updated to the current nodes (219 in total; 211 for 26 R1, 171 for 25 R2 — some operations exist in 25 R2 only)
+## [0.10.0] - 2026-10-07
+
+### Added
+- **AI agent tools**: all six nodes can be used as tools of n8n's AI Agent node (`usableAsTool`); self-hosted n8n needs `N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true` (see README)
 
 ### Removed
 - **Endpoint → Static Group**: *Get*, *Get Many*, *Create*, *Update*, *Delete*, and **Dynamic Group**: *Get*, *Get Many*. bConnect exposes these groups only through sub-routes; `/endpoints/v2.0/StaticGroups` and `/DynamicGroups` are in neither spec and return *404* on a live bMS 26R1 — the operations could never succeed. *Get Endpoints by Static/Dynamic Group*, *Assign Job to Static/Dynamic Group* and job instances by group remain (#60)
@@ -54,8 +56,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A Server URL with a trailing space or slash no longer breaks every request with 404; the URL is trimmed before use (#34)
 - The credential **Test** button now really checks the connection: it requests `/endpoints/v2.0/Endpoints` (the old path did not exist) and fails on HTTP errors, with clear messages for 401 (credentials), 403 (permissions) and 404 (Server URL). Before, it reported success even with a wrong URL or password (#35)
 
-### Added
-- **AI agent tools**: all six nodes can be used as tools of n8n's AI Agent node (`usableAsTool`); self-hosted n8n needs `N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true` (see README)
+### Documentation
+- README: operation counts updated to the current nodes (219 in total; 211 for 26 R1, 171 for 25 R2 — some operations exist in 25 R2 only)
+
+### For contributors
 - Lint and CI apply n8n's own community-node rules (`@n8n/eslint-plugin-community-nodes`, the set its verification scanner uses) to the nodes, credentials and `package.json`. Fixed along the way: `NodeConnectionTypes.Main` instead of `'main'`, n8n's `sleep` for the retry backoff, and errors from an operation always reach n8n as node errors with the failing item's index (an unexpected error was re-thrown raw). Still open, as warnings: SVG icons and moving authentication into the credential. The publish workflow drops the dev-only `overrides` field from the published `package.json`, which n8n does not allow in community packages
 - CI job **integration (bConnect-Mock)**: runs the E2E and system tests against a live bConnect-Mock container on every pull request, so they cannot silently go stale again (#40)
 - Spec-conformance check (`npm run check:spec`, part of the unit tests): calls every operation the editor offers, per bMS release and for every value of every option field, plus every dropdown and search function, and checks the HTTP requests against the 25R2/26R1 OpenAPI specs — route and module prefix, query parameters, body fields, required fields, enum values, JSON Patch paths. Known violations are baselined against their issues (#37, #39, #42–#46). JSON Patch paths are also accepted when the spec's own PATCH example uses them
