@@ -68,23 +68,6 @@ describe('E2E: Job — getJobDefinitionsByFolder', () => {
   });
 });
 
-describe('E2E: Job — CRUD lifecycle', () => {
-  it('create → update → deleteJob', async () => {
-    if (!available || !firstFolderId) return;
-    const createCtx = createRealContext({
-      name: 'E2E-TestJob',
-      folderId: firstFolderId,
-      additionalFields: {},
-    });
-    const created = await tryOp(() => job.create.call(createCtx, 0));
-    if (!created || created.length === 0) return;
-    const id = created[0].json.id as string;
-
-    await tryOp(() => job.update.call(createRealContext({ jobId: id, updateFields: { name: 'E2E-TestJob-Updated' } }), 0));
-    await tryOp(() => job.deleteJob.call(createRealContext({ jobId: id }), 0));
-  });
-});
-
 describe('E2E: Job — execute (accepts 404)', () => {
   // Strict: one job instance per endpoint (#45)
   it('execute job definition on two endpoints', async () => {

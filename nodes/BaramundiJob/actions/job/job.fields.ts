@@ -122,12 +122,6 @@ export const jobOperations: INodeProperties[] = [
       { name: 'Assign Job to Static Group', value: 'assignJobToStaticGroup', description: 'Assign a job definition to a static group', action: 'Assign job to static group' },
       { name: 'Assign Job to UDG', value: 'assignJobToUDG', description: 'Assign a job definition to a Universal Dynamic Group', action: 'Assign job to UDG' },
       {
-        name: 'Create',
-        value: 'create',
-        description: 'Create a new job definition',
-        action: 'Create a job definition',
-      },
-      {
         name: 'Create Folder',
         value: 'createFolder',
         description: 'Create a new job folder',
@@ -138,12 +132,6 @@ export const jobOperations: INodeProperties[] = [
         value: 'createKioskRelease',
         description: 'Create a new kiosk release',
         action: 'Create a kiosk release',
-      },
-      {
-        name: 'Delete',
-        value: 'delete',
-        description: 'Delete a job definition',
-        action: 'Delete a job definition',
       },
       {
         name: 'Delete Folder',
@@ -250,12 +238,6 @@ export const jobOperations: INodeProperties[] = [
         value: 'stopJobInstance',
         description: 'Stop a running job instance',
         action: 'Stop a job instance',
-      },
-      {
-        name: 'Update',
-        value: 'update',
-        description: 'Update a job definition',
-        action: 'Update a job definition',
       },
       {
         name: 'Update Folder',
@@ -980,149 +962,6 @@ export const jobFields: INodeProperties[] = [
   // ============================================================================
 
   // ----------------------------------
-  //         job:create
-  // ----------------------------------
-  {
-    displayName: 'Name',
-    name: 'name',
-    type: 'string',
-    required: true,
-    default: '',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['create'],
-      },
-    },
-    description: 'The name of the job definition',
-  },
-  {
-    displayName: 'Type',
-    name: 'type',
-    type: 'options',
-    required: true,
-    options: [
-      { name: 'Windows', value: 'Windows' },
-      { name: 'Mobile', value: 'Mobile' },
-      { name: 'Universal', value: 'Universal' },
-    ],
-    default: 'Windows',
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['create'],
-      },
-    },
-    description: 'The type of job definition',
-  },
-  {
-    displayName: 'Additional Fields',
-    name: 'additionalFields',
-    type: 'collection',
-    placeholder: 'Add Field',
-    default: {},
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['create'],
-      },
-    },
-    options: [
-      {
-        displayName: 'Display Name',
-        name: 'displayName',
-        type: 'string',
-        default: '',
-        description: 'Display name for the job',
-      },
-      {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'Description of the job',
-      },
-      {
-        displayName: 'Comments',
-        name: 'comments',
-        type: 'string',
-        default: '',
-        description: 'Comments about the job',
-      },
-      {
-        displayName: 'Parent ID',
-        name: 'parentId',
-        type: 'string',
-        default: '',
-        description: 'GUID of the parent folder',
-      },
-    ],
-  },
-
-  // ----------------------------------
-  //         job:update
-  // ----------------------------------
-  jobDefinitionLocator({
-    show: {
-      resource: ['job'],
-      operation: ['update'],
-    },
-  }),
-  {
-    displayName: 'Update Fields',
-    name: 'updateFields',
-    type: 'collection',
-    placeholder: 'Add Field',
-    default: {},
-    displayOptions: {
-      show: {
-        resource: ['job'],
-        operation: ['update'],
-      },
-    },
-    options: [
-      {
-        displayName: 'Name',
-        name: 'name',
-        type: 'string',
-        default: '',
-        description: 'New name for the job',
-      },
-      {
-        displayName: 'Display Name',
-        name: 'displayName',
-        type: 'string',
-        default: '',
-        description: 'New display name for the job',
-      },
-      {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'New description for the job',
-      },
-      {
-        displayName: 'Comments',
-        name: 'comments',
-        type: 'string',
-        default: '',
-        description: 'New comments for the job',
-      },
-    ],
-  },
-
-  // ----------------------------------
-  //         job:delete
-  // ----------------------------------
-  jobDefinitionLocator({
-    show: {
-      resource: ['job'],
-      operation: ['delete'],
-    },
-  }),
-
-  // ----------------------------------
   //  Phase 8D — new fields
   // ----------------------------------
   jobFolderLocator({
@@ -1227,7 +1066,7 @@ function withResource(fields: INodeProperties[], newResource: string): INodeProp
 // ── Operation lists per resource ─────────────────────────────────────────────
 
 const jobDefinitionOpValues = new Set([
-  'get', 'getMany', 'create', 'update', 'delete', 'execute', 'getJobDefinitionsByFolder',
+  'get', 'getMany', 'execute', 'getJobDefinitionsByFolder',
 ]);
 const jobFolderOpValues = new Set([
   'getFolders', 'getFolder', 'createFolder', 'updateFolder', 'deleteFolder', 'getSubFolders',
