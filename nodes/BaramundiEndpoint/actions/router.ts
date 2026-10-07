@@ -154,21 +154,6 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
 
         case 'staticGroup':
           switch (operation) {
-            case 'getStaticGroup':
-              responseData = await endpoint.getStaticGroup.call(this, i);
-              break;
-            case 'getStaticGroups':
-              responseData = await endpoint.getStaticGroups.call(this, i);
-              break;
-            case 'createStaticGroup':
-              responseData = await endpoint.createStaticGroup.call(this, i);
-              break;
-            case 'updateStaticGroup':
-              responseData = await endpoint.updateStaticGroup.call(this, i);
-              break;
-            case 'deleteStaticGroup':
-              responseData = await endpoint.deleteStaticGroup.call(this, i);
-              break;
             case 'getEndpointsByStaticGroup':
               responseData = await endpoint.getEndpointsByStaticGroup.call(this, i);
               break;
@@ -182,12 +167,6 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
 
         case 'dynamicGroup':
           switch (operation) {
-            case 'getDynamicGroup':
-              responseData = await endpoint.getDynamicGroup.call(this, i);
-              break;
-            case 'getDynamicGroups':
-              responseData = await endpoint.getDynamicGroups.call(this, i);
-              break;
             case 'getEndpointsByDynamicGroup':
               responseData = await endpoint.getEndpointsByDynamicGroup.call(this, i);
               break;

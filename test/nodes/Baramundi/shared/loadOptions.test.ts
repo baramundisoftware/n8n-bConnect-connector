@@ -9,8 +9,6 @@ import {
   getJobDefinitions,
   getOrgUnits,
   getLogicalGroups,
-  getStaticGroups,
-  getDynamicGroups,
   endpointSearch,
   jobDefinitionSearch,
   jobFolderSearch,
@@ -134,7 +132,7 @@ describe('getOptions methods', () => {
     });
   });
 
-  describe('getLogicalGroups / getStaticGroups / getDynamicGroups', () => {
+  describe('getLogicalGroups (getNamedItems)', () => {
     it('should return group options via getNamedItems', async () => {
       const mockCtx = createMockLoadOptionsFunctions({
         data: [{ id: 'g1', name: 'Group A' }],
@@ -145,23 +143,7 @@ describe('getOptions methods', () => {
       expect(result[0]).toEqual({ name: 'Group A', value: 'g1' });
     });
 
-    it('getStaticGroups returns options', async () => {
-      const mockCtx = createMockLoadOptionsFunctions({
-        data: [{ id: 'sg1', name: 'Static1' }],
-        hasNextPage: false,
-      });
-      const result = await getStaticGroups.call(mockCtx);
-      expect(result[0]).toEqual({ name: 'Static1', value: 'sg1' });
-    });
 
-    it('getDynamicGroups returns options', async () => {
-      const mockCtx = createMockLoadOptionsFunctions({
-        data: [{ id: 'dg1', name: 'Dynamic1' }],
-        hasNextPage: false,
-      });
-      const result = await getDynamicGroups.call(mockCtx);
-      expect(result[0]).toEqual({ name: 'Dynamic1', value: 'dg1' });
-    });
 
     it('should add truncation notice when hasNextPage is true (getNamedItems)', async () => {
       const mockCtx = createMockLoadOptionsFunctions({
