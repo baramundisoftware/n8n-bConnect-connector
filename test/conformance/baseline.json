@@ -47,11 +47,6 @@
   "25R2 baramundiSecurity/defenseControl.getBitLockerSecrets route: GET /defensecontrol/v2.0/BitLocker/WindowsEndpoints/{id}/Secrets - only in 26R1": 39,
   "25R2 baramundiSecurity/defenseControl.patchBitLockerSecrets no-request: error: Could not get parameter \"patchOperations\"": 39,
   "25R2 baramundiSecurity/defenseControl.patchLocalAdminUserCredentials patch-path: PATCH /defensecontrol/v2.0/LocalAdministrativeAccounts/WindowsEndpoints/{id} /expiryDate": 45,
-  "25R2 baramundiSoftware/variable.createVariableDefinition body-field: POST /variables/v2.0/VariableDefinitions dataType": 45,
-  "25R2 baramundiSoftware/variable.createVariableDefinition body-field: POST /variables/v2.0/VariableDefinitions description": 45,
-  "25R2 baramundiSoftware/variable.createVariableDefinition body-required: POST /variables/v2.0/VariableDefinitions category": 45,
-  "25R2 baramundiSoftware/variable.createVariableDefinition body-required: POST /variables/v2.0/VariableDefinitions scopes": 45,
-  "25R2 baramundiSoftware/variable.updateVariableDefinition patch-path: PATCH /variables/v2.0/VariableDefinitions/{id} /description": 45,
   "26R1 baramundiAdmin/operatingSystem.updateWindowsEndpoint patch-path: PATCH /operatingsystems/v2.0/WindowsEndpoints/{id} /osInstallFolderId": 45,
   "26R1 baramundiEndpoint/dynamicGroup.getDynamicGroup route: GET /endpoints/v2.0/DynamicGroups/{id} - not in spec": "accepted: undocumented static/dynamic group routes, verified on a real bMS (P16.3); bConnect-Mock#65",
   "26R1 baramundiEndpoint/dynamicGroup.getDynamicGroups route: GET /endpoints/v2.0/DynamicGroups - not in spec": "accepted: undocumented static/dynamic group routes, verified on a real bMS (P16.3); bConnect-Mock#65",
@@ -102,12 +97,5 @@
   "26R1 baramundiSecurity/bmsecurity.createSecurityGroup body-field: POST /servermanagement/v2.0/SecurityGroups description": 45,
   "26R1 baramundiSecurity/bmsecurity.updateSecurityGroup patch-path: PATCH /servermanagement/v2.0/SecurityGroups/{id} /description": 45,
   "26R1 baramundiSecurity/bmsecurity.updateSecurityGroup patch-path: PATCH /servermanagement/v2.0/SecurityGroups/{id} /name": 45,
-  "26R1 baramundiSecurity/defenseControl.patchLocalAdminUserCredentials patch-path: PATCH /defensecontrol/v2.0/LocalAdministrativeAccounts/WindowsEndpoints/{id} /expiryDate": 45,
-  "26R1 baramundiSoftware/softwareBundle.addApplicationToBundle body-field: POST /software/v2.0/Bundles/{id}/BundleApplications priority": 45,
-  "26R1 baramundiSoftware/softwareBundle.createBundle body-enum: POST /software/v2.0/Bundles type=zzSample (allowed: Install, Uninstall)": 45,
-  "26R1 baramundiSoftware/variable.createVariableDefinition body-field: POST /variables/v2.0/VariableDefinitions dataType": 45,
-  "26R1 baramundiSoftware/variable.createVariableDefinition body-field: POST /variables/v2.0/VariableDefinitions description": 45,
-  "26R1 baramundiSoftware/variable.createVariableDefinition body-required: POST /variables/v2.0/VariableDefinitions category": 45,
-  "26R1 baramundiSoftware/variable.createVariableDefinition body-required: POST /variables/v2.0/VariableDefinitions scopes": 45,
-  "26R1 baramundiSoftware/variable.updateVariableDefinition patch-path: PATCH /variables/v2.0/VariableDefinitions/{id} /description": 45
+  "26R1 baramundiSecurity/defenseControl.patchLocalAdminUserCredentials patch-path: PATCH /defensecontrol/v2.0/LocalAdministrativeAccounts/WindowsEndpoints/{id} /expiryDate": 45
 }

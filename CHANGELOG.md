@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Software → Variable → Create Variable Definition** could not succeed: bConnect requires **Category** and **Scopes**, which the form did not offer. Both were added (scopes per bMS version), *Data Type* became **Type** with the values bConnect supports (String, Integer, Password, Date, Drop-Down List, Drop-Down Editable List, Checkbox, File Link, Folder — the old *Boolean*/*DateTime* do not exist), and *Description* became **Comment**. *Update Variable Definition* offers Category and Comment instead of Description (#45)
+- **Software Bundle → Create**: *Type* is now a choice of **Install / Uninstall** (was free text). **Add Application to Bundle** no longer sends a *Priority* bConnect does not accept (#45)
 - **Job → Execute** assigned the job **only to the first** of several comma-separated endpoint IDs and silently dropped the rest. It now creates one job instance per endpoint and validates every ID first. The *Comment* and *Priority* options (not supported by bConnect, ignored) were replaced by **Start If Already Assigned** (#45)
 - **Job → Kiosk Release → Create** now sends what bConnect expects: a single **Assignment Target ID** (user, endpoint or group). *Target Type*, *Valid From/Until* and *Comment* were removed — bConnect has no such fields, and the required `assignmentTargetId` was missing (#45)
 - **Job → Folder Create / Update**: *Description* is now **Comment** (#45)

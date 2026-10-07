@@ -347,9 +347,8 @@ export async function addApplicationToBundle(
   if (!_applicationIdValidation.valid) {
     throw new NodeOperationError(this.getNode(), _applicationIdValidation.errors.join(', '), { itemIndex: index });
   }
-  const additionalFields = this.getNodeParameter('additionalFields', index, {}) as IDataObject;
-
-  const body: IDataObject = { applicationId, ...additionalFields };
+  // AddApplicationRequest: applicationId only
+  const body: IDataObject = { applicationId };
   const response = await apiRequest.call(this, 'POST', `/software/v2.0/Bundles/${bundleId}/BundleApplications`, body);
   return this.helpers.returnJsonArray(response as IDataObject);
 }

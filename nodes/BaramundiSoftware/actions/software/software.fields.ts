@@ -68,7 +68,7 @@ export const softwareFields: INodeProperties[] = [
 		default: {},
 		displayOptions: { show: { resource: ['software'], operation: ['createBundle'], bmsVersion: ['26R1'] } },
 		options: [
-			{ displayName: 'Type', name: 'type', type: 'string', default: '', description: 'Bundle type' },
+			{ displayName: 'Type', name: 'type', type: 'options', default: 'Install', options: [{ name: 'Install', value: 'Install' }, { name: 'Uninstall', value: 'Uninstall' }], description: 'Whether the bundle installs or uninstalls its applications' },
 			{ displayName: 'Ignore Dependencies', name: 'ignoreDependencies', type: 'boolean', default: false, description: 'Whether to ignore dependencies' },
 			{ displayName: 'Parent ID', name: 'parentId', type: 'string', default: '', description: 'GUID of the parent folder' },
 			{ displayName: 'Comment', name: 'comment', type: 'string', default: '', description: 'Optional comment' },
@@ -100,7 +100,6 @@ export const softwareFields: INodeProperties[] = [
 	// addApplicationToBundle
 	{ displayName: 'Bundle ID', name: 'bundleId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['addApplicationToBundle'], bmsVersion: ['26R1'] } }, description: 'The GUID of the bundle' },
 	{ displayName: 'Application ID', name: 'applicationId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['addApplicationToBundle'], bmsVersion: ['26R1'] } }, description: 'The GUID of the application to add' },
-	{ displayName: 'Additional Fields', name: 'additionalFields', type: 'collection', placeholder: 'Add Field', default: {}, displayOptions: { show: { resource: ['software'], operation: ['addApplicationToBundle'], bmsVersion: ['26R1'] } }, options: [{ displayName: 'Priority', name: 'priority', type: 'number', default: 0, description: 'Priority of the application in the bundle' }] },
 
 	// replaceApplicationInBundle
 	{ displayName: 'Bundle ID', name: 'bundleId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['replaceApplicationInBundle'], bmsVersion: ['26R1'] } }, description: 'The GUID of the bundle' },
@@ -155,7 +154,7 @@ export const softwareBundleFields: INodeProperties[] = [
 		displayName: 'Additional Fields', name: 'additionalFields', type: 'collection', placeholder: 'Add Field', default: {},
 		displayOptions: { show: { resource: ['softwareBundle'], operation: ['createBundle'] } },
 		options: [
-			{ displayName: 'Type', name: 'type', type: 'string', default: '', description: 'Bundle type' },
+			{ displayName: 'Type', name: 'type', type: 'options', default: 'Install', options: [{ name: 'Install', value: 'Install' }, { name: 'Uninstall', value: 'Uninstall' }], description: 'Whether the bundle installs or uninstalls its applications' },
 			{ displayName: 'Ignore Dependencies', name: 'ignoreDependencies', type: 'boolean', default: false, description: 'Whether to ignore dependencies' },
 			{ displayName: 'Parent ID', name: 'parentId', type: 'string', default: '', description: 'GUID of the parent folder' },
 			{ displayName: 'Comment', name: 'comment', type: 'string', default: '', description: 'Optional comment' },
@@ -172,7 +171,6 @@ export const softwareBundleFields: INodeProperties[] = [
 	},
 	{ displayName: 'Bundle ID', name: 'bundleId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['softwareBundle'], operation: ['addApplicationToBundle'] } }, description: 'The GUID of the bundle' },
 	{ displayName: 'Application ID', name: 'applicationId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['softwareBundle'], operation: ['addApplicationToBundle'] } }, description: 'The GUID of the application to add' },
-	{ displayName: 'Additional Fields', name: 'additionalFields', type: 'collection', placeholder: 'Add Field', default: {}, displayOptions: { show: { resource: ['softwareBundle'], operation: ['addApplicationToBundle'] } }, options: [{ displayName: 'Priority', name: 'priority', type: 'number', default: 0, description: 'Priority of the application in the bundle' }] },
 	{ displayName: 'Bundle ID', name: 'bundleId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['softwareBundle'], operation: ['replaceApplicationInBundle'] } }, description: 'The GUID of the bundle' },
 	{ displayName: 'Bundle Application ID', name: 'bundleApplicationId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['softwareBundle'], operation: ['replaceApplicationInBundle', 'deleteBundleApplication'] } }, description: 'The GUID of the bundle application' },
 	{ displayName: 'Update Fields', name: 'updateFields', type: 'collection', placeholder: 'Add Field', default: {}, displayOptions: { show: { resource: ['softwareBundle'], operation: ['replaceApplicationInBundle'] } }, options: [{ displayName: 'Application ID', name: 'applicationId', type: 'string', default: '', description: 'New application GUID' }, { displayName: 'Priority', name: 'priority', type: 'number', default: 0, description: 'New priority' }] },
