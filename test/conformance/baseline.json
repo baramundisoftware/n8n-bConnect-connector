@@ -1,5 +1,4 @@
 {
-  "25R2 baramundiAdmin/operatingSystem.updateWindowsEndpoint patch-path: PATCH /operatingsystems/v2.0/WindowsEndpoints/{id} /osInstallFolderId": 45,
   "25R2 baramundiAdmin/serverManagement.getApiKeys route: GET /servermanagement/v2.0/ApiKeys - only in 26R1": 39,
   "25R2 baramundiAdmin/serverManagement.getDipsMSWCleanup route: POST /servermanagement/v2.0/Dips/MSWCleanup - only in 26R1": 39,
   "25R2 baramundiAdmin/serverManagement.getDownloadJob no-request: error: Could not get parameter \"downloadJobId\"": 39,
@@ -41,13 +40,8 @@
   "25R2 baramundiJob/jobDefinition.create route: POST /jobs/v2.0/JobDefinitions - path exists, but not for POST": 42,
   "25R2 baramundiJob/jobDefinition.delete route: DELETE /jobs/v2.0/JobDefinitions/{id} - path exists, but not for DELETE": 42,
   "25R2 baramundiJob/jobDefinition.update route: PATCH /jobs/v2.0/JobDefinitions/{id} - path exists, but not for PATCH": 42,
-  "25R2 baramundiSecurity/bmsecurity.createSecurityGroup body-field: POST /servermanagement/v2.0/SecurityGroups description": 45,
-  "25R2 baramundiSecurity/bmsecurity.updateSecurityGroup patch-path: PATCH /servermanagement/v2.0/SecurityGroups/{id} /description": 45,
-  "25R2 baramundiSecurity/bmsecurity.updateSecurityGroup patch-path: PATCH /servermanagement/v2.0/SecurityGroups/{id} /name": 45,
   "25R2 baramundiSecurity/defenseControl.getBitLockerSecrets route: GET /defensecontrol/v2.0/BitLocker/WindowsEndpoints/{id}/Secrets - only in 26R1": 39,
   "25R2 baramundiSecurity/defenseControl.patchBitLockerSecrets no-request: error: Could not get parameter \"patchOperations\"": 39,
-  "25R2 baramundiSecurity/defenseControl.patchLocalAdminUserCredentials patch-path: PATCH /defensecontrol/v2.0/LocalAdministrativeAccounts/WindowsEndpoints/{id} /expiryDate": 45,
-  "26R1 baramundiAdmin/operatingSystem.updateWindowsEndpoint patch-path: PATCH /operatingsystems/v2.0/WindowsEndpoints/{id} /osInstallFolderId": 45,
   "26R1 baramundiEndpoint/dynamicGroup.getDynamicGroup route: GET /endpoints/v2.0/DynamicGroups/{id} - not in spec": "accepted: undocumented static/dynamic group routes, verified on a real bMS (P16.3); bConnect-Mock#65",
   "26R1 baramundiEndpoint/dynamicGroup.getDynamicGroups route: GET /endpoints/v2.0/DynamicGroups - not in spec": "accepted: undocumented static/dynamic group routes, verified on a real bMS (P16.3); bConnect-Mock#65",
   "26R1 baramundiEndpoint/endpoint.getMany query: GET /endpoints/v2.0/AndroidEndpoints ?OrgUnitId": 46,
@@ -93,9 +87,5 @@
   "26R1 baramundiEndpoint/staticGroup.updateStaticGroup route: PATCH /endpoints/v2.0/StaticGroups/{id} - not in spec": "accepted: undocumented static/dynamic group routes, verified on a real bMS (P16.3); bConnect-Mock#65",
   "26R1 baramundiJob/jobDefinition.create route: POST /jobs/v2.0/JobDefinitions - path exists, but not for POST": 42,
   "26R1 baramundiJob/jobDefinition.delete route: DELETE /jobs/v2.0/JobDefinitions/{id} - path exists, but not for DELETE": 42,
-  "26R1 baramundiJob/jobDefinition.update route: PATCH /jobs/v2.0/JobDefinitions/{id} - path exists, but not for PATCH": 42,
-  "26R1 baramundiSecurity/bmsecurity.createSecurityGroup body-field: POST /servermanagement/v2.0/SecurityGroups description": 45,
-  "26R1 baramundiSecurity/bmsecurity.updateSecurityGroup patch-path: PATCH /servermanagement/v2.0/SecurityGroups/{id} /description": 45,
-  "26R1 baramundiSecurity/bmsecurity.updateSecurityGroup patch-path: PATCH /servermanagement/v2.0/SecurityGroups/{id} /name": 45,
-  "26R1 baramundiSecurity/defenseControl.patchLocalAdminUserCredentials patch-path: PATCH /defensecontrol/v2.0/LocalAdministrativeAccounts/WindowsEndpoints/{id} /expiryDate": 45
+  "26R1 baramundiJob/jobDefinition.update route: PATCH /jobs/v2.0/JobDefinitions/{id} - path exists, but not for PATCH": 42
 }

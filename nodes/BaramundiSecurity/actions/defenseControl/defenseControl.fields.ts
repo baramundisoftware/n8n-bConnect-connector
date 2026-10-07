@@ -243,11 +243,11 @@ export const defenseControlFields: INodeProperties[] = [
     },
     options: [
       {
-        displayName: 'Expiry Date',
-        name: 'expiryDate',
+        displayName: 'Requested Expiration Date',
+        name: 'requestedExpirationDate',
         type: 'dateTime',
         default: '',
-        description: 'New expiry date for local admin account',
+        description: 'When the local admin password should expire',
       },
     ],
   },

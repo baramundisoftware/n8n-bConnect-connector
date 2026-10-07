@@ -252,15 +252,16 @@ describe('OS Windows Endpoints Operations', () => {
 
 	describe('updateWindowsEndpoint()', () => {
 		it('should update Windows endpoint OS config using PATCH', async () => {
+			const bootEnvironmentId = '22222222-2222-2222-2222-222222222222';
 			const mockUpdated = {
 				id: '11111111-1111-1111-1111-111111111111',
-				osInstallFolderId: 'folder-new',
+				bootEnvironmentId,
 			};
 
 			const mockContext = createMockExecuteFunctions(
 				{
 					endpointId: '11111111-1111-1111-1111-111111111111',
-					updateFields: { osInstallFolderId: 'folder-new' },
+					updateFields: { bootEnvironmentId, isOSInstallAllowed: true },
 				},
 				{},
 				mockUpdated,
@@ -269,7 +270,17 @@ describe('OS Windows Endpoints Operations', () => {
 			const result = await operatingSystem.updateWindowsEndpoint.call(mockContext, 0);
 
 			expect(result).toHaveLength(1);
-			expect(result[0].json.osInstallFolderId).toBe('folder-new');
+			expect(result[0].json.bootEnvironmentId).toBe(bootEnvironmentId);
+			// Paths from the spec's PATCH example (#45)
+			expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
+				expect.objectContaining({
+					method: 'PATCH',
+					body: [
+						{ op: 'replace', path: '/bootEnvironmentId', value: bootEnvironmentId },
+						{ op: 'replace', path: '/isOSInstallAllowed', value: true },
+					],
+				}),
+			);
 		});
 	});
 });

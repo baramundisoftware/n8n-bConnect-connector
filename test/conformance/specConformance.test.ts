@@ -144,6 +144,12 @@ describe('spec conformance checks', () => {
     expect(v.map((x) => x.kind)).toContain('body-enum');
   });
 
+  it('accepts JSON Patch paths named in the spec example even if the GET schema differs', () => {
+    // SecurityGroup GET has groupName; the spec's PATCH example uses /Name
+    const v = checkRequest('26R1', req('PATCH', '/servermanagement/v2.0/SecurityGroups/a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', [{ op: 'replace', path: '/name', value: 'x' }]));
+    expect(v).toEqual([]);
+  });
+
   it('flags JSON Patch paths the target resource does not have', () => {
     const v = checkRequest('26R1', req('PATCH', '/assets/v2.0/Assets/a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d', [{ op: 'replace', path: '/serialNumber', value: 'x' }]));
     expect(v.map((x) => x.kind)).toContain('patch-path');

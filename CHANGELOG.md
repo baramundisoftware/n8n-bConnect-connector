@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Security → bMS Security**: *Create Security Group* offers **Security Profile IDs** (sent as `profiles`) instead of a *Description* bConnect does not have; *Update Security Group* no longer sends a description. **Update Object Permissions** now changes **Inherit Rights** and **Security Profile Permissions** — the old *Security Profile Access Rights* patched a property that does not exist (#45)
+- **Security → Defense Control → Patch Local Admin User Credentials**: *Expiry Date* is now **Requested Expiration Date** and patches `/LocalAdminAccount/RequestedExpirationDate` — before, the change was not applied (#45)
+- **Admin → Operating System → Update Windows Endpoint**: offers the properties bConnect can change — Boot Environment ID, Hardware Profile ID, Is OS Install Allowed, Inherits Auto Installation — instead of a non-existent *OS Install Folder ID* (#45)
+- **Software Bundle → Replace Application in Bundle** no longer sends a *Priority* bConnect does not accept (#45)
 - **Software → Variable → Create Variable Definition** could not succeed: bConnect requires **Category** and **Scopes**, which the form did not offer. Both were added (scopes per bMS version), *Data Type* became **Type** with the values bConnect supports (String, Integer, Password, Date, Drop-Down List, Drop-Down Editable List, Checkbox, File Link, Folder — the old *Boolean*/*DateTime* do not exist), and *Description* became **Comment**. *Update Variable Definition* offers Category and Comment instead of Description (#45)
 - **Software Bundle → Create**: *Type* is now a choice of **Install / Uninstall** (was free text). **Add Application to Bundle** no longer sends a *Priority* bConnect does not accept (#45)
 - **Job → Execute** assigned the job **only to the first** of several comma-separated endpoint IDs and silently dropped the rest. It now creates one job instance per endpoint and validates every ID first. The *Comment* and *Priority* options (not supported by bConnect, ignored) were replaced by **Start If Already Assigned** (#45)
@@ -31,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The credential **Test** button now really checks the connection: it requests `/endpoints/v2.0/Endpoints` (the old path did not exist) and fails on HTTP errors, with clear messages for 401 (credentials), 403 (permissions) and 404 (Server URL). Before, it reported success even with a wrong URL or password (#35)
 
 ### Added
-- Spec-conformance check (`npm run check:spec`, part of the unit tests): calls every operation the editor offers, per bMS release and for every value of every option field, and checks the HTTP requests against the 25R2/26R1 OpenAPI specs — route and module prefix, query parameters, body fields, required fields, enum values, JSON Patch paths. Known violations are baselined against their issues (#37, #39, #42–#46)
+- Spec-conformance check (`npm run check:spec`, part of the unit tests): calls every operation the editor offers, per bMS release and for every value of every option field, and checks the HTTP requests against the 25R2/26R1 OpenAPI specs — route and module prefix, query parameters, body fields, required fields, enum values, JSON Patch paths. Known violations are baselined against their issues (#37, #39, #42–#46). JSON Patch paths are also accepted when the spec's own PATCH example uses them
 
 ## [0.9.2] - 2026-10-06
 

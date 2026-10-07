@@ -37,6 +37,8 @@ export interface SpecOperation {
   body?: Schema;
   /** Resolved 200 response schema of the GET on the same path (JSON Patch targets) */
   getResponse?: Schema;
+  /** First path segments used in the spec's own JSON Patch examples (lower-case) */
+  patchExamplePaths: Set<string>;
   resolve: (s: Schema | undefined) => Schema | undefined;
 }
 
@@ -89,6 +91,20 @@ function loadRelease(release: Release): SpecOperation[] {
           '^' + path.replace(/[.*+?^$()|[\]\\]/g, '\\$&').replace(/\\?\{[^}]+\\?\}/g, '[^/]+') + '$',
           'i',
         );
+        // A PATCH example names modifiable paths that the GET schema may spell differently
+        // (e.g. SecurityGroups: example "/Name", GET schema "groupName").
+        const patchExamplePaths = new Set<string>();
+        if (method === 'patch') {
+          const content = Object.values<any>(op.requestBody?.content ?? {})[0] ?? {};
+          const examples = [content.example, content.schema?.example, ...Object.values<any>(content.examples ?? {}).map((e) => e?.value)];
+          for (const ex of examples) {
+            if (!Array.isArray(ex)) continue;
+            for (const entry of ex) {
+              const first = String(entry?.path ?? '').split('/')[1];
+              if (first) patchExamplePaths.add(first.toLowerCase());
+            }
+          }
+        }
         ops.push({
           release,
           module,
@@ -98,6 +114,7 @@ function loadRelease(release: Release): SpecOperation[] {
           queryParams: new Set(params.filter((p) => p.in === 'query').map((p) => p.name.toLowerCase())),
           body: resolve(jsonSchemaOf(op.requestBody?.content)),
           getResponse,
+          patchExamplePaths,
           resolve,
         });
       }

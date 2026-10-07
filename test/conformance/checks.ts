@@ -45,12 +45,13 @@ function checkObjectBody(op: SpecOperation, schema: Schema, body: Record<string,
 function checkPatch(op: SpecOperation, body: unknown[]): Violation[] {
   const target = op.getResponse;
   const props = lowerKeys(target);
-  if (!props.size) return [];
+  if (!props.size && !op.patchExamplePaths.size) return [];
   const out: Violation[] = [];
   for (const entry of body) {
     const path = String((entry as { path?: unknown })?.path ?? '');
     const first = path.split('/')[1] ?? '';
-    if (first && !props.has(first.toLowerCase())) out.push({ kind: 'patch-path', detail: `/${first}` });
+    const known = props.has(first.toLowerCase()) || op.patchExamplePaths.has(first.toLowerCase());
+    if (first && !known) out.push({ kind: 'patch-path', detail: `/${first}` });
   }
   return out;
 }

@@ -243,12 +243,34 @@ export const operatingSystemFields: INodeProperties[] = [
 			},
 		},
 		options: [
+			// Modifiable properties per the spec's PATCH example (WindowsEndpoint)
 			{
-				displayName: 'OS Install Folder ID',
-				name: 'osInstallFolderId',
+				displayName: 'Boot Environment ID',
+				name: 'bootEnvironmentId',
 				type: 'string',
 				default: '',
-				description: 'The GUID of the OS install folder',
+				description: 'The GUID of the boot environment',
+			},
+			{
+				displayName: 'Hardware Profile ID',
+				name: 'hardwareProfileId',
+				type: 'string',
+				default: '',
+				description: 'The GUID of the hardware profile',
+			},
+			{
+				displayName: 'Inherits Auto Installation',
+				name: 'inheritsAutoInstallation',
+				type: 'boolean',
+				default: false,
+				description: 'Whether the endpoint inherits the automatic installation setting',
+			},
+			{
+				displayName: 'Is OS Install Allowed',
+				name: 'isOSInstallAllowed',
+				type: 'boolean',
+				default: false,
+				description: 'Whether an operating system installation is allowed on the endpoint',
 			},
 		],
 	},

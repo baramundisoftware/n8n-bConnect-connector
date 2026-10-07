@@ -217,7 +217,7 @@ describe('Defense Control Operations', () => {
         };
 
         const mockContext = createMockExecuteFunctions(
-          { endpointId, updateFields: { expiryDate: '2025-12-31' } },
+          { endpointId, updateFields: { requestedExpirationDate: '2025-12-31T00:00:00Z' } },
           {},
           {},
         );
@@ -232,6 +232,8 @@ describe('Defense Control Operations', () => {
           expect.objectContaining({
             method: 'PATCH',
             url: expect.stringContaining(`/defensecontrol/v2.0/LocalAdministrativeAccounts/WindowsEndpoints/${endpointId}`),
+            // Path from the spec's PATCH example (#45)
+            body: [{ op: 'replace', path: '/LocalAdminAccount/RequestedExpirationDate', value: '2025-12-31T00:00:00Z' }],
           }),
         );
       });
