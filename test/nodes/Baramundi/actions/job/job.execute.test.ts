@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { get, getMany, execute, getInstances, getAllJobInstances, getJobInstance, getEndpointJobInstances, startJobInstance, stopJobInstance, resumeJobInstance, deleteJobInstance, getFolders, getFolder, createFolder, updateFolder, deleteFolder, getKioskReleases, getKioskRelease, createKioskRelease, withdrawKioskRelease, getSubFolders, getJobDefinitionsByFolder, getKioskReleasesByJobDefinition, getJobInstancesByLogicalGroup, getJobInstancesByStaticGroup, getJobInstancesByDynamicGroup, getJobInstancesByUDG, assignJobToLogicalGroup, assignJobToStaticGroup, assignJobToDynamicGroup, assignJobToUDG, getKioskReleasesByEndpoint, getKioskReleasesByLogicalGroup, getKioskReleasesByADObject } from '../../../../../nodes/BaramundiJob/actions/job/job.execute';
+import { httpRequestWithAuthentication } from '../../../../helpers/httpRequestWithAuthentication';
 
 // Mock helper function to create IExecuteFunctions
 function createMockExecuteFunctions(
@@ -32,6 +33,7 @@ function createMockExecuteFunctions(
       ...credentials,
     })),
     helpers: {
+      httpRequestWithAuthentication,
       httpRequest,
       returnJsonArray: vi.fn((data: any) => {
         if (Array.isArray(data)) {
@@ -1822,6 +1824,7 @@ describe('Job Phase 8D - Folder/Group/Kiosk Navigation', () => {
       getNodeParameter: vi.fn((name: string, _idx: number, def?: any) => params[name] ?? def),
       getCredentials: vi.fn(async () => ({ baseUrl: 'https://bms:444/bconnect', username: 'u', password: 'test-password-do-not-use', ignoreSslIssues: false })),
       helpers: {
+        httpRequestWithAuthentication,
         httpRequest: vi.fn(async () => response),
         returnJsonArray: vi.fn((data: any) => (Array.isArray(data) ? data : [data]).map((j: any) => ({ json: j }))),
       },
@@ -1929,6 +1932,7 @@ describe('Validation error paths', () => {
       getNodeParameter: vi.fn((name: string, _idx: number, def?: any) => params[name] ?? def),
       getCredentials: vi.fn(async () => ({ baseUrl: 'https://bms:444/bconnect', username: 'u', password: 'test-password-do-not-use', ignoreSslIssues: false })),
       helpers: {
+        httpRequestWithAuthentication,
         httpRequest: vi.fn(),
         returnJsonArray: vi.fn((data: any) => (Array.isArray(data) ? data : [data]).map((j: any) => ({ json: j }))),
       },
@@ -2047,6 +2051,7 @@ describe('Job returnAll: true branches', () => {
       getNodeParameter: vi.fn((name: string, _i: number, def?: any) => params[name] ?? def),
       getCredentials: vi.fn(async () => ({ baseUrl: 'https://bms:444/bconnect', username: 'u', password: 'test-password-do-not-use', ignoreSslIssues: false })),
       helpers: {
+        httpRequestWithAuthentication,
         httpRequest: vi.fn(async () => { const r = pages[callIndex] || pages[pages.length - 1]; callIndex++; return r; }),
         returnJsonArray: vi.fn((data: any) => (Array.isArray(data) ? data : [data]).map((j: any) => ({ json: j }))),
       },

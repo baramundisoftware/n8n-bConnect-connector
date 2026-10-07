@@ -7,6 +7,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { IExecuteFunctions, IHttpRequestOptions } from 'n8n-workflow';
 import { apiRequest, apiRequestAllItems, MAX_PAGE_CAP } from '../../../../nodes/shared/transport/requestApi';
+import { httpRequestWithAuthentication } from '../../../helpers/httpRequestWithAuthentication';
 
 /**
  * Create a mock IExecuteFunctions for transport testing
@@ -35,6 +36,7 @@ function createMockExecuteFunctions(
       ignoreSslIssues: false,
     })),
     helpers: {
+      httpRequestWithAuthentication,
       httpRequest,
     },
     getNode: vi.fn(() => ({
@@ -477,6 +479,7 @@ describe('Request API Transport Layer', () => {
           ignoreSslIssues: false,
         })),
         helpers: {
+          httpRequestWithAuthentication,
           httpRequest: vi.fn(async () => {
             return calls++ === 0 ? page0 : page1;
           }),
@@ -502,6 +505,7 @@ describe('Request API Transport Layer', () => {
           ignoreSslIssues: false,
         })),
         helpers: {
+          httpRequestWithAuthentication,
           httpRequest: vi.fn(async () => ({
             data: [{ id: '1' }, { id: '2' }],
             hasNextPage: false,
@@ -528,6 +532,7 @@ describe('Request API Transport Layer', () => {
           ignoreSslIssues: false,
         })),
         helpers: {
+          httpRequestWithAuthentication,
           httpRequest: vi.fn(async () => {
             calls++;
             if (calls === 1) {
@@ -556,6 +561,7 @@ describe('Request API Transport Layer', () => {
           ignoreSslIssues: false,
         })),
         helpers: {
+          httpRequestWithAuthentication,
           httpRequest: vi.fn(async () => {
             calls++;
             if (calls === 1) {
@@ -583,6 +589,7 @@ describe('Request API Transport Layer', () => {
           ignoreSslIssues: false,
         })),
         helpers: {
+          httpRequestWithAuthentication,
           httpRequest: vi.fn(async () => {
             const err = Object.assign(new Error('Too Many Requests'), { response: { status: 429 } });
             throw err;
@@ -608,6 +615,7 @@ describe('Request API Transport Layer', () => {
           ignoreSslIssues: false,
         })),
         helpers: {
+          httpRequestWithAuthentication,
           httpRequest: vi.fn(async () => {
             const err = Object.assign(new Error('Not Found'), { response: { status: 404 } });
             throw err;
@@ -633,6 +641,7 @@ describe('Request API Transport Layer', () => {
           ignoreSslIssues: false,
         })),
         helpers: {
+          httpRequestWithAuthentication,
           httpRequest: vi.fn(async () => {
             const err = Object.assign(new Error('Unauthorized'), { response: { status: 401 } });
             throw err;
@@ -658,6 +667,7 @@ describe('Request API Transport Layer', () => {
           ignoreSslIssues: false,
         })),
         helpers: {
+          httpRequestWithAuthentication,
           httpRequest: vi.fn(async () => {
             calls++;
             if (calls === 1) {
@@ -673,6 +683,24 @@ describe('Request API Transport Layer', () => {
       const result = await apiRequest.call(mockContext, 'GET', '/endpoints/v2.0/Endpoints');
       expect(calls).toBe(2);
       expect(result).toEqual({ id: 'ok' });
+    });
+  });
+
+  describe('authentication through the credential', () => {
+    it('sends every request through httpRequestWithAuthentication with the bConnect credential', async () => {
+      const mockContext = createMockExecuteFunctions({ ok: true });
+      const withAuth = vi.fn(async () => ({ ok: true }));
+      (mockContext.helpers as any).httpRequestWithAuthentication = withAuth;
+
+      await apiRequest.call(mockContext, 'GET', '/endpoints/v2.0/Endpoints');
+
+      expect(withAuth).toHaveBeenCalledTimes(1);
+      const [type, options] = (withAuth.mock.calls[0] as unknown) as [string, Record<string, unknown>];
+      expect(type).toBe('bconnectApi');
+      // The transport itself adds no credentials; the credential type's authenticate() does
+      expect(options.auth).toBeUndefined();
+      expect(options.headers).toBeUndefined();
+      expect(options.baseURL).toBe('https://bms.example.com:444/bconnect');
     });
   });
 

@@ -114,8 +114,6 @@ export default tseslint.config(
       // - icons: SVG with light/dark variants, waiting for the official logo
       '@n8n/community-nodes/icon-validation': 'warn',
       '@n8n/community-nodes/cred-class-field-icon-missing': 'warn',
-      // - auth: moving Basic/API-key auth into the credential (httpRequestWithAuthentication)
-      '@n8n/community-nodes/no-http-request-with-manual-auth': 'warn',
       // `overrides` pins a patched axios in the dev tree only; publish.yml removes the field
       // from the published package.json, which is what n8n checks.
       '@n8n/community-nodes/no-overrides-field': 'off',

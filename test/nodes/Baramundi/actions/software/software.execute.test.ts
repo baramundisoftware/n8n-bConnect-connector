@@ -1,12 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { IExecuteFunctions, IDataObject } from 'n8n-workflow';
 import * as software from '../../../../../nodes/BaramundiSoftware/actions/software/software.execute';
+import { httpRequestWithAuthentication } from '../../../../helpers/httpRequestWithAuthentication';
 
 function createMockExecuteFunctions(nodeParameters: Record<string, any> = {}, credentials: Record<string, any> = {}, mockResponse: any = {}): IExecuteFunctions {
 	return {
 		getNodeParameter: vi.fn((paramName: string, itemIndex: number, fallback?: any) => nodeParameters[paramName] ?? fallback),
 		getCredentials: vi.fn(async () => ({ baseUrl: credentials.baseUrl || 'https://bms.example.com:444/bconnect', username: 'testuser', password: 'test-password-do-not-use', ignoreSslIssues: credentials.ignoreSslIssues ?? false })),
-		helpers: { httpRequest: vi.fn(async () => mockResponse), returnJsonArray: vi.fn((data: IDataObject | IDataObject[]) => { const array = Array.isArray(data) ? data : [data]; return array.map((item) => ({ json: item, pairedItem: { item: 0 } })); }) } as any,
+		helpers: {
+		  httpRequestWithAuthentication, httpRequest: vi.fn(async () => mockResponse), returnJsonArray: vi.fn((data: IDataObject | IDataObject[]) => { const array = Array.isArray(data) ? data : [data]; return array.map((item) => ({ json: item, pairedItem: { item: 0 } })); }) } as any,
 		continueOnFail: vi.fn(() => false),
 		getNode: vi.fn(() => ({ name: 'Test Node', type: 'test', typeVersion: 1, position: [0, 0], parameters: {} })),
 	} as unknown as IExecuteFunctions;
@@ -196,6 +198,7 @@ describe('Software Phase 8E — Bundle Application / Folder Operations', () => {
       getNodeParameter: vi.fn((name: string, _i: number, def?: any) => params[name] ?? def),
       getCredentials: vi.fn(async () => ({ baseUrl: 'https://bms:444/bconnect', username: 'u', password: 'test-password-do-not-use', ignoreSslIssues: false })),
       helpers: {
+        httpRequestWithAuthentication,
         httpRequest: vi.fn(async () => response),
         returnJsonArray: vi.fn((data: any) => (Array.isArray(data) ? data : [data]).map((j: any) => ({ json: j }))),
       },
@@ -262,6 +265,7 @@ describe('returnAll: true branches', () => {
       getNodeParameter: vi.fn((name: string, _i: number, def?: any) => params[name] ?? def),
       getCredentials: vi.fn(async () => ({ baseUrl: 'https://bms:444/bconnect', username: 'u', password: 'test-password-do-not-use', ignoreSslIssues: false })),
       helpers: {
+        httpRequestWithAuthentication,
         httpRequest: vi.fn(async () => { const r = pages[callIndex] || pages[pages.length - 1]; callIndex++; return r; }),
         returnJsonArray: vi.fn((data: any) => (Array.isArray(data) ? data : [data]).map((j: any) => ({ json: j }))),
       },

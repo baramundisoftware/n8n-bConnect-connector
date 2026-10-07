@@ -105,9 +105,9 @@ export async function apiRequest(
   body: object = {},
   qs: Record<string, string | number> = {},
 ): Promise<JsonObject> {
+  // Server URL and TLS setting only: authentication is added by the credential's
+  // `authenticate` (httpRequestWithAuthentication below).
   const credentials = await this.getCredentials('bconnectApi');
-
-  const isApiKey = credentials.authMethod === 'apiKey';
 
   const options: IHttpRequestOptions = {
     method,
@@ -117,14 +117,6 @@ export async function apiRequest(
     body,
     json: true,
     skipSslCertificateValidation: credentials.ignoreSslIssues as boolean,
-    ...(isApiKey
-      ? { headers: { 'X-Api-Key': credentials.apiKey as string } }
-      : {
-          auth: {
-            username: credentials.username as string,
-            password: credentials.password as string,
-          },
-        }),
   };
 
   if (Object.keys(body).length === 0) {
@@ -134,7 +126,7 @@ export async function apiRequest(
   let lastError: unknown;
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const response = await this.helpers.httpRequest(options);
+      const response = await this.helpers.httpRequestWithAuthentication.call(this, 'bconnectApi', options);
       return response as JsonObject;
     } catch (error) {
       lastError = error;

@@ -10,6 +10,7 @@ import {
   getDetectedRuleViolations,
   getDetectedRuleViolationsByEndpoint,
 } from '../../../../../nodes/BaramundiSecurity/actions/compliance/compliance.execute';
+import { httpRequestWithAuthentication } from '../../../../helpers/httpRequestWithAuthentication';
 
 function createMockExecuteFunctions(
   params: Record<string, any> = {},
@@ -26,6 +27,7 @@ function createMockExecuteFunctions(
       ignoreSslIssues: false,
     })),
     helpers: {
+      httpRequestWithAuthentication,
       httpRequest: vi.fn(async () => mockResponse),
       returnJsonArray: vi.fn((data: any) => {
         if (Array.isArray(data)) {
@@ -237,6 +239,7 @@ describe('returnAll: true branches', () => {
       getNodeParameter: vi.fn((name: string, _i: number, def?: any) => params[name] ?? def),
       getCredentials: vi.fn(async () => ({ baseUrl: 'https://bms:444/bconnect', username: 'u', password: 'test-password-do-not-use', ignoreSslIssues: false })),
       helpers: {
+        httpRequestWithAuthentication,
         httpRequest: vi.fn(async () => { const r = pages[callIndex] || pages[pages.length - 1]; callIndex++; return r; }),
         returnJsonArray: vi.fn((data: any) => (Array.isArray(data) ? data : [data]).map((j: any) => ({ json: j }))),
       },

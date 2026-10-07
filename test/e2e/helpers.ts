@@ -3,6 +3,7 @@
  */
 import { vi } from 'vitest';
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
+import { httpRequestWithAuthentication } from '../helpers/httpRequestWithAuthentication';
 
 export const MOCK_URL = 'http://localhost:8765/bconnect';
 export const MOCK_USER = 'Administrator';
@@ -32,6 +33,7 @@ export function createRealContext(params: Record<string, any> = {}): IExecuteFun
       ignoreSslIssues: false,
     })),
     helpers: {
+      httpRequestWithAuthentication,
       httpRequest: vi.fn(async (opts: any) => {
         const base = (opts.baseURL || '').replace(/\/$/, '');
         const path = opts.url || '';

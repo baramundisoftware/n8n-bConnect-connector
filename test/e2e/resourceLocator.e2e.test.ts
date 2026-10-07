@@ -10,6 +10,7 @@ import type { IExecuteFunctions, INodeExecutionData, IDataObject, ILoadOptionsFu
 import { endpointSearch, jobDefinitionSearch, jobFolderSearch } from '../../nodes/shared/loadOptions';
 import { get as getEndpoint, getMany as getManyEndpoints, search as searchEndpoints } from '../../nodes/BaramundiEndpoint/actions/endpoint/endpoint.execute';
 import { get as getJob, getEndpointJobInstances } from '../../nodes/BaramundiJob/actions/job/job.execute';
+import { httpRequestWithAuthentication } from '../helpers/httpRequestWithAuthentication';
 
 const MOCK_URL = 'http://localhost:8765/bconnect';
 const MOCK_USER = 'Administrator';
@@ -36,6 +37,7 @@ function createRealContext(
       ignoreSslIssues: false,
     })),
     helpers: {
+      httpRequestWithAuthentication,
       httpRequest: vi.fn(async (opts: any) => {
         // n8n merges baseURL + url
         const base = (opts.baseURL || '').replace(/\/$/, '');
