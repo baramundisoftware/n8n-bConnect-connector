@@ -7,6 +7,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
 import { get, getMany, search, deleteEndpoint, create, update, startEnrollment, triggerIntuneInstallation, getLogicalGroup, getLogicalGroups, createLogicalGroup, updateLogicalGroup, deleteLogicalGroup, setEntraIdData, deleteEntraIdData, getEntraIdDataByDeviceId, getUnmanagedEndpoints, getUnmanagedEndpoint, deleteUnmanagedEndpoint, createEndpointMaintenanceWindow, createGroupMaintenanceWindow, deleteEndpointMaintenanceWindow, deleteGroupMaintenanceWindow, putEndpointMaintenanceWindow, putGroupMaintenanceWindow, updateEndpointMaintenanceWindow, updateGroupMaintenanceWindow, getEndpointMaintenanceWindow, getGroupMaintenanceWindow, getLogicalGroupSubGroups, getEndpointsByLogicalGroup, getEndpointsByStaticGroup, getEndpointsByDynamicGroup, getEndpointsByUDG, getEndpointsByADUser, getEndpointsByGroup, getIndustrialEndpoints, getIndustrialEndpoint, createIndustrialEndpoint, updateIndustrialEndpoint, deleteIndustrialEndpoint, getIndustrialEndpointsByGroup } from '../../../../../nodes/BaramundiEndpoint/actions/endpoint/endpoint.execute';
+import { httpRequestWithAuthentication } from '../../../../helpers/httpRequestWithAuthentication';
 
 /**
  * Create a mock IExecuteFunctions instance for testing
@@ -28,6 +29,7 @@ function createMockExecuteFunctions(
       ...credentials,
     })),
     helpers: {
+      httpRequestWithAuthentication,
       httpRequest: vi.fn(async () => mockResponse),
       returnJsonArray: vi.fn((data: IDataObject | IDataObject[]) => {
         const array = Array.isArray(data) ? data : [data];

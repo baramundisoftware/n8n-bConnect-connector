@@ -15,6 +15,7 @@ import {
   getBitLockerSecrets,
   patchBitLockerSecrets,
 } from '../../../../../nodes/BaramundiSecurity/actions/defenseControl/defenseControl.execute';
+import { httpRequestWithAuthentication } from '../../../../helpers/httpRequestWithAuthentication';
 
 // Mock helper function to create IExecuteFunctions
 function createMockExecuteFunctions(
@@ -34,6 +35,7 @@ function createMockExecuteFunctions(
       ...credentials,
     })),
     helpers: {
+      httpRequestWithAuthentication,
       httpRequest: vi.fn(async () => mockResponse),
       returnJsonArray: vi.fn((data: any) => {
         if (Array.isArray(data)) {
@@ -551,6 +553,7 @@ describe('returnAll: true branches', () => {
       getNodeParameter: vi.fn((name: string, _i: number, def?: any) => params[name] ?? def),
       getCredentials: vi.fn(async () => ({ baseUrl: 'https://bms:444/bconnect', username: 'u', password: 'test-password-do-not-use', ignoreSslIssues: false })),
       helpers: {
+        httpRequestWithAuthentication,
         httpRequest: vi.fn(async () => { const r = pages[callIndex] || pages[pages.length - 1]; callIndex++; return r; }),
         returnJsonArray: vi.fn((data: any) => (Array.isArray(data) ? data : [data]).map((j: any) => ({ json: j })) as INodeExecutionData[]),
       },

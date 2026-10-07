@@ -6,6 +6,7 @@
 
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { vi } from 'vitest';
+import { httpRequestWithAuthentication } from '../helpers/httpRequestWithAuthentication';
 
 export interface SystemTestConfig {
   baseUrl: string;
@@ -85,6 +86,7 @@ export function createSystemTestContext(
       ignoreSslIssues: config.ignoreSslIssues,
     }),
     helpers: {
+      httpRequestWithAuthentication,
       httpRequest: async (options: any) => {
         console.log(`[REAL API CALL] ${options.method || 'GET'} ${config.baseUrl}${options.url}`);
 

@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { NodeOperationError } from 'n8n-workflow';
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { get, getMany, create, update, deleteAsset, getAssetTypes, getAssetType, getAssetsByEndpoint, getAssetsByLogicalGroup, createAssetType, deleteAssetType, getAssetStockAssets, getAssetStockFolders, createAssetStockFolder, updateAssetStockFolder, deleteAssetStockFolder, getAssetsByADObject, getAssetsByOrgUnit, getAssetStockFolder, getAssetStockSubFolders, getAssetTypeFolders, getAssetTypeFolder, createAssetTypeFolder, updateAssetTypeFolder, deleteAssetTypeFolder, getAssetTypeFolderSubFolders } from '../../../../../nodes/BaramundiAsset/actions/asset/asset.execute';
+import { httpRequestWithAuthentication } from '../../../../helpers/httpRequestWithAuthentication';
 
 // Mock helper function to create IExecuteFunctions
 function createMockExecuteFunctions(
@@ -33,6 +34,7 @@ function createMockExecuteFunctions(
       ...credentials,
     })),
     helpers: {
+      httpRequestWithAuthentication,
       httpRequest,
       returnJsonArray: vi.fn((data: any) => {
         if (Array.isArray(data)) {

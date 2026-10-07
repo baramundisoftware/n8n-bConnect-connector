@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { getADGroups, getADGroup, getADGroupsByOrgUnit, getADUsersByGroup, getADUsers, getADUser, getADObjects, getADObject, getOrgUnits, getOrgUnit, getADGroupsByADGroup, getADObjectsByADGroup, getADObjectMemberships, getADObjectsByOrgUnit, getADUsersByOrgUnit, getOrgUnitsByOrgUnit } from '../../../../../nodes/BaramundiAdmin/actions/activeDirectory/activeDirectory.execute';
+import { httpRequestWithAuthentication } from '../../../../helpers/httpRequestWithAuthentication';
 
 // Mock helper function to create IExecuteFunctions
 function createMockExecuteFunctions(
@@ -32,6 +33,7 @@ function createMockExecuteFunctions(
       ...credentials,
     })),
     helpers: {
+      httpRequestWithAuthentication,
       httpRequest,
       returnJsonArray: vi.fn((data: any) => {
         if (Array.isArray(data)) {

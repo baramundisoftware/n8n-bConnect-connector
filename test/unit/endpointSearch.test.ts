@@ -10,6 +10,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { ILoadOptionsFunctions } from 'n8n-workflow';
 import { endpointSearch } from '../../nodes/shared/loadOptions';
+import { httpRequestWithAuthentication } from '../helpers/httpRequestWithAuthentication';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -43,6 +44,7 @@ function makeCtx(endpointType: string): {
       ignoreSslIssues: false,
     })),
     helpers: {
+      httpRequestWithAuthentication,
       httpRequest: httpRequestSpy,
       returnJsonArray: vi.fn((d: unknown) => d),
     },

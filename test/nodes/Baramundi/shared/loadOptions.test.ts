@@ -13,6 +13,7 @@ import {
   jobDefinitionSearch,
   jobFolderSearch,
 } from '../../../../nodes/shared/loadOptions';
+import { httpRequestWithAuthentication } from '../../../helpers/httpRequestWithAuthentication';
 
 function createMockLoadOptionsFunctions(mockResponse: any = {}): ILoadOptionsFunctions {
   return {
@@ -25,6 +26,7 @@ function createMockLoadOptionsFunctions(mockResponse: any = {}): ILoadOptionsFun
       ignoreSslIssues: false,
     })),
     helpers: {
+      httpRequestWithAuthentication,
       httpRequest: vi.fn(async () => mockResponse),
       returnJsonArray: vi.fn((data: IDataObject | IDataObject[]) => {
         const array = Array.isArray(data) ? data : [data];

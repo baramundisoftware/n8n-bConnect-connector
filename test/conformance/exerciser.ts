@@ -24,6 +24,7 @@ import { BaramundiJob } from '../../nodes/BaramundiJob/BaramundiJob.node';
 import { BaramundiSecurity } from '../../nodes/BaramundiSecurity/BaramundiSecurity.node';
 import { BaramundiSoftware } from '../../nodes/BaramundiSoftware/BaramundiSoftware.node';
 import type { Release } from './spec';
+import { httpRequestWithAuthentication } from '../helpers/httpRequestWithAuthentication';
 
 export const NODES: INodeType[] = [
   new BaramundiEndpoint(),
@@ -308,6 +309,7 @@ export async function exercise(
     }),
     continueOnFail: () => false,
     helpers: {
+      httpRequestWithAuthentication,
       httpRequest: async (o: IHttpRequestOptions) => record(requests, o),
       returnJsonArray: (d: unknown) => (Array.isArray(d) ? d : [d]).map((json) => ({ json })),
     },
@@ -349,6 +351,7 @@ export async function exerciseMethods(node: INodeType, release: Release): Promis
           getNode: () => ({ name: node.description.displayName, type: node.description.name, typeVersion: 1, position: [0, 0], parameters: params }),
           getCredentials: async () => ({ baseUrl: BASE_URL, authMethod: 'basicAuth', username: 'u', password: 'p', ignoreSslIssues: false }),
           helpers: {
+            httpRequestWithAuthentication,
             httpRequest: async (o: IHttpRequestOptions) => record(requests, o),
           },
           logger: { debug() {}, info() {}, warn() {}, error() {} },

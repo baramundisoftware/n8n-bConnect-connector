@@ -1,7 +1,8 @@
 import type {
-  IAuthenticateGeneric,
+  ICredentialDataDecryptedObject,
   ICredentialTestRequest,
   ICredentialType,
+  IHttpRequestOptions,
   INodeProperties,
 } from 'n8n-workflow';
 
@@ -123,18 +124,27 @@ export class BconnectApi implements ICredentialType {
     },
   ];
 
-  // Note: The `authenticate` property provides auto-injection for Basic Auth (the default).
-  // For API Key auth, requestApi.ts handles injection via the X-Api-Key header directly,
-  // because n8n's IAuthenticateGeneric does not support conditional auth methods.
-  authenticate: IAuthenticateGeneric = {
-    type: 'generic',
-    properties: {
-      auth: {
-        username: '={{$credentials.username}}',
-        password: '={{$credentials.password}}',
-      },
-    },
-  };
+  /**
+   * Adds the chosen authentication to every request n8n sends with this credential: the
+   * nodes' requests (httpRequestWithAuthentication) and the credential test below. Exactly one
+   * of the two: Basic auth, or the `X-Api-Key` header. A generic `authenticate` cannot choose,
+   * and sent an empty Basic header next to the API key.
+   */
+  async authenticate(
+    credentials: ICredentialDataDecryptedObject,
+    requestOptions: IHttpRequestOptions,
+  ): Promise<IHttpRequestOptions> {
+    if (credentials.authMethod === 'apiKey') {
+      return {
+        ...requestOptions,
+        headers: { ...requestOptions.headers, 'X-Api-Key': credentials.apiKey as string },
+      };
+    }
+    return {
+      ...requestOptions,
+      auth: { username: credentials.username as string, password: credentials.password as string },
+    };
+  }
 
   // Lists one endpoint: a cheap read that exists in 25R2 and 26R1. bConnect routes carry a
   // module prefix (`/bconnect/endpoints/v2.0/...`), so the path must include `/endpoints`.
@@ -147,11 +157,6 @@ export class BconnectApi implements ICredentialType {
       url: '/endpoints/v2.0/Endpoints',
       qs: { PageSize: 1 },
       skipSslCertificateValidation: '={{$credentials.ignoreSslIssues}}',
-      // For API Key auth, the X-Api-Key header is injected here.
-      // For Basic Auth, the `authenticate` property above handles it.
-      headers: {
-        'X-Api-Key': '={{$credentials.authMethod === "apiKey" ? $credentials.apiKey : ""}}',
-      },
     },
     rules: [
       {
