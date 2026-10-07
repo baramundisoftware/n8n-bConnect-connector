@@ -54,6 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - CI job **integration (bConnect-Mock)**: runs the E2E and system tests against a live bConnect-Mock container on every pull request, so they cannot silently go stale again (#40)
 - Spec-conformance check (`npm run check:spec`, part of the unit tests): calls every operation the editor offers, per bMS release and for every value of every option field, plus every dropdown and search function, and checks the HTTP requests against the 25R2/26R1 OpenAPI specs — route and module prefix, query parameters, body fields, required fields, enum values, JSON Patch paths. Known violations are baselined against their issues (#37, #39, #42–#46). JSON Patch paths are also accepted when the spec's own PATCH example uses them
+- CI enforces a coverage floor: `npm run test:coverage` fails below 94 % statements, 83 % branches, 96 % functions, 95 % lines (the gate job runs it). New transport tests cover API-key auth, `Retry-After` handling and the network/SSL/HTTP/unknown error paths (`requestApi.ts` branches 72 % → 98 %)
 
 ## [0.9.2] - 2026-10-06
 

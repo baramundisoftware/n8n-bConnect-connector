@@ -72,9 +72,10 @@ jobs:
       - name: Build
         run: npm run build
 
-      # System tests (test/system/) need a live bMS server and are excluded.
-      - name: Unit tests
-        run: npm run test:unit
+      # System and E2E tests need a live server and run in the integration job.
+      # Fails when coverage drops below the thresholds in vitest.config.ts.
+      - name: Unit tests + coverage floor
+        run: npm run test:coverage
 
       - name: License check (runtime dependencies)
         run: npm run license-check

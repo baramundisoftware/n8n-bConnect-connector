@@ -22,6 +22,15 @@ export default defineConfig({
         'node_modules/**',
         'dist/**',
       ],
+      // Ratchet: just below the current numbers so coverage cannot silently drop.
+      // Raise these when coverage goes up; never lower them without a reason in the PR.
+      // Measured by `npm run test:coverage` (unit + conformance, no live-server tests).
+      thresholds: {
+        statements: 94,
+        branches: 83,
+        functions: 96,
+        lines: 95,
+      },
     },
   },
 });
