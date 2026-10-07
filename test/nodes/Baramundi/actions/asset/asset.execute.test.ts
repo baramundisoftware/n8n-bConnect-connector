@@ -263,7 +263,8 @@ describe('Asset Operations', () => {
       );
     });
 
-    it('should support AssetTypeId filter', async () => {
+    // GET /assets/v2.0/Assets has no AssetTypeId parameter; DisplayName is a spec parameter (#37)
+    it('should support the DisplayName filter', async () => {
       const assetTypeId = '11111111-1111-1111-1111-111111111111';
       const mockAssets = {
         currentPage: 0,
@@ -281,7 +282,7 @@ describe('Asset Operations', () => {
         {
           returnAll: false,
           limit: 50,
-          options: { assetTypeId },
+          options: { displayName: 'Laptop 1' },
         },
         {},
         mockAssets
@@ -292,7 +293,7 @@ describe('Asset Operations', () => {
       expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
           qs: expect.objectContaining({
-            AssetTypeId: assetTypeId,
+            DisplayName: 'Laptop 1',
           }),
         })
       );
@@ -323,20 +324,26 @@ describe('Asset Operations', () => {
   });
 
   describe('create()', () => {
+    // AssetForCreation requires assetTypeId, name, ownerId and ownerType (#37)
+    const ownerId = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee';
+    const ownerType = 'Machine';
+
     it('should create an asset with required fields only', async () => {
       const assetTypeId = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
-      const displayName = 'Test Laptop';
+      const name = 'Test Laptop';
       const mockCreatedAsset = {
         id: '12345678-1234-1234-1234-123456789abc',
         assetTypeId,
-        displayName,
+        name,
         createdAt: '2026-01-20T12:00:00Z',
       };
 
       const mockContext = createMockExecuteFunctions(
         {
           assetTypeId,
-          displayName,
+          name,
+          ownerId,
+          ownerType,
           additionalFields: {},
         },
         {},
@@ -347,7 +354,7 @@ describe('Asset Operations', () => {
 
       expect(result).toBeDefined();
       expect(result).toHaveLength(1);
-      expect(result[0].json.displayName).toBe(displayName);
+      expect(result[0].json.name).toBe(name);
       expect(result[0].json.assetTypeId).toBe(assetTypeId);
       expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -355,7 +362,9 @@ describe('Asset Operations', () => {
           url: expect.stringContaining('/assets/v2.0/Assets'),
           body: {
             assetTypeId,
-            displayName,
+            name,
+            ownerId,
+            ownerType,
           },
         })
       );
@@ -363,29 +372,31 @@ describe('Asset Operations', () => {
 
     it('should create an asset with all additional fields', async () => {
       const assetTypeId = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
-      const displayName = 'Dell Latitude 7490';
+      const name = 'Dell Latitude 7490';
       const additionalFields = {
-        comment: 'Assigned to IT department',
+        comments: 'Assigned to IT department',
+        contact: 'IT Service Desk',
+        costCenter: 'CC-4711',
         inventoryNumber: 'INV-2024-001',
-        serialNumber: 'SN123456789',
-        manufacturer: 'Dell',
-        model: 'Latitude 7490',
-        location: 'Building A, Floor 3',
+        url: 'https://inventory.example.com/INV-2024-001',
         purchaseDate: '2024-01-15T00:00:00Z',
-        purchasePrice: 1299.99,
+        purchasePrice: 1299,
+        operatingCost: 20,
       };
 
       const mockCreatedAsset = {
         id: '12345678-1234-1234-1234-123456789abc',
         assetTypeId,
-        displayName,
+        name,
         ...additionalFields,
       };
 
       const mockContext = createMockExecuteFunctions(
         {
           assetTypeId,
-          displayName,
+          name,
+          ownerId,
+          ownerType,
           additionalFields,
         },
         {},
@@ -396,14 +407,16 @@ describe('Asset Operations', () => {
 
       expect(result).toBeDefined();
       expect(result).toHaveLength(1);
-      expect(result[0].json.serialNumber).toBe(additionalFields.serialNumber);
-      expect(result[0].json.manufacturer).toBe(additionalFields.manufacturer);
+      expect(result[0].json.inventoryNumber).toBe(additionalFields.inventoryNumber);
+      expect(result[0].json.costCenter).toBe(additionalFields.costCenter);
       expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
           method: 'POST',
           body: {
             assetTypeId,
-            displayName,
+            name,
+            ownerId,
+            ownerType,
             ...additionalFields,
           },
         })
@@ -413,7 +426,9 @@ describe('Asset Operations', () => {
     it('should handle errors when creating asset with invalid type', async () => {
       const mockContext = createMockExecuteFunctions({
         assetTypeId: 'ffffffff-ffff-ffff-ffff-ffffffffffff',
-        displayName: 'Test Asset',
+        name: 'Test Asset',
+        ownerId,
+        ownerType,
         additionalFields: {},
       });
 
@@ -429,10 +444,23 @@ describe('Asset Operations', () => {
     it('should throw NodeOperationError for invalid assetTypeId GUID', async () => {
       const mockContext = createMockExecuteFunctions({
         assetTypeId: 'not-a-guid',
-        displayName: 'Test Asset',
+        name: 'Test Asset',
+        ownerId,
+        ownerType,
         additionalFields: {},
       });
       await expect(create.call(mockContext, 0)).rejects.toThrow(NodeOperationError);
+    });
+
+    it('should throw NodeOperationError for an invalid ownerId GUID', async () => {
+      const mockContext = createMockExecuteFunctions({
+        assetTypeId: 'ffffffff-ffff-ffff-ffff-ffffffffffff',
+        name: 'Test Asset',
+        ownerId: 'not-a-guid',
+        ownerType,
+        additionalFields: {},
+      });
+      await expect(create.call(mockContext, 0)).rejects.toThrow(/Invalid owner ID/);
     });
   });
 
@@ -846,8 +874,9 @@ describe('Asset Operations', () => {
         name,
       };
 
+      const ownerId = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee';
       const mockContext = createMockExecuteFunctions(
-        { name, additionalFields: {} },
+        { name, ownerId, additionalFields: {} },
         {},
         mockResponse
       );
@@ -861,30 +890,37 @@ describe('Asset Operations', () => {
         expect.objectContaining({
           method: 'POST',
           url: expect.stringContaining('/assets/v2.0/AssetTypes'),
-          body: expect.objectContaining({ name }),
+          body: expect.objectContaining({ name, ownerId }),
         })
       );
     });
 
-    it('should create asset type with description', async () => {
+    // AssetTypeForCreation has no description; comments is the free-text field (#37)
+    it('should create asset type with comments', async () => {
       const name = 'Smartphone';
-      const description = 'Mobile phones';
-      const mockResponse = { id: 'type-new', name, description };
+      const comments = 'Mobile phones';
+      const ownerId = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee';
+      const mockResponse = { id: 'type-new', name, comments };
 
       const mockContext = createMockExecuteFunctions(
-        { name, additionalFields: { description } },
+        { name, ownerId, additionalFields: { comments } },
         {},
         mockResponse
       );
 
       const result = await createAssetType.call(mockContext, 0);
 
-      expect(result[0].json.description).toBe(description);
+      expect(result[0].json.comments).toBe(comments);
       expect(mockContext.helpers.httpRequest).toHaveBeenCalledWith(
         expect.objectContaining({
-          body: expect.objectContaining({ name, description }),
+          body: expect.objectContaining({ name, ownerId, comments }),
         })
       );
+    });
+
+    it('should throw NodeOperationError for an invalid ownerId GUID', async () => {
+      const mockContext = createMockExecuteFunctions({ name: 'X', ownerId: 'not-a-guid', additionalFields: {} });
+      await expect(createAssetType.call(mockContext, 0)).rejects.toThrow(/Invalid owner ID/);
     });
   });
 
@@ -1450,14 +1486,6 @@ describe('Validation error paths', () => {
     const mock = createMockExecuteFunctions({
       returnAll: false, limit: 10,
       options: { orderBy: 'name "desc"' },
-    });
-    await expect(getMany.call(mock, 0)).rejects.toThrow();
-  });
-
-  it('should throw NodeOperationError for invalid OData assetTypeId filter in getMany', async () => {
-    const mock = createMockExecuteFunctions({
-      returnAll: false, limit: 10,
-      options: { assetTypeId: 'not-a-guid' },
     });
     await expect(getMany.call(mock, 0)).rejects.toThrow();
   });

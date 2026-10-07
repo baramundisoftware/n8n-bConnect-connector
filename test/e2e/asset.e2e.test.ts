@@ -61,20 +61,24 @@ describe('E2E: Asset — get', () => {
 });
 
 describe('E2E: Asset — CRUD lifecycle', () => {
+  // Strict: the body follows AssetForCreation, so a 400 is a real failure, not a mock quirk (#37)
   it('create → update → delete', async () => {
-    if (!available || !firstAssetTypeId) return;
+    if (!available || !firstAssetTypeId || !firstStockFolderId) return;
     const createCtx = createRealContext({
       assetTypeId: firstAssetTypeId,
-      displayName: 'E2E Test Asset',
-      additionalFields: {},
+      name: 'E2E Test Asset',
+      ownerType: 'AssetStock',
+      ownerId: firstStockFolderId,
+      additionalFields: { comments: 'Created by E2E', inventoryNumber: 'E2E-001' },
     });
-    // Also catch 400 Bad Request (mock may require additional mandatory fields)
-    const created = await tryOp(() => asset.create.call(createCtx, 0));
-    if (!created || created.length === 0) return;
+    const created = await asset.create.call(createCtx, 0);
+    expect(created).toHaveLength(1);
     const id = created[0].json.id as string;
+    expect(id).toBeTruthy();
 
-    await tryOp(() => asset.update.call(createRealContext({ assetId: id, updateFields: { displayName: 'E2E Test Asset Updated' } }), 0));
-    await tryOp(() => asset.deleteAsset.call(createRealContext({ assetId: id }), 0));
+    const updated = await asset.update.call(createRealContext({ assetId: id, updateFields: { name: 'E2E Test Asset Updated' } }), 0);
+    expect(updated[0].json).toHaveProperty('name', 'E2E Test Asset Updated');
+    await asset.deleteAsset.call(createRealContext({ assetId: id }), 0);
   });
 });
 
@@ -131,7 +135,7 @@ describe('E2E: Asset Type — list & get', () => {
 describe('E2E: Asset Type — createAssetType → deleteAssetType', () => {
   it('lifecycle (accepts 404)', async () => {
     if (!available) return;
-    const ctx = createRealContext({ name: 'E2E-AssetType', additionalFields: {} });
+    const ctx = createRealContext({ name: 'E2E-AssetType', ownerId: firstTypeFolderId || NONEXISTENT_GUID, additionalFields: {} });
     const created = await tryOp(() => asset.createAssetType.call(ctx, 0));
     if (!created || created.length === 0) return;
     const id = created[0].json.id as string;
