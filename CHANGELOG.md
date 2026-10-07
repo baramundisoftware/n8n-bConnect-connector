@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Endpoint node fields follow the bConnect schemas** (#45, Endpoint part):
+  - **Create Endpoint**: each platform shows only the fields bConnect accepts for it — *Owner* is now **Company / Private** (was *Corporate / Personal*, rejected); Android and iOS no longer offer *Host Name*; Linux no longer offers *Domain*, *Primary Subnet Mask* and *UUID* (Windows only)
+  - **Update Endpoint**: *Domain* is only offered for Windows endpoints
+  - **Start Enrollment**: *Email Recipient* is now **Enrollment Email Address** and is sent as `enrollmentMailAddress` — the old field was ignored, so no enrollment mail was sent. Auto-detect no longer routes Linux endpoints to a non-existent enrollment route
+  - **Logical Group Create / Update**: the *Description* field was removed — bConnect has no such property (use *Comment*)
+  - **Create Industrial Endpoint (25 R2)**: the required **Primary IP**, **Port** and **SNMP Configuration** were added
 - **Asset node now sends what bConnect accepts** (#37). Before, Asset → Create always failed with 400 and several fields were silently ignored:
   - **Create Asset**: *Display Name* is now **Name**, and the required **Owner Type** and **Owner ID** were added (AD Object and Org Unit owners need bMS 26 R1). Additional fields follow the bConnect schema: Comments, Contact, Cost Center, Inventory Number, URL, Purchase Date/Price, Operating Cost, Energy On/Off. *Serial Number, Manufacturer, Model, Location* were removed — bConnect has no such asset fields
   - **Update Asset**: the same fields (plus Name, Owner); the old ones produced JSON Patch paths bConnect does not know
