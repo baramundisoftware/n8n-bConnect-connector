@@ -10,6 +10,7 @@ import {
 } from './actions/serverManagement/serverManagement.fields';
 import { complianceOperations, complianceFields } from './actions/compliance/compliance.fields';
 import { defenseControlOperations, defenseControlFields } from './actions/defenseControl/defenseControl.fields';
+import { only26R1Options } from '../shared/utils/versionGating';
 import { router } from './actions/router';
 import { endpointSearch } from '../shared/loadOptions';
 
@@ -41,7 +42,8 @@ export class BaramundiSecurity implements INodeType {
       baseURL: '={{ String($credentials.baseUrl).trim().replace(/\\/+$/, "") }}',
       skipSslCertificateValidation: '={{$credentials.ignoreSslIssues}}',
     },
-    properties: [
+    // Compliance exists in 26R1 only
+    properties: only26R1Options([
       {
         // eslint-disable-next-line n8n-nodes-base/node-param-display-name-miscased -- baramundi is a lowercase brand name
         displayName: 'baramundi Management Suite Version',
@@ -83,12 +85,13 @@ export class BaramundiSecurity implements INodeType {
       // Operations
       ...bmsecurityOperations,
       ...complianceOperations,
-      ...defenseControlOperations,
+      // BitLocker secrets exist in 26R1 only
+      ...only26R1Options(defenseControlOperations, ['getBitLockerSecrets', 'patchBitLockerSecrets']),
       // Fields
       ...bmsecurityFields,
       ...complianceFields,
       ...defenseControlFields,
-    ],
+    ], ['compliance'], 'resource'),
   };
 
   methods = {

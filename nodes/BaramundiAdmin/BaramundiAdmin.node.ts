@@ -16,6 +16,7 @@ import {
   microserviceOperations, microserviceFields,
 } from './actions/serverManagement/serverManagement.fields';
 import { operatingSystemOperations, operatingSystemFields } from './actions/operatingSystem/operatingSystem.fields';
+import { only26R1Options } from '../shared/utils/versionGating';
 import { router } from './actions/router';
 import { getOrgUnits, endpointSearch } from '../shared/loadOptions';
 
@@ -95,7 +96,8 @@ export class BaramundiAdmin implements INodeType {
       ...adGroupOperations,
       ...adObjectOperations,
       ...orgUnitOperations,
-      ...serverManagementOperations,
+      // API keys, MSW cleanup and download jobs exist in 26R1 only
+      ...only26R1Options(serverManagementOperations, ['getApiKeys', 'getDipsMSWCleanup', 'simulateMSWCleanup', 'getDownloadJob', 'getDownloadJobs']),
       ...microserviceOperations,
       ...operatingSystemOperations,
       // Fields
