@@ -154,7 +154,8 @@ By contributing, you agree that your contributions will be licensed under the [M
 
 ## Spec conformance
 
-`test/conformance/` calls every operation the editor offers, for bMS 25R2 and 26R1, and
+`test/conformance/` calls every operation the editor offers, for bMS 25R2 and 26R1 and for
+every value of every option field (e.g. each Endpoint Type), and
 checks the HTTP requests against `docs/openapi/<release>`: route and module prefix, query
 parameters, request body fields, required fields, enum values and JSON Patch paths.
 

@@ -2,8 +2,8 @@
  * Spec-conformance check.
  *
  * Calls every operation the editor offers — per bMS release, node, resource
- * and operation, once with required input and once with every optional field
- * — records the HTTP requests and checks them against that release's OpenAPI
+ * and operation, once with required input, once with every optional field, and
+ * once per value of every option field — records the HTTP requests and checks them against that release's OpenAPI
  * spec (docs/openapi/<release>): route incl. module prefix, query parameters,
  * request body fields / required fields / enum values, JSON Patch paths.
  *
@@ -23,7 +23,7 @@ import { join } from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { checkExercise, checkRequest, keyOf } from './checks';
-import { NODES, exercise, operationsOf, type Exercise } from './exerciser';
+import { NODES, exercise, operationsOf, optionVariants, type Exercise } from './exerciser';
 import { RELEASES, SPEC } from './spec';
 
 const BASELINE_PATH = join(__dirname, 'baseline.json');
@@ -47,6 +47,16 @@ beforeAll(async () => {
         for (const ex of both) {
           for (const v of checkExercise(ex)) {
             if (v.kind === 'no-request' && (anyRequest || ex.pass === 'required')) continue;
+            found.set(keyOf(ex, v), ex);
+          }
+        }
+        // Every other value of every option field. Sample data may not satisfy every
+        // combination, so here only a form/code mismatch counts as "no request".
+        for (const variant of optionVariants(node, release, resource, operation)) {
+          const ex = await exercise(node, release, resource, operation, 'variant', variant);
+          exercises.push(ex);
+          for (const v of checkExercise(ex)) {
+            if (v.kind === 'no-request' && !/Could not get parameter/.test(v.detail)) continue;
             found.set(keyOf(ex, v), ex);
           }
         }
