@@ -109,7 +109,8 @@ export async function patchLocalAdminUserCredentials(
     if (value !== undefined && value !== null && value !== '') {
       patchOperations.push({
         op: 'replace',
-        path: `/${key}`,
+        // LocalAdminAccountWindowsEndpoint: the properties live under /LocalAdminAccount
+        path: `/LocalAdminAccount/${key.charAt(0).toUpperCase()}${key.slice(1)}`,
         value,
       });
     }

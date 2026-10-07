@@ -150,10 +150,16 @@ export async function createSecurityGroup(
   const name = this.getNodeParameter('name', index) as string;
   const additionalFields = this.getNodeParameter('additionalFields', index, {}) as IDataObject;
 
-  const body: IDataObject = {
-    name,
-    ...additionalFields,
-  };
+  // SecurityGroupForCreation: name, profiles (array of security profile GUIDs)
+  const body: IDataObject = { name };
+  if (additionalFields.profiles) {
+    const profiles = String(additionalFields.profiles).split(',').map((id) => id.trim()).filter(Boolean);
+    const invalid = profiles.filter((id) => !validateGuid(id).valid);
+    if (invalid.length > 0) {
+      throw new NodeOperationError(this.getNode(), `Invalid security profile ID(s): ${invalid.join(', ')}`, { itemIndex: index });
+    }
+    body.profiles = profiles;
+  }
 
   const response = await apiRequest.call(this, 'POST', '/servermanagement/v2.0/SecurityGroups', body);
   return this.helpers.returnJsonArray(response as IDataObject);
@@ -360,16 +366,20 @@ export async function updateObjectPermissions(
   // Build JSON Patch document for PATCH request
   const patchOperations: Array<{op: string; path: string; value: unknown}> = [];
 
-  if (updateFields.securityProfileAccessRights) {
-    const rights = typeof updateFields.securityProfileAccessRights === 'string'
-      ? JSON.parse(updateFields.securityProfileAccessRights as string)
-      : updateFields.securityProfileAccessRights;
-
-    patchOperations.push({
-      op: 'replace',
-      path: '/securityProfileAccessRights',
-      value: rights,
-    });
+  // Modifiable object permission properties per the spec's PATCH example
+  if (updateFields.inheritRights !== undefined) {
+    patchOperations.push({ op: 'replace', path: '/InheritRights', value: updateFields.inheritRights });
+  }
+  if (updateFields.securityProfilePermissions) {
+    let permissions: unknown;
+    try {
+      permissions = typeof updateFields.securityProfilePermissions === 'string'
+        ? JSON.parse(updateFields.securityProfilePermissions as string)
+        : updateFields.securityProfilePermissions;
+    } catch {
+      throw new NodeOperationError(this.getNode(), 'Security Profile Permissions must be valid JSON', { itemIndex: index });
+    }
+    patchOperations.push({ op: 'replace', path: '/SecurityProfilePermissions', value: permissions });
   }
 
   if (patchOperations.length === 0) {

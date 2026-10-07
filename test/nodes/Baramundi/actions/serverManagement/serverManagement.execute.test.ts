@@ -530,7 +530,8 @@ describe('Server Management Operations', () => {
           {
             objectId,
             updateFields: {
-              securityProfileAccessRights: JSON.stringify([{ profileId: 'sp-1', accessRights: 31 }]),
+              inheritRights: false,
+              securityProfilePermissions: JSON.stringify([{ securityProfileId: 'sp-1', permissions: ['Read'] }]),
             },
           },
           {},
@@ -548,8 +549,22 @@ describe('Server Management Operations', () => {
           expect.objectContaining({
             method: 'PATCH',
             url: expect.stringContaining(`/servermanagement/v2.0/Objects/${objectId}`),
+            // Paths from the spec's PATCH example (#45)
+            body: [
+              { op: 'replace', path: '/InheritRights', value: false },
+              { op: 'replace', path: '/SecurityProfilePermissions', value: [{ securityProfileId: 'sp-1', permissions: ['Read'] }] },
+            ],
           }),
         );
+      });
+
+      it('should reject Security Profile Permissions that are not JSON', async () => {
+        const mockContext = createMockExecuteFunctions(
+          { objectId: 'f0f0f0f0-f0f0-f0f0-f0f0-f0f0f0f0f0f0', updateFields: { securityProfilePermissions: '[nope' } },
+          {},
+          {},
+        );
+        await expect(updateObjectPermissions.call(mockContext, 0)).rejects.toThrow(/must be valid JSON/);
       });
     });
   });
