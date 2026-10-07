@@ -50,7 +50,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Filter to Failed instances in the last 24 hours and group by job definition\nconst cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();\nconst failed = $input.all().filter(i =>\n  i.json.state === 'Failed' && i.json.startedAt >= cutoff\n);\n\nif (failed.length === 0) {\n  return [{ json: { hasFailures: false, summary: 'No job failures in the last 24 hours.' } }];\n}\n\n// Group by jobDefinitionId\nconst groups = {};\nfor (const f of failed) {\n  const defId = f.json.jobDefinitionId || 'unknown';\n  if (!groups[defId]) groups[defId] = { jobDefinitionId: defId, count: 0, endpoints: [] };\n  groups[defId].count++;\n  groups[defId].endpoints.push(f.json.endpointName || f.json.endpointId || 'unknown');\n}\n\nreturn Object.values(groups).map(g => ({ json: { ...g, hasFailures: true } }));"
+        "jsCode": "// Filter to failed instances started in the last 24 hours and group by job definition\n// Job instance states as bConnect reports them (JobInstance.state)\nconst FAILED_STATES = ['FinishedWithError'];\nconst cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);\nconst failed = $input.all().filter(i =>\n  FAILED_STATES.includes(i.json.state) && i.json.start && new Date(i.json.start) >= cutoff\n);\n\nif (failed.length === 0) {\n  return [{ json: { hasFailures: false, summary: 'No job failures in the last 24 hours.' } }];\n}\n\n// Group by jobDefinitionId\nconst groups = {};\nfor (const f of failed) {\n  const defId = f.json.jobDefinitionId || 'unknown';\n  if (!groups[defId]) groups[defId] = { jobDefinitionId: defId, count: 0, endpoints: [] };\n  groups[defId].count++;\n  groups[defId].endpoints.push(f.json.endpointName || f.json.endpointId || 'unknown');\n}\n\nreturn Object.values(groups).map(g => ({ json: { ...g, hasFailures: true } }));"
       },
       "id": "filter-failed",
       "name": "Filter Failed (24h)",
@@ -113,7 +113,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Build notification message\nconst items = $input.all();\nconst totalFailures = items.reduce((sum, i) => sum + (i.json.count || 0), 0);\nconst lines = items.map(i => `\u2022 ${i.json.name || i.json.jobDefinitionId}: ${i.json.count} failure(s)`);\n\nconst message = `\ud83d\udea8 *Job Failure Alert*\\n${totalFailures} failed job instance(s) in the last 24 hours:\\n\\n${lines.join('\\n')}`;\n\nreturn [{ json: { message, totalFailures } }];"
+        "jsCode": "// Build notification message\n// \"Get Job Definition Name\" returns the job definition only, so take the counts\n// from \"Filter Failed (24h)\" and match them by job definition id.\nconst names = {};\nfor (const def of $input.all()) names[def.json.id] = def.json.displayName || def.json.name;\nconst groups = $('Filter Failed (24h)').all().map(i => i.json);\nconst totalFailures = groups.reduce((sum, g) => sum + (g.count || 0), 0);\nconst lines = groups.map(g => `\u2022 ${names[g.jobDefinitionId] || g.jobDefinitionId}: ${g.count} failure(s)`);\n\nconst message = `\ud83d\udea8 *Job Failure Alert*\\n${totalFailures} failed job instance(s) in the last 24 hours:\\n\\n${lines.join('\\n')}`;\n\nreturn [{ json: { message, totalFailures } }];"
       },
       "id": "format-message",
       "name": "Format Notification",

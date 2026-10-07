@@ -52,7 +52,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Filter endpoints not seen in 30+ days\nconst STALE_DAYS = 30;\nconst cutoff = new Date(Date.now() - STALE_DAYS * 24 * 60 * 60 * 1000);\n\nconst stale = $input.all().filter(i => {\n  const lastSeen = new Date(i.json.lastSeen || i.json.lastContact || 0);\n  return lastSeen < cutoff;\n});\n\nif (stale.length === 0) {\n  return [{ json: { hasStale: false, summary: `No endpoints inactive for ${STALE_DAYS}+ days.` } }];\n}\n\nreturn stale.map(i => ({\n  json: {\n    hasStale: true,\n    displayName: i.json.displayName || i.json.hostName || 'Unknown',\n    lastSeen: i.json.lastSeen || i.json.lastContact || 'Never',\n    logicalGroupId: i.json.logicalGroupId || '-',\n    endpointType: i.json.endpointType || '-',\n    primaryUser: i.json.primaryUser || '-',\n  }\n}));"
+        "jsCode": "// Filter endpoints not seen in 30+ days\nconst STALE_DAYS = 30;\nconst cutoff = new Date(Date.now() - STALE_DAYS * 24 * 60 * 60 * 1000);\n\nconst stale = $input.all().filter(i => {\n  const lastSeen = new Date(i.json.lastSeen || 0);\n  return lastSeen < cutoff;\n});\n\nif (stale.length === 0) {\n  return [{ json: { hasStale: false, summary: `No endpoints inactive for ${STALE_DAYS}+ days.` } }];\n}\n\nreturn stale.map(i => ({\n  json: {\n    hasStale: true,\n    displayName: i.json.displayName || i.json.hostName || 'Unknown',\n    lastSeen: i.json.lastSeen || 'Never',\n    logicalGroup: i.json.logicalGroup || '-',\n    endpointType: i.json.type || '-',\n    registeredUser: i.json.registeredUser || '-',\n  }\n}));"
       },
       "id": "filter-stale",
       "name": "Filter Stale (30+ days)",
@@ -96,7 +96,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Aggregate stale endpoints by group and build summary\nconst items = $input.all();\nconst byGroup = {};\nfor (const i of items) {\n  const group = i.json.logicalGroupId || 'Unassigned';\n  if (!byGroup[group]) byGroup[group] = [];\n  byGroup[group].push(i.json);\n}\n\nconst groupSummary = Object.entries(byGroup).map(([group, endpoints]) => ({\n  group,\n  count: endpoints.length,\n  endpoints: endpoints.map(e => `${e.displayName} (last: ${e.lastSeen})`).join(', '),\n}));\n\nreturn [{ json: {\n  totalStale: items.length,\n  groups: groupSummary,\n  staleEndpoints: items.map(i => i.json),\n} }];"
+        "jsCode": "// Aggregate stale endpoints by group and build summary\nconst items = $input.all();\nconst byGroup = {};\nfor (const i of items) {\n  const group = i.json.logicalGroup && i.json.logicalGroup !== '-' ? i.json.logicalGroup : 'Unassigned';\n  if (!byGroup[group]) byGroup[group] = [];\n  byGroup[group].push(i.json);\n}\n\nconst groupSummary = Object.entries(byGroup).map(([group, endpoints]) => ({\n  group,\n  count: endpoints.length,\n  endpoints: endpoints.map(e => `${e.displayName} (last: ${e.lastSeen})`).join(', '),\n}));\n\nreturn [{ json: {\n  totalStale: items.length,\n  groups: groupSummary,\n  staleEndpoints: items.map(i => i.json),\n} }];"
       },
       "id": "aggregate",
       "name": "Aggregate by Group",

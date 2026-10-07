@@ -34,6 +34,7 @@ Production-ready n8n workflow templates for the baramundi Management Suite conne
 - Replace `YOUR-WINDOWS-UPDATE-JOB-DEFINITION-GUID` with your Windows Update job definition ID
 - Adjust the cron expression and the maintenance window intervals for your patch window
 - Adjust the wait duration (default: 4 hours)
+- `SUCCEEDED_STATES` / `FAILED_STATES` in the Build HTML Report node decide what counts as succeeded or failed (bConnect job instance states such as `FinishedSuccessfully`, `FinishedWithError`, `RescheduledWithError`)
 - Configure the Send Report Email node with your SMTP credentials (disabled by default)
 
 **bMS version**: 25R2 or 26R1
@@ -52,6 +53,7 @@ Production-ready n8n workflow templates for the baramundi Management Suite conne
 - Add a Slack, Teams, or Email node after "Format Notification" to deliver the alert
 - Adjust the schedule interval
 - Change the 24-hour lookback window in the Code node
+- Add more job instance states to `FAILED_STATES` (default: `FinishedWithError`), e.g. `RescheduledWithError`
 
 **bMS version**: 25R2 or 26R1
 
