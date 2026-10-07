@@ -390,6 +390,7 @@ export const endpointFields: INodeProperties[] = [
     description: 'The host name of the endpoint (required for Windows and Linux)',
   },
   {
+    // WindowsEndpointForCreation
     displayName: 'Additional Fields',
     name: 'additionalFields',
     type: 'collection',
@@ -399,7 +400,7 @@ export const endpointFields: INodeProperties[] = [
       show: {
         resource: ['endpoint'],
         operation: ['create'],
-        endpointType: ['windows', 'linux'],
+        endpointType: ['windows'],
       },
     },
     options: [
@@ -415,7 +416,7 @@ export const endpointFields: INodeProperties[] = [
         name: 'domain',
         type: 'string',
         default: '',
-        description: 'The name of the domain the client is joined to (Windows only)',
+        description: 'The name of the domain the client is joined to',
       },
       {
         displayName: 'Logical Group ID',
@@ -445,7 +446,7 @@ export const endpointFields: INodeProperties[] = [
         type: 'string',
         default: '',
         placeholder: '255.255.255.0',
-        description: 'Primary subnet mask (Windows only)',
+        description: 'Primary subnet mask',
       },
       {
         displayName: 'Registered User',
@@ -459,11 +460,12 @@ export const endpointFields: INodeProperties[] = [
         name: 'uuid',
         type: 'string',
         default: '',
-        description: 'The UUID of the endpoint (Windows only)',
+        description: 'The UUID of the endpoint',
       },
     ],
   },
   {
+    // LinuxEndpointForCreation
     displayName: 'Additional Fields',
     name: 'additionalFields',
     type: 'collection',
@@ -473,7 +475,60 @@ export const endpointFields: INodeProperties[] = [
       show: {
         resource: ['endpoint'],
         operation: ['create'],
-        endpointType: ['mac', 'android', 'ios'],
+        endpointType: ['linux'],
+      },
+    },
+    options: [
+      {
+        displayName: 'Comment',
+        name: 'comment',
+        type: 'string',
+        default: '',
+        description: 'Text field for creating comments on the endpoint',
+      },
+      {
+        displayName: 'Logical Group ID',
+        name: 'logicalGroupId',
+        type: 'string',
+        default: '',
+        description: 'ID of Logical Group (GUID)',
+      },
+      {
+        displayName: 'Primary IP',
+        name: 'primaryIP',
+        type: 'string',
+        default: '',
+        description: 'Primary IP address of the endpoint',
+      },
+      {
+        displayName: 'Primary MAC',
+        name: 'primaryMAC',
+        type: 'string',
+        default: '',
+        placeholder: 'AA:BB:CC:DD:EE:FF',
+        description: 'Primary MAC address (IEEE MAC-48 format)',
+      },
+      {
+        displayName: 'Registered User',
+        name: 'registeredUser',
+        type: 'string',
+        default: '',
+        description: 'The registered user of the endpoint',
+      },
+    ],
+  },
+  {
+    // MacEndpointForCreation
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['create'],
+        endpointType: ['mac'],
       },
     },
     options: [
@@ -489,7 +544,7 @@ export const endpointFields: INodeProperties[] = [
         name: 'hostName',
         type: 'string',
         default: '',
-        description: 'Host name of the endpoint (optional for Mac)',
+        description: 'Host name of the endpoint',
       },
       {
         displayName: 'Logical Group ID',
@@ -502,19 +557,75 @@ export const endpointFields: INodeProperties[] = [
         displayName: 'Owner',
         name: 'owner',
         type: 'options',
-        default: 'Corporate',
+        default: 'Company',
         options: [
-          { name: 'Corporate', value: 'Corporate' },
-          { name: 'Personal', value: 'Personal' },
+          { name: 'Company', value: 'Company' },
+          { name: 'Private', value: 'Private' },
         ],
-        description: 'Owner type of the device',
+        description: 'Whether the device is company-owned or private',
       },
       {
         displayName: 'Registered User',
         name: 'registeredUser',
         type: 'string',
         default: '',
-        description: 'Registered user of the endpoint',
+        description: 'The registered user of the endpoint',
+      },
+      {
+        displayName: 'Serial Number',
+        name: 'serialNumber',
+        type: 'string',
+        default: '',
+        description: 'Serial number of the device',
+      },
+    ],
+  },
+  {
+    // AndroidEndpointForCreation / IosEndpointForCreation (no host name)
+    displayName: 'Additional Fields',
+    name: 'additionalFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['create'],
+        endpointType: ['android', 'ios'],
+      },
+    },
+    options: [
+      {
+        displayName: 'Comment',
+        name: 'comment',
+        type: 'string',
+        default: '',
+        description: 'Text field for creating comments on the endpoint',
+      },
+      {
+        displayName: 'Logical Group ID',
+        name: 'logicalGroupId',
+        type: 'string',
+        default: '',
+        description: 'ID of Logical Group (GUID)',
+      },
+      {
+        displayName: 'Owner',
+        name: 'owner',
+        type: 'options',
+        default: 'Company',
+        options: [
+          { name: 'Company', value: 'Company' },
+          { name: 'Private', value: 'Private' },
+        ],
+        description: 'Whether the device is company-owned or private',
+      },
+      {
+        displayName: 'Registered User',
+        name: 'registeredUser',
+        type: 'string',
+        default: '',
+        description: 'The registered user of the endpoint',
       },
       {
         displayName: 'Serial Number',
@@ -605,6 +716,7 @@ export const endpointFields: INodeProperties[] = [
       operation: ['update'],
     },
   }),
+  // Domain only exists on Windows endpoints; the other platform types have no such property.
   {
     displayName: 'Update Fields',
     name: 'updateFields',
@@ -615,6 +727,7 @@ export const endpointFields: INodeProperties[] = [
       show: {
         resource: ['endpoint'],
         operation: ['update'],
+        endpointType: ['windows'],
       },
     },
     options: [
@@ -640,11 +753,71 @@ export const endpointFields: INodeProperties[] = [
         description: 'The host name of the endpoint',
       },
       {
+        displayName: 'Primary IP',
+        name: 'primaryIP',
+        type: 'string',
+        default: '',
+        description: 'Primary IP address',
+      },
+      {
+        displayName: 'Primary MAC',
+        name: 'primaryMAC',
+        type: 'string',
+        default: '',
+        description: 'Primary MAC address',
+      },
+      {
+        displayName: 'Logical Group ID',
+        name: 'logicalGroupId',
+        type: 'string',
+        default: '',
+        description: 'Logical Group GUID',
+      },
+      {
         displayName: 'Domain',
         name: 'domain',
         type: 'string',
         default: '',
         description: 'Domain name',
+      },
+    ],
+  },
+  {
+    displayName: 'Update Fields',
+    name: 'updateFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['update'],
+      },
+      hide: {
+        endpointType: ['windows'],
+      },
+    },
+    options: [
+      {
+        displayName: 'Display Name',
+        name: 'displayName',
+        type: 'string',
+        default: '',
+        description: 'Display name of the endpoint',
+      },
+      {
+        displayName: 'Comment',
+        name: 'comment',
+        type: 'string',
+        default: '',
+        description: 'Comment text',
+      },
+      {
+        displayName: 'Host Name',
+        name: 'hostName',
+        type: 'string',
+        default: '',
+        description: 'The host name of the endpoint',
       },
       {
         displayName: 'Primary IP',
@@ -693,8 +866,8 @@ export const endpointFields: INodeProperties[] = [
     },
     options: [
       {
-        displayName: 'Email Recipient',
-        name: 'emailRecipient',
+        displayName: 'Enrollment Email Address',
+        name: 'enrollmentMailAddress',
         type: 'string',
         default: '',
         placeholder: 'user@company.com',
@@ -1052,13 +1225,6 @@ export const logicalGroupFields: INodeProperties[] = [
     },
     options: [
       {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'Description of the group',
-      },
-      {
         displayName: 'Comment',
         name: 'comment',
         type: 'string',
@@ -1090,13 +1256,6 @@ export const logicalGroupFields: INodeProperties[] = [
         type: 'string',
         default: '',
         description: 'Name of the group',
-      },
-      {
-        displayName: 'Description',
-        name: 'description',
-        type: 'string',
-        default: '',
-        description: 'Description of the group',
       },
       {
         displayName: 'Comment',
@@ -1953,6 +2112,35 @@ export const endpointTypeFields: INodeProperties[] = [
     displayOptions: { show: { resource: ['endpoint'], operation: ['createIndustrialEndpoint'] } },
     description: 'Display name for the new industrial endpoint',
   },
+  // IndustrialEndpointForCreation: primaryIP, port and snmpConfiguration are required
+  {
+    displayName: 'Primary IP',
+    name: 'primaryIP',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: { show: { resource: ['endpoint'], operation: ['createIndustrialEndpoint'] } },
+    description: 'Primary IP address of the industrial endpoint',
+  },
+  {
+    displayName: 'Port',
+    name: 'port',
+    type: 'number',
+    required: true,
+    default: 161,
+    displayOptions: { show: { resource: ['endpoint'], operation: ['createIndustrialEndpoint'] } },
+    description: 'SNMP port of the industrial endpoint',
+  },
+  {
+    displayName: 'SNMP Configuration (JSON)',
+    name: 'snmpConfiguration',
+    type: 'json',
+    required: true,
+    default: '{"version":"V2c","community":"public"}',
+    displayOptions: { show: { resource: ['endpoint'], operation: ['createIndustrialEndpoint'] } },
+    description:
+      'SnmpConfigurationForCreation: version (V1, V2c, V3), community, username, authentication (None, MD5, SHA, SHA256, SHA384, SHA512), encryption (None, DES, AES, TDES, AES192, AES256), contextName, contextEngineId, authenticationPassword, encryptionPassword',
+  },
   {
     displayName: 'Additional Fields',
     name: 'additionalFields',
@@ -1961,9 +2149,11 @@ export const endpointTypeFields: INodeProperties[] = [
     default: {},
     displayOptions: { show: { resource: ['endpoint'], operation: ['createIndustrialEndpoint'] } },
     options: [
-      { displayName: 'Primary IP', name: 'primaryIP', type: 'string', default: '' },
+      { displayName: 'Comment', name: 'comment', type: 'string', default: '' },
+      { displayName: 'Host Name', name: 'hostName', type: 'string', default: '' },
       { displayName: 'Primary MAC', name: 'primaryMAC', type: 'string', default: '' },
       { displayName: 'Logical Group ID', name: 'logicalGroupId', type: 'string', default: '' },
+      { displayName: 'Web Interface URL', name: 'webInterfaceUrl', type: 'string', default: '' },
     ],
   },
   {

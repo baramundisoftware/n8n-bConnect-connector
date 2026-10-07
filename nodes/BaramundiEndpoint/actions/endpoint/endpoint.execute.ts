@@ -363,12 +363,12 @@ export async function startEnrollment(
   }
 
   // Validate email recipient if provided
-  if (enrollmentOptions.emailRecipient) {
-    const emailValidation = validateEmail(enrollmentOptions.emailRecipient as string);
+  if (enrollmentOptions.enrollmentMailAddress) {
+    const emailValidation = validateEmail(enrollmentOptions.enrollmentMailAddress as string);
     if (!emailValidation.valid) {
       throw new NodeOperationError(
         this.getNode(),
-        `Invalid email recipient:\n${emailValidation.errors.join('\n')}`,
+        `Invalid enrollment email address:\n${emailValidation.errors.join('\n')}`,
         { itemIndex: index },
       );
     }
@@ -390,7 +390,6 @@ export async function startEnrollment(
     const apiType = (ep.type as string) || 'Windows';
     const enrollmentEndpointMap: Record<string, string> = {
       WindowsEndpoint: `/endpoints/v2.0/WindowsEndpoints/${endpointId}/StartEnrollment`,
-      LinuxEndpoint: `/endpoints/v2.0/LinuxEndpoints/${endpointId}/StartEnrollment`,
       MacEndpoint: `/endpoints/v2.0/MacEndpoints/${endpointId}/StartEnrollment`,
       AndroidEndpoint: `/endpoints/v2.0/AndroidEndpoints/${endpointId}/StartEnrollment`,
       IosEndpoint: `/endpoints/v2.0/IosEndpoints/${endpointId}/StartEnrollment`,
@@ -404,8 +403,9 @@ export async function startEnrollment(
 
   // Build enrollment request body
   const body: IDataObject = {};
-  if (enrollmentOptions.emailRecipient) {
-    body.emailRecipient = enrollmentOptions.emailRecipient;
+  // *EnrollmentRequest schemas: enrollmentMailAddress, emailLanguageId (+ type-specific options)
+  if (enrollmentOptions.enrollmentMailAddress) {
+    body.enrollmentMailAddress = enrollmentOptions.enrollmentMailAddress;
   }
   if (enrollmentOptions.emailLanguageId) {
     body.emailLanguageId = enrollmentOptions.emailLanguageId;
@@ -1513,7 +1513,16 @@ export async function createIndustrialEndpoint(
     throw new NodeOperationError(this.getNode(), `Invalid display name:\n${displayNameValidation.errors.join('\n')}`, { itemIndex: index });
   }
 
-  const body: IDataObject = { displayName, ...additionalFields };
+  const primaryIP = this.getNodeParameter('primaryIP', index) as string;
+  const port = this.getNodeParameter('port', index) as number;
+  const snmpRaw = this.getNodeParameter('snmpConfiguration', index) as string | IDataObject;
+  let snmpConfiguration: IDataObject;
+  try {
+    snmpConfiguration = typeof snmpRaw === 'string' ? (JSON.parse(snmpRaw) as IDataObject) : snmpRaw;
+  } catch {
+    throw new NodeOperationError(this.getNode(), 'SNMP Configuration must be valid JSON', { itemIndex: index });
+  }
+  const body: IDataObject = { displayName, primaryIP, port, snmpConfiguration, ...additionalFields };
   const response = await apiRequest.call(this, 'POST', '/endpoints/v2.0/IndustrialEndpoints', body);
   return this.helpers.returnJsonArray(response as IDataObject);
 }

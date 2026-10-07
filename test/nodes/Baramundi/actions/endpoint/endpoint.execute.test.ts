@@ -691,7 +691,7 @@ describe('Endpoint Operations - Unit Tests', () => {
           displayName,
           additionalFields: {
             serialNumber: 'C02ABC123456',
-            owner: 'Corporate',
+            owner: 'Company',
           },
         },
         {},
@@ -712,7 +712,7 @@ describe('Endpoint Operations - Unit Tests', () => {
           body: {
             displayName,
             serialNumber: 'C02ABC123456',
-            owner: 'Corporate',
+            owner: 'Company',
           },
         })
       );
@@ -734,7 +734,7 @@ describe('Endpoint Operations - Unit Tests', () => {
           displayName,
           additionalFields: {
             serialNumber: 'ANDROID123456',
-            owner: 'Corporate',
+            owner: 'Company',
             registeredUser: 'john.doe@company.com',
           },
         },
@@ -756,7 +756,7 @@ describe('Endpoint Operations - Unit Tests', () => {
           body: {
             displayName,
             serialNumber: 'ANDROID123456',
-            owner: 'Corporate',
+            owner: 'Company',
             registeredUser: 'john.doe@company.com',
           },
         })
@@ -950,7 +950,7 @@ describe('Endpoint Operations - Unit Tests', () => {
           endpointId,
           endpointId,
           enrollmentOptions: {
-            emailRecipient: 'user@company.com',
+            enrollmentMailAddress: 'user@company.com',
             emailLanguageId: 1033,
           },
         },
@@ -1038,7 +1038,7 @@ describe('Endpoint Operations - Unit Tests', () => {
           endpointId,
           endpointId,
           enrollmentOptions: {
-            emailRecipient: 'test@example.com',
+            enrollmentMailAddress: 'test@example.com',
             emailLanguageId: 1031,
           },
         },
@@ -1061,7 +1061,7 @@ describe('Endpoint Operations - Unit Tests', () => {
 
       // Assert
       expect(enrollmentBody).toEqual({
-        emailRecipient: 'test@example.com',
+        enrollmentMailAddress: 'test@example.com',
         emailLanguageId: 1031,
       });
       expect(result[0].json.success).toBe(true);
@@ -3395,16 +3395,42 @@ describe('Endpoint Phase 8C - Group Navigation Operations', () => {
 
   describe('createIndustrialEndpoint()', () => {
     it('should POST to create an industrial endpoint', async () => {
+      // IndustrialEndpointForCreation requires primaryIP, port and snmpConfiguration (#45)
       const ctx = createMockExecuteFunctions(
-        { displayName: 'PLC-New', additionalFields: { primaryIP: '10.0.0.1' } },
+        {
+          displayName: 'PLC-New',
+          primaryIP: '10.0.0.1',
+          port: 161,
+          snmpConfiguration: '{"version":"V2c","community":"public"}',
+          additionalFields: { hostName: 'plc-01' },
+        },
         {},
         { id: 'ind-new', displayName: 'PLC-New' },
       );
       const result = await createIndustrialEndpoint.call(ctx, 0);
       expect(result[0].json).toMatchObject({ id: 'ind-new' });
       expect(ctx.helpers.httpRequest).toHaveBeenCalledWith(
-        expect.objectContaining({ method: 'POST', url: '/endpoints/v2.0/IndustrialEndpoints' }),
+        expect.objectContaining({
+          method: 'POST',
+          url: '/endpoints/v2.0/IndustrialEndpoints',
+          body: {
+            displayName: 'PLC-New',
+            primaryIP: '10.0.0.1',
+            port: 161,
+            snmpConfiguration: { version: 'V2c', community: 'public' },
+            hostName: 'plc-01',
+          },
+        }),
       );
+    });
+
+    it('should reject an SNMP configuration that is not JSON', async () => {
+      const ctx = createMockExecuteFunctions(
+        { displayName: 'PLC-New', primaryIP: '10.0.0.1', port: 161, snmpConfiguration: '{not json', additionalFields: {} },
+        {},
+        {},
+      );
+      await expect(createIndustrialEndpoint.call(ctx, 0)).rejects.toThrow(/SNMP Configuration must be valid JSON/);
     });
   });
 
