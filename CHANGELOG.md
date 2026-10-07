@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- **Job → Job Definition → Create / Update / Delete**: job definitions are read-only in bConnect. A live bMS 26R1 answers `POST`/`PATCH`/`DELETE /jobs/v2.0/JobDefinitions` with *405 Method Not Allowed*, and neither the 25R2 nor the 26R1 spec has these methods — the operations could never succeed (#42)
+
 ### Fixed
 - **Org Unit dropdown** (Admin) listed nothing: it requested a path bConnect does not have. It now loads org units from `/activedirectory/v2.0/OrgUnits` (#38)
 - **Dropdowns show why they are empty**: when loading fails (wrong Server URL, missing permissions, unreachable server), the dropdown now shows *Could not load …* with the reason instead of an empty list. An empty list now means bConnect returned no data (#41)

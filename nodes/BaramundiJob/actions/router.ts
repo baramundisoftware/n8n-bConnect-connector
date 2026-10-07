@@ -19,9 +19,6 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
           switch (operation) {
             case 'get': responseData = await job.get.call(this, i); break;
             case 'getMany': responseData = await job.getMany.call(this, i); break;
-            case 'create': responseData = await job.create.call(this, i); break;
-            case 'update': responseData = await job.update.call(this, i); break;
-            case 'delete': responseData = await job.deleteJob.call(this, i); break;
             case 'execute': responseData = await job.execute.call(this, i); break;
             case 'getJobDefinitionsByFolder': responseData = await job.getJobDefinitionsByFolder.call(this, i); break;
             default:
