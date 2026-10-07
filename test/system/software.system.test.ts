@@ -38,8 +38,8 @@ describe.skipIf(skipConfig.skip)('Software API - System Tests', () => {
       // Verify structure of first item
       if (result.length > 0) {
         console.log('Sample software item:', JSON.stringify(result[0].json, null, 2));
-        expect(result[0].json).toHaveProperty('displayName');
-        expect(result[0].json).toHaveProperty('publisher');
+        expect(result[0].json).toHaveProperty('vendor');
+        expect(result[0].json).toHaveProperty('version');
       }
     });
 
@@ -57,7 +57,7 @@ describe.skipIf(skipConfig.skip)('Software API - System Tests', () => {
 
       // Verify search was applied (results should be filtered)
       if (result.length > 0) {
-        console.log('Search results:', result.map(r => r.json.displayName));
+        console.log('Search results:', result.map(r => r.json.name));
       }
     });
 
@@ -105,8 +105,8 @@ describe.skipIf(skipConfig.skip)('Software API - System Tests', () => {
       expect(Array.isArray(result)).toBe(true);
 
       if (result.length > 0) {
-        expect(result[0].json).toHaveProperty('displayName');
-        expect(result[0].json).toHaveProperty('publisher');
+        expect(result[0].json).toHaveProperty('vendor');
+        expect(result[0].json).toHaveProperty('version');
       }
     });
   });
@@ -141,8 +141,8 @@ describe.skipIf(skipConfig.skip)('Software API - System Tests', () => {
       expect(Array.isArray(result)).toBe(true);
 
       if (result.length > 0) {
-        expect(result[0].json).toHaveProperty('displayName');
-        expect(result[0].json).toHaveProperty('publisher');
+        expect(result[0].json).toHaveProperty('vendor');
+        expect(result[0].json).toHaveProperty('version');
       }
     });
   });
@@ -177,8 +177,8 @@ describe.skipIf(skipConfig.skip)('Software API - System Tests', () => {
       expect(Array.isArray(result)).toBe(true);
 
       if (result.length > 0) {
-        expect(result[0].json).toHaveProperty('displayName');
-        expect(result[0].json).toHaveProperty('publisher');
+        expect(result[0].json).toHaveProperty('vendor');
+        expect(result[0].json).toHaveProperty('version');
       }
     });
   });
