@@ -73,11 +73,16 @@ describe('getOptions methods', () => {
       expect(result[1].name).toContain('showing first 100');
     });
 
-    it('should return empty array on error', async () => {
+    // A dropdown that cannot load says so instead of showing an empty list (#41)
+    it('should report an error instead of returning an empty list', async () => {
       const mockCtx = createMockLoadOptionsFunctions({});
       (mockCtx.helpers.httpRequest as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('fail'));
-      const result = await getEndpoints.call(mockCtx);
-      expect(result).toEqual([]);
+      await expect(getEndpoints.call(mockCtx)).rejects.toThrow(/Could not load endpoints: .*fail/);
+    });
+
+    it('should return an empty list when bConnect returns no data', async () => {
+      const mockCtx = createMockLoadOptionsFunctions({ data: [], hasNextPage: false });
+      await expect(getEndpoints.call(mockCtx)).resolves.toEqual([]);
     });
   });
 
@@ -95,11 +100,10 @@ describe('getOptions methods', () => {
       expect(result[1]).toEqual({ name: 'Patch', value: 'j2' });
     });
 
-    it('should return empty array on error', async () => {
+    it('should report an error instead of returning an empty list', async () => {
       const mockCtx = createMockLoadOptionsFunctions({});
       (mockCtx.helpers.httpRequest as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('fail'));
-      const result = await getJobDefinitions.call(mockCtx);
-      expect(result).toEqual([]);
+      await expect(getJobDefinitions.call(mockCtx)).rejects.toThrow(/Could not load job definitions: .*fail/);
     });
   });
 
@@ -112,6 +116,21 @@ describe('getOptions methods', () => {
       const result = await getOrgUnits.call(mockCtx);
       expect(result[0]).toEqual({ name: 'HQ', value: 'ou1' });
       expect(result[1]).toEqual({ name: 'ou2', value: 'ou2' });
+    });
+
+    // Org units live in the Active Directory module (#38)
+    it('should request /activedirectory/v2.0/OrgUnits', async () => {
+      const mockCtx = createMockLoadOptionsFunctions({ data: [], hasNextPage: false });
+      await getOrgUnits.call(mockCtx);
+      expect(mockCtx.helpers.httpRequest).toHaveBeenCalledWith(
+        expect.objectContaining({ method: 'GET', url: '/activedirectory/v2.0/OrgUnits' }),
+      );
+    });
+
+    it('should report an error instead of returning an empty list', async () => {
+      const mockCtx = createMockLoadOptionsFunctions({});
+      (mockCtx.helpers.httpRequest as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('404 Not Found'));
+      await expect(getOrgUnits.call(mockCtx)).rejects.toThrow(/Could not load org units: .*404/);
     });
   });
 
@@ -154,11 +173,10 @@ describe('getOptions methods', () => {
       expect(result[1].name).toContain('showing first 100');
     });
 
-    it('should return empty array on error (getNamedItems)', async () => {
+    it('should report an error instead of returning an empty list (getNamedItems)', async () => {
       const mockCtx = createMockLoadOptionsFunctions({});
       (mockCtx.helpers.httpRequest as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('fail'));
-      const result = await getLogicalGroups.call(mockCtx);
-      expect(result).toEqual([]);
+      await expect(getLogicalGroups.call(mockCtx)).rejects.toThrow(/Could not load logical groups: .*fail/);
     });
   });
 });

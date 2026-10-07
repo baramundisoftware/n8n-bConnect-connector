@@ -3,7 +3,8 @@
  *
  * Calls every operation the editor offers — per bMS release, node, resource
  * and operation, once with required input, once with every optional field, and
- * once per value of every option field — records the HTTP requests and checks them against that release's OpenAPI
+ * once per value of every option field — plus every dropdown/search function
+ * (loadOptions, listSearch) — records the HTTP requests and checks them against that release's OpenAPI
  * spec (docs/openapi/<release>): route incl. module prefix, query parameters,
  * request body fields / required fields / enum values, JSON Patch paths.
  *
@@ -23,7 +24,7 @@ import { join } from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { checkExercise, checkRequest, keyOf } from './checks';
-import { NODES, exercise, operationsOf, optionVariants, type Exercise } from './exerciser';
+import { NODES, exercise, exerciseMethods, operationsOf, optionVariants, type Exercise } from './exerciser';
 import { RELEASES, SPEC } from './spec';
 
 const BASELINE_PATH = join(__dirname, 'baseline.json');
@@ -63,6 +64,22 @@ beforeAll(async () => {
       }
     }
   }
+  // Dropdown and search functions (shared between nodes: keep one key per function)
+  const seenMethods = new Set<string>();
+  for (const release of RELEASES) {
+    for (const node of NODES) {
+      for (const ex of await exerciseMethods(node, release)) {
+        exercises.push(ex);
+        for (const v of checkExercise(ex)) {
+          const key = keyOf({ ...ex, node: 'methods' }, v);
+          if (seenMethods.has(key)) continue;
+          seenMethods.add(key);
+          found.set(key, ex);
+        }
+      }
+    }
+  }
+
   if (mode === 'add-new' || mode === 'prune') {
     const next: Record<string, number | string> = {};
     for (const [k, issue] of Object.entries(baseline)) if (mode === 'add-new' || found.has(k)) next[k] = issue;

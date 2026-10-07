@@ -4,6 +4,7 @@ import type {
   INodeListSearchResult,
   INodePropertyOptions,
 } from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
 
 import { validateODataString } from './utils/validation';
 
@@ -14,6 +15,16 @@ import type {
   BConnectNamedItem,
   BConnectPagedResponse,
 } from './utils/types';
+
+/**
+ * A dropdown that cannot load must say so: n8n shows the error under the field.
+ * Returning [] instead made a wrong URL, missing permissions or a wrong path look like
+ * "no data" (#41) — which is how the wrong Org Units path went unnoticed (#38).
+ */
+function loadError(this: ILoadOptionsFunctions, what: string, error: unknown): NodeOperationError {
+  const reason = ((error as Error)?.message ?? String(error)).split('\n')[0];
+  return new NodeOperationError(this.getNode(), `Could not load ${what}: ${reason}`);
+}
 
 export async function getEndpoints(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
   try {
@@ -39,8 +50,8 @@ export async function getEndpoints(this: ILoadOptionsFunctions): Promise<INodePr
     }
 
     return options;
-  } catch (_error) {
-    return [];
+  } catch (error) {
+    throw loadError.call(this, 'endpoints', error);
   }
 }
 
@@ -68,8 +79,8 @@ export async function getJobDefinitions(this: ILoadOptionsFunctions): Promise<IN
     }
 
     return options;
-  } catch (_error) {
-    return [];
+  } catch (error) {
+    throw loadError.call(this, 'job definitions', error);
   }
 }
 
@@ -78,7 +89,7 @@ export async function getOrgUnits(this: ILoadOptionsFunctions): Promise<INodePro
     const response = await apiRequest.call(
       this as unknown as IExecuteFunctions,
       'GET',
-      '/organizationalunits/v2.0/OrganizationalUnits',
+      '/activedirectory/v2.0/OrgUnits',
       {},
       { PageSize: 100, Page: 0, OrderBy: 'Name asc' },
     );
@@ -97,14 +108,15 @@ export async function getOrgUnits(this: ILoadOptionsFunctions): Promise<INodePro
     }
 
     return options;
-  } catch (_error) {
-    return [];
+  } catch (error) {
+    throw loadError.call(this, 'org units', error);
   }
 }
 
 async function getNamedItems(
   this: ILoadOptionsFunctions,
   endpoint: string,
+  what: string,
 ): Promise<INodePropertyOptions[]> {
   try {
     const response = await apiRequest.call(
@@ -129,21 +141,21 @@ async function getNamedItems(
     }
 
     return options;
-  } catch (_error) {
-    return [];
+  } catch (error) {
+    throw loadError.call(this, what, error);
   }
 }
 
 export async function getLogicalGroups(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-  return getNamedItems.call(this, '/endpoints/v2.0/LogicalGroups');
+  return getNamedItems.call(this, '/endpoints/v2.0/LogicalGroups', 'logical groups');
 }
 
 export async function getStaticGroups(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-  return getNamedItems.call(this, '/endpoints/v2.0/StaticGroups');
+  return getNamedItems.call(this, '/endpoints/v2.0/StaticGroups', 'static groups');
 }
 
 export async function getDynamicGroups(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-  return getNamedItems.call(this, '/endpoints/v2.0/DynamicGroups');
+  return getNamedItems.call(this, '/endpoints/v2.0/DynamicGroups', 'dynamic groups');
 }
 
 // ─── listSearch methods (for resourceLocator components) ────────────────────
