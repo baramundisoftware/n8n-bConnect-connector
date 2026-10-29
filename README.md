@@ -17,6 +17,9 @@ Automate your **baramundi Management Suite** (bMS) from [n8n](https://n8n.io/) w
 
 **219 operations** across **6 nodes**, compatible with **baramundi Management Suite 2025 R2 and 2026 R1**.
 
+<img width="1905" height="880" alt="image" src="https://github.com/user-attachments/assets/b12fd43f-1d09-447c-a920-b12a68a78d23" />
+
+
 ---
 
 ## What You Need
