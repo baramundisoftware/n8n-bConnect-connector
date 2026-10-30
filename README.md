@@ -244,7 +244,7 @@ Report security issues to **bernd.wiedemann@baramundi.de** (not via public GitHu
 | Component | Version |
 |-----------|---------|
 | n8n | 2.9.0+ |
-| Node.js (to run n8n) | 22.16+ |
+| Node.js (to run n8n) | 22.23.4+ (or 24.22.1+) |
 | baramundi bConnect API | V2.0 |
 | baramundi bMS | 25R2, 26R1 |
 
