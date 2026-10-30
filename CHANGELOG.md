@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Minimum Node.js is now 22.23.4** (`engines`, `.nvmrc`, CI and publish workflows, docs). Earlier 22.x releases contain the Brotli decoder flaw CVE-2026-111497 ("Node2Shell"), which n8n's HTTP client can reach when decompressing API responses. On Node 24 use 24.22.1 or later; Node 20 is end-of-life and stays unpatched
+
 ## [0.10.0] - 2026-10-07
 
 ### Added
