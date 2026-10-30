@@ -80,7 +80,7 @@
   ],
   "devDependencies": {
     "@n8n/eslint-plugin-community-nodes": "^0.35.0",
-    "@n8n/node-cli": "^0.51.5",
+    "@n8n/node-cli": "^0.54.6",
     "@types/node": "^22.19.0",
     "@vitest/coverage-v8": "^5.0.5",
     "axios": "^1.21.0",
