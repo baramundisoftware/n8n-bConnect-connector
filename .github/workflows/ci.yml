@@ -46,7 +46,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 22.23.4 is the `engines` floor (.nvmrc); 24 is the forward check.
+        # 22.23.4 is the `engines` floor (.nvmrc); 24 is the forward check and
+        # resolves to the newest 24.x (>= 24.22.1, the CVE-2026-111497 fix).
         node: ["22.23.4", "24"]
     steps:
       - uses: actions/checkout@v7
@@ -117,7 +118,7 @@ jobs:
     # with read-write data; not a required check (the mock is a separate project).
     services:
       bconnect-mock:
-        image: ghcr.io/baramundisoftware/bconnect-mock:0.8.0
+        image: ghcr.io/baramundisoftware/bconnect-mock:0.8.1
         ports:
           - 8765:3433
         env:
