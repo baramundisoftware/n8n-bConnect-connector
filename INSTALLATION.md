@@ -29,7 +29,7 @@ This guide provides detailed instructions for installing the baramundi community
 Before installing, ensure you have:
 
 - **n8n**: Version 2.9.0 or higher (self-hosted — n8n Cloud only allows verified community nodes)
-- **Node.js**: Version 22.23.4 or higher (24.x: 24.22.1 or higher) on the n8n host (already included in the official n8n Docker image)
+- **Node.js**: Version 22.23.4 or higher (24.x: 24.22.1 or higher; 26.x: 26.12.1 or higher) on the n8n host (already included in the official n8n Docker image)
 - **npm**: To install the release file
 - **baramundi Management Suite**: With bConnect API enabled (V2.0, bMS 2025 R2 or 2026 R1)
 - **Network Access**: Connection to the baramundi Management Server on port 444
