@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Breaking: the package is now `@baramundi/n8n-nodes-baramundi-management-suite`** (was `n8n-nodes-baramundi-management-suite`), published under the baramundi npm organization. n8n stores the package name in every node's type, so workflows built with 0.10.0 or earlier show the baramundi nodes as unknown until their type prefix is updated; credentials are not affected. INSTALLATION.md → *Upgrade* has the steps. The release file is now `baramundi-n8n-nodes-baramundi-management-suite-<version>.tgz`
 - **Minimum Node.js is now 22.23.4** (`engines`, `.nvmrc`, CI and publish workflows, docs). Earlier 22.x releases contain the Brotli decoder flaw CVE-2026-111497 ("Node2Shell"), which n8n's HTTP client can reach when decompressing API responses. On Node 24 use 24.22.1 or later; Node 20 is end-of-life and stays unpatched
 - `engines.node` is `^22.23.4 || ^24.22.1 || >=26.12.1`: `>=22.23.4` still admitted the unpatched 24.0–24.22.0 and 26.0–26.12.0
 - CI integration tests run against bConnect-Mock 0.9.1 (Node 22.23.4 image; 0.8.0 was built on Node 20). Since 0.9.0 it returns the spec fields bConnect-Mock#86 dropped, so the system test checks a security group's `groupName` on the mock again

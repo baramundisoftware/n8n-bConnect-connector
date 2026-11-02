@@ -41,7 +41,7 @@
       },
       "id": "get-instances",
       "name": "Get All Job Instances",
-      "type": "n8n-nodes-baramundi-management-suite.baramundiJob",
+      "type": "@baramundi/n8n-nodes-baramundi-management-suite.baramundiJob",
       "typeVersion": 1,
       "position": [
         420,
@@ -104,7 +104,7 @@
       },
       "id": "enrich-job-name",
       "name": "Get Job Definition Name",
-      "type": "n8n-nodes-baramundi-management-suite.baramundiJob",
+      "type": "@baramundi/n8n-nodes-baramundi-management-suite.baramundiJob",
       "typeVersion": 1,
       "position": [
         1080,

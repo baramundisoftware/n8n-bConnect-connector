@@ -41,7 +41,7 @@
       },
       "id": "get-groups",
       "name": "Get Logical Groups",
-      "type": "n8n-nodes-baramundi-management-suite.baramundiEndpoint",
+      "type": "@baramundi/n8n-nodes-baramundi-management-suite.baramundiEndpoint",
       "typeVersion": 1,
       "position": [
         420,
@@ -71,7 +71,7 @@
       },
       "id": "set-mw",
       "name": "Set Maintenance Window",
-      "type": "n8n-nodes-baramundi-management-suite.baramundiEndpoint",
+      "type": "@baramundi/n8n-nodes-baramundi-management-suite.baramundiEndpoint",
       "typeVersion": 1,
       "position": [
         640,
@@ -87,7 +87,7 @@
         "returnAll": true
       },
       "name": "Get Endpoints in Group",
-      "type": "n8n-nodes-baramundi-management-suite.baramundiEndpoint",
+      "type": "@baramundi/n8n-nodes-baramundi-management-suite.baramundiEndpoint",
       "typeVersion": 1,
       "position": [
         750,
@@ -108,7 +108,7 @@
       },
       "id": "start-patch-job",
       "name": "Trigger Update Job",
-      "type": "n8n-nodes-baramundi-management-suite.baramundiJob",
+      "type": "@baramundi/n8n-nodes-baramundi-management-suite.baramundiJob",
       "typeVersion": 1,
       "position": [
         860,
@@ -144,7 +144,7 @@
       },
       "id": "get-results",
       "name": "Get Job Results (by Job Def)",
-      "type": "n8n-nodes-baramundi-management-suite.baramundiJob",
+      "type": "@baramundi/n8n-nodes-baramundi-management-suite.baramundiJob",
       "typeVersion": 1,
       "position": [
         1300,

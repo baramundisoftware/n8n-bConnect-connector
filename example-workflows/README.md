@@ -4,7 +4,7 @@ Production-ready n8n workflow templates for the baramundi Management Suite conne
 
 ## Prerequisites
 
-- n8n with `n8n-nodes-baramundi-management-suite` installed
+- n8n with `@baramundi/n8n-nodes-baramundi-management-suite` installed
 - **bConnect API credential** configured (Credentials > Add > "baramundi bConnect API"):
   - Server URL: `https://your-bms-server:444/bconnect`
   - Username / Password: service account with bConnect API access

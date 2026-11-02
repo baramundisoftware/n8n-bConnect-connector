@@ -43,7 +43,7 @@
       },
       "id": "get-endpoints",
       "name": "Get All Endpoints",
-      "type": "n8n-nodes-baramundi-management-suite.baramundiEndpoint",
+      "type": "@baramundi/n8n-nodes-baramundi-management-suite.baramundiEndpoint",
       "typeVersion": 1,
       "position": [
         420,

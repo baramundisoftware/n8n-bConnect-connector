@@ -42,7 +42,7 @@
       },
       "id": "get-vulns",
       "name": "Get All Detected Vulnerabilities",
-      "type": "n8n-nodes-baramundi-management-suite.baramundiSecurity",
+      "type": "@baramundi/n8n-nodes-baramundi-management-suite.baramundiSecurity",
       "typeVersion": 1,
       "position": [
         420,
@@ -58,7 +58,7 @@
       },
       "id": "enrich-cve",
       "name": "Get CVE Details",
-      "type": "n8n-nodes-baramundi-management-suite.baramundiSecurity",
+      "type": "@baramundi/n8n-nodes-baramundi-management-suite.baramundiSecurity",
       "typeVersion": 1,
       "position": [
         640,
@@ -135,7 +135,7 @@
       },
       "id": "enrich-endpoint",
       "name": "Get Endpoint Info",
-      "type": "n8n-nodes-baramundi-management-suite.baramundiEndpoint",
+      "type": "@baramundi/n8n-nodes-baramundi-management-suite.baramundiEndpoint",
       "typeVersion": 1,
       "position": [
         1520,
