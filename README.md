@@ -1,4 +1,4 @@
-# n8n-nodes-baramundi-management-suite
+# @baramundi/n8n-nodes-baramundi-management-suite
 
 Automate your **baramundi Management Suite** (bMS) from [n8n](https://n8n.io/) workflows. This community node connects n8n to your bMS via the bConnect REST API — manage endpoints, run jobs, deploy software, check compliance, and more.
 
@@ -44,18 +44,18 @@ Automate your **baramundi Management Suite** (bMS) from [n8n](https://n8n.io/) w
 
 > [!IMPORTANT]
 > The package is **not on the npm registry yet**, so installing it from
-> **Settings > Community Nodes** or with `npm install n8n-nodes-baramundi-management-suite`
+> **Settings > Community Nodes** or with `npm install @baramundi/n8n-nodes-baramundi-management-suite`
 > does not work at the moment (it fails with *"Package version does not exist"*).
 > Install it from the release file instead, as shown below.
 
-1. Download `n8n-nodes-baramundi-management-suite-<version>.tgz` and its `.sha256` file from the
+1. Download `baramundi-n8n-nodes-baramundi-management-suite-<version>.tgz` and its `.sha256` file from the
    [latest GitHub release](https://github.com/baramundisoftware/n8n-bConnect-connector/releases/latest).
 2. On your n8n server, check the file and install it into n8n's nodes folder:
 
 ```bash
-sha256sum -c n8n-nodes-baramundi-management-suite-0.10.0.tgz.sha256
+sha256sum -c baramundi-n8n-nodes-baramundi-management-suite-0.10.0.tgz.sha256
 mkdir -p ~/.n8n/nodes && cd ~/.n8n/nodes
-npm install /path/to/n8n-nodes-baramundi-management-suite-0.10.0.tgz
+npm install /path/to/baramundi-n8n-nodes-baramundi-management-suite-0.10.0.tgz
 ```
 
 3. Restart n8n.
@@ -112,7 +112,7 @@ If running n8n in Docker, build a custom image with the release file next to you
 ```dockerfile
 FROM n8nio/n8n:latest
 USER root
-COPY n8n-nodes-baramundi-management-suite-0.10.0.tgz /tmp/package.tgz
+COPY baramundi-n8n-nodes-baramundi-management-suite-0.10.0.tgz /tmp/package.tgz
 RUN mkdir -p /home/node/.n8n/nodes && \
     cd /home/node/.n8n/nodes && \
     npm init -y && \

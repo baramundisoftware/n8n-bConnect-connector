@@ -13,7 +13,7 @@ import { NODES, operationsOf } from '../conformance/exerciser';
 import { RELEASES, type Release } from '../conformance/spec';
 
 const DIR = join(__dirname, '../../example-workflows');
-const PACKAGE = 'n8n-nodes-baramundi-management-suite.';
+const PACKAGE = '@baramundi/n8n-nodes-baramundi-management-suite.';
 
 interface WorkflowNode {
   name: string;

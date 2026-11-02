@@ -147,7 +147,7 @@ jobs:
     timeout-minutes: 15
     environment:
       name: npm
-      url: https://www.npmjs.com/package/n8n-nodes-baramundi-management-suite/v/${{ needs.verify.outputs.version }}
+      url: https://www.npmjs.com/package/@baramundi/n8n-nodes-baramundi-management-suite/v/${{ needs.verify.outputs.version }}
     permissions:
       contents: read
       # OIDC token for trusted publishing and the provenance statement.

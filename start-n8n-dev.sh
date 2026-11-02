@@ -15,7 +15,7 @@ set -e
 
 cd "$(dirname "$0")"
 
-PACKAGE_NAME="n8n-nodes-baramundi-management-suite"
+PACKAGE_NAME="@baramundi/n8n-nodes-baramundi-management-suite"
 STAGING_DIR="$HOME/.n8n-node-cli-staging/$PACKAGE_NAME"
 LINK_PATH="$HOME/.n8n/custom/node_modules/$PACKAGE_NAME"
 
