@@ -57,7 +57,7 @@ ProductManagement/
 sbom.json
 *.asc
 
-# Source logo — processed versions live in nodes/*/baramundi.png
+# Old PNG source logo; nodes and credential use icons/baramundi-management-suite.svg
 /baramundi_logo.png
 
 # Claude Code

@@ -22,7 +22,7 @@ export class BaramundiAsset implements INodeType {
   description: INodeTypeDescription = {
     displayName: 'baramundi Asset',
     name: 'baramundiAsset',
-    icon: 'file:baramundi.png',
+    icon: { light: 'file:../../icons/baramundi-management-suite.svg', dark: 'file:../../icons/baramundi-management-suite.svg' },
     group: ['transform'],
     version: 1,
     subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',

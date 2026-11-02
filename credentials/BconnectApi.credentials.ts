@@ -3,6 +3,7 @@ import type {
   ICredentialTestRequest,
   ICredentialType,
   IHttpRequestOptions,
+  Icon,
   INodeProperties,
 } from 'n8n-workflow';
 
@@ -27,6 +28,7 @@ export class BconnectApi implements ICredentialType {
   name = 'bconnectApi';
   // eslint-disable-next-line n8n-nodes-base/cred-class-field-display-name-miscased -- baramundi is a lowercase brand name
   displayName = 'baramundi bConnect API';
+  icon: Icon = { light: 'file:../icons/baramundi-management-suite.svg', dark: 'file:../icons/baramundi-management-suite.svg' };
   // eslint-disable-next-line n8n-nodes-base/cred-class-field-documentation-url-miscased
   documentationUrl = 'https://docs.baramundi.com/';
 
