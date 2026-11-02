@@ -25,7 +25,7 @@ export class BaramundiAdmin implements INodeType {
   description: INodeTypeDescription = {
     displayName: 'baramundi Admin',
     name: 'baramundiAdmin',
-    icon: 'file:baramundi.png',
+    icon: { light: 'file:../../icons/baramundi-management-suite.svg', dark: 'file:../../icons/baramundi-management-suite.svg' },
     group: ['transform'],
     version: 1,
     subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',

@@ -37,7 +37,7 @@ export default tseslint.config(
       // n8n node rules
       'n8n-nodes-base/node-class-description-credentials-name-unsuffixed': 'error',
       'n8n-nodes-base/node-class-description-display-name-unsuffixed-trigger-node': 'error',
-      'n8n-nodes-base/node-class-description-icon-not-svg': 'warn',
+      'n8n-nodes-base/node-class-description-icon-not-svg': 'error',
       // Off, as in @n8n/node-cli's config: they demand ['main'], while the community-node
       // rule node-connection-type-literal demands NodeConnectionTypes.Main.
       'n8n-nodes-base/node-class-description-inputs-wrong-regular-node': 'off',
@@ -110,11 +110,7 @@ export default tseslint.config(
   {
     files: ['nodes/**/*.ts', 'credentials/**/*.ts', 'package.json'],
     rules: {
-      // Known gaps, kept visible as warnings until fixed:
-      // - icons: SVG with light/dark variants, waiting for the official logo
-      '@n8n/community-nodes/icon-validation': 'warn',
-      '@n8n/community-nodes/cred-class-field-icon-missing': 'warn',
-      // `overrides` pins a patched axios in the dev tree only; publish.yml removes the field
+      // `overrides` pins patched axios and qs in the dev tree only; publish.yml removes the field
       // from the published package.json, which is what n8n checks.
       '@n8n/community-nodes/no-overrides-field': 'off',
     },

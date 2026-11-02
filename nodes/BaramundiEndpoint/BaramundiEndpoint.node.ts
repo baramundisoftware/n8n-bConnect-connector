@@ -32,7 +32,7 @@ export class BaramundiEndpoint implements INodeType {
   description: INodeTypeDescription = {
     displayName: 'baramundi Endpoint',
     name: 'baramundiEndpoint',
-    icon: 'file:baramundi.png',
+    icon: { light: 'file:../../icons/baramundi-management-suite.svg', dark: 'file:../../icons/baramundi-management-suite.svg' },
     group: ['transform'],
     version: 1,
     subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
