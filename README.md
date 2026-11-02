@@ -9,15 +9,17 @@ Automate your **baramundi Management Suite** (bMS) from [n8n](https://n8n.io/) w
 > Features, APIs, and behavior may change over time.
 > 
 > Please perform thorough testing before deployment and use at your own risk. It is *not* recommended for production use.
->
+
 > When working with AI services, carefully review permissions, data access, and information shared with models.
 > Avoid using sensitive, confidential, or personal data unless you have verified that your security, privacy, and compliance requirements are met.
 >  
 > Keep an eye on AI token usage, especially during testing, as costs can add up quickly depending on the model and workload.
+>
+><img width="2156" height="758" alt="Screenshot 2026-11-02 144904" src="https://github.com/user-attachments/assets/0cba1735-7229-4170-bce7-8a0b1257e4e4" />
 
 **219 operations** across **6 nodes**, compatible with **baramundi Management Suite 2025 R2 and 2026 R1**.
 
-<img width="1905" height="880" alt="image" src="https://github.com/user-attachments/assets/b12fd43f-1d09-447c-a920-b12a68a78d23" />
+
 
 
 ---
