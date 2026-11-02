@@ -95,6 +95,7 @@
     "n8n-workflow": "*"
   },
   "overrides": {
-    "axios": "$axios"
+    "axios": "$axios",
+    "qs": "6.17.1"
   }
 }
