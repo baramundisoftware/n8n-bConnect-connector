@@ -26,10 +26,18 @@ audit:
 # Local release artifact. Produces the npm tarball,
 # its SHA-256 checksum, and the CycloneDX SBOM. Attach the .tgz + .sha256 + sbom.json
 # to the GitHub Release by hand (create it with: gh release create vX.Y.Z ...).
+# Packs without `overrides`, as publish.yml does (n8n rejects the field), so the tarball
+# matches the one on npm byte for byte; package.json is restored afterwards.
+PACK_WITHOUT_OVERRIDES = cp package.json .package.json.bak; \
+	npm pkg delete overrides; \
+	npm pack $(1); status=$$?; \
+	mv .package.json.bak package.json; \
+	exit $$status
+
 release: ci
 	npm run sbom
 	npm run license-check
-	npm pack
+	@$(call PACK_WITHOUT_OVERRIDES,)
 	@tgz=$$(ls -t *.tgz | head -1); \
 	sha256sum "$$tgz" > "$$tgz.sha256"; \
 	echo ""; \
@@ -41,7 +49,7 @@ release: ci
 # Validation only — build + pack without writing a real tarball.
 release-dry: ci
 	npm run sbom
-	npm pack --dry-run
+	@$(call PACK_WITHOUT_OVERRIDES,--dry-run)
 
 # Publish to the npm registry (requires `npm login`). Runs prepublishOnly (build).
 # npm publishing runs only in GitHub Actions (.github/workflows/publish.yml): n8n accepts
@@ -52,4 +60,4 @@ publish:
 	@exit 1
 
 clean:
-	rm -f *.tgz *.tgz.sha256 sbom.json
+	rm -f *.tgz *.tgz.sha256 sbom.json .package.json.bak

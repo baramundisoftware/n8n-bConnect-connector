@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- `make release` and `make release-dry` pack without the dev-only `overrides` field, as the publish workflow does, so a local release tarball is byte-identical to the one on npm (checked against 0.11.0)
+
 ## [0.11.0] - 2026-11-02
 
 ### Added
