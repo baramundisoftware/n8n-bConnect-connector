@@ -248,32 +248,13 @@ describe.skipIf(skipConfig.skip)('Assets API - System Tests', () => {
       expect(result[0].json.guid).toBe(typeId);
     });
 
-    // Skip this test - creating asset types requires valid parent hierarchy configuration
-    it.skip('should create and delete an asset type', async () => {
-      // Get an existing asset type to use as parent
-      const listContext = createSystemTestContext({
-        returnAll: false,
-        limit: 1,
-      }, config!);
-
-      const existingTypes = await asset.getAssetTypes.call(listContext, 0);
-
-      if (existingTypes.length === 0) {
-        console.warn('No existing asset types to use as parent, skipping create test');
-        return;
-      }
-
-      const parentId = existingTypes[0].json.guidParent as string;
-
-      // CREATE - Only include guidParent if it's not null/empty
-      const additionalFields: any = {};
-      if (parentId && parentId !== '00000000-0000-0000-0000-000000000000') {
-        additionalFields.guidParent = parentId;
-      }
-
+    // Mock only: AssetTypeForCreation requires an ownerId ("GUID of owner"), and which object
+    // a real bMS expects as the owner is not confirmed yet. bConnect-Mock accepts any GUID.
+    it.runIf(process.env.BCONNECT_IS_MOCK === 'true')('should create and delete an asset type', async () => {
       const createContext = createSystemTestContext({
         name: `SystemTest_Type_${Date.now()}`,
-        additionalFields,
+        ownerId: '11111111-2222-3333-4444-555555555555',
+        additionalFields: {},
       }, config!);
 
       const created = await asset.createAssetType.call(createContext, 0);
