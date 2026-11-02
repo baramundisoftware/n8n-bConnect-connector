@@ -10,6 +10,9 @@ import { getSystemTestConfig, skipIfNoCredentials, createSystemTestContext } fro
 import * as server from '../../nodes/BaramundiAdmin/actions/serverManagement/serverManagement.execute';
 
 const skipConfig = skipIfNoCredentials();
+// Operations that would disrupt a real bMS (stop services, restart the server) run only
+// against bConnect-Mock, which accepts them without side effects.
+const isMock = process.env.BCONNECT_IS_MOCK === 'true';
 
 describe.skipIf(skipConfig.skip)('Server Management API - System Tests', () => {
   let config: ReturnType<typeof getSystemTestConfig>;
@@ -98,8 +101,8 @@ describe.skipIf(skipConfig.skip)('Server Management API - System Tests', () => {
       expect(result[0].json.id).toBe(microserviceId);
     });
 
-    // Skip microservice control operations - potentially disruptive
-    it.skip('should start a microservice', async () => {
+    // Microservice control would disrupt a real bMS: mock only.
+    it.runIf(isMock)('should start a microservice', async () => {
       const listContext = createSystemTestContext({}, config!);
       const microservices = await server.getMicroservices.call(listContext, 0);
 
@@ -114,10 +117,10 @@ describe.skipIf(skipConfig.skip)('Server Management API - System Tests', () => {
       }, config!);
 
       const result = await server.startMicroservice.call(context, 0);
-      expect(result).toBeDefined();
+      expect(result[0].json).toEqual({ success: true, microserviceId, action: 'start' });
     });
 
-    it.skip('should stop a microservice', async () => {
+    it.runIf(isMock)('should stop a microservice', async () => {
       const listContext = createSystemTestContext({}, config!);
       const microservices = await server.getMicroservices.call(listContext, 0);
 
@@ -132,10 +135,10 @@ describe.skipIf(skipConfig.skip)('Server Management API - System Tests', () => {
       }, config!);
 
       const result = await server.stopMicroservice.call(context, 0);
-      expect(result).toBeDefined();
+      expect(result[0].json).toEqual({ success: true, microserviceId, action: 'stop' });
     });
 
-    it.skip('should restart a microservice', async () => {
+    it.runIf(isMock)('should restart a microservice', async () => {
       const listContext = createSystemTestContext({}, config!);
       const microservices = await server.getMicroservices.call(listContext, 0);
 
@@ -150,7 +153,7 @@ describe.skipIf(skipConfig.skip)('Server Management API - System Tests', () => {
       }, config!);
 
       const result = await server.restartMicroservice.call(context, 0);
-      expect(result).toBeDefined();
+      expect(result[0].json).toEqual({ success: true, microserviceId, action: 'restart' });
     });
   });
 
@@ -330,17 +333,17 @@ describe.skipIf(skipConfig.skip)('Server Management API - System Tests', () => {
   });
 
   describe('Server Control Operations', () => {
-    // Skip server restart operations - highly disruptive
-    it.skip('should restart management server', async () => {
+    // Restarting the management server would disrupt a real bMS: mock only.
+    it.runIf(isMock)('should restart management server', async () => {
       const context = createSystemTestContext({}, config!);
       const result = await server.restartManagementServer.call(context, 0);
-      expect(result).toBeDefined();
+      expect(result[0].json).toEqual({ success: true, action: 'restart' });
     });
 
-    it.skip('should cancel scheduled restart', async () => {
+    it.runIf(isMock)('should cancel scheduled restart', async () => {
       const context = createSystemTestContext({}, config!);
       const result = await server.cancelScheduledRestart.call(context, 0);
-      expect(result).toBeDefined();
+      expect(result[0].json).toEqual({ success: true, action: 'cancel_restart' });
     });
   });
 
