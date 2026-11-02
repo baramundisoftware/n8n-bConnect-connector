@@ -37,7 +37,7 @@ updates:
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
       # eslint is peer-pinned to an EXACT version by @n8n/node-cli
-      # (0.51 still pins eslint 9.29.0), so any eslint bump breaks `npm ci`.
+      # (0.54 still pins eslint 9.29.0), so any eslint bump breaks `npm ci`.
       # It is governed by node-cli — ignore all updates; it moves only when
       # node-cli is upgraded as a deliberate task.
       - dependency-name: "eslint"
@@ -50,6 +50,7 @@ updates:
       # @n8n/node-cli is the build toolchain — upgrade it as a deliberate,
       # locally-verified task. It is a 0.x package, so its meaningful bumps are
       # semver-minor; ignore both minor and major so Dependabot never auto-PRs it.
+      # Security updates ignore these rules: #79 (handlebars) moved it to 0.54.
       - dependency-name: "@n8n/node-cli"
         update-types:
           - "version-update:semver-major"

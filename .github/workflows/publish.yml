@@ -119,7 +119,7 @@ jobs:
       - name: License check (runtime dependencies)
         run: npm run license-check
 
-      # `overrides` pins a patched axios in the dev tree only; n8n does not allow the field in
+      # `overrides` pins patched axios and qs in the dev tree only; n8n does not allow the field in
       # a published community package. Drop it from the manifest that gets packed, then check
       # that manifest with n8n's rule.
       - name: Remove dev-only overrides from the published package.json
