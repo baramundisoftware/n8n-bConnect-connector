@@ -2,20 +2,18 @@
 
 This guide provides detailed instructions for installing the baramundi community node for n8n.
 
-> [!IMPORTANT]
-> The package is **not published to the npm registry yet**. Installing it from
-> **Settings > Community Nodes** in n8n, or with `npm install @baramundi/n8n-nodes-baramundi-management-suite`,
-> fails with *"Package version does not exist"*. The n8n Community Nodes screen can only install
-> packages from npm, so until the package is published, install it from the release file
-> (Method 1 or Method 2 below).
+> [!NOTE]
+> The package is on npm as `@baramundi/n8n-nodes-baramundi-management-suite` from version 0.11.0 on. Versions up to 0.10.0 exist only as
+> release files, under the old name `n8n-nodes-baramundi-management-suite`; to move from one of
+> those, see [Upgrade](#from-0100-or-earlier-the-package-was-renamed).
 
 ## Table of Contents
 
 1. [Prerequisites](#prerequisites)
 2. [Installation Methods](#installation-methods)
-   - [Method 1: Install from the Release File (Recommended)](#method-1-install-from-the-release-file-recommended)
-   - [Method 2: Docker Installation](#method-2-docker-installation)
-   - [Method 3: npm Registry (not available yet)](#method-3-npm-registry-not-available-yet)
+   - [Method 1: n8n Community Nodes (Recommended)](#method-1-n8n-community-nodes-recommended)
+   - [Method 2: Install from the Release File](#method-2-install-from-the-release-file)
+   - [Method 3: Docker Installation](#method-3-docker-installation)
 3. [Verify Package Integrity](#verify-package-integrity)
 4. [Verify Installation](#verify-installation)
 5. [Upgrade](#upgrade)
@@ -38,7 +36,28 @@ Before installing, ensure you have:
 
 ## Installation Methods
 
-### Method 1: Install from the Release File (Recommended)
+### Method 1: n8n Community Nodes (Recommended)
+
+1. In n8n, open **Settings > Community Nodes** and click **Install**.
+2. Enter `@baramundi/n8n-nodes-baramundi-management-suite`, confirm that you understand the risks of community nodes, and click
+   **Install**.
+3. The six baramundi nodes appear in the nodes panel; search for "baramundi".
+
+The same from the command line, in n8n's nodes folder:
+
+```bash
+mkdir -p ~/.n8n/nodes && cd ~/.n8n/nodes
+npm install @baramundi/n8n-nodes-baramundi-management-suite
+```
+
+Then restart n8n. Each version on npm carries a provenance statement that links it to the GitHub
+Actions run that built it; `npm audit signatures` checks it.
+
+---
+
+### Method 2: Install from the Release File
+
+Use this when the n8n server cannot reach the npm registry.
 
 Each [GitHub release](https://github.com/baramundisoftware/n8n-bConnect-connector/releases)
 contains two files:
@@ -46,7 +65,7 @@ contains two files:
 - `baramundi-n8n-nodes-baramundi-management-suite-<version>.tgz` — the package
 - `baramundi-n8n-nodes-baramundi-management-suite-<version>.tgz.sha256` — its SHA-256 checksum
 
-The examples below use version `0.10.0`; replace it with the version you downloaded.
+The examples below use version `0.11.0`; replace it with the version you downloaded.
 
 #### Step 1: Download
 
@@ -55,7 +74,7 @@ Download both files from the
 or on the n8n server:
 
 ```bash
-VERSION=0.10.0
+VERSION=0.11.0
 BASE=https://github.com/baramundisoftware/n8n-bConnect-connector/releases/download/v$VERSION
 curl -fLO "$BASE/baramundi-n8n-nodes-baramundi-management-suite-$VERSION.tgz"
 curl -fLO "$BASE/baramundi-n8n-nodes-baramundi-management-suite-$VERSION.tgz.sha256"
@@ -67,7 +86,7 @@ If the n8n server has no internet access, download the files elsewhere and copy 
 #### Step 2: Verify the Checksum
 
 ```bash
-sha256sum -c baramundi-n8n-nodes-baramundi-management-suite-0.10.0.tgz.sha256
+sha256sum -c baramundi-n8n-nodes-baramundi-management-suite-0.11.0.tgz.sha256
 ```
 
 See [Verify Package Integrity](#verify-package-integrity).
@@ -77,7 +96,7 @@ See [Verify Package Integrity](#verify-package-integrity).
 ```bash
 mkdir -p ~/.n8n/nodes
 cd ~/.n8n/nodes
-npm install /path/to/baramundi-n8n-nodes-baramundi-management-suite-0.10.0.tgz
+npm install /path/to/baramundi-n8n-nodes-baramundi-management-suite-0.11.0.tgz
 ```
 
 `~/.n8n` is the n8n user folder of the account that runs n8n (or the folder set in `N8N_USER_FOLDER`).
@@ -94,9 +113,11 @@ n8n start
 
 ---
 
-### Method 2: Docker Installation
+### Method 3: Docker Installation
 
-Put the downloaded `.tgz` next to your `Dockerfile` or `docker-compose.yml`.
+To install from npm, use `npm install --ignore-scripts @baramundi/n8n-nodes-baramundi-management-suite` in place of the `COPY` line and
+the `.tgz` path below. For the release file, put the downloaded `.tgz` next to your `Dockerfile` or
+`docker-compose.yml`.
 
 #### Option A: Custom Dockerfile
 
@@ -104,7 +125,7 @@ Put the downloaded `.tgz` next to your `Dockerfile` or `docker-compose.yml`.
 FROM n8nio/n8n:latest
 
 USER root
-COPY baramundi-n8n-nodes-baramundi-management-suite-0.10.0.tgz /tmp/package.tgz
+COPY baramundi-n8n-nodes-baramundi-management-suite-0.11.0.tgz /tmp/package.tgz
 RUN mkdir -p /home/node/.n8n/nodes && \
     cd /home/node/.n8n/nodes && \
     npm init -y && \
@@ -139,7 +160,7 @@ services:
       dockerfile_inline: |
         FROM n8nio/n8n:latest
         USER root
-        COPY baramundi-n8n-nodes-baramundi-management-suite-0.10.0.tgz /tmp/package.tgz
+        COPY baramundi-n8n-nodes-baramundi-management-suite-0.11.0.tgz /tmp/package.tgz
         RUN mkdir -p /home/node/.n8n/nodes && \
             cd /home/node/.n8n/nodes && \
             npm init -y && \
@@ -162,38 +183,23 @@ docker compose up -d --build
 
 ---
 
-### Method 3: npm Registry (not available yet)
-
-> **Note**: npm registry publishing is pending approval. Once the package is published, you can
-> install it from **Settings > Community Nodes** in n8n by entering
-> `@baramundi/n8n-nodes-baramundi-management-suite`, or with:
->
-> ```bash
-> cd ~/.n8n/nodes
-> npm install @baramundi/n8n-nodes-baramundi-management-suite
-> ```
->
-> Until then, these commands fail with *"Package version does not exist"* / `404 Not Found`.
-
----
-
 ## Verify Package Integrity
 
 Every release includes a SHA-256 checksum file. Run the check in the folder that contains both files:
 
 ```bash
-sha256sum -c baramundi-n8n-nodes-baramundi-management-suite-0.10.0.tgz.sha256
+sha256sum -c baramundi-n8n-nodes-baramundi-management-suite-0.11.0.tgz.sha256
 ```
 
 Expected output:
 ```
-baramundi-n8n-nodes-baramundi-management-suite-0.10.0.tgz: OK
+baramundi-n8n-nodes-baramundi-management-suite-0.11.0.tgz: OK
 ```
 
 On Windows (PowerShell), compare the hash with the value in the `.sha256` file:
 
 ```powershell
-Get-FileHash .\baramundi-n8n-nodes-baramundi-management-suite-0.10.0.tgz -Algorithm SHA256
+Get-FileHash .\baramundi-n8n-nodes-baramundi-management-suite-0.11.0.tgz -Algorithm SHA256
 ```
 
 If the checksum does not match, do **not** install the package. Download it again from the
@@ -223,7 +229,7 @@ npm list @baramundi/n8n-nodes-baramundi-management-suite
 Expected output:
 ```
 nodes
-└── @baramundi/n8n-nodes-baramundi-management-suite@0.10.0
+└── @baramundi/n8n-nodes-baramundi-management-suite@0.11.0
 ```
 
 ---
@@ -324,9 +330,9 @@ type (`bconnectApi`) does not contain the package name.
 
 ### "Package version does not exist" in Community Nodes
 
-The package is not on the npm registry yet. Install it from the release file
-([Method 1](#method-1-install-from-the-release-file-recommended) or
-[Method 2](#method-2-docker-installation)).
+The package name is `@baramundi/n8n-nodes-baramundi-management-suite`. The old unscoped name
+`n8n-nodes-baramundi-management-suite` was never on npm; versions up to 0.10.0 exist only as
+[release files](#method-2-install-from-the-release-file).
 
 ### Node Not Appearing in n8n
 

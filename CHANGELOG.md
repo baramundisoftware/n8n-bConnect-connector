@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-02
+
+### Added
+- **On npm**: the package is published to the npm registry under the baramundi organization, with a provenance statement from GitHub Actions. It installs from n8n's **Settings > Community Nodes** with `@baramundi/n8n-nodes-baramundi-management-suite` (#21)
+
 ### Changed
 - **Breaking: the package is now `@baramundi/n8n-nodes-baramundi-management-suite`** (was `n8n-nodes-baramundi-management-suite`), published under the baramundi npm organization. n8n stores the package name in every node's type, so workflows built with 0.10.0 or earlier show the baramundi nodes as unknown until their type prefix is updated; credentials are not affected. INSTALLATION.md → *Upgrade* has the steps. The release file is now `baramundi-n8n-nodes-baramundi-management-suite-<version>.tgz`
 - **Minimum Node.js is now 22.23.4** (`engines`, `.nvmrc`, CI and publish workflows, docs). Earlier 22.x releases contain the Brotli decoder flaw CVE-2026-111497 ("Node2Shell"), which n8n's HTTP client can reach when decompressing API responses. On Node 24 use 24.22.1 or later; Node 20 is end-of-life and stays unpatched
