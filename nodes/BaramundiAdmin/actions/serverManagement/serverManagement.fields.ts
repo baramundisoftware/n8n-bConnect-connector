@@ -1,5 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
-import { SINCE_26R1 } from '../../../shared/utils/versionGating';
+import { SINCE_26R1, SINCE_26R2 } from '../../../shared/utils/versionGating';
 
 export const serverManagementOperations: INodeProperties[] = [
   {
@@ -17,6 +17,24 @@ export const serverManagementOperations: INodeProperties[] = [
         name: 'Cancel Scheduled Restart',
         value: 'cancelScheduledRestart',
         action: 'Cancel scheduled restart',
+      },
+      {
+        name: 'Create API Key',
+        value: 'createApiKey',
+        description: 'Create an API key; the output contains its secret (requires bMS 26R2+)',
+        action: 'Create API key',
+      },
+      {
+        name: 'Delete API Key',
+        value: 'deleteApiKey',
+        description: 'Delete an API key (requires bMS 26R2+)',
+        action: 'Delete API key',
+      },
+      {
+        name: 'Get API Key',
+        value: 'getApiKey',
+        description: 'Get an API key by ID (requires bMS 26R2+)',
+        action: 'Get API key',
       },
       {
         name: 'Get API Keys',
@@ -89,6 +107,12 @@ export const serverManagementOperations: INodeProperties[] = [
         value: 'simulateMSWCleanup',
         description: 'Simulate MSW cleanup (requires bMS 26R1+)',
         action: 'Simulate MSW cleanup',
+      },
+      {
+        name: 'Update API Key',
+        value: 'updateApiKey',
+        description: 'Update an API key (requires bMS 26R2+)',
+        action: 'Update API key',
       },
     ],
     default: 'getManagementServer',
@@ -498,6 +522,111 @@ export const serverManagementFields: INodeProperties[] = [
       },
     },
     description: 'The GUID of the download job',
+  },
+
+  // ============================================================================
+  // API KEYS (26R2+; listing exists from 26R1 on)
+  // ============================================================================
+  {
+    displayName: 'API Key ID',
+    name: 'apiKeyId',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['serverManagement'],
+        operation: ['getApiKey', 'updateApiKey', 'deleteApiKey'],
+        bmsVersion: SINCE_26R2,
+      },
+    },
+    description: 'The GUID of the API key',
+  },
+  {
+    displayName:
+      'The output contains the API key secret, which bMS shows only this once. n8n keeps it in the execution data: turn off saving successful executions for this workflow, or pass the secret on and remove it in the next node.',
+    name: 'apiKeySecretNotice',
+    type: 'notice',
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['serverManagement'],
+        operation: ['createApiKey'],
+        bmsVersion: SINCE_26R2,
+      },
+    },
+  },
+  {
+    displayName: 'Name',
+    name: 'apiKeyName',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['serverManagement'],
+        operation: ['createApiKey'],
+        bmsVersion: SINCE_26R2,
+      },
+    },
+    description: 'The name of the API key (up to 256 characters)',
+  },
+  {
+    displayName: 'Security Profile IDs',
+    name: 'securityProfileIds',
+    type: 'string',
+    required: true,
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['serverManagement'],
+        operation: ['createApiKey'],
+        bmsVersion: SINCE_26R2,
+      },
+    },
+    description: 'Comma-separated GUIDs of the security profiles assigned to the API key',
+  },
+  {
+    displayName: 'Additional Fields',
+    name: 'apiKeyFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['serverManagement'],
+        operation: ['createApiKey'],
+        bmsVersion: SINCE_26R2,
+      },
+    },
+    options: [
+      { displayName: 'Comment', name: 'comment', type: 'string', default: '', description: 'A comment on the API key (up to 4000 characters)' },
+      { displayName: 'Expiration Date', name: 'expirationDate', type: 'dateTime', default: '', description: 'The day the API key expires' },
+      { displayName: 'Is Active', name: 'isActive', type: 'boolean', default: true, description: 'Whether the API key can be used' },
+      { displayName: 'Is Available via Gateway', name: 'isAvailableViaGateway', type: 'boolean', default: false, description: 'Whether the API key can be used through the baramundi Gateway' },
+    ],
+  },
+  {
+    displayName: 'Update Fields',
+    name: 'apiKeyUpdateFields',
+    type: 'collection',
+    placeholder: 'Add Field',
+    default: {},
+    displayOptions: {
+      show: {
+        resource: ['serverManagement'],
+        operation: ['updateApiKey'],
+        bmsVersion: SINCE_26R2,
+      },
+    },
+    options: [
+      { displayName: 'Comment', name: 'comment', type: 'string', default: '', description: 'A comment on the API key (up to 4000 characters)' },
+      { displayName: 'Expiration Date', name: 'expirationDate', type: 'dateTime', default: '', description: 'The day the API key expires' },
+      { displayName: 'Is Active', name: 'isActive', type: 'boolean', default: true, description: 'Whether the API key can be used' },
+      { displayName: 'Is Available via Gateway', name: 'isAvailableViaGateway', type: 'boolean', default: false, description: 'Whether the API key can be used through the baramundi Gateway' },
+      { displayName: 'Name', name: 'name', type: 'string', default: '', description: 'The name of the API key (up to 256 characters)' },
+      { displayName: 'Security Profile IDs', name: 'securityProfileIds', type: 'string', default: '', description: 'Comma-separated GUIDs of the security profiles; replaces the current list' },
+    ],
   },
 ];
 

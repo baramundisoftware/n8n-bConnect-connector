@@ -17,7 +17,7 @@ import {
   microserviceOperations, microserviceFields,
 } from './actions/serverManagement/serverManagement.fields';
 import { operatingSystemOperations, operatingSystemFields } from './actions/operatingSystem/operatingSystem.fields';
-import { SINCE_26R1, versionedOptions } from '../shared/utils/versionGating';
+import { SINCE_26R1, SINCE_26R2, versionedOptions } from '../shared/utils/versionGating';
 import { router } from './actions/router';
 import { getOrgUnits, endpointSearch } from '../shared/loadOptions';
 
@@ -99,7 +99,8 @@ export class BaramundiAdmin implements INodeType {
       ...adGroupOperations,
       ...adObjectOperations,
       ...orgUnitOperations,
-      // API keys, MSW cleanup and download jobs exist from 26R1 on; cloud connectors were removed in 26R2
+      // API key list, MSW cleanup and download jobs exist from 26R1 on, API key management from 26R2 on;
+      // cloud connectors were removed in 26R2
       ...versionedOptions(serverManagementOperations, {
         getApiKeys: SINCE_26R1,
         getDipsMSWCleanup: SINCE_26R1,
@@ -107,6 +108,10 @@ export class BaramundiAdmin implements INodeType {
         getDownloadJob: SINCE_26R1,
         getDownloadJobs: SINCE_26R1,
         getCloudConnectors: ['25R2', '26R1'],
+        getApiKey: SINCE_26R2,
+        createApiKey: SINCE_26R2,
+        updateApiKey: SINCE_26R2,
+        deleteApiKey: SINCE_26R2,
       }),
       ...microserviceOperations,
       ...operatingSystemOperations,

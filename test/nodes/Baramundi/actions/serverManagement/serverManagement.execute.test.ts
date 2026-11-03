@@ -29,6 +29,10 @@ import {
   getDipsMSWCleanup,
   simulateMSWCleanup,
   getApiKeys,
+  getApiKey,
+  createApiKey,
+  updateApiKey,
+  deleteApiKey,
   getDownloadJobs,
   getDownloadJob,
 } from '../../../../../nodes/BaramundiAdmin/actions/serverManagement/serverManagement.execute';
@@ -712,6 +716,97 @@ describe('ServerManagement Phase 4 - New Operations', () => {
       const mockContext = createMockExecuteFunctions({}, {}, [{ id: 'key1', name: 'ApiKey1' }]);
       const result = await getApiKeys.call(mockContext, 0);
       expect(result).toHaveLength(1);
+    });
+  });
+
+  // #93: API key management, bMS 26R2
+  describe('API keys (26R2)', () => {
+    const KEY_ID = 'a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1';
+    const PROFILE_1 = 'b2b2b2b2-b2b2-4b2b-8b2b-b2b2b2b2b2b2';
+    const PROFILE_2 = 'c3c3c3c3-c3c3-4c3c-8c3c-c3c3c3c3c3c3';
+    const lastCall = (mock: IExecuteFunctions) => {
+      const calls = (mock.helpers.httpRequest as ReturnType<typeof vi.fn>).mock.calls;
+      return calls[calls.length - 1][0];
+    };
+
+    it('getApiKey gets a key by ID', async () => {
+      const mock = createMockExecuteFunctions({ apiKeyId: KEY_ID }, {}, { id: KEY_ID, name: 'n8n' });
+      const result = await getApiKey.call(mock, 0);
+      expect(result[0].json).toEqual({ id: KEY_ID, name: 'n8n' });
+      expect(lastCall(mock).url).toContain(`/servermanagement/v2.0/ApiKeys/${KEY_ID}`);
+    });
+
+    it('getApiKey rejects an invalid ID', async () => {
+      const mock = createMockExecuteFunctions({ apiKeyId: 'key1' });
+      await expect(getApiKey.call(mock, 0)).rejects.toThrow();
+    });
+
+    it('createApiKey posts ApiKeyForCreation and returns the secret', async () => {
+      const created = { id: KEY_ID, name: 'n8n', securityProfiles: [PROFILE_1, PROFILE_2], apiKeySecret: 'secret-shown-once' };
+      const mock = createMockExecuteFunctions(
+        {
+          apiKeyName: 'n8n',
+          securityProfileIds: ` ${PROFILE_1}, ${PROFILE_2} `,
+          apiKeyFields: { expirationDate: '2027-06-30T00:00:00.000Z', isActive: true, isAvailableViaGateway: false, comment: 'automation' },
+        },
+        {},
+        created,
+      );
+      const result = await createApiKey.call(mock, 0);
+      expect(result[0].json.apiKeySecret).toBe('secret-shown-once');
+      const call = lastCall(mock);
+      expect(call.method).toBe('POST');
+      expect(call.url).toContain('/servermanagement/v2.0/ApiKeys');
+      expect(call.body).toEqual({
+        name: 'n8n',
+        securityProfiles: [PROFILE_1, PROFILE_2],
+        expirationDate: '2027-06-30',
+        isActive: true,
+        isAvailableViaGateway: false,
+        comment: 'automation',
+      });
+    });
+
+    it('createApiKey requires valid security profile IDs', async () => {
+      await expect(createApiKey.call(createMockExecuteFunctions({ apiKeyName: 'n8n', securityProfileIds: 'Administrators' }), 0)).rejects.toThrow(/Administrators/);
+      await expect(createApiKey.call(createMockExecuteFunctions({ apiKeyName: 'n8n', securityProfileIds: ' , ' }), 0)).rejects.toThrow(/none given/);
+    });
+
+    it('createApiKey rejects a name over 256 characters', async () => {
+      const mock = createMockExecuteFunctions({ apiKeyName: 'x'.repeat(257), securityProfileIds: PROFILE_1 });
+      await expect(createApiKey.call(mock, 0)).rejects.toThrow(/256/);
+    });
+
+    it('updateApiKey sends a JSON Patch with the spec paths', async () => {
+      const mock = createMockExecuteFunctions(
+        { apiKeyId: KEY_ID, apiKeyUpdateFields: { name: 'renamed', isActive: false, securityProfileIds: PROFILE_2, expirationDate: '2027-01-01T12:00:00' } },
+        {},
+        { id: KEY_ID, name: 'renamed', isActive: false },
+      );
+      const result = await updateApiKey.call(mock, 0);
+      expect(result[0].json).toMatchObject({ name: 'renamed', isActive: false });
+      const call = lastCall(mock);
+      expect(call.method).toBe('PATCH');
+      expect(call.body).toEqual([
+        { op: 'replace', path: '/Name', value: 'renamed' },
+        { op: 'replace', path: '/IsActive', value: false },
+        { op: 'replace', path: '/SecurityProfiles', value: [PROFILE_2] },
+        { op: 'replace', path: '/ExpirationDate', value: '2027-01-01' },
+      ]);
+    });
+
+    it('updateApiKey can clear the comment but refuses an empty update', async () => {
+      const mock = createMockExecuteFunctions({ apiKeyId: KEY_ID, apiKeyUpdateFields: { comment: '' } }, {}, { id: KEY_ID });
+      await updateApiKey.call(mock, 0);
+      expect(lastCall(mock).body).toEqual([{ op: 'replace', path: '/Comment', value: '' }]);
+      await expect(updateApiKey.call(createMockExecuteFunctions({ apiKeyId: KEY_ID, apiKeyUpdateFields: { name: '' } }), 0)).rejects.toThrow(/No fields/);
+    });
+
+    it('deleteApiKey deletes a key', async () => {
+      const mock = createMockExecuteFunctions({ apiKeyId: KEY_ID }, {}, undefined);
+      const result = await deleteApiKey.call(mock, 0);
+      expect(result[0].json).toEqual({ success: true, deletedId: KEY_ID });
+      expect(lastCall(mock).method).toBe('DELETE');
     });
   });
 
