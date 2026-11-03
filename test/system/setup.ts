@@ -18,6 +18,12 @@ export interface SystemTestConfig {
 }
 
 /**
+ * bMS version the server runs, from BCONNECT_BMS_VERSION (25r2, 26r1 or 26r2, as bConnect-Mock
+ * takes it; default 26R1): for tests of routes a version added or removed
+ */
+export const bmsVersion = (process.env.BCONNECT_BMS_VERSION || '26R1').toUpperCase();
+
+/**
  * Get system test configuration from environment variables
  * Returns null if credentials are not configured
  */

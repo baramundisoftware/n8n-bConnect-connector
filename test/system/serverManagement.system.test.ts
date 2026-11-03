@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { getSystemTestConfig, skipIfNoCredentials, createSystemTestContext } from './setup';
+import { getSystemTestConfig, skipIfNoCredentials, createSystemTestContext, bmsVersion } from './setup';
 import * as server from '../../nodes/BaramundiAdmin/actions/serverManagement/serverManagement.execute';
 
 const skipConfig = skipIfNoCredentials();
@@ -158,7 +158,8 @@ describe.skipIf(skipConfig.skip)('Server Management API - System Tests', () => {
   });
 
   describe('Cloud Connectors and PXE Relays', () => {
-    it('should fetch cloud connectors', async () => {
+    // 26R2 removed GET /CloudConnectors (#93), and the node does not offer it there
+    it.skipIf(bmsVersion === '26R2')('should fetch cloud connectors', async () => {
       const context = createSystemTestContext({}, config!);
       const result = await server.getCloudConnectors.call(context, 0);
 
