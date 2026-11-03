@@ -131,6 +131,7 @@ jobs:
       BCONNECT_PASSWORD: ci
       BCONNECT_IGNORE_SSL: "false"
       BCONNECT_IS_MOCK: "true"
+      BCONNECT_BMS_VERSION: 26r1 # the mock's version, for tests of routes a version added or removed
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
