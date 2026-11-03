@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { SINCE_26R1 } from '../../../shared/utils/versionGating';
 import { endpointLocator } from '../../../shared/resourceLocators';
 
 export const complianceOperations: INodeProperties[] = [{
@@ -6,7 +7,7 @@ export const complianceOperations: INodeProperties[] = [{
 	name: 'operation',
 	type: 'options',
 	noDataExpression: true,
-	displayOptions: { show: { resource: ['compliance'], bmsVersion: ['26R1'] } },
+	displayOptions: { show: { resource: ['compliance'], bmsVersion: SINCE_26R1 } },
 	options: [
 		{ name: 'Get Detected Rule Violations', value: 'getDetectedRuleViolations', description: 'Get all detected configuration rule violations', action: 'Get detected rule violations' },
 		{ name: 'Get Detected Rule Violations by Endpoint', value: 'getDetectedRuleViolationsByEndpoint', description: 'Get detected rule violations for a specific endpoint', action: 'Get detected rule violations by endpoint' },
@@ -27,7 +28,7 @@ export const complianceFields: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		displayOptions: { show: { resource: ['compliance'], operation: ['getRule'], bmsVersion: ['26R1'] } },
+		displayOptions: { show: { resource: ['compliance'], operation: ['getRule'], bmsVersion: SINCE_26R1 } },
 		description: 'The GUID of the compliance rule',
 	},
 	{
@@ -36,16 +37,16 @@ export const complianceFields: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		displayOptions: { show: { resource: ['compliance'], operation: ['getVulnerability'], bmsVersion: ['26R1'] } },
+		displayOptions: { show: { resource: ['compliance'], operation: ['getVulnerability'], bmsVersion: SINCE_26R1 } },
 		description: 'The GUID of the vulnerability',
 	},
-	endpointLocator({ show: { resource: ['compliance'], operation: ['getDetectedVulnerabilitiesByEndpoint', 'getDetectedRuleViolationsByEndpoint'], bmsVersion: ['26R1'] } }),
+	endpointLocator({ show: { resource: ['compliance'], operation: ['getDetectedVulnerabilitiesByEndpoint', 'getDetectedRuleViolationsByEndpoint'], bmsVersion: SINCE_26R1 } }),
 	{
 		displayName: 'Return All',
 		name: 'returnAll',
 		type: 'boolean',
 		default: false,
-		displayOptions: { show: { resource: ['compliance'], operation: ['getRules', 'getVulnerabilities', 'getDetectedVulnerabilities', 'getDetectedVulnerabilitiesByEndpoint', 'getDetectedRuleViolations', 'getDetectedRuleViolationsByEndpoint'], bmsVersion: ['26R1'] } },
+		displayOptions: { show: { resource: ['compliance'], operation: ['getRules', 'getVulnerabilities', 'getDetectedVulnerabilities', 'getDetectedVulnerabilitiesByEndpoint', 'getDetectedRuleViolations', 'getDetectedRuleViolationsByEndpoint'], bmsVersion: SINCE_26R1 } },
 		description: 'Whether to return all results or only up to a given limit',
     hint: 'Results are capped at 5,000 items regardless of this setting',
 	},
@@ -55,7 +56,7 @@ export const complianceFields: INodeProperties[] = [
 		type: 'number',
 		typeOptions: { minValue: 1 },
 		default: 50,
-		displayOptions: { show: { resource: ['compliance'], operation: ['getRules', 'getVulnerabilities', 'getDetectedVulnerabilities', 'getDetectedVulnerabilitiesByEndpoint', 'getDetectedRuleViolations', 'getDetectedRuleViolationsByEndpoint'], returnAll: [false], bmsVersion: ['26R1'] } },
+		displayOptions: { show: { resource: ['compliance'], operation: ['getRules', 'getVulnerabilities', 'getDetectedVulnerabilities', 'getDetectedVulnerabilitiesByEndpoint', 'getDetectedRuleViolations', 'getDetectedRuleViolationsByEndpoint'], returnAll: [false], bmsVersion: SINCE_26R1 } },
 		description: 'Max number of results to return',
 	},
 	{
@@ -64,7 +65,7 @@ export const complianceFields: INodeProperties[] = [
 		type: 'collection',
 		placeholder: 'Add Option',
 		default: {},
-		displayOptions: { show: { resource: ['compliance'], operation: ['getRules', 'getVulnerabilities', 'getDetectedVulnerabilities', 'getDetectedRuleViolations'], bmsVersion: ['26R1'] } },
+		displayOptions: { show: { resource: ['compliance'], operation: ['getRules', 'getVulnerabilities', 'getDetectedVulnerabilities', 'getDetectedRuleViolations'], bmsVersion: SINCE_26R1 } },
 		options: [
 			{ displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order for results' },
 		],

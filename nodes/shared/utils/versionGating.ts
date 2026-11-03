@@ -1,30 +1,53 @@
 import type { INodeProperties } from 'n8n-workflow';
 
+/** bMS versions the nodes support, oldest first (values of the `bmsVersion` parameter). */
+export const BMS_VERSIONS = ['25R2', '26R1', '26R2'] as const;
+export type BmsVersion = (typeof BMS_VERSIONS)[number];
+
+/** `bmsVersion` values for features added in 26R1: use in `displayOptions.show`. */
+export const SINCE_26R1: BmsVersion[] = ['26R1', '26R2'];
+
 /**
- * Offer some options of a property only for bMS 26R1.
+ * Offer some options of a property only for some bMS versions.
  *
- * Every property named `name` that is not already tied to a bmsVersion is
- * replaced by two copies: a 25R2 copy without the 26R1-only options and a
- * 26R1 copy with all of them. A 25R2 copy left without options is dropped.
- * Used for operation and resource lists whose routes exist in 26R1 only.
+ * `availableIn` maps an option value to the versions that have it; options it
+ * does not name exist in every version. Every property named `name` that is not
+ * already tied to a bmsVersion and has a gated option is replaced by one copy
+ * per distinct option list, shown for the versions that share it. A copy left
+ * without options is dropped.
  */
-export function only26R1Options(props: INodeProperties[], only26R1: string[], name = 'operation'): INodeProperties[] {
-	const later = new Set(only26R1);
+export function versionedOptions(
+	props: INodeProperties[],
+	availableIn: Record<string, readonly BmsVersion[]>,
+	name = 'operation',
+): INodeProperties[] {
 	return props.flatMap((p) => {
 		const show = p.displayOptions?.show ?? {};
 		const options = (p.options ?? []) as Array<{ value: unknown }>;
-		if (p.name !== name || 'bmsVersion' in show || !options.some((o) => later.has(String(o.value)))) return [p];
+		if (p.name !== name || 'bmsVersion' in show || !options.some((o) => String(o.value) in availableIn)) return [p];
 
-		const forVersion = (version: string, opts: Array<{ value: unknown }>): INodeProperties => {
+		const copies = new Map<string, { versions: BmsVersion[]; options: Array<{ value: unknown }> }>();
+		for (const version of BMS_VERSIONS) {
+			const opts = options.filter((o) => availableIn[String(o.value)]?.includes(version) ?? true);
+			if (!opts.length) continue;
+			const key = opts.map((o) => String(o.value)).join('\n');
+			const copy = copies.get(key) ?? { versions: [], options: opts };
+			copy.versions.push(version);
+			copies.set(key, copy);
+		}
+		return [...copies.values()].map(({ versions, options: opts }): INodeProperties => {
 			const values = opts.map((o) => o.value);
 			return {
 				...p,
-				displayOptions: { ...p.displayOptions, show: { ...show, bmsVersion: [version] } },
+				displayOptions: { ...p.displayOptions, show: { ...show, bmsVersion: versions } },
 				options: opts as INodeProperties['options'],
 				default: values.includes(p.default) ? p.default : (values[0] as INodeProperties['default']),
 			};
-		};
-		const options25R2 = options.filter((o) => !later.has(String(o.value)));
-		return [...(options25R2.length ? [forVersion('25R2', options25R2)] : []), forVersion('26R1', options)];
+		});
 	});
+}
+
+/** Offer some options of a property only from bMS 26R1 on (see {@link versionedOptions}). */
+export function since26R1Options(props: INodeProperties[], since26R1: string[], name = 'operation'): INodeProperties[] {
+	return versionedOptions(props, Object.fromEntries(since26R1.map((v) => [v, SINCE_26R1])), name);
 }

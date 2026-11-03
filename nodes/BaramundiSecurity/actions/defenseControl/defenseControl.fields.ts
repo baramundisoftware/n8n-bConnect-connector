@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { SINCE_26R1 } from '../../../shared/utils/versionGating';
 import { endpointLocator } from '../../../shared/resourceLocators';
 
 export const defenseControlOperations: INodeProperties[] = [
@@ -216,7 +217,7 @@ export const defenseControlFields: INodeProperties[] = [
       show: {
         resource: ['defenseControl'],
         operation: ['patchBitLockerSecrets'],
-        bmsVersion: ['26R1'],
+        bmsVersion: SINCE_26R1,
       },
     },
     description: 'JSON Patch operations array (RFC 6902). E.g. [{"op":"replace","path":"/InitialStartupPin","value":"12345678"}]',

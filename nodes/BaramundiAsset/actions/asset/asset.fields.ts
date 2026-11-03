@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { SINCE_26R1 } from '../../../shared/utils/versionGating';
 import { endpointLocator } from '../../../shared/resourceLocators';
 
 // Field lists follow the bConnect schemas (identical in 25R2 and 26R1):
@@ -81,7 +82,7 @@ export const assetOperations25R2: INodeProperties[] = [
 export const assetOperations26R1: INodeProperties[] = [
   {
     displayName: 'Operation', name: 'operation', type: 'options', noDataExpression: true,
-    displayOptions: { show: { resource: ['asset'], bmsVersion: ['26R1'] } },
+    displayOptions: { show: { resource: ['asset'], bmsVersion: SINCE_26R1 } },
     options: [
       ...COMMON_ASSET_OPTIONS,
       { name: 'Get Assets by AD Object', value: 'getAssetsByADObject', description: 'Get assets linked to an AD object (bMS 26R1+)', action: 'Get assets by AD object' },
@@ -240,7 +241,7 @@ export const assetFields: INodeProperties[] = [
     default: 'Machine',
     displayOptions: {
       show: {
-        bmsVersion: ['26R1'],
+        bmsVersion: SINCE_26R1,
         resource: ['asset'],
         operation: ['create'],
       },
@@ -547,7 +548,7 @@ export const assetFields: INodeProperties[] = [
       show: {
         resource: ['asset'],
         operation: ['getAssetsByADObject', 'getAssetsByOrgUnit'],
-        bmsVersion: ['26R1'],
+        bmsVersion: SINCE_26R1,
       },
     },
     description: 'Whether to return all results or only up to a given limit',
@@ -563,7 +564,7 @@ export const assetFields: INodeProperties[] = [
       show: {
         resource: ['asset'],
         operation: ['getAssetsByADObject', 'getAssetsByOrgUnit'],
-        bmsVersion: ['26R1'],
+        bmsVersion: SINCE_26R1,
         returnAll: [false],
       },
     },
@@ -579,7 +580,7 @@ export const assetFields: INodeProperties[] = [
       show: {
         resource: ['asset'],
         operation: ['getAssetsByADObject'],
-        bmsVersion: ['26R1'],
+        bmsVersion: SINCE_26R1,
       },
     },
     description: 'The GUID of the AD object',
@@ -594,7 +595,7 @@ export const assetFields: INodeProperties[] = [
       show: {
         resource: ['asset'],
         operation: ['getAssetsByOrgUnit'],
-        bmsVersion: ['26R1'],
+        bmsVersion: SINCE_26R1,
       },
     },
     description: 'The GUID of the org unit',
@@ -1080,7 +1081,7 @@ export const assetOperations25R2Trimmed: INodeProperties[] = [
 export const assetOperations26R1Trimmed: INodeProperties[] = [
   {
     displayName: 'Operation', name: 'operation', type: 'options', noDataExpression: true,
-    displayOptions: { show: { resource: ['asset'], bmsVersion: ['26R1'] } },
+    displayOptions: { show: { resource: ['asset'], bmsVersion: SINCE_26R1 } },
     options: [
       { name: 'Create', value: 'create', description: 'Create a new asset', action: 'Create an asset' },
       { name: 'Delete', value: 'delete', description: 'Delete an asset', action: 'Delete an asset' },

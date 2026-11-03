@@ -70,6 +70,7 @@ export class BaramundiEndpoint implements INodeType {
         options: [
           { name: '25 R2', value: '25R2' },
           { name: '26 R1', value: '26R1' },
+          { name: '26 R2', value: '26R2' },
         ],
       },
       {

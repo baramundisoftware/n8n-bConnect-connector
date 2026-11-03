@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { SINCE_26R1 } from '../../../shared/utils/versionGating';
 import { endpointLocator } from '../../../shared/resourceLocators';
 
 // ============================================================
@@ -42,7 +43,7 @@ export const endpointOperations26R1: INodeProperties[] = [
     name: 'operation',
     type: 'options',
     noDataExpression: true,
-    displayOptions: { show: { resource: ['endpoint'], bmsVersion: ['26R1'] } },
+    displayOptions: { show: { resource: ['endpoint'], bmsVersion: SINCE_26R1 } },
     options: [
       { name: 'Create', value: 'create', description: 'Create a new endpoint', action: 'Create an endpoint' },
       { name: 'Delete', value: 'delete', description: 'Delete an endpoint', action: 'Delete an endpoint' },
@@ -163,7 +164,7 @@ export const maintenanceWindowOperations26R1: INodeProperties[] = [
     name: 'operation',
     type: 'options',
     noDataExpression: true,
-    displayOptions: { show: { resource: ['maintenanceWindow'], bmsVersion: ['26R1'] } },
+    displayOptions: { show: { resource: ['maintenanceWindow'], bmsVersion: SINCE_26R1 } },
     options: [
       { name: 'Create Endpoint Maintenance Window', value: 'createEndpointMaintenanceWindow', description: 'Create a maintenance window for an endpoint', action: 'Create endpoint maintenance window' },
       { name: 'Create Group Maintenance Window', value: 'createGroupMaintenanceWindow', description: 'Create a maintenance window for a group', action: 'Create group maintenance window' },
@@ -902,7 +903,7 @@ export const endpointFields: INodeProperties[] = [
     show: {
       resource: ['endpoint'],
       operation: ['setEntraIdData', 'deleteEntraIdData'],
-      bmsVersion: ['26R1'],
+      bmsVersion: SINCE_26R1,
     },
   }),
   {
@@ -915,7 +916,7 @@ export const endpointFields: INodeProperties[] = [
       show: {
         resource: ['endpoint'],
         operation: ['setEntraIdData'],
-        bmsVersion: ['26R1'],
+        bmsVersion: SINCE_26R1,
       },
     },
     placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
@@ -931,7 +932,7 @@ export const endpointFields: INodeProperties[] = [
       show: {
         resource: ['endpoint'],
         operation: ['setEntraIdData'],
-        bmsVersion: ['26R1'],
+        bmsVersion: SINCE_26R1,
       },
     },
     options: [
@@ -963,7 +964,7 @@ export const endpointFields: INodeProperties[] = [
       show: {
         resource: ['endpoint'],
         operation: ['getEntraIdDataByDeviceId'],
-        bmsVersion: ['26R1'],
+        bmsVersion: SINCE_26R1,
       },
     },
     placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
@@ -982,7 +983,7 @@ export const endpointFields: INodeProperties[] = [
       show: {
         resource: ['endpoint'],
         operation: ['getUnmanagedEndpoints'],
-        bmsVersion: ['26R1'],
+        bmsVersion: SINCE_26R1,
       },
     },
     description: 'Whether to return all results or only up to a given limit',
@@ -998,7 +999,7 @@ export const endpointFields: INodeProperties[] = [
       show: {
         resource: ['endpoint'],
         operation: ['getUnmanagedEndpoints'],
-        bmsVersion: ['26R1'],
+        bmsVersion: SINCE_26R1,
         returnAll: [false],
       },
     },
@@ -1014,7 +1015,7 @@ export const endpointFields: INodeProperties[] = [
       show: {
         resource: ['endpoint'],
         operation: ['getUnmanagedEndpoint', 'deleteUnmanagedEndpoint'],
-        bmsVersion: ['26R1'],
+        bmsVersion: SINCE_26R1,
       },
     },
     placeholder: 'e.g. 12345678-1234-1234-1234-123456789012',
@@ -1073,7 +1074,7 @@ export const endpointFields: INodeProperties[] = [
     type: 'string',
     required: true,
     default: '',
-    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByUDG'], bmsVersion: ['26R1'] } },
+    displayOptions: { show: { resource: ['endpoint'], operation: ['getEndpointsByUDG'], bmsVersion: SINCE_26R1 } },
     description: 'The GUID of the Universal Dynamic Group (bMS 26R1+)',
   },
   {
@@ -1435,15 +1436,15 @@ const MW_DEFINITION_TYPES_26R1 = [
   { name: 'Never', value: 'Never' },
 ];
 
-function mwDefinitionType(version: '25R2' | '26R1'): INodeProperties {
+function mwDefinitionType(versions: string[]): INodeProperties {
   return {
     displayName: 'Definition Type',
     name: 'maintenanceWindowDefinitionType',
     type: 'options',
     required: true,
     default: 'Everyday',
-    displayOptions: { show: { bmsVersion: [version], resource: ['maintenanceWindow'], operation: MW_WRITE_OPS } },
-    options: version === '25R2' ? MW_DEFINITION_TYPES_25R2 : MW_DEFINITION_TYPES_26R1,
+    displayOptions: { show: { bmsVersion: versions, resource: ['maintenanceWindow'], operation: MW_WRITE_OPS } },
+    options: versions.includes('25R2') ? MW_DEFINITION_TYPES_25R2 : MW_DEFINITION_TYPES_26R1,
     description: 'How the maintenance window is defined',
   };
 }
@@ -1466,8 +1467,8 @@ export const maintenanceWindowFields: INodeProperties[] = [
     displayOptions: { show: { resource: ['maintenanceWindow'], operation: MW_GROUP_OPS } },
     description: 'The GUID of the logical group (maintenance windows exist for logical groups only)',
   },
-  mwDefinitionType('25R2'),
-  mwDefinitionType('26R1'),
+  mwDefinitionType(['25R2']),
+  mwDefinitionType(SINCE_26R1),
   {
     displayName: 'Intervals',
     name: 'intervals',

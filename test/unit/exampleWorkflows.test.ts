@@ -25,10 +25,10 @@ const workflows = readdirSync(DIR)
   .filter((f) => f.endsWith('.json'))
   .map((file) => ({ file, nodes: JSON.parse(readFileSync(join(DIR, file), 'utf8')).nodes as WorkflowNode[] }));
 
-/** JobInstance.state values of both specs. */
+/** JobInstance.state values of every release (26R2 names the file jobs.json). */
 const JOB_STATES = new Set(
   RELEASES.flatMap((release) => {
-    const file = readdirSync(join(__dirname, '../../docs/openapi', release)).find((f) => /^bConnect_Jobs\.json$/i.test(f))!;
+    const file = readdirSync(join(__dirname, '../../docs/openapi', release)).find((f) => /^(bConnect_)?Jobs\.json$/i.test(f))!;
     const doc = JSON.parse(readFileSync(join(__dirname, '../../docs/openapi', release, file), 'utf8'));
     return doc.components.schemas.State.enum as string[];
   }),

@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { SINCE_26R1 } from '../../../shared/utils/versionGating';
 import { endpointLocator } from '../../../shared/resourceLocators';
 
 export const variableOperations: INodeProperties[] = [
@@ -269,7 +270,7 @@ export const variableFields: INodeProperties[] = [
 		default: ['Endpoint'],
 		displayOptions: {
 			show: {
-				bmsVersion: ['26R1'],
+				bmsVersion: SINCE_26R1,
 				resource: ['variable'],
 				operation: ['createVariableDefinition'],
 			},

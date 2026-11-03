@@ -16,7 +16,7 @@ import {
 import { universalDynamicGroupsOperations, universalDynamicGroupsFields } from './actions/universalDynamicGroups/universalDynamicGroups.fields';
 import { updateManagementOperations, updateManagementFields } from './actions/updateManagement/updateManagement.fields';
 import { variableOperations, variableFields } from './actions/variable/variable.fields';
-import { only26R1Options } from '../shared/utils/versionGating';
+import { since26R1Options } from '../shared/utils/versionGating';
 import { router } from './actions/router';
 import { endpointSearch } from '../shared/loadOptions';
 
@@ -49,8 +49,8 @@ export class BaramundiSoftware implements INodeType {
       baseURL: '={{ String($credentials.baseUrl).trim().replace(/\\/+$/, "") }}',
       skipSslCertificateValidation: '={{$credentials.ignoreSslIssues}}',
     },
-    // Universal Dynamic Groups and Software Bundles exist in 26R1 only
-    properties: only26R1Options([
+    // Universal Dynamic Groups and Software Bundles exist from 26R1 on
+    properties: since26R1Options([
       {
         // eslint-disable-next-line n8n-nodes-base/node-param-display-name-miscased -- baramundi is a lowercase brand name
         displayName: 'baramundi Management Suite Version',
@@ -63,6 +63,7 @@ export class BaramundiSoftware implements INodeType {
         options: [
           { name: '25 R2', value: '25R2' },
           { name: '26 R1', value: '26R1' },
+          { name: '26 R2', value: '26R2' },
         ],
       },
       {

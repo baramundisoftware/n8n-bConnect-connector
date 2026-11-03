@@ -102,9 +102,10 @@ beforeAll(async () => {
 }, 120_000);
 
 describe('spec conformance', () => {
-  it('loads both specs and exercises every node', () => {
+  it('loads every release and exercises every node', () => {
     expect(SPEC['25R2'].length).toBeGreaterThan(150);
     expect(SPEC['26R1'].length).toBeGreaterThan(200);
+    expect(SPEC['26R2'].length).toBeGreaterThan(200);
     for (const node of NODES) expect(exercises.some((e) => e.node === node.description.name)).toBe(true);
   });
 

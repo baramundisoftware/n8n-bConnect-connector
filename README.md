@@ -17,7 +17,7 @@ Automate your **baramundi Management Suite** (bMS) from [n8n](https://n8n.io/) w
 >
 ><img width="2156" height="758" alt="Screenshot 2026-11-02 144904" src="https://github.com/user-attachments/assets/0cba1735-7229-4170-bce7-8a0b1257e4e4" />
 
-**219 operations** across **6 nodes**, compatible with **baramundi Management Suite 2025 R2 and 2026 R1**.
+**219 operations** across **6 nodes**, compatible with **baramundi Management Suite 2025 R2, 2026 R1 and 2026 R2**.
 
 
 
@@ -27,7 +27,7 @@ Automate your **baramundi Management Suite** (bMS) from [n8n](https://n8n.io/) w
 ## What You Need
 
 - An **n8n instance** (version 2.9.0 or later) — [install n8n](https://docs.n8n.io/hosting/)
-- A **baramundi Management Suite** (2025 R2 or 2026 R1) with bConnect API enabled
+- A **baramundi Management Suite** (2025 R2, 2026 R1 or 2026 R2) with bConnect API enabled
 - Your **bMS server address** (e.g. `https://bms.company.com:444/bconnect`)
 - A **bMS user account** with API access, or an **API key**
   (generate one in the baramundi management console under **Server Management > API Keys**)
@@ -82,7 +82,7 @@ For Docker, see [Docker Installation](#docker-installation) below.
 3. Click **"+"** after the trigger > search **"baramundi"** > add it
 4. In the baramundi node:
    - **Credential**: select your baramundi credential
-   - **bMS Version**: select `26R1` or `25R2` (matching your server)
+   - **bMS Version**: select `26R2`, `26R1` or `25R2` (matching your server)
    - **Resource**: `Endpoint`
    - **Operation**: `Get Many`
    - **Return All**: on
@@ -96,7 +96,7 @@ Try these common workflows:
 
 - **List all Windows endpoints** — Endpoint > Get Many > Filter by endpoint type
 - **Run a job** — Job > Execute > select a job instance
-- **Check compliance** — Security > List Detected Vulnerabilities (26R1 only)
+- **Check compliance** — Security > List Detected Vulnerabilities (26R1 and later)
 - **Software inventory** — Software > Get Installed Software > by endpoint
 
 See the [example workflows](example-workflows/) for ready-to-use templates.
@@ -177,6 +177,7 @@ Every baramundi node has a **bMS Version** dropdown as its first parameter. Sele
 
 | Setting | Shows |
 |---------|-------|
+| `26 R2` | 210 operations: those of 26 R1 without *Get Cloud Connectors*, which 26 R2 removed. The operations new in 26 R2 (thresholds, API key management, Intune remote actions) are not available yet ([#93](https://github.com/baramundisoftware/n8n-bConnect-connector/issues/93)) |
 | `26 R1` (default) | 211 operations, including compliance, Universal Dynamic Groups and software bundles |
 | `25 R2` | 171 operations, including industrial endpoints and *Replace (PUT)* maintenance windows, which exist in 25 R2 only |
 
@@ -212,7 +213,7 @@ Each tool runs exactly the resource and operation you configure on it. Give an a
 | **Connection timeout** | Check network connectivity and firewall rules. bConnect default port is 444. |
 | **Empty results** | Check API user permissions. Try enabling "Return All" to get more than one page. |
 | **Dropdowns not loading** | Test your credential first. Use "Enter Custom GUID" as fallback. |
-| **Operation not visible** | Check the bMS Version dropdown matches your server (25R2 vs 26R1). |
+| **Operation not visible** | Check the bMS Version dropdown matches your server (25R2, 26R1 or 26R2). |
 
 ---
 
@@ -246,7 +247,7 @@ Report security issues to **bernd.wiedemann@baramundi.de** (not via public GitHu
 | n8n | 2.9.0+ |
 | Node.js (to run n8n) | 22.23.4+, 24.22.1+ or 26.12.1+ |
 | baramundi bConnect API | V2.0 |
-| baramundi bMS | 25R2, 26R1 |
+| baramundi bMS | 25R2, 26R1, 26R2 |
 
 ---
 

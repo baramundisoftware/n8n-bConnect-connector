@@ -27,11 +27,11 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
             'deleteIndustrialEndpoint',
             'getIndustrialEndpointsByGroup',
           ]);
-          if (bmsVersionEndpoint === '26R1' && industrialOps.has(operation)) {
+          if (bmsVersionEndpoint !== '25R2' && industrialOps.has(operation)) {
             throw new NodeOperationError(
               this.getNode(),
               `Operation "${operation}" is only available in bMS 25R2. ` +
-                'Industrial Endpoints are not supported in bMS 26R1.',
+                'Industrial Endpoints are not supported from bMS 26R1 on.',
               { itemIndex: i },
             );
           }
@@ -196,11 +196,11 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
               responseData = await endpoint.getEndpointMaintenanceWindow.call(this, i);
               break;
             case 'putEndpointMaintenanceWindow':
-              if (bmsVersion === '26R1') {
+              if (bmsVersion !== '25R2') {
                 throw new NodeOperationError(
                   this.getNode(),
                   'Operation "Replace Endpoint Maintenance Window" (PUT) is only available in bMS 25R2. ' +
-                    'In bMS 26R1, use "Update Endpoint Maintenance Window" (PATCH) instead. ' +
+                    'From bMS 26R1 on, use "Update Endpoint Maintenance Window" (PATCH) instead. ' +
                     'Note: the request body format differs between PUT and PATCH.',
                   { itemIndex: i },
                 );
@@ -220,11 +220,11 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
               responseData = await endpoint.getGroupMaintenanceWindow.call(this, i);
               break;
             case 'putGroupMaintenanceWindow':
-              if (bmsVersion === '26R1') {
+              if (bmsVersion !== '25R2') {
                 throw new NodeOperationError(
                   this.getNode(),
                   'Operation "Replace Group Maintenance Window" (PUT) is only available in bMS 25R2. ' +
-                    'In bMS 26R1, use "Update Group Maintenance Window" (PATCH) instead. ' +
+                    'From bMS 26R1 on, use "Update Group Maintenance Window" (PATCH) instead. ' +
                     'Note: the request body format differs between PUT and PATCH.',
                   { itemIndex: i },
                 );
