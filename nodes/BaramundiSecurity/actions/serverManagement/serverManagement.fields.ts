@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { SINCE_26R1 } from '../../../shared/utils/versionGating';
 
 export const serverManagementOperations: INodeProperties[] = [
   {
@@ -461,7 +462,7 @@ export const serverManagementFields: INodeProperties[] = [
       show: {
         resource: ['serverManagement'],
         operation: ['getDownloadJobs'],
-        bmsVersion: ['26R1'],
+        bmsVersion: SINCE_26R1,
       },
     },
     description: 'Whether to return all results or only up to a given limit',
@@ -477,7 +478,7 @@ export const serverManagementFields: INodeProperties[] = [
       show: {
         resource: ['serverManagement'],
         operation: ['getDownloadJobs'],
-        bmsVersion: ['26R1'],
+        bmsVersion: SINCE_26R1,
         returnAll: [false],
       },
     },
@@ -493,7 +494,7 @@ export const serverManagementFields: INodeProperties[] = [
       show: {
         resource: ['serverManagement'],
         operation: ['getDownloadJob'],
-        bmsVersion: ['26R1'],
+        bmsVersion: SINCE_26R1,
       },
     },
     description: 'The GUID of the download job',

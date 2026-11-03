@@ -1,7 +1,7 @@
 /**
  * Unit Tests for SEC-08: Version-Mismatch Guards in BaramundiEndpoint Router
  *
- * Verifies that 25R2-only operations throw NodeOperationError when bmsVersion = '26R1',
+ * Verifies that 25R2-only operations throw NodeOperationError when bmsVersion is 26R1 or 26R2,
  * preventing silent workflow breakage when credentials are updated to a 26R1 server.
  */
 
@@ -101,6 +101,12 @@ describe('Router Version-Mismatch Guards (SEC-08)', () => {
       await expect(router.call(ctx)).rejects.toThrow(/25R2/);
     });
 
+    it('should throw for both PUT operations when bmsVersion is 26R2 (#93)', async () => {
+      for (const op of ['putEndpointMaintenanceWindow', 'putGroupMaintenanceWindow']) {
+        await expect(router.call(createMockContext('maintenanceWindow', op, '26R2'))).rejects.toThrow(/From bMS 26R1 on/);
+      }
+    });
+
     it('should NOT throw for putEndpointMaintenanceWindow when bmsVersion is 25R2', async () => {
       const ctx = createMockContext('maintenanceWindow', 'putEndpointMaintenanceWindow', '25R2');
       await expect(router.call(ctx)).resolves.toBeDefined();
@@ -131,6 +137,11 @@ describe('Router Version-Mismatch Guards (SEC-08)', () => {
       it(`should include '25R2' in error message for ${op}`, async () => {
         const ctx = createMockContext('endpoint', op, '26R1');
         await expect(router.call(ctx)).rejects.toThrow(/25R2/);
+      });
+
+      it(`should throw for ${op} when bmsVersion is 26R2 (#93)`, async () => {
+        const ctx = createMockContext('endpoint', op, '26R2');
+        await expect(router.call(ctx)).rejects.toThrow(NodeOperationError);
       });
 
       it(`should NOT throw for ${op} when bmsVersion is 25R2`, async () => {

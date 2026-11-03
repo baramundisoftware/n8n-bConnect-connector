@@ -3,12 +3,13 @@
  *
  * Loads docs/openapi/<release>/*.json. Each file is one bConnect module; its
  * `servers` URL names the module prefix the connector puts in front of the
- * spec path (`…/bconnect/endpoints` → `/endpoints/v2.0/Endpoints`).
+ * spec path (`…/bconnect/endpoints` → `/endpoints/v2.0/Endpoints`). The 26R2
+ * files have no `servers`: there the file name is the module (`endpoints.json`).
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-export const RELEASES = ['25R2', '26R1'] as const;
+export const RELEASES = ['25R2', '26R1', '26R2'] as const;
 export type Release = (typeof RELEASES)[number];
 
 export type Schema = {
@@ -84,7 +85,9 @@ function loadRelease(release: Release): SpecOperation[] {
   const ops: SpecOperation[] = [];
   for (const file of readdirSync(dir).filter((f) => f.endsWith('.json'))) {
     const doc = JSON.parse(readFileSync(join(dir, file), 'utf8'));
-    const module = String(doc.servers?.[0]?.url ?? '').split('/bconnect/')[1]?.replace(/\/$/, '').toLowerCase();
+    const module = doc.servers
+      ? String(doc.servers[0]?.url ?? '').split('/bconnect/')[1]?.replace(/\/$/, '').toLowerCase()
+      : file.replace(/\.json$/, '').toLowerCase();
     if (!module) throw new Error(`${release}/${file}: cannot read module from servers URL`);
     const resolve = makeResolver(doc);
     for (const [path, item] of Object.entries<Record<string, any>>(doc.paths ?? {})) {
@@ -134,6 +137,7 @@ function loadRelease(release: Release): SpecOperation[] {
 export const SPEC: Record<Release, SpecOperation[]> = {
   '25R2': loadRelease('25R2'),
   '26R1': loadRelease('26R1'),
+  '26R2': loadRelease('26R2'),
 };
 
 /** Find the spec operation for a connector request path like /endpoints/v2.0/Endpoints/{guid}. */
@@ -151,9 +155,8 @@ export function explainMissingRoute(release: Release, method: string, requestPat
   const m = requestPath.match(/^\/([^/]+)(\/v2\.0\/.*)$/i);
   if (!m) return 'path is not /<module>/v2.0/…';
   const rest = m[2].replace(/\/$/, '');
-  const other = RELEASES.find((r) => r !== release)!;
-  const sameModuleOther = findOperation(other, method, requestPath);
-  if (sameModuleOther) return `only in ${other}`;
+  const others = RELEASES.filter((r) => r !== release && findOperation(r, method, requestPath));
+  if (others.length) return `only in ${others.join(', ')}`;
   const anyModule = SPEC[release].find((o) => o.method === method && o.matcher.test(rest));
   if (anyModule) return `route exists under module "${anyModule.module}", not "${m[1]}"`;
   const anyMethod = SPEC[release].find((o) => o.module === m[1].toLowerCase() && o.matcher.test(rest));

@@ -1,4 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { SINCE_26R1 } from '../../../shared/utils/versionGating';
 import { endpointLocator } from '../../../shared/resourceLocators';
 
 const COMMON_SOFTWARE_OPTIONS = [
@@ -16,7 +17,7 @@ export const softwareOperations25R2: INodeProperties[] = [{
 
 export const softwareOperations26R1: INodeProperties[] = [{
 	displayName: 'Operation', name: 'operation', type: 'options', noDataExpression: true,
-	displayOptions: { show: { resource: ['software'], bmsVersion: ['26R1'] } },
+	displayOptions: { show: { resource: ['software'], bmsVersion: SINCE_26R1 } },
 	options: [
 		...COMMON_SOFTWARE_OPTIONS,
 		{ name: 'Get Software by Universal Dynamic Group', value: 'getInstalledSoftwareByUniversalDynamicGroup', description: 'Get installed software for a universal dynamic group (bMS 26R1+)', action: 'Get software by universal dynamic group' },
@@ -58,15 +59,15 @@ export const softwareFields: INodeProperties[] = [
 	// BUNDLE OPERATIONS (bMS 26R1+)
 	// ============================================================================
 
-	{ displayName: 'Bundle ID', name: 'bundleId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['getBundle', 'deleteBundle', 'getBundleApplicationsByBundle'], bmsVersion: ['26R1'] } }, description: 'The GUID of the bundle' },
-	{ displayName: 'Name', name: 'name', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['createBundle', 'createBundleFolder'], bmsVersion: ['26R1'] } }, description: 'The name of the bundle or folder' },
+	{ displayName: 'Bundle ID', name: 'bundleId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['getBundle', 'deleteBundle', 'getBundleApplicationsByBundle'], bmsVersion: SINCE_26R1 } }, description: 'The GUID of the bundle' },
+	{ displayName: 'Name', name: 'name', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['createBundle', 'createBundleFolder'], bmsVersion: SINCE_26R1 } }, description: 'The name of the bundle or folder' },
 	{
 		displayName: 'Additional Fields',
 		name: 'additionalFields',
 		type: 'collection',
 		placeholder: 'Add Field',
 		default: {},
-		displayOptions: { show: { resource: ['software'], operation: ['createBundle'], bmsVersion: ['26R1'] } },
+		displayOptions: { show: { resource: ['software'], operation: ['createBundle'], bmsVersion: SINCE_26R1 } },
 		options: [
 			{ displayName: 'Type', name: 'type', type: 'options', default: 'Install', options: [{ name: 'Install', value: 'Install' }, { name: 'Uninstall', value: 'Uninstall' }], description: 'Whether the bundle installs or uninstalls its applications' },
 			{ displayName: 'Ignore Dependencies', name: 'ignoreDependencies', type: 'boolean', default: false, description: 'Whether to ignore dependencies' },
@@ -79,14 +80,14 @@ export const softwareFields: INodeProperties[] = [
 	// BUNDLE FOLDER OPERATIONS (bMS 26R1+)
 	// ============================================================================
 
-	{ displayName: 'Bundle Folder ID', name: 'bundleFolderId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['getBundleFolder', 'getBundleSubFolders', 'deleteBundleFolder', 'updateBundleFolder'], bmsVersion: ['26R1'] } }, description: 'The GUID of the bundle folder' },
+	{ displayName: 'Bundle Folder ID', name: 'bundleFolderId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['getBundleFolder', 'getBundleSubFolders', 'deleteBundleFolder', 'updateBundleFolder'], bmsVersion: SINCE_26R1 } }, description: 'The GUID of the bundle folder' },
 	{
 		displayName: 'Additional Fields',
 		name: 'additionalFields',
 		type: 'collection',
 		placeholder: 'Add Field',
 		default: {},
-		displayOptions: { show: { resource: ['software'], operation: ['createBundleFolder'], bmsVersion: ['26R1'] } },
+		displayOptions: { show: { resource: ['software'], operation: ['createBundleFolder'], bmsVersion: SINCE_26R1 } },
 		options: [
 			{ displayName: 'Parent ID', name: 'parentId', type: 'string', default: '', description: 'GUID of the parent folder' },
 			{ displayName: 'Comment', name: 'comment', type: 'string', default: '', description: 'Optional comment' },
@@ -98,20 +99,20 @@ export const softwareFields: INodeProperties[] = [
 	// ============================================================================
 
 	// addApplicationToBundle
-	{ displayName: 'Bundle ID', name: 'bundleId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['addApplicationToBundle'], bmsVersion: ['26R1'] } }, description: 'The GUID of the bundle' },
-	{ displayName: 'Application ID', name: 'applicationId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['addApplicationToBundle'], bmsVersion: ['26R1'] } }, description: 'The GUID of the application to add' },
+	{ displayName: 'Bundle ID', name: 'bundleId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['addApplicationToBundle'], bmsVersion: SINCE_26R1 } }, description: 'The GUID of the bundle' },
+	{ displayName: 'Application ID', name: 'applicationId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['addApplicationToBundle'], bmsVersion: SINCE_26R1 } }, description: 'The GUID of the application to add' },
 
 	// replaceApplicationInBundle
-	{ displayName: 'Bundle ID', name: 'bundleId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['replaceApplicationInBundle'], bmsVersion: ['26R1'] } }, description: 'The GUID of the bundle' },
-	{ displayName: 'Bundle Application ID', name: 'bundleApplicationId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['replaceApplicationInBundle', 'deleteBundleApplication'], bmsVersion: ['26R1'] } }, description: 'The GUID of the bundle application' },
-	{ displayName: 'Update Fields', name: 'updateFields', type: 'collection', placeholder: 'Add Field', default: {}, displayOptions: { show: { resource: ['software'], operation: ['replaceApplicationInBundle'], bmsVersion: ['26R1'] } }, options: [{ displayName: 'Application ID', name: 'applicationId', type: 'string', default: '', description: 'New application GUID' }] },
+	{ displayName: 'Bundle ID', name: 'bundleId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['replaceApplicationInBundle'], bmsVersion: SINCE_26R1 } }, description: 'The GUID of the bundle' },
+	{ displayName: 'Bundle Application ID', name: 'bundleApplicationId', type: 'string', required: true, default: '', displayOptions: { show: { resource: ['software'], operation: ['replaceApplicationInBundle', 'deleteBundleApplication'], bmsVersion: SINCE_26R1 } }, description: 'The GUID of the bundle application' },
+	{ displayName: 'Update Fields', name: 'updateFields', type: 'collection', placeholder: 'Add Field', default: {}, displayOptions: { show: { resource: ['software'], operation: ['replaceApplicationInBundle'], bmsVersion: SINCE_26R1 } }, options: [{ displayName: 'Application ID', name: 'applicationId', type: 'string', default: '', description: 'New application GUID' }] },
 
 	// updateBundleFolder
-	{ displayName: 'Update Fields', name: 'updateFields', type: 'collection', placeholder: 'Add Field', default: {}, displayOptions: { show: { resource: ['software'], operation: ['updateBundleFolder'], bmsVersion: ['26R1'] } }, options: [{ displayName: 'Name', name: 'name', type: 'string', default: '', description: 'New folder name' }] },
+	{ displayName: 'Update Fields', name: 'updateFields', type: 'collection', placeholder: 'Add Field', default: {}, displayOptions: { show: { resource: ['software'], operation: ['updateBundleFolder'], bmsVersion: SINCE_26R1 } }, options: [{ displayName: 'Name', name: 'name', type: 'string', default: '', description: 'New folder name' }] },
 
 	// getBundleApplications
-	{ displayName: 'Return All', name: 'returnAll', type: 'boolean', default: false, displayOptions: { show: { resource: ['software'], operation: ['getBundleApplications'], bmsVersion: ['26R1'] } }, description: 'Whether to return all results or only up to a given limit' },
-	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 1 }, default: 50, displayOptions: { show: { resource: ['software'], operation: ['getBundleApplications'], bmsVersion: ['26R1'], returnAll: [false] } }, description: 'Max number of results to return' },
+	{ displayName: 'Return All', name: 'returnAll', type: 'boolean', default: false, displayOptions: { show: { resource: ['software'], operation: ['getBundleApplications'], bmsVersion: SINCE_26R1 } }, description: 'Whether to return all results or only up to a given limit' },
+	{ displayName: 'Limit', name: 'limit', type: 'number', typeOptions: { minValue: 1 }, default: 50, displayOptions: { show: { resource: ['software'], operation: ['getBundleApplications'], bmsVersion: SINCE_26R1, returnAll: [false] } }, description: 'Max number of results to return' },
 ];
 
 // ============================================================================
@@ -120,7 +121,7 @@ export const softwareFields: INodeProperties[] = [
 
 export const softwareBundleOperations: INodeProperties[] = [{
 	displayName: 'Operation', name: 'operation', type: 'options', noDataExpression: true,
-	displayOptions: { show: { resource: ['softwareBundle'], bmsVersion: ['26R1'] } },
+	displayOptions: { show: { resource: ['softwareBundle'], bmsVersion: SINCE_26R1 } },
 	options: [
 		{ name: 'Add Application to Bundle', value: 'addApplicationToBundle', description: 'Add an application to a bundle', action: 'Add application to bundle' },
 		{ name: 'Create Bundle', value: 'createBundle', description: 'Create a software bundle', action: 'Create bundle' },
@@ -192,7 +193,7 @@ export const softwareOperations25R2Trimmed: INodeProperties[] = [{
 
 export const softwareOperations26R1Trimmed: INodeProperties[] = [{
 	displayName: 'Operation', name: 'operation', type: 'options', noDataExpression: true,
-	displayOptions: { show: { resource: ['software'], bmsVersion: ['26R1'] } },
+	displayOptions: { show: { resource: ['software'], bmsVersion: SINCE_26R1 } },
 	options: [
 		...COMMON_SOFTWARE_OPTIONS,
 		{ name: 'Get Software by Universal Dynamic Group', value: 'getInstalledSoftwareByUniversalDynamicGroup', description: 'Get installed software for a universal dynamic group (bMS 26R1+)', action: 'Get software by universal dynamic group' },

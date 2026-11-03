@@ -1,11 +1,12 @@
 import type { INodeProperties } from 'n8n-workflow';
+import { SINCE_26R1 } from '../../../shared/utils/versionGating';
 
 export const universalDynamicGroupsOperations: INodeProperties[] = [{
 	displayName: 'Operation',
 	name: 'operation',
 	type: 'options',
 	noDataExpression: true,
-	displayOptions: { show: { resource: ['universalDynamicGroups'], bmsVersion: ['26R1'] } },
+	displayOptions: { show: { resource: ['universalDynamicGroups'], bmsVersion: SINCE_26R1 } },
 	options: [
 		{ name: 'Get Folder', value: 'getFolder', description: 'Get a universal dynamic groups folder by ID', action: 'Get folder' },
 		{ name: 'Get Folders', value: 'getFolders', description: 'Get all universal dynamic group folders', action: 'Get folders' },
@@ -24,7 +25,7 @@ export const universalDynamicGroupsFields: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['get'], bmsVersion: ['26R1'] } },
+		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['get'], bmsVersion: SINCE_26R1 } },
 		description: 'The GUID of the universal dynamic group',
 	},
 	{
@@ -33,7 +34,7 @@ export const universalDynamicGroupsFields: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['getFolder', 'getSubFolders', 'getGroupsByFolder'], bmsVersion: ['26R1'] } },
+		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['getFolder', 'getSubFolders', 'getGroupsByFolder'], bmsVersion: SINCE_26R1 } },
 		description: 'The GUID of the folder',
 	},
 	{
@@ -41,7 +42,7 @@ export const universalDynamicGroupsFields: INodeProperties[] = [
 		name: 'returnAll',
 		type: 'boolean',
 		default: false,
-		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['getMany', 'getFolders', 'getSubFolders', 'getGroupsByFolder'], bmsVersion: ['26R1'] } },
+		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['getMany', 'getFolders', 'getSubFolders', 'getGroupsByFolder'], bmsVersion: SINCE_26R1 } },
 		description: 'Whether to return all results or only up to a given limit',
     hint: 'Results are capped at 5,000 items regardless of this setting',
 	},
@@ -51,7 +52,7 @@ export const universalDynamicGroupsFields: INodeProperties[] = [
 		type: 'number',
 		typeOptions: { minValue: 1 },
 		default: 50,
-		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['getMany', 'getFolders', 'getSubFolders', 'getGroupsByFolder'], returnAll: [false], bmsVersion: ['26R1'] } },
+		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['getMany', 'getFolders', 'getSubFolders', 'getGroupsByFolder'], returnAll: [false], bmsVersion: SINCE_26R1 } },
 		description: 'Max number of results to return',
 	},
 	{
@@ -60,7 +61,7 @@ export const universalDynamicGroupsFields: INodeProperties[] = [
 		type: 'collection',
 		placeholder: 'Add Option',
 		default: {},
-		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['getMany'], bmsVersion: ['26R1'] } },
+		displayOptions: { show: { resource: ['universalDynamicGroups'], operation: ['getMany'], bmsVersion: SINCE_26R1 } },
 		options: [
 			{ displayName: 'Order By', name: 'orderBy', type: 'string', default: '', placeholder: 'Name asc', description: 'Sort order for results' },
 		],
