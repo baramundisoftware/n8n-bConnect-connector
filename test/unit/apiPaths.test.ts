@@ -15,6 +15,7 @@ import * as path from 'path';
 function loadSpecPaths(): Set<string> {
   const specBase = process.env.OPENAPI_BASE || path.join(__dirname, '../../docs/openapi');
   const specDirs = [
+    path.join(specBase, '26R2'),
     path.join(specBase, '26R1'),
     path.join(specBase, '25R2'),
   ];

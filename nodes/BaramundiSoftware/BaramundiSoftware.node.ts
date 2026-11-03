@@ -13,10 +13,11 @@ import {
   softwareBundleOperations,
   softwareBundleFields,
 } from './actions/software/software.fields';
+import { thresholdOperations, thresholdFields } from './actions/threshold/threshold.fields';
 import { universalDynamicGroupsOperations, universalDynamicGroupsFields } from './actions/universalDynamicGroups/universalDynamicGroups.fields';
 import { updateManagementOperations, updateManagementFields } from './actions/updateManagement/updateManagement.fields';
 import { variableOperations, variableFields } from './actions/variable/variable.fields';
-import { since26R1Options } from '../shared/utils/versionGating';
+import { SINCE_26R1, SINCE_26R2, versionedOptions } from '../shared/utils/versionGating';
 import { router } from './actions/router';
 import { endpointSearch } from '../shared/loadOptions';
 
@@ -28,7 +29,7 @@ export class BaramundiSoftware implements INodeType {
     group: ['transform'],
     version: 1,
     subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-    description: 'Manage software, bundles, updates, variables, and universal dynamic groups via bConnect API',
+    description: 'Manage software, bundles, updates, variables, universal dynamic groups and their thresholds via bConnect API',
     defaults: {
       name: 'baramundi Software',
     },
@@ -49,8 +50,8 @@ export class BaramundiSoftware implements INodeType {
       baseURL: '={{ String($credentials.baseUrl).trim().replace(/\\/+$/, "") }}',
       skipSslCertificateValidation: '={{$credentials.ignoreSslIssues}}',
     },
-    // Universal Dynamic Groups and Software Bundles exist from 26R1 on
-    properties: since26R1Options([
+    // Universal Dynamic Groups and Software Bundles exist from 26R1 on, their thresholds from 26R2 on
+    properties: versionedOptions([
       {
         // eslint-disable-next-line n8n-nodes-base/node-param-display-name-miscased -- baramundi is a lowercase brand name
         displayName: 'baramundi Management Suite Version',
@@ -88,6 +89,11 @@ export class BaramundiSoftware implements INodeType {
             description: 'Manage universal dynamic groups and folders (requires bMS 26R1+)',
           },
           {
+            name: 'Universal Dynamic Group Threshold',
+            value: 'threshold',
+            description: 'Manage endpoint count thresholds of universal dynamic groups (requires bMS 26R2+)',
+          },
+          {
             name: 'Update Management',
             value: 'updateManagement',
             description: 'Manage Windows endpoint update profiles',
@@ -105,15 +111,17 @@ export class BaramundiSoftware implements INodeType {
       ...softwareOperations26R1Trimmed,
       ...softwareBundleOperations,
       ...universalDynamicGroupsOperations,
+      ...thresholdOperations,
       ...updateManagementOperations,
       ...variableOperations,
       // Fields
       ...softwareFields,
       ...softwareBundleFields,
       ...universalDynamicGroupsFields,
+      ...thresholdFields,
       ...updateManagementFields,
       ...variableFields,
-    ], ['universalDynamicGroups', 'softwareBundle'], 'resource'),
+    ], { universalDynamicGroups: SINCE_26R1, softwareBundle: SINCE_26R1, threshold: SINCE_26R2 }, 'resource'),
   };
 
   methods = {
