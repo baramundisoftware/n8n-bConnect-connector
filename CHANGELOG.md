@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- CI integration tests run against bConnect-Mock 0.10.0, which returns the endpoint inventory and record fields a live bMS fills (CPU, RAM, storage media, asset properties, job instance steps, ...). E2E and system tests pass unchanged
+
 ### Fixed
 - `make release` and `make release-dry` pack without the dev-only `overrides` field, as the publish workflow does, so a local release tarball is byte-identical to the one on npm (checked against 0.11.0)
 
