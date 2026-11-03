@@ -52,9 +52,9 @@ Without access to the npm registry, install the release file instead:
 2. On your n8n server, check the file and install it into n8n's nodes folder:
 
 ```bash
-sha256sum -c baramundi-n8n-nodes-baramundi-management-suite-0.11.0.tgz.sha256
+sha256sum -c baramundi-n8n-nodes-baramundi-management-suite-0.12.0.tgz.sha256
 mkdir -p ~/.n8n/nodes && cd ~/.n8n/nodes
-npm install /path/to/baramundi-n8n-nodes-baramundi-management-suite-0.11.0.tgz
+npm install /path/to/baramundi-n8n-nodes-baramundi-management-suite-0.12.0.tgz
 ```
 
 3. Restart n8n.
@@ -110,7 +110,7 @@ If running n8n in Docker, build a custom image with the release file next to you
 ```dockerfile
 FROM n8nio/n8n:latest
 USER root
-COPY baramundi-n8n-nodes-baramundi-management-suite-0.11.0.tgz /tmp/package.tgz
+COPY baramundi-n8n-nodes-baramundi-management-suite-0.12.0.tgz /tmp/package.tgz
 RUN mkdir -p /home/node/.n8n/nodes && \
     cd /home/node/.n8n/nodes && \
     npm init -y && \
