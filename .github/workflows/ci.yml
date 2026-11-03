@@ -111,19 +111,24 @@ jobs:
           npm audit --audit-level=critical || true
 
   integration:
-    name: integration (bConnect-Mock)
+    name: integration (bConnect-Mock ${{ matrix.bms }})
     runs-on: ubuntu-latest
     # E2E and system tests against a live bConnect-Mock, so they cannot silently go stale
-    # again (#40: the system suite could not even load after the node split). Uses 26R1
-    # with read-write data; not a required check (the mock is a separate project).
+    # again (#40: the system suite could not even load after the node split). Runs 26R1 (the
+    # node's default) and 26R2 with read-write data; not a required check (the mock is a
+    # separate project).
+    strategy:
+      fail-fast: false
+      matrix:
+        bms: [26r1, 26r2]
     services:
       bconnect-mock:
-        image: ghcr.io/baramundisoftware/bconnect-mock:0.10.0
+        image: ghcr.io/baramundisoftware/bconnect-mock:0.11.0
         ports:
           - 8765:3433
         env:
           BCONNECT_PROFILE: standard-readwrite
-          BCONNECT_BMS_VERSION: 26r1
+          BCONNECT_BMS_VERSION: ${{ matrix.bms }}
           RATE_LIMIT_ENABLED: "false"
     env:
       BCONNECT_BASE_URL: http://localhost:8765/bconnect
@@ -131,7 +136,7 @@ jobs:
       BCONNECT_PASSWORD: ci
       BCONNECT_IGNORE_SSL: "false"
       BCONNECT_IS_MOCK: "true"
-      BCONNECT_BMS_VERSION: 26r1 # the mock's version, for tests of routes a version added or removed
+      BCONNECT_BMS_VERSION: ${{ matrix.bms }} # the mock's version, for tests of routes a version added or removed
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
