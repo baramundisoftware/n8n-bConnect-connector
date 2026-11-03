@@ -6,7 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
-import { get, getMany, search, deleteEndpoint, create, update, startEnrollment, triggerIntuneInstallation, getLogicalGroup, getLogicalGroups, createLogicalGroup, updateLogicalGroup, deleteLogicalGroup, setEntraIdData, deleteEntraIdData, getEntraIdDataByDeviceId, getUnmanagedEndpoints, getUnmanagedEndpoint, deleteUnmanagedEndpoint, createEndpointMaintenanceWindow, createGroupMaintenanceWindow, deleteEndpointMaintenanceWindow, deleteGroupMaintenanceWindow, putEndpointMaintenanceWindow, putGroupMaintenanceWindow, updateEndpointMaintenanceWindow, updateGroupMaintenanceWindow, getEndpointMaintenanceWindow, getGroupMaintenanceWindow, getLogicalGroupSubGroups, getEndpointsByLogicalGroup, getEndpointsByStaticGroup, getEndpointsByDynamicGroup, getEndpointsByUDG, getEndpointsByADUser, getEndpointsByGroup, getIndustrialEndpoints, getIndustrialEndpoint, createIndustrialEndpoint, updateIndustrialEndpoint, deleteIndustrialEndpoint, getIndustrialEndpointsByGroup } from '../../../../../nodes/BaramundiEndpoint/actions/endpoint/endpoint.execute';
+import { get, getMany, search, deleteEndpoint, create, update, startEnrollment, triggerIntuneInstallation, getLogicalGroup, getLogicalGroups, createLogicalGroup, updateLogicalGroup, deleteLogicalGroup, setEntraIdData, deleteEntraIdData, getEntraIdData, getEntraIdDataByDeviceId, intuneRemoteAction, getUnmanagedEndpoints, getUnmanagedEndpoint, deleteUnmanagedEndpoint, createEndpointMaintenanceWindow, createGroupMaintenanceWindow, deleteEndpointMaintenanceWindow, deleteGroupMaintenanceWindow, putEndpointMaintenanceWindow, putGroupMaintenanceWindow, updateEndpointMaintenanceWindow, updateGroupMaintenanceWindow, getEndpointMaintenanceWindow, getGroupMaintenanceWindow, getLogicalGroupSubGroups, getEndpointsByLogicalGroup, getEndpointsByStaticGroup, getEndpointsByDynamicGroup, getEndpointsByUDG, getEndpointsByADUser, getEndpointsByGroup, getIndustrialEndpoints, getIndustrialEndpoint, createIndustrialEndpoint, updateIndustrialEndpoint, deleteIndustrialEndpoint, getIndustrialEndpointsByGroup } from '../../../../../nodes/BaramundiEndpoint/actions/endpoint/endpoint.execute';
 import { httpRequestWithAuthentication } from '../../../../helpers/httpRequestWithAuthentication';
 
 /**
@@ -2756,4 +2756,73 @@ describe('Validation error paths', () => {
     await expect(getLogicalGroups.call(mock, 0)).rejects.toThrow();
   });
 
+});
+
+// #93: Intune remote actions and Get Entra ID Data (bMS 26R2)
+describe('Endpoint - Intune remote actions and Entra ID data (26R2)', () => {
+  const endpointId = '12345678-1234-1234-1234-123456789abc';
+  const lastRequest = (ctx: IExecuteFunctions) => (ctx.helpers.httpRequest as any).mock.calls[0][0];
+
+  it.each([
+    ['intuneAutopilotReset', 'IntuneRemoteActionWindowsAutopilotReset'],
+    ['intuneReboot', 'IntuneRemoteActionReboot'],
+    ['intuneRetire', 'IntuneRemoteActionRetire'],
+    ['intuneSync', 'IntuneRemoteActionSync'],
+  ])('%s posts to %s without a body', async (operation, route) => {
+    const ctx = createMockExecuteFunctions({ endpointId, keepUserData: true }, {}, true);
+    const result = await intuneRemoteAction.call(ctx, 0, operation);
+    expect(result[0].json).toEqual({ success: true, endpointId, action: operation });
+    const req = lastRequest(ctx);
+    expect(req.method).toBe('POST');
+    expect(req.url).toBe(`/endpoints/v2.0/WindowsEndpoints/${endpointId}/${route}`);
+    expect(req.body ?? {}).toEqual({});
+  });
+
+  it('intuneFreshStart sends keepUserData', async () => {
+    const ctx = createMockExecuteFunctions({ endpointId, keepUserData: true, keepEnrollmentData: true }, {}, true);
+    await intuneRemoteAction.call(ctx, 0, 'intuneFreshStart');
+    const req = lastRequest(ctx);
+    expect(req.url).toBe(`/endpoints/v2.0/WindowsEndpoints/${endpointId}/IntuneRemoteActionFreshRestart`);
+    expect(req.body).toEqual({ keepUserData: true });
+  });
+
+  it('intuneWipe sends keepUserData and keepEnrollmentData, false by default', async () => {
+    const ctx = createMockExecuteFunctions({ endpointId }, {}, true);
+    await intuneRemoteAction.call(ctx, 0, 'intuneWipe');
+    const req = lastRequest(ctx);
+    expect(req.url).toBe(`/endpoints/v2.0/WindowsEndpoints/${endpointId}/IntuneRemoteActionWipe`);
+    expect(req.body).toEqual({ keepUserData: false, keepEnrollmentData: false });
+  });
+
+  it('reports success false when the API answers false', async () => {
+    const ctx = createMockExecuteFunctions({ endpointId }, {}, false);
+    const result = await intuneRemoteAction.call(ctx, 0, 'intuneSync');
+    expect(result[0].json.success).toBe(false);
+  });
+
+  it('rejects an invalid endpoint ID without calling the API', async () => {
+    const ctx = createMockExecuteFunctions({ endpointId: 'not-a-guid' }, {}, true);
+    await expect(intuneRemoteAction.call(ctx, 0, 'intuneWipe')).rejects.toThrow('Invalid endpoint ID');
+    expect(ctx.helpers.httpRequest).not.toHaveBeenCalled();
+  });
+
+  it('rejects an unknown action', async () => {
+    const ctx = createMockExecuteFunctions({ endpointId }, {}, true);
+    await expect(intuneRemoteAction.call(ctx, 0, 'intuneExplode')).rejects.toThrow('Unknown Intune remote action');
+  });
+
+  it('getEntraIdData gets the data by endpoint ID', async () => {
+    const data = { endpointId, entraIdDeviceId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' };
+    const ctx = createMockExecuteFunctions({ endpointId }, {}, data);
+    const result = await getEntraIdData.call(ctx, 0);
+    expect(result[0].json).toEqual(data);
+    const req = lastRequest(ctx);
+    expect(req.method).toBe('GET');
+    expect(req.url).toBe(`/endpoints/v2.0/Endpoints/${endpointId}/EntraIdData`);
+  });
+
+  it('getEntraIdData rejects an invalid endpoint ID', async () => {
+    const ctx = createMockExecuteFunctions({ endpointId: 'nope' }, {}, {});
+    await expect(getEntraIdData.call(ctx, 0)).rejects.toThrow('Invalid endpoint ID');
+  });
 });

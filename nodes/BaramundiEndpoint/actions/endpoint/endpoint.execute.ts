@@ -449,6 +449,54 @@ export async function triggerIntuneInstallation(
   });
 }
 
+// Intune remote actions on Windows endpoints (26R2+): operation -> route
+const INTUNE_REMOTE_ACTIONS: Record<string, (id: string) => string> = {
+  intuneAutopilotReset: (id) => `/endpoints/v2.0/WindowsEndpoints/${id}/IntuneRemoteActionWindowsAutopilotReset`,
+  intuneFreshStart: (id) => `/endpoints/v2.0/WindowsEndpoints/${id}/IntuneRemoteActionFreshRestart`,
+  intuneReboot: (id) => `/endpoints/v2.0/WindowsEndpoints/${id}/IntuneRemoteActionReboot`,
+  intuneRetire: (id) => `/endpoints/v2.0/WindowsEndpoints/${id}/IntuneRemoteActionRetire`,
+  intuneSync: (id) => `/endpoints/v2.0/WindowsEndpoints/${id}/IntuneRemoteActionSync`,
+  intuneWipe: (id) => `/endpoints/v2.0/WindowsEndpoints/${id}/IntuneRemoteActionWipe`,
+};
+
+export async function intuneRemoteAction(
+  this: IExecuteFunctions,
+  index: number,
+  operation: string,
+): Promise<INodeExecutionData[]> {
+  const route = INTUNE_REMOTE_ACTIONS[operation];
+  if (!route) {
+    throw new NodeOperationError(this.getNode(), `Unknown Intune remote action "${operation}"`, { itemIndex: index });
+  }
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
+
+  const guidValidation = validateGuid(endpointId);
+  if (!guidValidation.valid) {
+    throw new NodeOperationError(
+      this.getNode(),
+      `Invalid endpoint ID:\n${guidValidation.errors.join('\n')}`,
+      { itemIndex: index },
+    );
+  }
+
+  // Fresh Start and Wipe take what to keep; the other actions have no body
+  let body: IDataObject = {};
+  if (operation === 'intuneFreshStart' || operation === 'intuneWipe') {
+    body = { keepUserData: this.getNodeParameter('keepUserData', index, false) as boolean };
+  }
+  if (operation === 'intuneWipe') {
+    body.keepEnrollmentData = this.getNodeParameter('keepEnrollmentData', index, false) as boolean;
+  }
+
+  // The API answers with a boolean: whether Intune accepted the action
+  const response = await apiRequest.call(this, 'POST', route(endpointId), body);
+  return this.helpers.returnJsonArray({
+    success: (response as unknown) === true,
+    endpointId,
+    action: operation,
+  });
+}
+
 // ============================================================================
 // LOGICAL GROUP OPERATIONS
 // ============================================================================
@@ -765,6 +813,25 @@ export async function deleteEntraIdData(
 
   await apiRequest.call(this, 'DELETE', `/endpoints/v2.0/Endpoints/${endpointId}/EntraIdData`);
   return this.helpers.returnJsonArray({ success: true, deletedEndpointId: endpointId });
+}
+
+export async function getEntraIdData(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const endpointId = extractResourceLocatorValue(this.getNodeParameter('endpointId', index));
+
+  const validation = validateGuid(endpointId);
+  if (!validation.valid) {
+    throw new NodeOperationError(
+      this.getNode(),
+      `Invalid endpoint ID:\n${validation.errors.join('\n')}`,
+      { itemIndex: index },
+    );
+  }
+
+  const response = await apiRequest.call(this, 'GET', `/endpoints/v2.0/Endpoints/${endpointId}/EntraIdData`);
+  return this.helpers.returnJsonArray(response as IDataObject);
 }
 
 export async function getEntraIdDataByDeviceId(

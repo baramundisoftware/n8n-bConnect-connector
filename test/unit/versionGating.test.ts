@@ -62,6 +62,15 @@ describe('versionedOptions', () => {
     expect(out.map((p) => p.displayOptions?.show?.bmsVersion)).toEqual([['25R2', '26R1'], ['26R2']]);
   });
 
+  it('splits a property already gated to some versions among those only', () => {
+    const gated = { ...ops(['a', 'new']), displayOptions: { show: { resource: ['r'], bmsVersion: ['26R1', '26R2'] } } };
+    const out = versionedOptions([gated], { new: ['26R2'] });
+    expect(out.map((p) => [p.displayOptions?.show, (p.options as any[]).map((o) => o.value)])).toEqual([
+      [{ resource: ['r'], bmsVersion: ['26R1'] }, ['a']],
+      [{ resource: ['r'], bmsVersion: ['26R2'] }, ['a', 'new']],
+    ]);
+  });
+
   it('moves the default off an option a version lacks', () => {
     const [, p26r2] = versionedOptions([ops(['old', 'a'], 'old')], { old: ['25R2', '26R1'] });
     expect(p26r2.default).toBe('a');
