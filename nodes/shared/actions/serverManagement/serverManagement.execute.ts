@@ -480,6 +480,96 @@ export async function getApiKeys(
   return this.helpers.returnJsonArray(response as unknown as IDataObject[]);
 }
 
+// API keys (26R2+). PATCH paths as in the spec example; PATCH returns the updated key.
+const API_KEY_PATCH_PATHS: Record<string, string> = {
+  name: '/Name',
+  expirationDate: '/ExpirationDate',
+  comment: '/Comment',
+  isActive: '/IsActive',
+  isAvailableViaGateway: '/IsAvailableViaGateway',
+  securityProfiles: '/SecurityProfiles',
+};
+
+function apiKeyIdParameter(this: IExecuteFunctions, index: number): string {
+  const apiKeyId = this.getNodeParameter('apiKeyId', index) as string;
+  const validation = validateGuid(apiKeyId);
+  if (!validation.valid) {
+    throw new NodeOperationError(this.getNode(), validation.errors.join(', '), { itemIndex: index });
+  }
+  return apiKeyId;
+}
+
+/** Turn the form values into ApiKey fields: Security Profile IDs as the securityProfiles GUID array, date as yyyy-MM-dd. */
+function apiKeyValues(this: IExecuteFunctions, fields: IDataObject, index: number): IDataObject {
+  const values: IDataObject = {};
+  for (const [key, value] of Object.entries(fields)) {
+    if (value === undefined || value === null || (value === '' && key !== 'comment')) continue;
+    if (key === 'securityProfileIds') {
+      const profiles = String(value).split(',').map((id) => id.trim()).filter(Boolean);
+      const invalid = profiles.filter((id) => !validateGuid(id).valid);
+      if (profiles.length === 0 || invalid.length > 0) {
+        throw new NodeOperationError(this.getNode(), `Invalid security profile ID(s): ${invalid.join(', ') || '(none given)'}`, { itemIndex: index });
+      }
+      values.securityProfiles = profiles;
+    } else if (key === 'expirationDate') {
+      values.expirationDate = String(value).slice(0, 10);
+    } else if (key === 'name' && String(value).length > 256) {
+      throw new NodeOperationError(this.getNode(), 'Name is longer than 256 characters', { itemIndex: index });
+    } else if (key === 'comment' && String(value).length > 4000) {
+      throw new NodeOperationError(this.getNode(), 'Comment is longer than 4000 characters', { itemIndex: index });
+    } else {
+      values[key] = value;
+    }
+  }
+  return values;
+}
+
+export async function getApiKey(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const apiKeyId = apiKeyIdParameter.call(this, index);
+  const response = await apiRequest.call(this, 'GET', `/servermanagement/v2.0/ApiKeys/${apiKeyId}`);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+/** Returns ApiKeyWithSecret: `apiKeySecret` is shown only this once by bMS. */
+export async function createApiKey(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const body = apiKeyValues.call(this, {
+    name: this.getNodeParameter('apiKeyName', index) as string,
+    securityProfileIds: this.getNodeParameter('securityProfileIds', index) as string,
+    ...(this.getNodeParameter('apiKeyFields', index, {}) as IDataObject),
+  }, index);
+  const response = await apiRequest.call(this, 'POST', '/servermanagement/v2.0/ApiKeys', body);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function updateApiKey(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const apiKeyId = apiKeyIdParameter.call(this, index);
+  const values = apiKeyValues.call(this, this.getNodeParameter('apiKeyUpdateFields', index, {}) as IDataObject, index);
+  const patchOperations = Object.entries(values).map(([key, value]) => ({ op: 'replace', path: API_KEY_PATCH_PATHS[key], value }));
+  if (patchOperations.length === 0) {
+    throw new NodeOperationError(this.getNode(), 'No fields to update specified', { itemIndex: index });
+  }
+  const response = await apiRequest.call(this, 'PATCH', `/servermanagement/v2.0/ApiKeys/${apiKeyId}`, patchOperations);
+  return this.helpers.returnJsonArray(response as IDataObject);
+}
+
+export async function deleteApiKey(
+  this: IExecuteFunctions,
+  index: number,
+): Promise<INodeExecutionData[]> {
+  const apiKeyId = apiKeyIdParameter.call(this, index);
+  await apiRequest.call(this, 'DELETE', `/servermanagement/v2.0/ApiKeys/${apiKeyId}`);
+  return this.helpers.returnJsonArray({ success: true, deletedId: apiKeyId });
+}
+
 export async function getDownloadJobs(
   this: IExecuteFunctions,
   index: number,

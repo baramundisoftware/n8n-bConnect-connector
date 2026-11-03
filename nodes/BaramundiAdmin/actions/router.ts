@@ -76,6 +76,10 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
             case 'getDipsMSWCleanup': responseData = await serverManagement.getDipsMSWCleanup.call(this, i); break;
             case 'simulateMSWCleanup': responseData = await serverManagement.simulateMSWCleanup.call(this, i); break;
             case 'getApiKeys': responseData = await serverManagement.getApiKeys.call(this, i); break;
+            case 'getApiKey': responseData = await serverManagement.getApiKey.call(this, i); break;
+            case 'createApiKey': responseData = await serverManagement.createApiKey.call(this, i); break;
+            case 'updateApiKey': responseData = await serverManagement.updateApiKey.call(this, i); break;
+            case 'deleteApiKey': responseData = await serverManagement.deleteApiKey.call(this, i); break;
             case 'getDownloadJobs': responseData = await serverManagement.getDownloadJobs.call(this, i); break;
             case 'getDownloadJob': responseData = await serverManagement.getDownloadJob.call(this, i); break;
             default:
