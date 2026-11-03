@@ -7,6 +7,9 @@ export type BmsVersion = (typeof BMS_VERSIONS)[number];
 /** `bmsVersion` values for features added in 26R1: use in `displayOptions.show`. */
 export const SINCE_26R1: BmsVersion[] = ['26R1', '26R2'];
 
+/** `bmsVersion` values for features added in 26R2. */
+export const SINCE_26R2: BmsVersion[] = ['26R2'];
+
 /**
  * Offer some options of a property only for some bMS versions.
  *

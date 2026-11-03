@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Universal Dynamic Group thresholds** (bMS 26R2, Software node, #93): list all thresholds or a group's, get, create, update and delete. A threshold compares a group's endpoint count with an upper or lower limit and raises a notification of the chosen severity
 - **bMS 2026 R2** in every node's *bMS Version* dropdown (#93). It offers the 26R1 operations except *Get Cloud Connectors*, which 26R2 removed; the spec-conformance check now covers 26R2 too. The operations new in 26R2 (thresholds, API key management, Intune remote actions) follow separately. The default stays 26R1, so existing workflows keep their version. On 26R2, network endpoints return their device details in `deviceInfo` instead of `operatingSystem`, `cpu`, `totalRAM`, `networkInfo` and similar fields, unmanaged endpoints no longer return `networkGroupName`, and Active Directory objects have the type `ADUser`/`ADGroup` (or `EntraIDUser`/`EntraIDGroup`) instead of `User`/`Group`: check workflows that read these fields
 
 ### Changed

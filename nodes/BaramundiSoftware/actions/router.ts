@@ -4,6 +4,7 @@ import { NodeOperationError } from 'n8n-workflow';
 import { toItemError } from '../../shared/utils/nodeError';
 
 import { software } from './software';
+import { threshold } from './threshold';
 import { universalDynamicGroups } from './universalDynamicGroups';
 import { updateManagement } from './updateManagement';
 import { variable } from './variable';
@@ -93,6 +94,19 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
             case 'getGroupsByFolder': responseData = await universalDynamicGroups.getGroupsByFolder.call(this, i); break;
             default:
               throw new NodeOperationError(this.getNode(), `Unknown operation "${operation}" for resource "universalDynamicGroups"`);
+          }
+          break;
+
+        case 'threshold':
+          switch (operation) {
+            case 'getMany': responseData = await threshold.getMany.call(this, i); break;
+            case 'getByGroup': responseData = await threshold.getByGroup.call(this, i); break;
+            case 'get': responseData = await threshold.get.call(this, i); break;
+            case 'create': responseData = await threshold.create.call(this, i); break;
+            case 'update': responseData = await threshold.update.call(this, i); break;
+            case 'delete': responseData = await threshold.deleteThreshold.call(this, i); break;
+            default:
+              throw new NodeOperationError(this.getNode(), `Unknown operation "${operation}" for resource "threshold"`);
           }
           break;
 

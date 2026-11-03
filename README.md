@@ -17,7 +17,7 @@ Automate your **baramundi Management Suite** (bMS) from [n8n](https://n8n.io/) w
 >
 ><img width="2156" height="758" alt="Screenshot 2026-11-02 144904" src="https://github.com/user-attachments/assets/0cba1735-7229-4170-bce7-8a0b1257e4e4" />
 
-**219 operations** across **6 nodes**, compatible with **baramundi Management Suite 2025 R2, 2026 R1 and 2026 R2**.
+**225 operations** across **6 nodes**, compatible with **baramundi Management Suite 2025 R2, 2026 R1 and 2026 R2**.
 
 
 
@@ -177,7 +177,7 @@ Every baramundi node has a **bMS Version** dropdown as its first parameter. Sele
 
 | Setting | Shows |
 |---------|-------|
-| `26 R2` | 210 operations: those of 26 R1 without *Get Cloud Connectors*, which 26 R2 removed. The operations new in 26 R2 (thresholds, API key management, Intune remote actions) are not available yet ([#93](https://github.com/baramundisoftware/n8n-bConnect-connector/issues/93)) |
+| `26 R2` | 216 operations: those of 26 R1 without *Get Cloud Connectors*, which 26 R2 removed, plus Universal Dynamic Group thresholds. API key management and Intune remote actions follow ([#93](https://github.com/baramundisoftware/n8n-bConnect-connector/issues/93)) |
 | `26 R1` (default) | 211 operations, including compliance, Universal Dynamic Groups and software bundles |
 | `25 R2` | 171 operations, including industrial endpoints and *Replace (PUT)* maintenance windows, which exist in 25 R2 only |
 
@@ -189,7 +189,7 @@ Every baramundi node has a **bMS Version** dropdown as its first parameter. Sele
 |------|-----------|--------------|
 | **baramundi Admin** | 43 | Active Directory, server management, microservices, OS config |
 | **baramundi Endpoint** | 42 | Endpoints (all types), logical groups, endpoints by static/dynamic group, maintenance windows |
-| **baramundi Software** | 41 | Software inventory, bundles, updates, variables, Universal Dynamic Groups |
+| **baramundi Software** | 47 | Software inventory, bundles, updates, variables, Universal Dynamic Groups and their thresholds |
 | **baramundi Job** | 34 | Job definitions (read and execute), instances, folders, kiosk releases |
 | **baramundi Security** | 33 | Compliance, BitLocker, Defender, local admin accounts |
 | **baramundi Asset** | 26 | Asset inventory, asset types, stock/type folders |
