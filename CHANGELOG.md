@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **bMS 2026 R2** in every node's *bMS Version* dropdown (#93). It offers the 26R1 operations except *Get Cloud Connectors*, which 26R2 removed; the spec-conformance check now covers 26R2 too. The operations new in 26R2 (thresholds, API key management, Intune remote actions) are listed above. The default stays 26R1, so existing workflows keep their version. On 26R2, network endpoints return their device details in `deviceInfo` instead of `operatingSystem`, `cpu`, `totalRAM`, `networkInfo` and similar fields, unmanaged endpoints no longer return `networkGroupName`, and Active Directory objects have the type `ADUser`/`ADGroup` (or `EntraIDUser`/`EntraIDGroup`) instead of `User`/`Group`: check workflows that read these fields
 
 ### Changed
-- CI integration tests run against bConnect-Mock 0.10.0, which returns the endpoint inventory and record fields a live bMS fills (CPU, RAM, storage media, asset properties, job instance steps, ...). E2E and system tests pass unchanged
+- CI integration tests run against bConnect-Mock 0.11.0 for both bMS 26R1 and 26R2. A new E2E suite runs the 26R2 operations (thresholds, API keys, Intune remote actions, Get Entra ID Data) against the 26R2 mock. The system tests read the server's version from `BCONNECT_BMS_VERSION` and skip *Get Cloud Connectors* on 26R2
 
 ### Fixed
 - `make release` and `make release-dry` pack without the dev-only `overrides` field, as the publish workflow does, so a local release tarball is byte-identical to the one on npm (checked against 0.11.0)
