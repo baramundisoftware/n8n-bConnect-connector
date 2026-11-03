@@ -66,6 +66,17 @@ export async function router(this: IExecuteFunctions): Promise<INodeExecutionDat
             case 'deleteEntraIdData':
               responseData = await endpoint.deleteEntraIdData.call(this, i);
               break;
+            case 'getEntraIdData':
+              responseData = await endpoint.getEntraIdData.call(this, i);
+              break;
+            case 'intuneAutopilotReset':
+            case 'intuneFreshStart':
+            case 'intuneReboot':
+            case 'intuneRetire':
+            case 'intuneSync':
+            case 'intuneWipe':
+              responseData = await endpoint.intuneRemoteAction.call(this, i, operation);
+              break;
             case 'getEntraIdDataByDeviceId':
               responseData = await endpoint.getEntraIdDataByDeviceId.call(this, i);
               break;

@@ -1,5 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
-import { SINCE_26R1 } from '../../../shared/utils/versionGating';
+import { SINCE_26R1, SINCE_26R2 } from '../../../shared/utils/versionGating';
 import { endpointLocator } from '../../../shared/resourceLocators';
 
 // ============================================================
@@ -36,7 +36,7 @@ export const endpointOperations25R2: INodeProperties[] = [
   },
 ];
 
-/** Operations shown when bmsVersion = 26R1 */
+/** Operations shown from bmsVersion 26R1 on; the node offers the 26R2 ones only for 26R2 (INTUNE_OPERATIONS_26R2) */
 export const endpointOperations26R1: INodeProperties[] = [
   {
     displayName: 'Operation',
@@ -53,10 +53,17 @@ export const endpointOperations26R1: INodeProperties[] = [
       { name: 'Get By Group', value: 'getEndpointsByGroup', description: 'Get endpoints in a group, optionally filtered by platform type', action: 'Get endpoints by group' },
       { name: 'Get Endpoints by AD User', value: 'getEndpointsByADUser', description: 'Get endpoints assigned to an AD user', action: 'Get endpoints by AD user' },
       { name: 'Get Endpoints by UDG', value: 'getEndpointsByUDG', description: 'Get endpoints in a Universal Dynamic Group (bMS 26R1+)', action: 'Get endpoints by UDG' },
+      { name: 'Get Entra ID Data', value: 'getEntraIdData', description: 'Get the Entra ID data of an endpoint (bMS 26R2+)', action: 'Get Entra ID data for endpoint' },
       { name: 'Get Entra ID Data By Device ID', value: 'getEntraIdDataByDeviceId', description: 'Get Entra ID endpoint data by Entra ID device ID (bMS 26R1+)', action: 'Get Entra ID data by device ID' },
       { name: 'Get Many', value: 'getMany', description: 'Get many endpoints, optionally filtered by platform type', action: 'Get many endpoints' },
       { name: 'Get Unmanaged Endpoint', value: 'getUnmanagedEndpoint', description: 'Get an unmanaged endpoint by ID (bMS 26R1+)', action: 'Get unmanaged endpoint' },
       { name: 'Get Unmanaged Endpoints', value: 'getUnmanagedEndpoints', description: 'Get all unmanaged endpoints (bMS 26R1+)', action: 'Get unmanaged endpoints' },
+      { name: 'Intune Autopilot Reset', value: 'intuneAutopilotReset', description: 'Reset a Windows endpoint with Windows Autopilot via Intune, removing user data and apps (bMS 26R2+)', action: 'Run Intune Autopilot reset on endpoint' },
+      { name: 'Intune Fresh Start', value: 'intuneFreshStart', description: 'Reinstall Windows on an endpoint via Intune, removing preinstalled apps (bMS 26R2+)', action: 'Run Intune fresh start on endpoint' },
+      { name: 'Intune Reboot', value: 'intuneReboot', description: 'Reboot a Windows endpoint via Intune (bMS 26R2+)', action: 'Reboot endpoint via Intune' },
+      { name: 'Intune Retire', value: 'intuneRetire', description: 'Remove company data and the Intune management from a Windows endpoint (bMS 26R2+)', action: 'Retire endpoint via Intune' },
+      { name: 'Intune Sync', value: 'intuneSync', description: 'Make a Windows endpoint check in with Intune (bMS 26R2+)', action: 'Sync endpoint via Intune' },
+      { name: 'Intune Wipe', value: 'intuneWipe', description: 'Reset a Windows endpoint to factory settings via Intune (bMS 26R2+)', action: 'Wipe endpoint via Intune' },
       { name: 'Search', value: 'search', description: 'Search endpoints by name or other criteria', action: 'Search endpoints' },
       { name: 'Set Entra ID Data', value: 'setEntraIdData', description: 'Create or update Entra ID data for an endpoint (bMS 26R1+)', action: 'Set Entra ID data for endpoint' },
       { name: 'Start Enrollment', value: 'startEnrollment', description: 'Start enrollment process for an endpoint', action: 'Start enrollment for endpoint' },
@@ -65,6 +72,17 @@ export const endpointOperations26R1: INodeProperties[] = [
     ],
     default: 'getMany',
   },
+];
+
+/** Intune remote actions on Windows endpoints and Get Entra ID Data: routes added in bMS 26R2 */
+export const INTUNE_OPERATIONS_26R2 = [
+  'getEntraIdData',
+  'intuneAutopilotReset',
+  'intuneFreshStart',
+  'intuneReboot',
+  'intuneRetire',
+  'intuneSync',
+  'intuneWipe',
 ];
 
 /** @deprecated Use endpointOperations25R2 and endpointOperations26R1 instead */
@@ -906,6 +924,66 @@ export const endpointFields: INodeProperties[] = [
       bmsVersion: SINCE_26R1,
     },
   }),
+  endpointLocator({
+    show: {
+      resource: ['endpoint'],
+      operation: ['getEntraIdData'],
+      bmsVersion: SINCE_26R2,
+    },
+  }),
+
+  // ----------------------------------
+  //         endpoint: Intune remote actions (26R2+)
+  // ----------------------------------
+  {
+    displayName:
+      'Wipe, Retire, Fresh Start and Autopilot Reset remove data from the endpoint and cannot be undone. Only Windows endpoints managed with Intune are supported; the API key or user needs the Intune Action permission.',
+    name: 'intuneDestructiveNotice',
+    type: 'notice',
+    default: '',
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['intuneAutopilotReset', 'intuneFreshStart', 'intuneRetire', 'intuneWipe'],
+        bmsVersion: SINCE_26R2,
+      },
+    },
+  },
+  endpointLocator({
+    show: {
+      resource: ['endpoint'],
+      operation: ['intuneAutopilotReset', 'intuneFreshStart', 'intuneReboot', 'intuneRetire', 'intuneSync', 'intuneWipe'],
+      bmsVersion: SINCE_26R2,
+    },
+  }),
+  {
+    displayName: 'Keep User Data',
+    name: 'keepUserData',
+    type: 'boolean',
+    default: false,
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['intuneFreshStart', 'intuneWipe'],
+        bmsVersion: SINCE_26R2,
+      },
+    },
+    description: 'Whether to keep the user data on the endpoint',
+  },
+  {
+    displayName: 'Keep Enrollment Data',
+    name: 'keepEnrollmentData',
+    type: 'boolean',
+    default: false,
+    displayOptions: {
+      show: {
+        resource: ['endpoint'],
+        operation: ['intuneWipe'],
+        bmsVersion: SINCE_26R2,
+      },
+    },
+    description: 'Whether to keep the enrollment data, so the endpoint enrolls in Intune again after the wipe',
+  },
   {
     displayName: 'Entra ID Device ID',
     name: 'entraIdDeviceId',

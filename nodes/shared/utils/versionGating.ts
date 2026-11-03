@@ -14,10 +14,10 @@ export const SINCE_26R2: BmsVersion[] = ['26R2'];
  * Offer some options of a property only for some bMS versions.
  *
  * `availableIn` maps an option value to the versions that have it; options it
- * does not name exist in every version. Every property named `name` that is not
- * already tied to a bmsVersion and has a gated option is replaced by one copy
- * per distinct option list, shown for the versions that share it. A copy left
- * without options is dropped.
+ * does not name exist in every version. Every property named `name` that has a
+ * gated option is replaced by one copy per distinct option list, shown for the
+ * versions that share it; a property already tied to some bmsVersions is split
+ * among those only. A copy left without options is dropped.
  */
 export function versionedOptions(
 	props: INodeProperties[],
@@ -27,10 +27,11 @@ export function versionedOptions(
 	return props.flatMap((p) => {
 		const show = p.displayOptions?.show ?? {};
 		const options = (p.options ?? []) as Array<{ value: unknown }>;
-		if (p.name !== name || 'bmsVersion' in show || !options.some((o) => String(o.value) in availableIn)) return [p];
+		if (p.name !== name || !options.some((o) => String(o.value) in availableIn)) return [p];
 
+		const shownIn = (show.bmsVersion as BmsVersion[] | undefined) ?? BMS_VERSIONS;
 		const copies = new Map<string, { versions: BmsVersion[]; options: Array<{ value: unknown }> }>();
-		for (const version of BMS_VERSIONS) {
+		for (const version of BMS_VERSIONS.filter((v) => shownIn.includes(v))) {
 			const opts = options.filter((o) => availableIn[String(o.value)]?.includes(version) ?? true);
 			if (!opts.length) continue;
 			const key = opts.map((o) => String(o.value)).join('\n');

@@ -13,6 +13,7 @@ import {
   endpointOperations25R2,
   endpointOperations26R1,
   endpointTypeFields,
+  INTUNE_OPERATIONS_26R2,
   logicalGroupFields,
   logicalGroupOperations,
   maintenanceWindowFields,
@@ -22,6 +23,7 @@ import {
   staticGroupOperations,
 } from './actions/endpoint/endpoint.fields';
 import { router } from './actions/router';
+import { SINCE_26R2, versionedOptions } from '../shared/utils/versionGating';
 import {
   getEndpoints,
   getLogicalGroups,
@@ -110,7 +112,7 @@ export class BaramundiEndpoint implements INodeType {
       // Operations
       ...dynamicGroupOperations,
       ...endpointOperations25R2,
-      ...endpointOperations26R1,
+      ...versionedOptions(endpointOperations26R1, Object.fromEntries(INTUNE_OPERATIONS_26R2.map((op) => [op, SINCE_26R2]))),
       ...logicalGroupOperations,
       ...maintenanceWindowOperations25R2,
       ...maintenanceWindowOperations26R1,
