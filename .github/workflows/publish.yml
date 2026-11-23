@@ -8,7 +8,8 @@
 # (since May 2026); `@n8n/node-cli` looks for this file under this name.
 #
 # A pull request that touches this file or package.json, and a manual run, do
-# the same checks and `npm publish --dry-run`. Nothing is published.
+# the same checks and `npm publish --dry-run` (`npm pack --dry-run` when that
+# version is already on npm, e.g. a dependency bump). Nothing is published.
 #
 # ── Publishing is off until it is switched on ───────────────────────────────
 # The `publish` job runs only when the repository variable
@@ -128,10 +129,23 @@ jobs:
           npx eslint --rule '{"@n8n/community-nodes/no-overrides-field": "error"}' package.json
 
       # Shows the tarball contents in the log and fails on a broken package.json.
+      # `npm publish --dry-run` also fails when the version is already on npm. That is right
+      # for a tag, and for a release PR that bumps the version. A PR or manual run between
+      # releases (e.g. a Dependabot bump) still carries the published version, so it packs
+      # instead: same tarball check, no registry clash.
       - name: Publish dry run
         env:
           DIST_TAG: ${{ steps.version.outputs.dist-tag }}
-        run: npm publish --dry-run --tag "$DIST_TAG"
+          VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
+        run: |
+          name=$(jq -r .name package.json)
+          if [ "$IS_TAG" != "true" ] && npm view "$name@$VERSION" version >/dev/null 2>&1; then
+            echo "$name@$VERSION is already on npm (not a release run) → npm pack --dry-run"
+            npm pack --dry-run
+          else
+            npm publish --dry-run --tag "$DIST_TAG"
+          fi
 
       - name: Publishing disabled
         if: env.IS_TAG == 'true' && vars.NPM_PUBLISH_ENABLED != 'true'
